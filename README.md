@@ -1,4 +1,4 @@
 # Khateeb Remind
 A system to organize jummah khateeb communication - once and for all.
 
-Built with React and Express.
+Built with Vue and Express.
