@@ -7,10 +7,34 @@
 
 <script>
 import Header from './components/Header.vue'
+import datetime from './utils/datetime.js'
+
+import axios from 'axios'
 
 export default {
   components: {
     Header
+  },
+  methods: {
+    getDateInformation() {
+      const payload = datetime.currentDate()
+      this.$store.dispatch('dateInfo', payload)
+      const upcomingFridayInfo = datetime.upcomingFriday()
+      this.$store.dispatch('upcomingFriday', upcomingFridayInfo)
+    },
+    getKhateebData() {
+      // should be cached data ==> perhaps cached from every week saturday
+      const API_SERVER = process.env.VUE_APP_API_SERVER_URL || 'http://localhost:5000'
+      axios.post(API_SERVER + '/')
+        .then((response) => {
+            this.$store.dispatch('khateebScheduleInfo', response.data)
+          })
+        .catch((error) => { console.log(error) })
+    }
+  },
+  created() {
+    this.getDateInformation()
+    this.getKhateebData()
   }
 }
 </script>

@@ -9,24 +9,21 @@
         <slider-button
         leftMessage="This Week"
         rightMessage="Monthly"
+        altText="Toggle between weekly and monthly view"
         @slider-toggled="weeklyView = !weeklyView"
         />
       </div>
       <div>
-        <weekly-khateeb-schedule v-if="weeklyView" />
-        <monthly-khateeb-schedule v-if="!weeklyView" />
+        <khateeb-schedule-display :isWeekly="weeklyView" />
       </div>
   </div>
 </template>
 
 <script>
-import weeklyKhateebSchedule from '../components/weeklyKhateebSchedule.vue'
-
 export default {
   name: 'Home',
   components: {
-    monthlyKhateebSchedule: () => import('../components/monthlyKhateebSchedule.vue'),
-    weeklyKhateebSchedule
+    khateebScheduleDisplay: () => import('../components/khateebScheduleDisplay.vue')
   },
   data() {
     return {
@@ -36,7 +33,10 @@ export default {
     }
   },
   methods: {
-
+    
+  },
+  created() {
+    
   }
 }
 </script>

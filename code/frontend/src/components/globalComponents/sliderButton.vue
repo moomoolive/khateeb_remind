@@ -1,7 +1,7 @@
 <template>
     <div>
         <p style="display: inline-block;">{{ leftMessage }}</p>
-        <label class="switch">
+        <label class="switch" :aria-label="altText">
             <input type="checkbox">
             <span class="slider round" @click="$emit('slider-toggled')"></span>
         </label>
@@ -20,6 +20,10 @@ export default {
         rightMessage: {
             type: String,
             required: false
+        },
+        altText: {
+          type: String,
+          required: false
         }
     }
 }
