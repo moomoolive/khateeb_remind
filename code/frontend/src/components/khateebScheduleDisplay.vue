@@ -1,31 +1,29 @@
 <template>
     <div>
-        <div id="headers">
-            <h4>
-                Today's Date: {{ date.currentDate.dayOfTheWeek }}
-                {{ date.currentDate.month }} {{ date.currentDate.date }}, {{date.currentDate.year}}
-            </h4>
-            <h2 v-if="!isWeekly">This Month's Khateeb Schedule</h2>
-            <h2 v-if="isWeekly">This Week's Khateeb Schedule</h2>
-            <h4>Schedule for: {{ date.month }} {{ date.day }}, {{date.year}}</h4>
-        </div>
-        <div id="changeWeekButtons" style="height: 15px; margin-bottom: 15px;">
-            <div v-if="!isWeekly">
+        <slider-button
+        leftMessage="This Week"
+        rightMessage="This Month"
+        altText="Toggle between weekly and monthly view"
+        @slider-toggled="isWeeklyView = !isWeeklyView"
+        style="margin-top: 20px; margin-bottom: 20px;"
+        />
+        <div id="changeWeekButtons" class="whiteSpace">
+            <div v-if="!isWeeklyView">
                 <button
                 v-for="(value, weekOf) in khateebInfo.locationInfo.location1.monthlySchedule"
                 :key="weekOf"
-                @click="date.day = weekOf"
-                :aria-label="`button to view schedule for ${date.month} ${weekOf}`"
+                @click="displayData.weekOf = weekOf"
+                :aria-label="`view schedule for ${date.upComingFriday.month} ${weekOf}`"
                 >
-                    {{ date.button }} {{ weekOf }}
+                    {{ date.abbreviatedMonthName }} {{ weekOf }}
                 </button>
             </div>
         </div>
-        <div id="changeLocationButtons" style="height: 15px; margin-bottom: 15px;">
-            <div v-if="!isWeekly">
+        <div id="changeLocationButtons" class="whiteSpace">
+            <div>
                 <button
                 @click="displayData.displayedLocation = 'All'"
-                aria-label="button to view schedule for all locations"
+                aria-label="view schedule for all locations"
                 >
                     All locations
                 </button>
@@ -33,34 +31,37 @@
                 v-for="(prayerLocationData, location_IDs) in khateebInfo.locationInfo"
                 :key="location_IDs"
                 @click="displayData.displayedLocation = location_IDs"
-                :aria-label="`button to view schedule for ${prayerLocationData.info.name}`"
+                :aria-label="`view schedule for ${prayerLocationData.info.name}`"
                 >
                     {{ prayerLocationData.info.name }}
                 </button>
             </div>
         </div>
+        <div id="headers">
+            <h3 style="margin-top: 0px; margin-bottom: 4px;">
+                {{ date.upComingFriday.month }} {{ displayData.weekOf }}, {{date.upComingFriday.year}}
+            </h3>
+        </div>
         <div id="scheduleTables">
             <table
             v-for="(prayerLocation, locationIDs) in shownLocations"
             :key="locationIDs"
-            style="width: 100%;"
+            style="width: 95%;"
             >
                 <tr>
                     <th colspan="2">{{ prayerLocation.info.name }}</th>
                 </tr>
                 <tr>
-                    <th v-for="columnNames in khateebInfo.columnData" :key="columnNames">{{columnNames}}</th>
+                    <th v-for="columnNames in khateebInfo.columnData" :key="columnNames">
+                        {{columnNames}}
+                    </th>
                 </tr>
-                <tr
-                v-for="(rows, rowNumber) in prayerLocation.monthlySchedule[date.day]" 
-                :key="rowNumber"
-                >
-                    <th v-for="rowData in rows" :key="rowData">{{ rowData }}</th>
+                <tr v-for="(khateeb, prayerTiming) in prayerLocation.monthlySchedule[displayData.weekOf]" :key="prayerTiming">
+                    <th>{{ prayerLocation.timing[prayerTiming] }}</th>
+                    <th>{{ khateeb }}</th>
                 </tr>
                 <tr>
-                    <th colspan="2">
-                        Location: {{ prayerLocation.info.address }}
-                    </th>
+                    <th colspan="2">Location: {{ prayerLocation.info.address }}</th>
                 </tr>
             </table>
         </div>
@@ -69,35 +70,22 @@
 
 <script>
 export default {
-    name: 'monthlyKhateebSchedule',
-    props: {
-        isWeekly: {
-            type: Boolean,
-            required: true
-        }
-    },
+    name: 'khateebScheduleDisplay',
     data() {
         return {
             date: {
-                month: this.$store.state.date.upcomingFriday.month,
-                year: this.$store.state.date.upcomingFriday.year,
-                button: this.$store.state.date.upcomingFriday.month.slice(0,3),
-                day: this.$store.state.date.upcomingFriday.date,
-                upComingFriday: this.$store.state.date.upcomingFriday.date,
-                currentDate: {
-                    date: this.$store.state.date.currentDate.date,
-                    dayOfTheWeek: this.$store.state.date.currentDate.dayOfTheWeek,
-                    month: this.$store.state.date.currentDate.month,
-                    year: this.$store.state.date.currentDate.year
-                }
+                upComingFriday: this.$store.state.date.upcomingFriday,
+                abbreviatedMonthName: this.$store.state.date.upcomingFriday.month.slice(0,3)
             },
             khateebInfo : {
                 columnData: this.$store.state.khateebSchedule.columnData,
                 locationInfo: this.$store.state.khateebSchedule.rows
             },
             displayData: {
-                displayedLocation: 'All'
-            }
+                displayedLocation: 'All',
+                weekOf: this.$store.state.date.upcomingFriday.date,
+            },
+            isWeeklyView: true
         }
     },
     computed: {
@@ -109,19 +97,30 @@ export default {
         }
     },
     watch: {
-        isWeekly(newValue) {
+        isWeeklyView(newValue) {
             if (newValue) {
-                this.date.day = this.date.upComingFriday
+                this.displayData.weekOf = this.date.upComingFriday.date
             }
         }
     }
 }
 </script>
 
-<style scoped>
-table {
-    margin-top: 10px;
+<style lang="scss" scoped>
+.whiteSpace {
+    $size: 30px;
+    height: $size;
+    margin-bottom: $size;
 }
 
+table, th, td {
+  border: 1px solid black;
+}
+
+table {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
 
 </style>

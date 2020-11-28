@@ -2,18 +2,23 @@
   <div id="app">
     <Header />
     <router-view/>
+    <Footer />
   </div>
 </template>
 
 <script>
 import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
+
 import datetime from './utils/datetime.js'
+import API from './utils/apiCalls.js'
 
 import axios from 'axios'
 
 export default {
   components: {
-    Header
+    Header,
+    Footer
   },
   methods: {
     getDateInformation() {
@@ -23,14 +28,9 @@ export default {
       }
       this.$store.dispatch('dateInfo', info)
     },
-    getKhateebData() {
-      // should be cached data ==> perhaps cached from every week saturday
-      const API_SERVER = process.env.VUE_APP_API_SERVER_URL || 'http://localhost:5000'
-      axios.post(API_SERVER + '/')
-        .then((response) => {
-            this.$store.dispatch('khateebScheduleInfo', response.data)
-          })
-        .catch((error) => { console.log(error) })
+    async getKhateebData() {
+      const monthlySchedule = await API.monthlySchedule()
+      this.$store.dispatch('khateebScheduleInfo', monthlySchedule)
     }
   },
   created() {
@@ -59,12 +59,10 @@ img {
   min-height: 0px;
 }
 
-table, th, td {
-  border: 1px solid black;
-}
-
-table {
-    margin-left: auto;
-    margin-right: auto;
+body {
+  margin-top: 8%;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
 }
 </style>

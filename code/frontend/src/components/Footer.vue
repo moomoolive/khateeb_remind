@@ -1,11 +1,8 @@
 <template>
     <div>
         <div class="topnav">
-          <router-link to="/" exact>Home</router-link>
-          <router-link :to="{ name: 'announcements' }">Announcements</router-link>
-          <a class="currentDate" style="float: right; ">
-            {{ abbreviatedDayOfWeek }} {{ abbreviatedMonthName }} {{ currentDate }}, {{ abbreviatedYear }}
-          </a>
+          <router-link to="/about" exact>About</router-link>
+          <router-link :to="{ name: 'login' }">Login</router-link>
         </div>
     </div>
 </template>
@@ -27,18 +24,12 @@ export default {
 <style lang="scss" scoped>
 /* Add a black background color to the top navigation */
 .topnav {
-  background-color: #333;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  height: 5.1vh;
-  width: 100vw;
-  left: 0;
-}
-
-.currentDate {
-    background-color: #ddd; 
-    color: black;
+    margin-top: 30px;
+    background-color: #333;
+    overflow: hidden;
+    left: 0;
+    height: 5.1vh;
+    width: 100vw;
 }
 
 .router-link-active {

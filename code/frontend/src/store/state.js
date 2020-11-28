@@ -1,4 +1,5 @@
 export default {
+    //khateebSchedule and date are just documentation
     khateebSchedule: {
         // template for every location >> if there's more than one
         // X in the name 'locationX' is replace with a number

@@ -6,15 +6,7 @@
         <img :src="prayerProviderLogo" alt="Friday Prayer Provider Logo">
       </div>
       <div>
-        <slider-button
-        leftMessage="This Week"
-        rightMessage="Monthly"
-        altText="Toggle between weekly and monthly view"
-        @slider-toggled="weeklyView = !weeklyView"
-        />
-      </div>
-      <div>
-        <khateeb-schedule-display :isWeekly="weeklyView" />
+        <khateeb-schedule-display />
       </div>
   </div>
 </template>
