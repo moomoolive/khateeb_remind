@@ -17,10 +17,11 @@ export default {
   },
   methods: {
     getDateInformation() {
-      const payload = datetime.currentDate()
-      this.$store.dispatch('dateInfo', payload)
-      const upcomingFridayInfo = datetime.upcomingFriday()
-      this.$store.dispatch('upcomingFriday', upcomingFridayInfo)
+      const info = {
+        currentDateInfo: datetime.currentDate(),
+        upcomingFridayInfo: datetime.upcomingFriday()
+      }
+      this.$store.dispatch('dateInfo', info)
     },
     getKhateebData() {
       // should be cached data ==> perhaps cached from every week saturday

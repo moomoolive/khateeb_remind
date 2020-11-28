@@ -23,7 +23,7 @@ const datetime = {
         }
 
         const returnDate = {
-            day: 'Friday',
+            dayOfTheWeek: 'Friday',
             month: this.monthList[upcomingFriday.getMonth()],
             date: upcomingFriday.getDate(),
             year: upcomingFriday.getFullYear(),
@@ -33,16 +33,12 @@ const datetime = {
     },
     currentDate() {
         const x = new Date()
-        const month = this.monthList[x.getMonth()]
-        const year = x.getFullYear()
-        const day = x.getDate()
-        const dayOfTheWeek = this.weekDayList[x.getDay()]
 
         const returnDate = {
-            month,
-            year,
-            day,
-            dayOfTheWeek
+            month: this.monthList[x.getMonth()],
+            year: x.getFullYear(),
+            date: x.getDate(),
+            dayOfTheWeek: this.weekDayList[x.getDay()]
           }
         
         return returnDate

@@ -2,7 +2,7 @@
     <div class="topnav">
         <router-link to="/" exact>Home</router-link>
         <router-link :to="{ name: 'about' }">About</router-link>
-        <router-link :to="{ name: 'contact' }">Contact</router-link>
+        <router-link :to="{ name: 'announcements' }">Announcements</router-link>
         <router-link :to="{ name: 'login' }">Login</router-link>
     </div>
 </template>

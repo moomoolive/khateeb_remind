@@ -1,30 +1,69 @@
 <template>
     <div>
-        <h2 v-if="!isWeekly">This Month's Khateeb Schedule</h2>
-        <h2 v-if="isWeekly">This Week's Khateeb Schedule</h2>
-        <h4>{{ date.month }} {{ date.day }}, {{date.year}}</h4>
-        <h3>Location: {{ khateebInfo.location }}</h3>
-        <div style="height: 15px; margin-bottom: 15px;">
-            <div v-if="!isWeekly" style="">
+        <div id="headers">
+            <h4>
+                Today's Date: {{ date.currentDate.dayOfTheWeek }}
+                {{ date.currentDate.month }} {{ date.currentDate.date }}, {{date.currentDate.year}}
+            </h4>
+            <h2 v-if="!isWeekly">This Month's Khateeb Schedule</h2>
+            <h2 v-if="isWeekly">This Week's Khateeb Schedule</h2>
+            <h4>Schedule for: {{ date.month }} {{ date.day }}, {{date.year}}</h4>
+        </div>
+        <div id="changeWeekButtons" style="height: 15px; margin-bottom: 15px;">
+            <div v-if="!isWeekly">
                 <button
-                v-for="(value, key) in khateebInfo.weeks"
-                :key="key"
-                @click="date.day = key"
-                :aria-label="`button to view ${date.month} ${key}`"
+                v-for="(value, weekOf) in khateebInfo.locationInfo.location1.monthlySchedule"
+                :key="weekOf"
+                @click="date.day = weekOf"
+                :aria-label="`button to view schedule for ${date.month} ${weekOf}`"
                 >
-                    {{ date.button }} {{ key }}
+                    {{ date.button }} {{ weekOf }}
                 </button>
             </div>
         </div>
-        <table style="width: 100%;">
-            <tr>
-                <th v-for="data in khateebInfo.columnData" :key="data">{{data}}</th>
-            </tr>
-            <tr v-for="item in displayedRows" :key="item.timing">
-                <th>{{ item.timing }}</th>
-                <th>{{ item.khateeb }}</th>
-            </tr>
-        </table>
+        <div id="changeLocationButtons" style="height: 15px; margin-bottom: 15px;">
+            <div v-if="!isWeekly">
+                <button
+                @click="displayData.displayedLocation = 'All'"
+                aria-label="button to view schedule for all locations"
+                >
+                    All locations
+                </button>
+                <button
+                v-for="(prayerLocationData, location_IDs) in khateebInfo.locationInfo"
+                :key="location_IDs"
+                @click="displayData.displayedLocation = location_IDs"
+                :aria-label="`button to view schedule for ${prayerLocationData.info.name}`"
+                >
+                    {{ prayerLocationData.info.name }}
+                </button>
+            </div>
+        </div>
+        <div id="scheduleTables">
+            <table
+            v-for="(prayerLocation, locationIDs) in shownLocations"
+            :key="locationIDs"
+            style="width: 100%;"
+            >
+                <tr>
+                    <th colspan="2">{{ prayerLocation.info.name }}</th>
+                </tr>
+                <tr>
+                    <th v-for="columnNames in khateebInfo.columnData" :key="columnNames">{{columnNames}}</th>
+                </tr>
+                <tr
+                v-for="(rows, rowNumber) in prayerLocation.monthlySchedule[date.day]" 
+                :key="rowNumber"
+                >
+                    <th v-for="rowData in rows" :key="rowData">{{ rowData }}</th>
+                </tr>
+                <tr>
+                    <th colspan="2">
+                        Location: {{ prayerLocation.info.address }}
+                    </th>
+                </tr>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -40,26 +79,33 @@ export default {
     data() {
         return {
             date: {
-                month: this.$store.state.date.month,
-                year: this.$store.state.date.year,
-                button: this.$store.state.date.month.slice(0,3),
-                day: 27, //hardcoded right now
-                upComingFriday: 27
+                month: this.$store.state.date.upcomingFriday.month,
+                year: this.$store.state.date.upcomingFriday.year,
+                button: this.$store.state.date.upcomingFriday.month.slice(0,3),
+                day: this.$store.state.date.upcomingFriday.date,
+                upComingFriday: this.$store.state.date.upcomingFriday.date,
+                currentDate: {
+                    date: this.$store.state.date.currentDate.date,
+                    dayOfTheWeek: this.$store.state.date.currentDate.dayOfTheWeek,
+                    month: this.$store.state.date.currentDate.month,
+                    year: this.$store.state.date.currentDate.year
+                }
             },
             khateebInfo : {
-                weeks: this.$store.state.khateebSchedule.weeks,
-                columnData: ['Timing', 'Khateeb'], //should hard code?? not sure
-                location: this.$store.state.khateebSchedule.location
+                columnData: this.$store.state.khateebSchedule.columnData,
+                locationInfo: this.$store.state.khateebSchedule.rows
+            },
+            displayData: {
+                displayedLocation: 'All'
             }
         }
     },
     computed: {
-        displayedRows() {
-            if (!this.isWeekly) {
-                return this.khateebInfo.weeks[this.date.day]
-            } else {
-                return this.khateebInfo.weeks[this.date.upComingFriday]
-            }
+        shownLocations() {
+            const location = this.displayData.displayedLocation
+            if (this.displayData.displayedLocation !== 'All') {
+                return { location: this.khateebInfo.locationInfo[location] }
+            } else return this.khateebInfo.locationInfo
         }
     },
     watch: {
@@ -73,5 +119,9 @@ export default {
 </script>
 
 <style scoped>
+table {
+    margin-top: 10px;
+}
+
 
 </style>

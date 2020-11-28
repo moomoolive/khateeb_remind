@@ -1,14 +1,34 @@
 export default {
     khateebSchedule: {
-        weeks: null,
-        location: null
+        // template for every location >> if there's more than one
+        // X in the name 'locationX' is replace with a number
+        // starting from 1
+        locationX: {
+            info: {
+                name: null,
+                address: null
+            },
+            monthlySchedule: {
+                6: null,
+                13: null,
+                20: null,
+                27: null
+            }
+        }
     },
     date: {
-        // should be cleaned up into current date and upcoming date
-        month: null,
-        day: null,
-        year: null,
-        dayOfTheWeek: null,
-        upcomingFriday: null
+        currentDate: {
+            month: null,
+            year: null,
+            date: null,
+            dayOfTheWeek: null
+        },
+        upcomingFriday: {
+            dayOfTheWeek: null,
+            month: null,
+            date: null,
+            year: null,
+            daysTill: null
+        }
     }
 }

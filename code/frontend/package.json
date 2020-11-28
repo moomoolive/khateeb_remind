@@ -47,7 +47,8 @@
     "rules": {
       "vue/no-side-effects-in-computed-properties": 0,
       "vue/return-in-computed-property": 0,
-      "no-unused-vars": 0
+      "no-unused-vars": 0,
+      "vue/require-v-for-key": 0
     },
     "overrides": [
       {
