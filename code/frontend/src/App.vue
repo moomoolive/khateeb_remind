@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header />
-    <router-view/>
+    <router-view class="displayedPage"/>
     <Footer />
   </div>
 </template>
@@ -12,8 +12,6 @@ import Footer from './components/Footer.vue'
 
 import datetime from './utils/datetime.js'
 import API from './utils/apiCalls.js'
-
-import axios from 'axios'
 
 export default {
   components: {
@@ -49,6 +47,11 @@ export default {
   color: #2c3e50;
 }
 
+.displayedPage {
+  background-color: #fffff4;
+  padding-bottom: 5%;
+}
+
 div {
   height: 100%;
   width: 100%;
@@ -64,5 +67,6 @@ body {
   margin-bottom: 0;
   margin-left: 0;
   margin-right: 0;
+  background-color: #333;
 }
 </style>

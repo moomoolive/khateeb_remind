@@ -22,15 +22,15 @@
         <div id="changeLocationButtons" class="whiteSpace">
             <div>
                 <button
-                @click="displayData.displayedLocation = 'All'"
+                @click="displayData.location = 'All'"
                 aria-label="view schedule for all locations"
                 >
                     All locations
                 </button>
                 <button
-                v-for="(prayerLocationData, location_IDs) in khateebInfo.locationInfo"
-                :key="location_IDs"
-                @click="displayData.displayedLocation = location_IDs"
+                v-for="(prayerLocationData, location_ID) in khateebInfo.locationInfo"
+                :key="location_ID"
+                @click="displayData.location = location_ID"
                 :aria-label="`view schedule for ${prayerLocationData.info.name}`"
                 >
                     {{ prayerLocationData.info.name }}
@@ -44,8 +44,8 @@
         </div>
         <div id="scheduleTables">
             <table
-            v-for="(prayerLocation, locationIDs) in shownLocations"
-            :key="locationIDs"
+            v-for="(prayerLocation, locationID) in shownLocations"
+            :key="locationID"
             style="width: 95%;"
             >
                 <tr>
@@ -82,7 +82,7 @@ export default {
                 locationInfo: this.$store.state.khateebSchedule.rows
             },
             displayData: {
-                displayedLocation: 'All',
+                location: 'All',
                 weekOf: this.$store.state.date.upcomingFriday.date,
             },
             isWeeklyView: true
@@ -90,8 +90,8 @@ export default {
     },
     computed: {
         shownLocations() {
-            const location = this.displayData.displayedLocation
-            if (this.displayData.displayedLocation !== 'All') {
+            const location = this.displayData.location
+            if (location !== 'All') {
                 return { location: this.khateebInfo.locationInfo[location] }
             } else return this.khateebInfo.locationInfo
         }

@@ -31,5 +31,7 @@ export default {
             year: null,
             daysTill: null
         }
-    }
+    },
+    JWT_TOKEN: localStorage.getItem('token') || null,
+    institution: 'uofc' //hardcoded
 }

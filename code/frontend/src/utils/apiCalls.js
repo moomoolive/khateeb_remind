@@ -8,6 +8,23 @@ const apiCalls = {
             .then((response) => { responseData = response.data })
             .catch((error) => { console.log(error) })
         return responseData
+    },
+    async announcements() {
+        let responseData
+        await axios.post(this.API_SERVER + '/announcements')
+            .then((response) => { responseData = response.data })
+            .catch((error) => { console.log(error) })
+        return responseData
+    },
+    async login(secretKey) {
+        let responseData
+        const requestData = {key: secretKey}
+        await axios.post(this.API_SERVER + '/authenicate', requestData)
+            .then((response) => {
+                responseData = response.data
+            })
+            .catch((error) => { console.log(error) })
+        return responseData
     }
 }
 

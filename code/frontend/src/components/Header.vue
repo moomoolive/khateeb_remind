@@ -38,12 +38,14 @@ export default {
 
 .currentDate {
     background-color: #ddd; 
-    color: black;
+    color: black !important;
+    cursor: auto;
 }
 
 .router-link-active {
     background-color: #4CAF50;
     color: white;
+    padding: 0;
 }
 
 /* Style the links inside the navigation bar */
@@ -51,7 +53,7 @@ export default {
   float: left;
   color: #f2f2f2;
   text-align: center;
-  padding: 1.8vh 16px;
+  padding: 1.87vh 2vw 0.9vh 2vw;
   text-decoration: none;
   font-size: 1.8vh;
   font-weight: bold;

@@ -42,6 +42,27 @@ const datetime = {
           }
         
         return returnDate
+    },
+    allUpcomingFridays(input) {
+        const date = new Date(input.getTime())
+        const month = date.getMonth()
+        let fridays = []
+
+        date.setDate(1)
+
+        while (date.getDay() !== 5) {
+            date.setDate(date.getDate() + 1)
+        }
+
+        while (date.getMonth() === month) {
+            let oneFriday = new Date(date.getTime())
+            let calendarDate = oneFriday.getDate()
+            let year = oneFriday.getFullYear()
+            let month = this.monthList[oneFriday.getMonth()]
+            fridays.push(`${calendarDate} ${month} ${year}`)
+            date.setDate(date.getDate() + 7)
+        }
+        return fridays
     }
 }
 

@@ -1,36 +1,45 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import store from '../store/index.js'
+
+import adminRoutes from './admin.js'
+import userRoutes from './users.js'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'about',
-    component: () => import ('../views/about.vue')
-  },
-  {
-    path: '/contact',
-    name: 'announcements',
-    component: () => import ('../views/announcements.vue')
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import ('../views/login.vue')
-  },
+    path: '*',
+    name: 'Not Found',
+    component: () => import ('../views/404.vue')
+  }, 
+  ...adminRoutes,
+  ...userRoutes
 ]
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requireAuthorization)) {
+    if (!store.getters.tokenExists) {
+      next('/login')
+      alert('Please login to view this page')
+      return
+    }
+    if (!store.getters.isJWTValid) {
+      next('/login')
+      alert('Your login has expired. Please sign-in again')
+      store.dispatch('logout')
+      return
+    }
+    next()
+  } else {
+    next()
+  }
 })
 
 export default router

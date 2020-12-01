@@ -2,20 +2,34 @@
     <div>
         <div class="topnav">
           <router-link to="/about" exact>About</router-link>
-          <router-link :to="{ name: 'login' }">Login</router-link>
+          <router-link 
+          :to="{ name: 'login' }"
+          v-if="!isLoggedIn"
+          >
+            Admin Login
+          </router-link>
+          <router-link 
+          :to="`/admin/${this.$store.state.institution}/dashboard`"
+          v-if="isLoggedIn"
+          >
+            Admin Dashboard
+          </router-link>
+          <img style="width: 20px; float: right; padding: 1vh;" :src="logo">
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'Header',
+    name: 'Footer',
     data() {
       return {
-        currentDate: this.$store.state.date.currentDate.date,
-        abbreviatedMonthName: this.$store.state.date.currentDate.month.slice(0,3),
-        abbreviatedDayOfWeek: this.$store.state.date.currentDate.dayOfTheWeek.slice(0,3),
-        abbreviatedYear: `'${this.$store.state.date.currentDate.year - 2_000}`,
+        logo: require('../assets/paper-plane-solid.svg')
+      }
+    },
+    computed: {
+      isLoggedIn() {
+        return this.$store.getters.isJWTValid
       }
     }
 }
@@ -25,11 +39,11 @@ export default {
 /* Add a black background color to the top navigation */
 .topnav {
     margin-top: 30px;
-    background-color: #333;
     overflow: hidden;
     left: 0;
     height: 5.1vh;
     width: 100vw;
+    margin: 0;
 }
 
 .router-link-active {

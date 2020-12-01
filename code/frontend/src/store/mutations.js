@@ -7,5 +7,7 @@ export default {
     dateInfo(state, info) {
         state.date.currentDate = info.currentDateInfo
         state.date.upcomingFriday = info.upcomingFridayInfo
-    }
+    },
+    updateToken(state, token) { state.JWT_TOKEN = token },
+    removeToke(state) { state.JWT_TOKEN = null }
 }
