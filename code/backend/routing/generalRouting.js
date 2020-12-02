@@ -53,4 +53,4 @@ router.post('/authenicate', (req, res) => {
     }
 })
 
-export { router as generalRouting }
+export { router as generalRoutes }

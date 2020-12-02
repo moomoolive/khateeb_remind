@@ -76,9 +76,28 @@ router.post('/khateebs', (req, res) => {
     const unauthorized = 401
     try {
         const token = req.body.token
-        console.log(token)
         jwt.verify(token, JWT_SECRET)
         res.json(dummyKhateebs)
+    }
+    catch {
+        res.status(unauthorized)
+        res.json({data: null, msg: 'Unauthorized'})
+    }
+})
+
+router.post('/update-khateeb/:khateebID', (req, res) => {
+    const unauthorized = 401
+    try {
+        const token = req.body.token
+        jwt.verify(token, JWT_SECRET)
+        if (req.params.khateebID === 'New Khateeb') {
+            console.log('New Khateeb')
+            console.log(req.body.payload)
+        } else {
+            console.log(req.params.khateebID)
+            console.log(req.body.payload)
+        }
+        res.json('success')
     }
     catch {
         res.status(unauthorized)
