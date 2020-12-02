@@ -3,24 +3,19 @@ const monthList = [
     "July", "August", "September", "October", "November", "December"
 ]
 
-const date = new Date()
-const month = date.getMonth()
-let fridays = []
+let x = new Date()
 
-date.setDate(1)
-
-while (date.getDay() !== 1) {
-    date.setDate(date.getDate() + 1)
-    console.log(date.getMonth(), date.getDate())
+function incrementMonth(value) {
+    const currentMonth = x.getMonth()
+    while (x.getMonth() === currentMonth) {
+        x = new Date(x.setDate(x.getDate() + (15 * value)))
+    }
 }
 
-while (date.getMonth() === month) {
-    let oneFriday = new Date(date.getTime())
-    let calendarDate = oneFriday.getDate()
-    let year = oneFriday.getFullYear()
-    let month = monthList[oneFriday.getMonth()]
-    fridays.push(`${calendarDate}${month}${year}`)
-    date.setDate(date.getDate() + 7)
+for (let k = 0; k < 3; k++) {
+    console.log(incrementMonth(1))
 }
 
-console.log(fridays)
+for (let k = 0; k < 3; k++) {
+    console.log(incrementMonth(-1))
+}

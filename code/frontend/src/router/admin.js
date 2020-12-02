@@ -10,7 +10,15 @@ const adminRoutes = [
               },
               {
                 path: 'schedule',
-                component: () => import ('../views/adminPages/scheduleSetter.vue')
+                component: () => import('../views/adminPages/scheduleSetter.vue')
+              },
+              {
+                path: 'announcements',
+                component: () => import('../views/adminPages/addAnnouncements.vue')
+              },
+              {
+                path: 'khateebs',
+                component: () => import('../views/adminPages/khateebs.vue')
               }
         ],
         meta: {
