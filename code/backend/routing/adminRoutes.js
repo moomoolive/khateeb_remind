@@ -91,9 +91,11 @@ router.post('/update-khateeb/:khateebID', (req, res) => {
         const token = req.body.token
         jwt.verify(token, JWT_SECRET)
         if (req.params.khateebID === 'New Khateeb') {
+            // add new entry to database
             console.log('New Khateeb')
             console.log(req.body.payload)
         } else {
+            // update existing entry
             console.log(req.params.khateebID)
             console.log(req.body.payload)
         }
