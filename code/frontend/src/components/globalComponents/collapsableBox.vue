@@ -8,14 +8,14 @@
         >
             {{ headline }}<span style="float: right;">{{ icon }}</span><br>
             <span
-            v-if="isUrgent"
+            v-if="isUrgent === 'true'"
             class="tag"
             >
                 !!Urgent!!
             </span>
             <span v-show="false">hi there</span>
             <span
-            v-if="isVeryImportant"
+            v-if="isVeryImportant === 'true'"
             class="tag"
             style="background-color: orange;"
             >
@@ -46,13 +46,13 @@ export default {
             required: true
         },
         isUrgent: {
-            type: Boolean,
-            default: false,
+            type: String,
+            default: 'false',
             required: false
         },
         isVeryImportant: {
-            type: Boolean,
-            default: false,
+            type: String,
+            default: 'false',
             required: false
         }
     },

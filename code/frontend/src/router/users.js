@@ -1,4 +1,4 @@
-import Home from '../views/Home.vue'
+import Home from '../views/userPages/Home.vue'
 
 export default [
     {
@@ -9,16 +9,16 @@ export default [
     {
         path: '/about',
         name: 'about',
-        component: () => import ('../views/about.vue')
+        component: () => import ('../views/userPages/about.vue')
     },
     {
         path: '/announcements',
         name: 'announcements',
-        component: () => import ('../views/announcements.vue')
+        component: () => import ('../views/userPages/announcements.vue')
     },
     {
         path: '/login',
         name: 'login',
-        component: () => import ('../views/login.vue')
+        component: () => import ('../views/userPages/login.vue')
     }
 ]

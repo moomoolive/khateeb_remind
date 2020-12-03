@@ -83,8 +83,8 @@ export default {
         return {
             month: new Date(),
             khateebInfo : {
-                columnData: this.$store.state.khateebSchedule.columnData,
-                locationInfo: this.$store.state.khateebSchedule.rows,
+                columnData: null, //this.$store.state.khateebSchedule.columnData,
+                locationInfo: null, //this.$store.state.khateebSchedule.rows,
                 originalSchedule: null
             },
             displayData: {
@@ -95,6 +95,9 @@ export default {
         }
     },
     methods: {
+        // need to add function that checks if timings have been changed
+        // and if so fill in vacant new spot with TBD
+        // without losing already given order
         incrementMonth(value) {
             const currentMonth = this.month.getMonth()
             const halfOfAMonth = 15
@@ -133,8 +136,8 @@ export default {
             }
         },
         updateSchedule(schedule) {
-            this.khateebInfo.columnData = schedule.data.columnData
-            this.khateebInfo.locationInfo = schedule.data.rows
+            this.khateebInfo.columnData = schedule.data.data.columnData
+            this.khateebInfo.locationInfo = schedule.data.data.rows
             this.cacheOriginalSchedule()
         },
         cacheOriginalSchedule() {
@@ -152,7 +155,12 @@ export default {
                         }
                     }
                 }
-                API.sendUpdatedSchedule(this.token, this.khateebInfo.locationInfo, this.khateebInfo.originalSchedule)
+                const payload = {
+                    key: this.currentScheduleKey,
+                    updatedSchedule: this.khateebInfo.locationInfo,
+                    originalSchedule: this.khateebInfo.originalSchedule
+                }
+                API.sendUpdatedSchedule(this.token, payload)
                 this.cacheOriginalSchedule()
             }
         }
@@ -169,6 +177,9 @@ export default {
                 abbreviatedMonthName: firstFridayOfMonth[1].slice(0,3)
             }
             return returnValue
+        },
+        currentScheduleKey() {
+            return `${this.displayedMonthInfo.month}${this.displayedMonthInfo.year}`
         },
         fridayDates() {
             let splitDates = []

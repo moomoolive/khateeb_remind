@@ -14,7 +14,7 @@
                 <option value="New Khateeb">Create New Khateeb</option>
             </select>
         </div>
-        <div v-for="(property, key) in inputData" :key="key">
+        <div v-for="(property, key) in inputFieldsWithoutID" :key="key">
             <label :for="key">{{ key }}: </label>
             <div>
                 <input type="text" :id="key" v-model="inputData[key]">
@@ -34,24 +34,33 @@ export default {
             khateebData: null,
             selectedKhateeb: 'New Khateeb',
             inputData: {
+                _id: null,
                 firstName: null,
                 lastName: null,
                 phoneNumber: null,
                 active: null,
                 email: null,
                 dropouts: null,
-                comments: []
+                comments: [],
+                __v: 0
             }
         }
     },
     methods: {
         async submit() {
+            if (this.selectedKhateeb !== 'New Khateeb') this.inputData.__v++
             await API.updateKhateeb(this.$store.state.JWT_TOKEN, this.selectedKhateeb, this.inputData)
         }
     },
     computed: {
         khateebName() {
             return this.selectedKhateeb === 'New Khateeb' ? this.selectedKhateeb : `${this.inputData.firstName} ${this.inputData.lastName}`
+        },
+        inputFieldsWithoutID() {
+            const x = JSON.parse(JSON.stringify(this.inputData))
+            delete x._id
+            delete x.__v
+            return x
         }
     },
     watch: {

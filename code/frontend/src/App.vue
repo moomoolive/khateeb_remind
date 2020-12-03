@@ -25,15 +25,16 @@ export default {
         upcomingFridayInfo: datetime.upcomingFriday()
       }
       this.$store.dispatch('dateInfo', info)
+      return `${info.currentDateInfo.month}${info.currentDateInfo.year}`
     },
-    async getKhateebData() {
-      const monthlySchedule = await API.monthlySchedule()
+    async getKhateebData(date) {
+      const monthlySchedule = await API.monthlySchedule(date)
       this.$store.dispatch('khateebScheduleInfo', monthlySchedule)
     }
   },
   created() {
-    this.getDateInformation()
-    this.getKhateebData()
+    const scheduleFor = this.getDateInformation()
+    this.getKhateebData(scheduleFor)
   }
 }
 </script>

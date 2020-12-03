@@ -4,9 +4,9 @@ export default {
     API_SERVER: process.env.VUE_APP_API_SERVER_URL || 'http://localhost:5000',
     generalRoutes: '/general',
     adminRoutes: '/admin',
-    async monthlySchedule() {
+    async monthlySchedule(date) {
         let responseData
-        await axios.post(this.API_SERVER + this.generalRoutes + '/')
+        await axios.post(this.API_SERVER + this.generalRoutes + '/', { date })
             .then((response) => { responseData = response.data })
             .catch((error) => { console.log(error) })
         return responseData
@@ -41,11 +41,10 @@ export default {
             .catch((error) => { console.log(error) })
         return responseData
     },
-    async sendUpdatedSchedule(token, updatedSchedule, originalSchedule) {
+    async sendUpdatedSchedule(token, payload) {
         const requestData = {
             token,
-            updatedSchedule,
-            originalSchedule
+            payload
         }
         await axios.post(this.API_SERVER + this.adminRoutes + '/update-schedule', requestData)
             .then((response) => {
