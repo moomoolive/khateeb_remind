@@ -83,9 +83,11 @@ export default {
         return {
             month: new Date(),
             khateebInfo : {
-                columnData: null, //this.$store.state.khateebSchedule.columnData,
-                locationInfo: null, //this.$store.state.khateebSchedule.rows,
-                originalSchedule: null
+                columnData: null,
+                locationInfo: null,
+                originalSchedule: null,
+                _id: null,
+                __v: null
             },
             displayData: {
                 location: 'All',
@@ -134,10 +136,14 @@ export default {
                 this.khateebInfo.locationInfo[location].monthlySchedule = newWeeks
                 this.cacheOriginalSchedule()
             }
+            delete this.khateebInfo._id
+            delete this.khateebInfo.__v
         },
         updateSchedule(schedule) {
-            this.khateebInfo.columnData = schedule.data.data.columnData
-            this.khateebInfo.locationInfo = schedule.data.data.rows
+            this.khateebInfo.columnData = schedule.data.columnData
+            this.khateebInfo.locationInfo = schedule.data.rows
+            this.khateebInfo._id = schedule.data._id
+            this.khateebInfo.__v = schedule.data.__v
             this.cacheOriginalSchedule()
         },
         cacheOriginalSchedule() {
@@ -158,10 +164,29 @@ export default {
                 const payload = {
                     key: this.currentScheduleKey,
                     updatedSchedule: this.khateebInfo.locationInfo,
-                    originalSchedule: this.khateebInfo.originalSchedule
+                    originalSchedule: this.khateebInfo.originalSchedule,
+                    _id: this.khateebInfo._id,
+                    __v: this.khateebInfo.__v
                 }
                 API.sendUpdatedSchedule(this.token, payload)
                 this.cacheOriginalSchedule()
+            }
+        },
+        async fetchInitialTable() {
+            const payload = {
+                month: this.currentScheduleKey,
+                fridayDates: this.fridayDates
+            }
+            const data = await API.initialTable(this.token, payload)
+            this.updateSchedule(data)
+        },
+        async makeInitialAPICalls() {
+            const scheduleFor = `${this.$store.state.date.currentDate.month}${this.$store.state.date.currentDate.year}`
+            const data = await API.fetchMonthlySchedules(this.token, scheduleFor)
+            if (data.msg === 'No data recorded for given month') {
+                this.fetchInitialTable()
+            } else {
+                this.updateSchedule(data)
             }
         }
     },
@@ -200,10 +225,7 @@ export default {
         }
     },
     async created() {
-        const scheduleFor = `${this.$store.state.date.currentDate.month}${this.$store.state.date.currentDate.year}`
-        const data = await API.fetchMonthlySchedules(this.token, scheduleFor)
-        this.updateSchedule(data)
-        // assumes current month table is made by default
+        this.makeInitialAPICalls()
     }
 }
 </script>

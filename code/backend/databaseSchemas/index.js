@@ -21,5 +21,9 @@ export default {
         important: String,
         urgent: String,
         date: String
+    }),
+    settings: new mongoose.Schema({
+        name: String,
+        options: Object
     })
 }

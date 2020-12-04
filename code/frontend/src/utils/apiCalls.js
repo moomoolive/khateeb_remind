@@ -55,12 +55,28 @@ export default {
                 window.alert('There was a problem saving your changes')
             })
     },
-    async sendNewAnnouncement(token, payload) {
+    async getAnnouncements(token, payload) {
         const requestData = {
             token,
             payload
         }
-        await axios.post(this.API_SERVER + this.adminRoutes + '/new-announcement', requestData)
+        let responseData
+        await axios.post(this.API_SERVER + this.adminRoutes + '/announcements', requestData)
+            .then((response) => {
+                responseData = response.data
+            })
+            .catch((error) => {
+                console.log(error)
+                window.alert('There was a problem saving your changes')
+            })
+            return responseData
+    },
+    async updateAnnouncements(token, payload) {
+        const requestData = {
+            token,
+            payload
+        }
+        await axios.post(this.API_SERVER + this.adminRoutes + '/announcements', requestData)
             .then((response) => {
                 console.log(response)
             })
@@ -70,8 +86,14 @@ export default {
             })
     },
     async getKhateebs(token) {
+        const requestData = {
+            token,
+            payload: {
+                action: 'get' 
+            }
+        }
         let responseData
-        await axios.post(this.API_SERVER + this.adminRoutes + '/khateebs', { token })
+        await axios.post(this.API_SERVER + this.adminRoutes + '/update-khateeb/' + '__GET__', requestData)
             .then((response) => { responseData = response.data })
             .catch((error) => { console.log(error) })
         return responseData
@@ -89,5 +111,47 @@ export default {
                 console.log(error)
                 window.alert('There was a problem saving your changes')
             })
-    }
+    },
+    async saveLocationAndTiming(token, payload, version, id=null) {
+        const requestData = {
+            token,
+            payload,
+            __v: version,
+            _id: id
+        }
+        await axios.post(this.API_SERVER + this.adminRoutes + '/locations-timing', requestData)
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+                window.alert('There was a problem saving your changes')
+            })
+    },
+    async getLocationAndTiming(token) {
+        let responseData
+        await axios.post(this.API_SERVER + this.adminRoutes + '/locations-timing-info', { token })
+            .then((response) => {
+                responseData = response.data
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        return responseData
+    },
+    async initialTable(token, payload) {
+        const requestData = {
+            token,
+            payload
+        }
+        let responseData
+        await axios.post(this.API_SERVER + '/initialize' + '/location-timing', requestData)
+            .then((response) => {
+                responseData = response.data
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        return responseData
+    },
 }

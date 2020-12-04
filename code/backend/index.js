@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 
 import { adminRoutes } from './routing/adminRoutes.js'
 import { generalRoutes } from './routing/generalRoutes.js'
+import { initializeRoutes } from './routing/initializeRoutes.js'
 
 const PORT = process.env.PORT || 5_000
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
@@ -17,6 +18,7 @@ app.use(express.json())
 
 app.use('/general', generalRoutes)
 app.use('/admin', adminRoutes)
+app.use('/initialize', initializeRoutes)
 
 db.once('open', () => { console.log(`Database listening on ${DATABASE}`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })

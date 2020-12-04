@@ -2,6 +2,9 @@
     <div>
         <h2>Khateebs</h2>
         <h4>{{ khateebName }}</h4>
+        <button v-if="selectedKhateeb !== 'New Khateeb'" @click="deleteKhateeb()">
+            Delete Khateeb
+        </button>
         <div>
             <label for="khateebs">Choose a Khateeb to Edit or Create a new Khateeb:</label>
             <select id="khateebs" v-model="selectedKhateeb">
@@ -31,7 +34,7 @@ export default {
     name: 'khateebs',
     data() {
         return {
-            khateebData: null,
+            khateebData: [],
             selectedKhateeb: 'New Khateeb',
             inputData: {
                 _id: null,
@@ -48,8 +51,23 @@ export default {
     },
     methods: {
         async submit() {
-            if (this.selectedKhateeb !== 'New Khateeb') this.inputData.__v++
             await API.updateKhateeb(this.$store.state.JWT_TOKEN, this.selectedKhateeb, this.inputData)
+            this.resetForm()
+        },
+        async deleteKhateeb() {
+            const payload = {
+                action: 'delete',
+                _id: this.inputData._id
+            }
+            await API.updateKhateeb(this.$store.state.JWT_TOKEN, this.selectedKhateeb, payload)
+            this.resetForm()
+        },
+        resetForm() {
+            this.selectedKhateeb = 'New Khateeb'
+            for (let field in this.inputData) {
+                if (field === 'comments') this.inputData[field] = []
+                else this.inputData[field] = null
+            }
         }
     },
     computed: {
@@ -61,15 +79,12 @@ export default {
             delete x._id
             delete x.__v
             return x
-        }
+        },
     },
     watch: {
         selectedKhateeb(newValue) {
             if (this.selectedKhateeb === 'New Khateeb') {
-                for (let property in this.inputData) {
-                    if (property === 'comments') this.inputData[property] = []
-                    else this.inputData[property] = null
-                }
+                this.resetForm()
             } else {
                 this.inputData = JSON.parse(JSON.stringify(this.khateebData[newValue]))
             }

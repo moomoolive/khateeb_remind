@@ -14,11 +14,15 @@ const adminRoutes = [
               },
               {
                 path: 'announcements',
-                component: () => import('../views/adminPages/addAnnouncements.vue')
+                component: () => import('../views/adminPages/announcements.vue')
               },
               {
                 path: 'khateebs',
                 component: () => import('../views/adminPages/khateebs.vue')
+              },
+              {
+                path: 'location-settings',
+                component: () => import('../views/adminPages/locationSettings.vue')
               }
         ],
         meta: {

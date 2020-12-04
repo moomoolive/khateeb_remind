@@ -5,6 +5,7 @@
             <button @click="click('dashboard')">Dashboard/Admin Home</button>
             <button @click="click('announcements')">Announcements</button>
             <button @click="click('khateebs')">Khateebs</button>
+            <button @click="click('location-settings')">Location Settings</button>
         </div>
         <router-view></router-view>
     </div>
