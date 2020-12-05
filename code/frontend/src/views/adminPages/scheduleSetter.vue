@@ -68,7 +68,7 @@
                 </tr>
             </table>
         </div>
-        <button @click="saveData">save changes</button>
+        <button @click="saveData" :disabled="isSame">save changes</button>
     </div>
     </div>
 </template>
@@ -76,6 +76,7 @@
 <script>
 import datetime from '../../utils/datetime.js'
 import API from '../../utils/apiCalls.js'
+import equal from 'fast-deep-equal'
 
 export default {
     name: 'scheduleSetter',
@@ -222,6 +223,9 @@ export default {
                 returnLocation[location] = this.khateebInfo.locationInfo[location] 
                 return  returnLocation
             } else return this.khateebInfo.locationInfo
+        },
+        isSame() {
+            return equal(this.khateebInfo.locationInfo, this.khateebInfo.originalSchedule)
         }
     },
     async created() {

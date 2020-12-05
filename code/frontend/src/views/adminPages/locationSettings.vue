@@ -1,48 +1,55 @@
 <template>
     <div>
         <h2>Location Settings</h2>
-        <button @click="saveLocations()">Save Locations</button>
+        <button @click="saveLocations()" :disabled="isSame">
+            Save Locations
+        </button>
         <h3 v-if="!hasInitializedLocations">
             You need to create at least one location, with one timing to<br>
             start setting your schedules
         </h3>
-        <div v-for="(location, ID) in locations" :key="ID">
-            <h4>{{ location.info.name || ID }}</h4>
+        <div v-for="(location, locationIndex) in locations" :key="locationIndex">
+            <h4>{{ location.info.name || `Location ${locationIndex + 1}` }}</h4>
+            <h5>{{ location.info.address || `My Backyard` }}</h5>
             <div>
                 Name: <input v-model="location.info.name">
                 Address: <input v-model="location.info.address">
             </div>
             <div
-            v-for="(timing, key) in location.timings"
-            :key="key"
+            v-for="(timing, timingIndex) in location.timings"
+            :key="timingIndex"
             style="padding-top: 20px"
             >
-                Prayer Timing {{ key }}<br>
+                Prayer Timing {{ timingIndex + 1 }}<br>
                 <div 
-                v-for="(value, property) in location.timings[key]"
+                v-for="(value, property) in location.timings[timingIndex]"
                 :key="property"
                 style="display: inline;"
                 >
                     <p>
-                    <span @click="incrementTime({
-                        property,
-                        ID,
-                        key
-                    }, 1)">
-                        +
-                    </span><br>
-                    {{ value }}<br>
-                    <span @click="incrementTime({
-                        property,
-                        ID,
-                        key
-                    }, -1)">
-                        -
-                    </span>
+                        <button 
+                        @click="incrementTime({property, locationIndex, timingIndex }, 1)"
+                        >
+                            +
+                        </button><br>
+                        {{ value }}<br>
+                        <button
+                        @click="incrementTime({ property, locationIndex, timingIndex }, -1)"
+                        >
+                            -
+                        </button>
                     </p>
                 </div>
+                <div>
+                    <button @click="deleteTiming(locationIndex, timingIndex)">Delete This Timing</button>
+                </div>
+                <div>
+                    <button @click="addNewTiming(locationIndex, timingIndex)">Add New Timing</button>
+                </div>
             </div>
-            <button @click="addNewTiming(ID)">Add New Timing</button>
+            <div style="padding-top: 20px">
+                    <button @click="deleteLocation(locationIndex)">Delete This Location</button>
+            </div>
         </div>
         <button @click="addNewLocation()" style="margin-top: 20px">
             Add New Location
@@ -52,138 +59,138 @@
 
 <script>
 import API from '../../utils/apiCalls.js'
+import equal from 'fast-deep-equal'
 
 export default {
     name: "locationSettings",
     data() {
         return {
             hasInitializedLocations: true,
-            locations: {
-                location1: {
+            locations: [
+                {
                     info: {
                         name: null,
                         address: null
                     },
-                    timings: {
-                        1: {
+                    timings: [
+                        {
                             hour: 12,
-                            minutes: '59',
-                            timing: 'PM'
+                            minutes: '00',
+                            AMorPM: 'PM'
                         }, 
-                        2: {
+                        {
                             hour: 1,
                             minutes: '00',
-                            timing: 'PM'
+                            AMorPM: 'PM'
                         }
-                    }
+                    ]
                 }
-            },
+            ],
             ver: null,
-            id: null
+            id: null,
+            cachedLocations: []
         }
     },
     methods: {
-        // this needs to be completely redone... it's attrocious
-        // also need to put checks to stop prayer 2 for example earlier than prayer 1
-        // and not later than prayer
         incrementTime(info, value=null) {
-            if (info.property === 'timing') {
-                this.locations[info.ID].timings[info.key][info.property] === 'AM' ? this.locations[info.ID].timings[info.key][info.property] = 'PM' : this.locations[info.ID].timings[info.key][info.property] = 'AM'
-            } else {
-                if (info.property === 'hour') {
-                    if (this.locations[info.ID].timings[info.key][info.property] + 1 >= 13 && value === 1) {
-                    this.$set(this.locations[info.ID].timings[info.key], info.property, 1)
-                    this.$nextTick(() => {
-                        this.locations[info.ID].timings[info.key].timing === 'AM' ? this.locations[info.ID].timings[info.key].timing = 'PM' : this.locations[info.ID].timings[info.key].timing = 'AM'
-                    })
-                    } 
-                    else if (this.locations[info.ID].timings[info.key][info.property] - 1 <= 0 && value === -1) {
-                        this.$set(this.locations[info.ID].timings[info.key], info.property, 12)
-                        this.$set( this.locations[info.ID].timings[info.key], 'timing', this.locations[info.ID].timings[info.key][info.timing] === 'AM' ? 'PM' : 'AM')
-                        this.$nextTick(() => {
-                            this.locations[info.ID].timings[info.key].timing === 'AM' ? this.locations[info.ID].timings[info.key].timing = 'PM' : this.locations[info.ID].timings[info.key].timing = 'AM'
-                        })
-                    } else {
-                        this.$set(this.locations[info.ID].timings[info.key], info.property, this.locations[info.ID].timings[info.key][info.property] + value)
-                    }
-                } else {
-                    const nonStringMinutes = parseInt(this.locations[info.ID].timings[info.key][info.property])
-                    if (nonStringMinutes + 1 >= 60 && value === 1) {
-                        console.log('hi')
-                        this.$set(this.locations[info.ID].timings[info.key], info.property, '00')
-                        this.$nextTick(() => {
-                            if (this.locations[info.ID].timings[info.key].hour + 1 >= 13) {
-                                this.$set(this.locations[info.ID].timings[info.key], 'hour', 1)
-                            } else {
-                                this.$set(this.locations[info.ID].timings[info.key], 'hour', this.locations[info.ID].timings[info.key][info.property] + 1)
-                            }
-                            
-                        })
-                    }
-                    else if (nonStringMinutes - 1 <= -1 && value === -1) {
-                        this.$set(this.locations[info.ID].timings[info.key], info.property, '59')
-                        this.$nextTick(() => {
-                            if (this.locations[info.ID].timings[info.key].hour - 1 <= 0) {
-                                this.$set(this.locations[info.ID].timings[info.key], 'hour', 12)
-                            } else {
-                                this.$set(this.locations[info.ID].timings[info.key], 'hour', this.locations[info.ID].timings[info.key][info.property] - 1)
-                            }
-                        })
-                    } else { 
-                        const number = this.nonStringMinutes(this.locations[info.ID].timings[info.key].minutes, value)
-                        this.$set(this.locations[info.ID].timings[info.key], info.property, number)
-                    }
-                }
+            if (info.property === 'hour') this.incrementHour(info, value)
+            else if (info.property === 'minutes') this.incrementMinutes(info, value)
+            else this.changeAMPM(info)
+        },
+        incrementHour(info, value) {
+            const previousHour = this.locations[info.locationIndex].timings[info.timingIndex].hour
+            this.locations[info.locationIndex].timings[info.timingIndex].hour = previousHour + value
+            const currentHour = this.locations[info.locationIndex].timings[info.timingIndex].hour
+            if (currentHour >= 13) {
+                this.locations[info.locationIndex].timings[info.timingIndex].hour = 1
+            }
+            else if (currentHour <= 0) {
+                this.locations[info.locationIndex].timings[info.timingIndex].hour = 12
+            }
+            else if (currentHour === 12 || previousHour === 12) this.changeAMPM(info)
+        },
+        incrementMinutes(info, value) {
+            const previousMinute = parseInt(this.locations[info.locationIndex].timings[info.timingIndex].minutes)
+            this.locations[info.locationIndex].timings[info.timingIndex].minutes = this.nonStringMinutes(previousMinute, value)
+            const currentMinute = this.locations[info.locationIndex].timings[info.timingIndex].minutes
+            const currentHour = this.locations[info.locationIndex].timings[info.timingIndex].hour
+            if (currentMinute >= '60') {
+                this.locations[info.locationIndex].timings[info.timingIndex].minutes = '00'
+                this.incrementHour(info, value)
+            }
+            else if (currentMinute <= '-1') {
+                this.locations[info.locationIndex].timings[info.timingIndex].minutes = '59'
+                this.incrementHour(info, value)
             }
         },
-        nonStringMinutes(value, increment) {
-            const parsedValue = parseInt(value)
-            const x = parsedValue + increment
-            return parsedValue < 9 ? `0${x}` : `${x}`
+        changeAMPM(info) {
+            const value = this.locations[info.locationIndex].timings[info.timingIndex].AMorPM
+                if (value === 'AM') {
+                    this.locations[info.locationIndex].timings[info.timingIndex].AMorPM = 'PM'
+                } else this.locations[info.locationIndex].timings[info.timingIndex].AMorPM = 'AM'
         },
-        addNewTiming(ID) {
-            const numberOfTimings = Object.keys(this.locations[ID].timings).length
-            const lastTimingEntry = numberOfTimings
-            this.$set(this.locations[ID].timings, parseInt(numberOfTimings) + 1, {
-                hour: this.locations[ID].timings[lastTimingEntry].hour,
-                minutes: `${this.nonStringMinutes(this.locations[ID].timings[lastTimingEntry].minutes, 1)}`,
-                timing: this.locations[ID].timings[lastTimingEntry].timing
-            })
+        nonStringMinutes(parsedValue, increment) {
+            const x = parsedValue + increment
+            return x <= 9 && x >= 0 ? `0${x}` : `${x}`
+        },
+        addNewTiming(locationIndex, timingIndex) {
+            const mins = this.nonStringMinutes(parseInt(this.locations[locationIndex].timings[timingIndex].minutes), 1)
+            const newTiming = {
+                hour: this.locations[locationIndex].timings[timingIndex].hour,
+                minutes: mins,
+                AMorPM: this.locations[locationIndex].timings[timingIndex].AMorPM
+            }
+            this.locations[locationIndex].timings.splice(timingIndex + 1, 0, newTiming)
+        },
+        deleteTiming(locationIndex, timingIndex) {
+            this.locations[locationIndex].timings.splice(timingIndex, 1)
         },
         addNewLocation() {
-            const numberOfLocations = Object.keys(this.locations).length
             const emptyLocation = {
                     info: {
                         name: null,
                         address: null
                     },
-                    timings: {
-                        1: {
+                    timings: [
+                        {
                             hour: 12,
-                            minutes: '59',
-                            timing: 'PM'
+                            minutes: '00',
+                            AMorPM: 'PM'
                         }, 
-                        2: {
+                        {
                             hour: 1,
                             minutes: '00',
-                            timing: 'PM'
+                            AMorPM: 'PM'
                         }
-                    }
-            }
-            this.$set(this.locations, `location${numberOfLocations + 1}`, emptyLocation)
+                    ]
+                }
+            this.locations.push(emptyLocation)
+        },
+        deleteLocation(locationIndex) {
+            console.log('hi')
+            this.locations.splice(locationIndex, 1)
         },
         async saveLocations() {
             await API.saveLocationAndTiming(this.$store.state.JWT_TOKEN, this.locations, this.ver, this.id)
         }
     },
+    computed: {
+        isSame() {
+            for (let x = 0; x < this.locations.length; x++) {
+                if (!equal(this.locations[x], this.cachedLocations[x])) return false
+            }
+            return true
+        },
+
+    },
     async created() {
         const locations =  await API.getLocationAndTiming(this.$store.state.JWT_TOKEN)
         if (locations) {
-            console.log(locations)
             this.locations = locations.options
+            this.cachedLocations = JSON.parse(JSON.stringify(this.locations))
             this.ver = locations.__v 
             this.id = locations._id
-        }
+        } else this.hasInitializedLocations = false
     }
 }
 </script>

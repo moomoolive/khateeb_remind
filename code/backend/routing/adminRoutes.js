@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import db from '../index.js'
 import schemas from '../databaseSchemas/index.js'
 import httpCodes from '../utils/httpCodes.js'
+import e from 'express'
 
 const router = express.Router()
 
@@ -83,13 +84,90 @@ router.post('/scheduler', (req, res) => {
                     if (!schedule) {
                         res.json({ data: null, msg: "No data recorded for given month"})
                     } else {
-                        const responseData = {
-                                columnData: columnData,
-                                rows: schedule.data,
-                                _id: schedule._id,
-                                __v: schedule.__v
-                        }
-                        res.json({data: responseData, msg:'Data Found' })
+                            const setting = db.model('setting', schemas.settings)
+                            setting.findOne({name: 'locations&Timing'}, (err, locationAndTiming) => {
+                                if (err) console.log(err)
+                                else {
+                                    if (locationAndTiming.savedOn > schedule.savedOn ) {
+                                        const updatedNumberOfLocations = locationAndTiming.options.length
+                                        const oldNumberOfLocations = schedule.data.length
+                                        const difference = oldNumberOfLocations - updatedNumberOfLocations < 0 ? 0 : oldNumberOfLocations - updatedNumberOfLocations
+                                        for (let x = 0; x < difference; x++) {
+                                            schedule.data.pop()
+                                        }
+                                        for (let location = 0; location < locationAndTiming.options.length; location++) {
+                                            if (schedule.data[location]) {
+                                                schedule.data[location].info = JSON.parse(JSON.stringify(locationAndTiming.options[location].info))
+                                                const updatedTimingLength = locationAndTiming.options[location].timings.length
+                                                const oldTimingLength = schedule.data[location].timing.length
+                                                const diff = oldTimingLength - updatedTimingLength < 0 ? 0 : oldTimingLength - updatedTimingLength
+                                                for (let x = 0; x < diff; x++) {
+                                                    schedule.data[location].timing.pop()
+                                                }
+                                                let mismatchedTimings = []
+                                                for (let x = 0; x < locationAndTiming.options[location].timings.length; x++) {
+                                                    const y = locationAndTiming.options[location].timings[x]
+                                                    const compareVal = `${y.hour}:${y.minutes}${y.AMorPM}`
+                                                    if (schedule.data[location].timing[x] !== compareVal) {
+                                                        schedule.data[location].timing[x] = compareVal
+                                                        mismatchedTimings.push(x)
+                                                    }
+                                                }
+                                                for (let week in schedule.data[location].monthlySchedule) {
+                                                    for (let x = 0; x < diff; x++) {
+                                                        schedule.data[location].monthlySchedule[week].pop()
+                                                    }
+                                                    let y = 0
+                                                    for (let x = 0; x < schedule.data[location].monthlySchedule[week].length; x++) {
+                                                        if (x === mismatchedTimings[y]) {
+                                                            schedule.data[location].monthlySchedule[week][x] = 'TBD'
+                                                            y++
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                const tempSchedule = JSON.parse(JSON.stringify(schedule.data[location - 1]))
+                                                tempSchedule.info = JSON.parse(JSON.stringify(locationAndTiming.options[location].info))
+                                                tempSchedule.timing = locationAndTiming.options[location].timings
+                                                const numberOfKhateebsPerWeek = tempSchedule.timing.length
+                                                let emptyArray = []
+                                                for (let x = 0; x < numberOfKhateebsPerWeek; x++) {
+                                                    emptyArray.push('TBD')
+                                                }
+                                                for (let week in tempSchedule.monthlySchedule) {
+                                                    tempSchedule.monthlySchedule[week] = emptyArray
+                                                }
+                                                schedule.data[location] = JSON.parse(JSON.stringify(tempSchedule))
+                                            }
+                                        }
+                                        // save to database
+                                        monthlySchedule.findByIdAndUpdate(schedule._id,
+                                            {
+                                                month: schedule.month,
+                                                data: schedule.data,
+                                                savedOn: new Date().toUTCString(),
+                                                __v: schedule.__v + 1
+                                            }, (err) => {
+                                                if (err) console.log(err)
+                                            })
+                                        const responseData = {
+                                            columnData: columnData,
+                                            rows: schedule.data,
+                                            _id: schedule._id,
+                                            __v: schedule.__v
+                                        }
+                                        res.json({data: responseData, msg:'Data Found' })
+                                    } else {
+                                        const responseData = {
+                                            columnData: columnData,
+                                            rows: schedule.data,
+                                            _id: schedule._id,
+                                            __v: schedule.__v
+                                        }
+                                        res.json({data: responseData, msg:'Data Found' })
+                                    }
+                                }
+                            })
                     }
                 }
             })
@@ -123,6 +201,7 @@ router.post('/update-schedule', (req, res) => {
                     {
                         month: monthName,
                         data: updatedSchedule,
+                        savedOn: new Date().toUTCString(),
                         __v: req.body.payload.__v + 1
                     }, (err) => {
                         if (err) console.log(err)
@@ -130,7 +209,8 @@ router.post('/update-schedule', (req, res) => {
             } else {
                 const monthlyScheduleX = new monthlySchedule({
                     month: monthName,
-                    data: updatedSchedule
+                    data: updatedSchedule,
+                    savedOn: new Date().toUTCString(),
                 })
                 monthlyScheduleX.save((err) => {
                     if (err) console.log(err)
@@ -219,6 +299,7 @@ router.post('/locations-timing', (req, res) => {
             setting.findByIdAndUpdate(req.body._id, {
                 name: 'locations&Timing',
                 options: req.body.payload,
+                savedOn: new Date().toUTCString(),
                 __v: req.body.__v + 1
             }, (err) => {
                 if (err) console.log(err)
@@ -226,7 +307,8 @@ router.post('/locations-timing', (req, res) => {
         } else {
             const settingX = new setting({
                 name: 'locations&Timing',
-                options: req.body.payload
+                options: req.body.payload,
+                savedOn: new Date().toUTCString()
             })
             settingX.save((err) => {
                 if (err) console.log(err)

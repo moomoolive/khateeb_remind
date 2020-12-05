@@ -21,8 +21,9 @@ router.post('/location-timing', (req, res) => {
                 if (locationAndTiming) {
                     const weeksThisMonth = req.body.payload.fridayDates
                     const tableData = locationAndTiming.options
-                    const firstSchedule = { }
+                    const firstSchedule = []
                     for (let location in tableData) {
+                        console.log(location)
                         firstSchedule[location] = {
                             info: { },
                             timing: [],
@@ -35,7 +36,7 @@ router.post('/location-timing', (req, res) => {
                         for (let timing in tableData[location].timings) {
                             const hour = tableData[location].timings[timing].hour
                             const minutes = tableData[location].timings[timing].minutes
-                            const AMorPM = tableData[location].timings[timing].timing
+                            const AMorPM = tableData[location].timings[timing].AMorPM
                             const completeTiming = `${hour}:${minutes}${AMorPM}`
                             timingsArray.push(completeTiming)
                             emptyKhateebsArray.push(toBeDecidedIndicator)
