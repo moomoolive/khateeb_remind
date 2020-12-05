@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-export default {
+const schemas = {   
     scheduleEntry: new mongoose.Schema({
         month: String,
         data: Object,
@@ -23,9 +23,18 @@ export default {
         urgent: String,
         date: String
     }),
-    settings: new mongoose.Schema({
+    setting: new mongoose.Schema({
         name: String,
         options: Object,
         savedOn: Date
     })
+ }
+
+ const models = {
+    settings: mongoose.model('setting', schemas.setting),
+    announcements: mongoose.model('announcement', schemas.announcement),
+    monthlySchedules: mongoose.model('monthlySchedule', schemas.scheduleEntry),
+    khateebs: mongoose.model('khateeb', schemas.khateeb)
 }
+
+ export default models

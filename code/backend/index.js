@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import { adminRoutes } from './routing/adminRoutes.js'
 import { generalRoutes } from './routing/generalRoutes.js'
 import { initializeRoutes } from './routing/initializeRoutes.js'
+import { middleware } from './utils/middleware.js'
 
 const PORT = process.env.PORT || 5_000
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
@@ -15,6 +16,7 @@ const db = mongoose.connection
 
 app.use(cors())
 app.use(express.json())
+app.use(middleware.generalError)
 
 app.use('/general', generalRoutes)
 app.use('/admin', adminRoutes)
