@@ -13,6 +13,8 @@ import Footer from './components/Footer.vue'
 import datetime from './utils/datetime.js'
 import API from './utils/apiCalls.js'
 
+import axios from 'axios'
+
 export default {
   components: {
     Header,
@@ -33,8 +35,12 @@ export default {
     }
   },
   created() {
+    const token = localStorage.getItem('token')
+    if (token) {
+      axios.defaults.headers.common['authorization'] = token
+    }
     const scheduleFor = this.getDateInformation()
-    this.getKhateebData(scheduleFor)
+    this.getKhateebData()
   }
 }
 </script>

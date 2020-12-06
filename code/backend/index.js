@@ -17,6 +17,8 @@ const db = mongoose.connection
 app.use(cors())
 app.use(express.json())
 app.use(middleware.generalError)
+app.post('*', middleware.noEmptyBody)
+app.delete('*', [middleware.noEmptyBody, middleware.validationCheck(['_id'])])
 
 app.use('/general', generalRoutes)
 app.use('/admin', adminRoutes)
@@ -25,5 +27,3 @@ app.use('/initialize', initializeRoutes)
 db.once('open', () => { console.log(`Database listening on ${DATABASE}`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
 app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })
-
-export default db

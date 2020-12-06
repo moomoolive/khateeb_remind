@@ -55,7 +55,9 @@
                     </th>
                 </tr>
                 <tr v-for="(khateeb, prayerTiming) in prayerLocation.monthlySchedule[displayData.weekOf]" :key="prayerTiming">
-                    <th>{{ prayerLocation.timing[prayerTiming] }}</th>
+                    <th>
+                        {{ `${prayerLocation.timing[prayerTiming].hour}:${prayerLocation.timing[prayerTiming].minutes}${prayerLocation.timing[prayerTiming].AMorPM}` }}
+                    </th>
                     <th>
                         <input 
                         v-model="khateebInfo.locationInfo[locationID].monthlySchedule[displayData.weekOf][prayerTiming]" 

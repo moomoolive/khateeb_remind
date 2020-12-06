@@ -12,6 +12,8 @@
 <script>
 import API from '../../utils/apiCalls.js'
 
+import axios from 'axios'
+
 export default {
     name: 'login',
     data() {
@@ -25,9 +27,8 @@ export default {
         async submit(event) {
             event.preventDefault()
             const token = await API.login(this.secretKey)
-            this.$store.dispatch('JWT_TOKEN', token.token)
+            axios.defaults.headers.common['authorization'] = token
             localStorage.setItem('token', token.token)
-            console.log(token)
             if (token.token) {
                 this.$nextTick(() => {
                     this.$router.push(`/admin/${this.instituteName}/dashboard`)

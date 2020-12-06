@@ -4,12 +4,12 @@
             <option
             v-for="(announcement, ID) in announcementData" :key="ID"
             :value="ID">
-                {{ announcement.date }} || {{ announcement.headline }}
+                {{ dateDisplay(inputData.savedOn, false) }} || {{ announcement.headline }}
             </option>
             <option value="New">New</option>
         </select>
         <div>
-            {{ inputData.date }} <br>
+            {{ selectedAnnouncement === 'New' ? dateDisplay(inputData.savedOn) : dateDisplay(inputData.savedOn, false) }}<br>
             headline: 
             <input v-model="inputData.headline" type="text"> 
         </div>
@@ -42,7 +42,8 @@ export default {
                 content: '',
                 urgent: false,
                 important: false,
-                date: null,
+                savedOn: new Date(),
+
             },
             announcementData: [],
             selectedAnnouncement: 'New'
@@ -51,33 +52,36 @@ export default {
     methods: {
         async submit() {
             if (window.confirm('Are you sure you want to send this announcement?')) {
-                await API.updateAnnouncements(this.$store.state.JWT_TOKEN, this.inputData)
+                await API.updateAnnouncements(this.inputData)
                 this.resetForm()
             }
         },
-        async removeAnnouncement() {
-            const payload = {
-                action: 'delete',
-                _id: this.inputData._id
-            }
-            await API.updateAnnouncements(this.$store.state.JWT_TOKEN, payload)
+        removeAnnouncement() {
+            return API.deleteAnnouncement({ _id: this.inputData._id })
         },
         resetForm() {
             this.inputData.headline = ''
             this.inputData.content = ''
             this.inputData.urgent = false
             this.inputData.important = false
+            this.inputData.savedOn = new Date()
             this.selectedAnnouncement = "New"
             delete this.inputData._id
-            delete this.inputData._id
             delete this.inputData.__v
+        },
+        dateDisplay(dateString, notDatabase=true) {
+            let x
+            notDatabase ? x = dateString : x = new Date(dateString)
+            const month = x.toLocaleString('default', {month: 'short'})
+            const date = x.getDate()
+            const year = x.getFullYear()
+            return `${month} ${date}, ${year}`
         }
     },
     computed: {
         readyToSubmit() {
             const headlineIsNotEmpty = this.inputData.headline.length > 0
             const bodyIsNotEmpty = this.inputData.content.length > 0
-
             return headlineIsNotEmpty && bodyIsNotEmpty
         }
     },
@@ -87,7 +91,6 @@ export default {
                 this.resetForm()
             } else {
                 this.inputData = JSON.parse(JSON.stringify(this.announcementData[newValue]))
-                this.date = this.announcementData[newValue].date
             }
         }
     },
@@ -95,10 +98,7 @@ export default {
         const payload = {
             action: 'get'
         }
-        this.announcementData = await API.getAnnouncements(this.$store.state.JWT_TOKEN, payload)
-        const dateData = this.$store.state.date.currentDate
-        const abbreviatedDate = dateData.month.slice(0,3)
-        this.inputData.date = `${abbreviatedDate} ${dateData.date}, ${dateData.year}`
+        this.announcementData = await API.getAnnouncements()
     }
 }
 </script>

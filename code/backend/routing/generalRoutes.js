@@ -7,29 +7,33 @@ const router = express.Router()
 
 const columnData = ['Timing', 'Khateeb'] //hardcoded
 
-router.post('/', (req, res) => {
-    const scheduleFor = req.body.date
+router.get('/', (req, res) => {
+    const x = new Date()
+    const month = x.toLocaleString('default', { month: 'long' })
+    const year = x.getFullYear()
+    const scheduleFor = `${month}${year}`
     dbModels.monthlySchedules.findOne({month : scheduleFor}, (err, schedule) => {
         if (err) console.log(err)
         else {
-            const responseData = {
-                columnData,
-                rows: schedule.data
+            if (schedule) {
+                const responseData = {
+                    columnData,
+                    rows: schedule.data
+                }
+                res.json(responseData)
+            } else {
+                res.json({ msg: "This month's schedule hasn't been created yet" })
             }
-            res.json(responseData)
         }
     })
 })
 
-router.post('/announcements', (req, res) => {
+router.get('/announcements', (req, res) => {
     const maxDisplayedAnnouncements = 5
     const mostRecent = { _id: -1 }
     dbModels.announcements.find({}, (err, announcements) => {
-        if (err) {
-            console.log(err)
-        } else {
-            res.json(announcements)
-        }
+        if (err) console.log(err)
+        else res.json(announcements)
     }).limit(maxDisplayedAnnouncements).sort(mostRecent)
 })
 

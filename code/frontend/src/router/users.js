@@ -14,7 +14,7 @@ export default [
     {
         path: '/announcements',
         name: 'announcements',
-        component: () => import ('../views/userPages/announcements.vue')
+        component: () => import (/* webpackPrefetch: true */ '../views/userPages/announcements.vue')
     },
     {
         path: '/login',

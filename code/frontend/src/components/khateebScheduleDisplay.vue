@@ -1,69 +1,76 @@
 <template>
     <div>
-        <slider-button
-        leftMessage="This Week"
-        rightMessage="This Month"
-        altText="Toggle between weekly and monthly view"
-        @slider-toggled="isWeeklyView = !isWeeklyView"
-        style="margin-top: 20px; margin-bottom: 20px;"
-        />
-        <div id="changeWeekButtons" class="whiteSpace">
-            <div v-if="!isWeeklyView">
-                <button
-                v-for="(value, weekOf) in khateebInfo.locationInfo.location1.monthlySchedule"
-                :key="weekOf"
-                @click="displayData.weekOf = weekOf"
-                :aria-label="`view schedule for ${date.upComingFriday.month} ${weekOf}`"
-                >
-                    {{ date.abbreviatedMonthName }} {{ weekOf }}
-                </button>
+        <div v-if="errorMsg">
+            Monthly schedule hasn't been made yet... check back later
+        </div>
+        <div v-if="!errorMsg">
+            <slider-button
+            leftMessage="This Week"
+            rightMessage="This Month"
+            altText="Toggle between weekly and monthly view"
+            @slider-toggled="isWeeklyView = !isWeeklyView"
+            style="margin-top: 20px; margin-bottom: 20px;"
+            />
+            <div id="changeWeekButtons" class="whiteSpace">
+                <div v-if="!isWeeklyView">
+                    <button
+                    v-for="(value, weekOf) in khateebInfo.locationInfo.location1.monthlySchedule"
+                    :key="weekOf"
+                    @click="displayData.weekOf = weekOf"
+                    :aria-label="`view schedule for ${date.upComingFriday.month} ${weekOf}`"
+                    >
+                        {{ date.abbreviatedMonthName }} {{ weekOf }}
+                    </button>
+                </div>
             </div>
-        </div>
-        <div id="changeLocationButtons" class="whiteSpace">
-            <div>
-                <button
-                @click="displayData.location = 'All'"
-                aria-label="view schedule for all locations"
-                >
-                    All locations
-                </button>
-                <button
-                v-for="(prayerLocationData, location_ID) in khateebInfo.locationInfo"
-                :key="location_ID"
-                @click="displayData.location = location_ID"
-                :aria-label="`view schedule for ${prayerLocationData.info.name}`"
-                >
-                    {{ prayerLocationData.info.name }}
-                </button>
+            <div id="changeLocationButtons" class="whiteSpace">
+                <div>
+                    <button
+                    @click="displayData.location = 'All'"
+                    aria-label="view schedule for all locations"
+                    >
+                        All locations
+                    </button>
+                    <button
+                    v-for="(prayerLocationData, location_ID) in khateebInfo.locationInfo"
+                    :key="location_ID"
+                    @click="displayData.location = location_ID"
+                    :aria-label="`view schedule for ${prayerLocationData.info.name}`"
+                    >
+                        {{ prayerLocationData.info.name }}
+                    </button>
+                </div>
             </div>
-        </div>
-        <div id="headers">
-            <h3 style="margin-top: 0px; margin-bottom: 4px;">
-                {{ date.upComingFriday.month }} {{ displayData.weekOf }}, {{date.upComingFriday.year}}
-            </h3>
-        </div>
-        <div id="scheduleTables">
-            <table
-            v-for="(prayerLocation, locationID) in shownLocations"
-            :key="locationID"
-            style="width: 95%;"
-            >
-                <tr>
-                    <th colspan="2">{{ prayerLocation.info.name }}</th>
-                </tr>
-                <tr>
-                    <th v-for="columnNames in khateebInfo.columnData" :key="columnNames">
-                        {{columnNames}}
-                    </th>
-                </tr>
-                <tr v-for="(khateeb, prayerTiming) in prayerLocation.monthlySchedule[displayData.weekOf]" :key="prayerTiming">
-                    <th>{{ prayerLocation.timing[prayerTiming] }}</th>
-                    <th>{{ khateeb }}</th>
-                </tr>
-                <tr>
-                    <th colspan="2">Location: {{ prayerLocation.info.address }}</th>
-                </tr>
-            </table>
+            <div id="headers">
+                <h3 style="margin-top: 0px; margin-bottom: 4px;">
+                    {{ date.upComingFriday.month }} {{ displayData.weekOf }}, {{date.upComingFriday.year}}
+                </h3>
+            </div>
+            <div id="scheduleTables">
+                <table
+                v-for="(prayerLocation, locationID) in shownLocations"
+                :key="locationID"
+                style="width: 95%;"
+                >
+                    <tr>
+                        <th colspan="2">{{ prayerLocation.info.name }}</th>
+                    </tr>
+                    <tr>
+                        <th v-for="columnNames in khateebInfo.columnData" :key="columnNames">
+                            {{columnNames}}
+                        </th>
+                    </tr>
+                    <tr v-for="(khateeb, prayerTiming) in prayerLocation.monthlySchedule[displayData.weekOf]" :key="prayerTiming">
+                        <th>
+                            {{ `${prayerLocation.timing[prayerTiming].hour}:${prayerLocation.timing[prayerTiming].minutes}${prayerLocation.timing[prayerTiming].AMorPM}` }}
+                        </th>
+                        <th>{{ khateeb }}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Location: {{ prayerLocation.info.address }}</th>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </template>
@@ -85,7 +92,8 @@ export default {
                 location: 'All',
                 weekOf: this.$store.state.date.upcomingFriday.date,
             },
-            isWeeklyView: true
+            isWeeklyView: true,
+            errorMsg: false
         }
     },
     computed: {
@@ -102,6 +110,9 @@ export default {
                 this.displayData.weekOf = this.date.upComingFriday.date
             }
         }
+    },
+    mounted() {
+        if (!this.$store.state.khateebSchedule) this.errorMsg = true
     }
 }
 </script>

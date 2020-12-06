@@ -45,13 +45,14 @@ export default {
                 email: null,
                 dropouts: null,
                 comments: [],
+                savedOn: new Date(),
                 __v: 0
             }
         }
     },
     methods: {
         async submit() {
-            await API.updateKhateeb(this.$store.state.JWT_TOKEN, this.selectedKhateeb, this.inputData)
+            await API.updateKhateeb(this.inputData)
             this.resetForm()
         },
         async deleteKhateeb() {
@@ -59,13 +60,14 @@ export default {
                 action: 'delete',
                 _id: this.inputData._id
             }
-            await API.updateKhateeb(this.$store.state.JWT_TOKEN, this.selectedKhateeb, payload)
+            await API.deleteKhateeb({ _id: this.inputData._id})
             this.resetForm()
         },
         resetForm() {
             this.selectedKhateeb = 'New Khateeb'
             for (let field in this.inputData) {
                 if (field === 'comments') this.inputData[field] = []
+                else if (field === 'savedOn') this.inputData[field] = new Date()
                 else this.inputData[field] = null
             }
         }
@@ -78,6 +80,7 @@ export default {
             const x = JSON.parse(JSON.stringify(this.inputData))
             delete x._id
             delete x.__v
+            delete x.savedOn
             return x
         },
     },
@@ -91,7 +94,7 @@ export default {
         }
     },
     async created() {
-        this.khateebData = await API.getKhateebs(this.$store.state.JWT_TOKEN)
+        this.khateebData = await API.getKhateebs()
     }
 }
 </script>

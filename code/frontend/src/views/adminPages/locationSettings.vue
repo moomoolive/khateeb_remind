@@ -8,7 +8,7 @@
             You need to create at least one location, with one timing to<br>
             start setting your schedules
         </h3>
-        <div v-for="(location, locationIndex) in locations" :key="locationIndex">
+        <div v-for="(location, locationIndex) in inputData.options" :key="locationIndex">
             <h4>{{ location.info.name || `Location ${locationIndex + 1}` }}</h4>
             <h5>{{ location.info.address || `My Backyard` }}</h5>
             <div>
@@ -66,28 +66,28 @@ export default {
     data() {
         return {
             hasInitializedLocations: true,
-            locations: [
-                {
-                    info: {
-                        name: null,
-                        address: null
-                    },
-                    timings: [
-                        {
-                            hour: 12,
-                            minutes: '00',
-                            AMorPM: 'PM'
-                        }, 
-                        {
-                            hour: 1,
-                            minutes: '00',
-                            AMorPM: 'PM'
-                        }
-                    ]
-                }
-            ],
-            ver: null,
-            id: null,
+            inputData: {
+                options: [
+                    {
+                        info: {
+                            name: null,
+                            address: null
+                        },
+                        timings: [
+                            {
+                                hour: 12,
+                                minutes: '00',
+                                AMorPM: 'PM'
+                            }, 
+                            {
+                                hour: 1,
+                                minutes: '00',
+                                AMorPM: 'PM'
+                            }
+                        ]
+                    }
+                ],
+            },
             cachedLocations: []
         }
     },
@@ -98,52 +98,52 @@ export default {
             else this.changeAMPM(info)
         },
         incrementHour(info, value) {
-            const previousHour = this.locations[info.locationIndex].timings[info.timingIndex].hour
-            this.locations[info.locationIndex].timings[info.timingIndex].hour = previousHour + value
-            const currentHour = this.locations[info.locationIndex].timings[info.timingIndex].hour
+            const previousHour = this.inputData.options[info.locationIndex].timings[info.timingIndex].hour
+            this.inputData.options[info.locationIndex].timings[info.timingIndex].hour = previousHour + value
+            const currentHour = this.inputData.options[info.locationIndex].timings[info.timingIndex].hour
             if (currentHour >= 13) {
-                this.locations[info.locationIndex].timings[info.timingIndex].hour = 1
+                this.inputData.options[info.locationIndex].timings[info.timingIndex].hour = 1
             }
             else if (currentHour <= 0) {
-                this.locations[info.locationIndex].timings[info.timingIndex].hour = 12
+                this.inputData.options[info.locationIndex].timings[info.timingIndex].hour = 12
             }
             else if (currentHour === 12 || previousHour === 12) this.changeAMPM(info)
         },
         incrementMinutes(info, value) {
-            const previousMinute = parseInt(this.locations[info.locationIndex].timings[info.timingIndex].minutes)
-            this.locations[info.locationIndex].timings[info.timingIndex].minutes = this.nonStringMinutes(previousMinute, value)
-            const currentMinute = this.locations[info.locationIndex].timings[info.timingIndex].minutes
-            const currentHour = this.locations[info.locationIndex].timings[info.timingIndex].hour
+            const previousMinute = parseInt(this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes)
+            this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes = this.nonStringMinutes(previousMinute, value)
+            const currentMinute = this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes
+            const currentHour = this.inputData.options[info.locationIndex].timings[info.timingIndex].hour
             if (currentMinute >= '60') {
-                this.locations[info.locationIndex].timings[info.timingIndex].minutes = '00'
+                this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes = '00'
                 this.incrementHour(info, value)
             }
             else if (currentMinute <= '-1') {
-                this.locations[info.locationIndex].timings[info.timingIndex].minutes = '59'
+                this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes = '59'
                 this.incrementHour(info, value)
             }
         },
         changeAMPM(info) {
-            const value = this.locations[info.locationIndex].timings[info.timingIndex].AMorPM
+            const value = this.inputData.options[info.locationIndex].timings[info.timingIndex].AMorPM
                 if (value === 'AM') {
-                    this.locations[info.locationIndex].timings[info.timingIndex].AMorPM = 'PM'
-                } else this.locations[info.locationIndex].timings[info.timingIndex].AMorPM = 'AM'
+                    this.inputData.options[info.locationIndex].timings[info.timingIndex].AMorPM = 'PM'
+                } else this.inputData.options[info.locationIndex].timings[info.timingIndex].AMorPM = 'AM'
         },
         nonStringMinutes(parsedValue, increment) {
             const x = parsedValue + increment
             return x <= 9 && x >= 0 ? `0${x}` : `${x}`
         },
         addNewTiming(locationIndex, timingIndex) {
-            const mins = this.nonStringMinutes(parseInt(this.locations[locationIndex].timings[timingIndex].minutes), 1)
+            const mins = this.nonStringMinutes(parseInt(this.inputData.options[locationIndex].timings[timingIndex].minutes), 1)
             const newTiming = {
-                hour: this.locations[locationIndex].timings[timingIndex].hour,
+                hour: this.inputData.options[locationIndex].timings[timingIndex].hour,
                 minutes: mins,
-                AMorPM: this.locations[locationIndex].timings[timingIndex].AMorPM
+                AMorPM: this.inputData.options[locationIndex].timings[timingIndex].AMorPM
             }
-            this.locations[locationIndex].timings.splice(timingIndex + 1, 0, newTiming)
+            this.inputData.options[locationIndex].timings.splice(timingIndex + 1, 0, newTiming)
         },
         deleteTiming(locationIndex, timingIndex) {
-            this.locations[locationIndex].timings.splice(timingIndex, 1)
+            this.inputData.options[locationIndex].timings.splice(timingIndex, 1)
         },
         addNewLocation() {
             const emptyLocation = {
@@ -164,32 +164,34 @@ export default {
                         }
                     ]
                 }
-            this.locations.push(emptyLocation)
+            this.inputData.options.push(emptyLocation)
         },
         deleteLocation(locationIndex) {
             console.log('hi')
-            this.locations.splice(locationIndex, 1)
+            this.inputData.options.splice(locationIndex, 1)
         },
         async saveLocations() {
-            await API.saveLocationAndTiming(this.$store.state.JWT_TOKEN, this.locations, this.ver, this.id)
+            await API.updateLocationAndTiming(this.inputData)
         }
     },
     computed: {
         isSame() {
-            for (let x = 0; x < this.locations.length; x++) {
-                if (!equal(this.locations[x], this.cachedLocations[x])) return false
+            for (let x = 0; x < this.inputData.options.length; x++) {
+                if (!equal(this.inputData.options[x], this.cachedLocations[x])) return false
             }
-            return true
+            return true && this.sameNumberOfLocations
         },
+        sameNumberOfLocations() {
+            return this.inputData.options.length === this.cachedLocations.length
+        }
 
     },
     async created() {
-        const locations =  await API.getLocationAndTiming(this.$store.state.JWT_TOKEN)
+        const locations =  await API.getLocationAndTiming('locations&Timing')
         if (locations) {
-            this.locations = locations.options
-            this.cachedLocations = JSON.parse(JSON.stringify(this.locations))
-            this.ver = locations.__v 
-            this.id = locations._id
+            console.log(locations)
+            this.inputData = locations
+            this.cachedLocations = JSON.parse(JSON.stringify(this.inputData.options))
         } else this.hasInitializedLocations = false
     }
 }

@@ -13,11 +13,7 @@ export default {
             let timingsArray = []
             let emptyKhateebsArray = []
             for (let timing in tableData[location].timings) {
-                const hour = tableData[location].timings[timing].hour
-                const minutes = tableData[location].timings[timing].minutes
-                const AMorPM = tableData[location].timings[timing].AMorPM
-                const completeTiming = `${hour}:${minutes}${AMorPM}`
-                timingsArray.push(completeTiming)
+                timingsArray.push(tableData[location].timings[timing])
                 emptyKhateebsArray.push(toBeDecidedIndicator)
             }
             newSchedule[location].timing = timingsArray
