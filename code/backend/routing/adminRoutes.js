@@ -1,132 +1,51 @@
 import express from 'express'
 import dbModels from '../database/models.js'
-import httpCodes from '../utils/httpCodes.js'
 import { middleware } from '../utils/middleware.js'
-import scheduleFunctions from '../utils/montlySchedule.js'
-import db from '../database/funcs.js'
+import $schedule from '../utils/schedule.js'
+import $db from '../database/funcs.js'
 
 const router = express.Router()
 
 router.use(middleware.authAdmin)
-// router.post(middleware.schemaValidationCheck) >> must finish schedule requests
+router.post('*', middleware.validationCheck('schema'))
 
 const routerGroup1 = 'announcements'
 const routerGroup1URL = `/${routerGroup1}`
 router.get(routerGroup1URL, (req, res) => {
     dbModels.announcements.find({}, (err, announcements) => {
-        if (err) db.databaseErrorCallback(err, res)
+        if (err) $db.databaseErrorCallback(err, res)
         else res.json(announcements)
     })
 })
 
 router.delete(routerGroup1URL, (req, res) => {
-    db.delete(routerGroup1, req.body._id, res)
+    $db.delete(routerGroup1, req.body._id, res)
 })
 
 router.post(routerGroup1URL, (req, res) => {
-    db.save(routerGroup1, req.body, res)
-})
-
-const columnData = ['Timing', 'Khateeb'] //hardcoded
-
-router.post('/scheduler', (req, res) => {
-    if (req.body.month) {
-        dbModels.monthlySchedules.findOne({month : req.body.month}, (err, schedule) => {
-            if (err) {
-                console.log(err)
-            } else {
-                if (!schedule) {
-                    res.json({ data: null, msg: "No data recorded for given month"})
-                } else {
-                        dbModels.settings.findOne({name: 'locations&Timing'}, (err, locationAndTiming) => {
-                            if (err) console.log(err)
-                            else {
-                                if (locationAndTiming.savedOn > schedule.savedOn ) {
-                                    const updatedSchedule = scheduleFunctions.updateExistingScheduleWithNewSettings(schedule, locationAndTiming)
-                                    dbModels.monthlySchedules.findByIdAndUpdate(schedule._id,
-                                        {
-                                            month: schedule.month,
-                                            data: updatedSchedule,
-                                            savedOn: new Date().toUTCString(),
-                                            __v: schedule.__v + 1
-                                        }, (err) => {
-                                            if (err) console.log(err)
-                                        })
-                                    const responseData = {
-                                        columnData: columnData,
-                                        rows: updatedSchedule,
-                                        _id: schedule._id,
-                                        __v: schedule.__v
-                                    }
-                                    res.json({data: responseData, msg:'Data Found' })
-                                } else {
-                                    const responseData = {
-                                        columnData: columnData,
-                                        rows: schedule.data,
-                                        _id: schedule._id,
-                                        __v: schedule.__v
-                                    }
-                                    res.json({data: responseData, msg:'Data Found' })
-                                }
-                            }
-                        })
-                }
-            }
-        })
-    } else {
-        res.status(httpCodes.notAcceptable)
-        res.json({ data: null, msg: "You're missing required data for request!" })
-    }
-})
-
-router.post('/update-schedule', (req, res) => {
-    if (!req.body.payload) {
-        res.status(httpCodes.notAcceptable)
-        res.json('No data was sent')
-    } else {
-        const monthName = req.body.payload.key
-        const updatedSchedule = req.body.payload.updatedSchedule
-        const originalSchedule = req.body.payload.originalSchedule // unused for now
-        if (req.body.payload._id) {
-            dbModels.monthlySchedules.findByIdAndUpdate(req.body.payload._id,
-                {
-                    month: monthName,
-                    data: updatedSchedule,
-                    savedOn: new Date().toUTCString(),
-                    __v: req.body.payload.__v + 1
-                }, (err) => {
-                    if (err) console.log(err)
-                })
-        } else {
-            const monthlyScheduleX = new dbModels.monthlySchedules({
-                month: monthName,
-                data: updatedSchedule,
-                savedOn: new Date().toUTCString(),
-            })
-            monthlyScheduleX.save((err) => {
-                if (err) console.log(err)
-                else console.log(`Schedule for ${monthlyScheduleX.month} saved successfully!`)
-            })
-        }
-    }
+    $db.save(routerGroup1, req.body, res)
 })
 
 const routerGroup2 = 'khateebs'
 const routerGroup2URL = `/${routerGroup2}`
 
-router.get(routerGroup2URL, (req, res) => {
+router.get(routerGroup2URL + '/:fullOrNot', (req, res) => {
+    let x
+    req.params.fullOrNot === 'no' ? x = ['_id', 'firstName', 'lastName'] : x = null;
     dbModels.khateebs.find({}, (err, khateebs) => {
         if (err) console.log(err)
-        else res.json(khateebs)
-    })
+        else {
+            khateebs ? res.json(khateebs) : res.json(`you haven't created any khateebs!`)
+        }
+    }).select(x)
 })
 
 router.delete(routerGroup2URL, (req, res) => {
-    db.delete(routerGroup2, req.body._id, res)
+    $db.delete(routerGroup2, req.body._id, res)
 })
 
 router.post(routerGroup2URL, (req, res) => {
-    db.save(routerGroup2, req.body, res)
+    $db.save(routerGroup2, req.body, res)
 })
 
 const routerGroup3 = 'settings'
@@ -140,7 +59,41 @@ router.get(routerGroup3URL + '/:settingName', (req, res) => {
 })
 
 router.post(routerGroup3URL, (req, res) => {
-    db.save(routerGroup3, req.body, res)
+    $db.save(routerGroup3, req.body, res)
+})
+
+const routerGroup4 = 'monthlySchedules'
+const routerGroup4URL = `/${routerGroup4}`
+
+
+router.get(routerGroup4URL + '/:monthToQuery/:fridayDates', (req, res) => {
+    dbModels.monthlySchedules.findOne({month : req.params.monthToQuery}, (err, schedule) => {
+        if (err) console.log(err)
+        else {
+            dbModels.settings.findOne({name: 'locations&Timing'}, (err, locationAndTiming) => {
+                const fridayDates = req.params.fridayDates.split(',')
+                if (err) console.log(err)
+                else if (!schedule) {
+                    if (!locationAndTiming) res.json('No locations or timings were found!')
+                    else {
+                        const newSchedule = $schedule.createNewSchedule(fridayDates, locationAndTiming)
+                        res.json({ data: newSchedule })
+                    }
+                } else {
+                    if (locationAndTiming.savedOn > schedule.savedOn) {
+                        const updatedSchedule = $schedule.updateExistingSchedule(fridayDates, locationAndTiming, schedule)
+                        res.json(updatedSchedule)
+                    } else res.json(schedule)
+                }
+            })
+        }
+    })
+})
+
+router.post(routerGroup4URL, (req, res) => {
+    // const originalSchedule = req.body.original >> soon to be used for updates
+    delete req.body.original
+    $db.save(routerGroup4, req.body, res)
 })
 
 export {router as adminRoutes}

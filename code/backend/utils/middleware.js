@@ -25,25 +25,29 @@ const funcs = {
             response.json(`You cannot send an empty request body to this route!`)
         } else next()
     },
-    validationCheck(fields) {
+    validationCheck(fields=[]) {
         return (request, response, next) => {
+            if (typeof(fields) === 'string') {
+                fields = funcs[fields + 'VC'](request) 
+            }   
             let passed = true
             for (let field of fields ) {
                 if (request.body[field] === undefined) {
                     passed = false
                     response.status(httpCodes.notAcceptable)
                     response.json(`You're missing required information`)
+                    break
                 }
             }
             if (passed) next()
         }
     },
-    schemaValidationCheck(request) {
+    schemaVC(request) {
         const urlComponents = request.originalUrl.split('/')
         const schemaName = urlComponents[2]
         const validationList = dbModels.schemaParams(schemaName)
-        return this.validationCheck(validationList)
-    }
+        return validationList
+    },
 }
 
 export { funcs as middleware }

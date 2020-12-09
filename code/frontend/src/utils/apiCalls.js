@@ -28,26 +28,15 @@ export default {
             .catch((error) => { console.log(error) })
         return responseData
     },
-    async fetchMonthlySchedules(token, monthToQuery) {
+    async fetchMonthlySchedules(monthToQuery, fridayDates) {
         let responseData
-        const requestData = {
-            token,
-            month: monthToQuery
-        }
-        await axios.post(this.API_SERVER + this.adminRoutes + '/scheduler', requestData)
-            .then((response) => {
-                responseData = response.data
-            })
+        await axios.get(this.API_SERVER + this.adminRoutes + `/monthlySchedules/${monthToQuery}/${fridayDates}`)
+            .then((response) => { responseData = response.data })
             .catch((error) => { console.log(error) })
-        console.log(responseData)
         return responseData
     },
-    async sendUpdatedSchedule(token, payload) {
-        const requestData = {
-            token,
-            payload
-        }
-        await axios.post(this.API_SERVER + this.adminRoutes + '/update-schedule', requestData)
+    async sendUpdatedSchedule(payload) {
+        await axios.post(this.API_SERVER + this.adminRoutes + '/monthlySchedules', payload)
             .then((response) => {
                 console.log(response)
             })
@@ -88,9 +77,9 @@ export default {
                 window.alert('There was a problem saving your changes')
             })
     },
-    async getKhateebs() {
+    async getKhateebs(fullOrNot) {
         let responseData
-        await axios.get(this.API_SERVER + this.adminRoutes + '/khateebs')
+        await axios.get(this.API_SERVER + this.adminRoutes + '/khateebs/' + fullOrNot)
             .then((response) => { responseData = response.data })
             .catch((error) => { console.log(error) })
         return responseData
@@ -138,20 +127,5 @@ export default {
                 console.log(error)
             })
         return responseData
-    },
-    async initialTable(token, payload) {
-        const requestData = {
-            token,
-            payload
-        }
-        let responseData
-        await axios.post(this.API_SERVER + '/initialize' + '/location-timing', requestData)
-            .then((response) => {
-                responseData = response.data
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-        return responseData
-    },
+    }
 }

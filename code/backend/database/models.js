@@ -40,7 +40,12 @@ const schemas = {
     schemaParams(schemaName, full=false) {
         const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
         if (!full) {
-            const versionParam = fullSchemaParams.pop()
+            for (let param in fullSchemaParams) {
+                let x = fullSchemaParams[param]
+                if (x == '__v' || x == 'savedOn') {
+                    fullSchemaParams.splice(param, 1)
+                }
+            }
             const IDParam = fullSchemaParams.pop()
         }
         return fullSchemaParams

@@ -1,76 +1,88 @@
 <template>
     <div style="padding-top: 20px;">
         set schedule<br>
-        {{ month }}
-        <div>
-        <div id="changeWeekButtons" class="whiteSpace">
+        <h2 v-if="!initalized">You need to first create a locations and timings to start setting a schedule</h2>
+        <div v-if="initalized">
             <div>
-                <button
-                v-for="fridayDate of fridayDates"
-                :key="fridayDate"
-                @click="displayData.weekOf = fridayDate"
-                :aria-label="`view schedule for ${displayedMonthInfo.month} ${fridayDate}`"
-                >
-                    {{ displayedMonthInfo.abbreviatedMonthName }} {{ fridayDate }}
-                </button>
+            <div id="changeWeekButtons" class="whiteSpace">
+                <div>
+                    <button
+                    v-for="fridayDate of fridayDates"
+                    :key="fridayDate"
+                    @click="displayData.weekOf = fridayDate"
+                    :aria-label="`view schedule for ${displayedMonthInfo.month} ${fridayDate}`"
+                    >
+                        {{ displayedMonthInfo.abbreviatedMonthName }} {{ fridayDate }}
+                    </button>
+                </div>
             </div>
-        </div>
-        <div id="changeLocationButtons" class="whiteSpace">
-            <div>
-                <button
-                @click="displayData.location = 'All'"
-                aria-label="view schedule for all locations"
-                >
-                    All locations
-                </button>
-                <button
-                v-for="(prayerLocationData, location_ID) in khateebInfo.locationInfo"
-                :key="location_ID"
-                @click="displayData.location = location_ID"
-                :aria-label="`view schedule for ${prayerLocationData.info.name}`"
-                >
-                    {{ prayerLocationData.info.name }}
-                </button>
+            <div id="changeLocationButtons" class="whiteSpace">
+                <div>
+                    <button
+                    @click="displayData.location = 'All'"
+                    aria-label="view schedule for all locations"
+                    >
+                        All locations
+                    </button>
+                    <button
+                    v-for="(prayerLocationData, location_ID) in currentSchedule.data.rows"
+                    :key="location_ID"
+                    @click="displayData.location = location_ID"
+                    :aria-label="`view schedule for ${prayerLocationData.info.name}`"
+                    >
+                        {{ prayerLocationData.info.name }}
+                    </button>
+                </div>
             </div>
+            <div id="headers">
+                <h3 style="margin-top: 0px; margin-bottom: 4px;">
+                    <button @click="incrementMonth(1)">Add month</button>
+                    {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{ displayedMonthInfo.year }}
+                    <button @click="incrementMonth(-1)">Less month</button>
+                </h3>
+            </div>
+            <div id="scheduleTables">
+                <table
+                v-for="(prayerLocation, locationID) in shownLocations"
+                :key="locationID"
+                style="width: 95%;"
+                >
+                    <tr>
+                        <th colspan="2">{{ prayerLocation.info.name }}</th>
+                    </tr>
+                    <tr>
+                        <th v-for="columnNames in currentSchedule.data.columnData" :key="columnNames">
+                            {{columnNames}}
+                        </th>
+                    </tr>
+                    <tr v-for="(khateeb, prayerTiming) in prayerLocation.monthlySchedule[displayData.weekOf]" :key="prayerTiming">
+                        <th>
+                            {{ `${prayerLocation.timing[prayerTiming].hour}:${prayerLocation.timing[prayerTiming].minutes}${prayerLocation.timing[prayerTiming].AMorPM}` }}
+                        </th>
+                        <th>
+                            <select 
+                            v-model="currentSchedule.data.rows[locationID].monthlySchedule[displayData.weekOf][prayerTiming]" 
+                            >
+                                <option
+                                v-for="(khateeb, khateebNumber) in khateebList" :key="khateebNumber"
+                                :value="khateeb"
+                                >
+                                    {{ khateeb.firstName }} {{ khateeb.lastName }}
+                                </option>
+                                <option selected :value="emptyKhateeb">
+                                    TBD
+                                </option>
+                            </select>
+                            <button @click="revertToOriginal(locationID, prayerTiming)">Revert</button>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Location: {{ prayerLocation.info.address }}</th>
+                    </tr>
+                </table>
+            </div>
+            <button @click="saveData" :disabled="isSame">save changes</button>
         </div>
-        <div id="headers">
-            <h3 style="margin-top: 0px; margin-bottom: 4px;">
-                <button @click="incrementMonth(1)">Add month</button>
-                {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{ displayedMonthInfo.year }}
-                <button @click="incrementMonth(-1)">Less month</button>
-            </h3>
-        </div>
-        <div id="scheduleTables">
-            <table
-            v-for="(prayerLocation, locationID) in shownLocations"
-            :key="locationID"
-            style="width: 95%;"
-            >
-                <tr>
-                    <th colspan="2">{{ prayerLocation.info.name }}</th>
-                </tr>
-                <tr>
-                    <th v-for="columnNames in khateebInfo.columnData" :key="columnNames">
-                        {{columnNames}}
-                    </th>
-                </tr>
-                <tr v-for="(khateeb, prayerTiming) in prayerLocation.monthlySchedule[displayData.weekOf]" :key="prayerTiming">
-                    <th>
-                        {{ `${prayerLocation.timing[prayerTiming].hour}:${prayerLocation.timing[prayerTiming].minutes}${prayerLocation.timing[prayerTiming].AMorPM}` }}
-                    </th>
-                    <th>
-                        <input 
-                        v-model="khateebInfo.locationInfo[locationID].monthlySchedule[displayData.weekOf][prayerTiming]" 
-                        >
-                        <button @click="revertToOriginal(locationID, prayerTiming)">Revert</button>
-                    </th>
-                </tr>
-                <tr>
-                    <th colspan="2">Location: {{ prayerLocation.info.address }}</th>
-                </tr>
-            </table>
-        </div>
-        <button @click="saveData" :disabled="isSame">save changes</button>
     </div>
     </div>
 </template>
@@ -85,24 +97,18 @@ export default {
     data() {
         return {
             month: new Date(),
-            khateebInfo : {
-                columnData: null,
-                locationInfo: null,
-                originalSchedule: null,
-                _id: null,
-                __v: null
-            },
+            currentSchedule: null,
+            originalSchedule: null,
             displayData: {
                 location: 'All',
                 weekOf: this.$store.state.date.upcomingFriday.date,
             },
-            token: this.$store.state.JWT_TOKEN
+            initalized: true,
+            khateebList: null,
+            emptyKhateeb: 'randomValue'
         }
     },
     methods: {
-        // need to add function that checks if timings have been changed
-        // and if so fill in vacant new spot with TBD
-        // without losing already given order
         incrementMonth(value) {
             const currentMonth = this.month.getMonth()
             const halfOfAMonth = 15
@@ -110,87 +116,53 @@ export default {
                 this.month = new Date(this.month.setDate(this.month.getDate() + (halfOfAMonth * value)))
             }
             this.$nextTick(async () => {
-                const scheduleFor = `${this.displayedMonthInfo.month}${this.displayedMonthInfo.year}`
-                const data = await API.fetchMonthlySchedules(this.token, scheduleFor)
-                if (data.msg === 'No data recorded for given month') {
-                    this.createNewEmptyTable()
-                } else {
-                    this.updateSchedule(data)
-                }
+                this.fetchMonthlySchedule()
                 this.displayData.weekOf = this.fridayDates[0]
             })
         },
         revertToOriginal(location, index) {
-            const originalData = JSON.parse(JSON.stringify(this.khateebInfo.originalSchedule[location].monthlySchedule[this.displayData.weekOf][index]))
-            this.khateebInfo.locationInfo[location].monthlySchedule[this.displayData.weekOf].splice(index, 1, originalData)
-        },
-        createNewEmptyTable() {
-            const toBeDecidedIndicator = 'TBD'
-            for (let location in this.khateebInfo.locationInfo) {
-                let numberOfRows = this.khateebInfo.locationInfo[location].timing.length
-                let emptyArray = []
-                for (let i = 0; i < numberOfRows; i++) {
-                        emptyArray.push(toBeDecidedIndicator)
-                }
-                let newWeeks = {}
-                for (let weeks in this.fridayDates) {
-                    newWeeks[this.fridayDates[weeks]] = emptyArray
-                }
-                this.khateebInfo.locationInfo[location].monthlySchedule = newWeeks
-                this.cacheOriginalSchedule()
-            }
-            delete this.khateebInfo._id
-            delete this.khateebInfo.__v
+            const originalData = JSON.parse(JSON.stringify(this.originalSchedule.data.rows[location].monthlySchedule[this.displayData.weekOf][index]))
+            this.currentSchedule.data.rows[location].monthlySchedule[this.displayData.weekOf].splice(index, 1, originalData)
         },
         updateSchedule(schedule) {
-            this.khateebInfo.columnData = schedule.data.columnData
-            this.khateebInfo.locationInfo = schedule.data.rows
-            this.khateebInfo._id = schedule.data._id
-            this.khateebInfo.__v = schedule.data.__v
+            this.currentSchedule = schedule
             this.cacheOriginalSchedule()
         },
         cacheOriginalSchedule() {
-            this.khateebInfo.originalSchedule = JSON.parse(JSON.stringify(this.khateebInfo.locationInfo))
+            this.originalSchedule = JSON.parse(JSON.stringify(this.currentSchedule))
         },
         saveData() {
             const toBeDecidedIndicator = 'TBD'
             if (window.confirm("Are you sure you want to save these changes?")) {
-                for (let location in this.khateebInfo.locationInfo) {
-                    for (let week in this.khateebInfo.locationInfo[location].monthlySchedule) {
-                        for (let khateeb in this.khateebInfo.locationInfo[location].monthlySchedule[week]) {
-                            if (this.khateebInfo.locationInfo[location].monthlySchedule[week][khateeb] === '') {
-                                this.khateebInfo.locationInfo[location].monthlySchedule[week].splice(khateeb, 1, toBeDecidedIndicator)
-                            } 
-                        }
-                    }
-                }
-                const payload = {
-                    key: this.currentScheduleKey,
-                    updatedSchedule: this.khateebInfo.locationInfo,
-                    originalSchedule: this.khateebInfo.originalSchedule,
-                    _id: this.khateebInfo._id,
-                    __v: this.khateebInfo.__v
-                }
-                API.sendUpdatedSchedule(this.token, payload)
+                this.currentSchedule.month = this.originalSchedule.month = this.currentScheduleKey
+                const payload = JSON.parse(JSON.stringify(this.currentSchedule))
+                payload.original = JSON.parse(JSON.stringify(this.originalSchedule))
+                API.sendUpdatedSchedule(payload)
                 this.cacheOriginalSchedule()
             }
         },
-        async fetchInitialTable() {
-            const payload = {
-                month: this.currentScheduleKey,
-                fridayDates: this.fridayDates
-            }
-            const data = await API.initialTable(this.token, payload)
-            this.updateSchedule(data)
+        async fetchMonthlySchedule() {
+            const scheduleFor = `${this.currentScheduleKey}`
+            const fridayDates = this.fridayDates
+            const data = await API.fetchMonthlySchedules(scheduleFor, fridayDates)
+            if (data === 'No locations or timings were found!') this.initalized = false
+            else this.updateSchedule(data)
         },
-        async makeInitialAPICalls() {
-            const scheduleFor = `${this.$store.state.date.currentDate.month}${this.$store.state.date.currentDate.year}`
-            const data = await API.fetchMonthlySchedules(this.token, scheduleFor)
-            if (data.msg === 'No data recorded for given month') {
-                this.fetchInitialTable()
+        async fetchKhateebs() {
+            const khateebs = await API.getKhateebs('no')
+            if (khateebs === `you haven't created any khateebs!`) {
+                this.initalized = false
             } else {
-                this.updateSchedule(data)
+                this.khateebList = khateebs
+                this.emptyKhateeb = this.toBeDecidedIndicator(khateebs)
             }
+        },
+        toBeDecidedIndicator(khateebArray) {
+            const randomKhateeb = JSON.parse(JSON.stringify(khateebArray[0]))
+            for (let field in randomKhateeb) {
+                randomKhateeb[field] = null
+            }
+            return randomKhateeb
         }
     },
     computed: {
@@ -222,16 +194,17 @@ export default {
             const location = this.displayData.location
             if (location !== 'All') {
                 let returnLocation = {}
-                returnLocation[location] = this.khateebInfo.locationInfo[location] 
+                returnLocation[location] = this.currentSchedule.data.rows[location] 
                 return  returnLocation
-            } else return this.khateebInfo.locationInfo
+            } else return this.currentSchedule.data.rows
         },
         isSame() {
-            return equal(this.khateebInfo.locationInfo, this.khateebInfo.originalSchedule)
+            return equal(this.currentSchedule.data.rows, this.originalSchedule.data.rows)
         }
     },
-    async created() {
-        this.makeInitialAPICalls()
+    created() {
+        this.fetchMonthlySchedule()
+        this.fetchKhateebs()
     }
 }
 </script>

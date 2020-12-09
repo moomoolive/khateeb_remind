@@ -94,7 +94,7 @@ export default {
         }
     },
     async created() {
-        this.khateebData = await API.getKhateebs()
+        this.khateebData = await API.getKhateebs('yes')
     }
 }
 </script>

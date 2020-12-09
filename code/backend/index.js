@@ -27,3 +27,6 @@ app.use('/initialize', initializeRoutes)
 db.once('open', () => { console.log(`Database listening on ${DATABASE}`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
 app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })
+
+// note any import prefixed by "$" refers to a utility library
+// meaning a local utility library, specific to this api

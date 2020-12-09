@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div v-if="errorMsg">
-            Monthly schedule hasn't been made yet... check back later
+        <div v-if="!scheduleAvailable">
+           {{ errorMsg }}
         </div>
-        <div v-if="!errorMsg">
+        <div v-if="scheduleAvailable">
             <slider-button
             leftMessage="This Week"
             rightMessage="This Month"
@@ -14,7 +14,7 @@
             <div id="changeWeekButtons" class="whiteSpace">
                 <div v-if="!isWeeklyView">
                     <button
-                    v-for="(value, weekOf) in khateebInfo.locationInfo.location1.monthlySchedule"
+                    v-for="(value, weekOf) in locationInfo[0].monthlySchedule"
                     :key="weekOf"
                     @click="displayData.weekOf = weekOf"
                     :aria-label="`view schedule for ${date.upComingFriday.month} ${weekOf}`"
@@ -32,7 +32,7 @@
                         All locations
                     </button>
                     <button
-                    v-for="(prayerLocationData, location_ID) in khateebInfo.locationInfo"
+                    v-for="(prayerLocationData, location_ID) in locationInfo"
                     :key="location_ID"
                     @click="displayData.location = location_ID"
                     :aria-label="`view schedule for ${prayerLocationData.info.name}`"
@@ -56,7 +56,7 @@
                         <th colspan="2">{{ prayerLocation.info.name }}</th>
                     </tr>
                     <tr>
-                        <th v-for="columnNames in khateebInfo.columnData" :key="columnNames">
+                        <th v-for="columnNames in columnData" :key="columnNames">
                             {{columnNames}}
                         </th>
                     </tr>
@@ -76,6 +76,8 @@
 </template>
 
 <script>
+import API from '../utils/apiCalls.js'
+
 export default {
     name: 'khateebScheduleDisplay',
     data() {
@@ -84,24 +86,35 @@ export default {
                 upComingFriday: this.$store.state.date.upcomingFriday,
                 abbreviatedMonthName: this.$store.state.date.upcomingFriday.month.slice(0,3)
             },
-            khateebInfo : {
-                columnData: this.$store.state.khateebSchedule.columnData,
-                locationInfo: this.$store.state.khateebSchedule.rows
-            },
+            columnData: null,
+            locationInfo: null,
             displayData: {
                 location: 'All',
                 weekOf: this.$store.state.date.upcomingFriday.date,
             },
             isWeeklyView: true,
-            errorMsg: false
+            scheduleAvailable: true,
+            errorMsg: null
+        }
+    },
+    methods: {
+        async getSchedule() {
+            const monthlySchedule = await API.monthlySchedule()
+            if (monthlySchedule === `This month's schedule hasn't been created yet`) {
+                this.scheduleAvailable = false
+                this.errorMsg = monthlySchedule
+            } else {
+                this.columnData = monthlySchedule.columnData
+                this.locationInfo = monthlySchedule.rows
+            }
         }
     },
     computed: {
         shownLocations() {
             const location = this.displayData.location
             if (location !== 'All') {
-                return { location: this.khateebInfo.locationInfo[location] }
-            } else return this.khateebInfo.locationInfo
+                return { location: this.locationInfo[location] }
+            } else return this.locationInfo
         }
     },
     watch: {
@@ -111,8 +124,8 @@ export default {
             }
         }
     },
-    mounted() {
-        if (!this.$store.state.khateebSchedule) this.errorMsg = true
+    created() {
+        this.getSchedule()
     }
 }
 </script>

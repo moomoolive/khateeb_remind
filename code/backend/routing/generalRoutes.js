@@ -5,8 +5,6 @@ import httpCodes from '../utils/httpCodes.js'
 
 const router = express.Router()
 
-const columnData = ['Timing', 'Khateeb'] //hardcoded
-
 router.get('/', (req, res) => {
     const x = new Date()
     const month = x.toLocaleString('default', { month: 'long' })
@@ -15,15 +13,8 @@ router.get('/', (req, res) => {
     dbModels.monthlySchedules.findOne({month : scheduleFor}, (err, schedule) => {
         if (err) console.log(err)
         else {
-            if (schedule) {
-                const responseData = {
-                    columnData,
-                    rows: schedule.data
-                }
-                res.json(responseData)
-            } else {
-                res.json({ msg: "This month's schedule hasn't been created yet" })
-            }
+            if (schedule) res.json(schedule.data)
+            else res.json("This month's schedule hasn't been created yet")
         }
     })
 })
