@@ -1,5 +1,0 @@
-things needed to initialize app:
-- unique JWT secret
-- unique admin secret key && emergency key
-- first schedule
-- tutorial??

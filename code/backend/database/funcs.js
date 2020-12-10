@@ -1,4 +1,4 @@
-import dbModels from './models.js'
+import $dbModels from './models.js'
 
 export default {
     databaseError(response, error) {
@@ -16,16 +16,16 @@ export default {
         toBeSaved.savedOn = new Date().toUTCString()
         if (toBeSaved._id) {
             toBeSaved.__v++
-            dbModels[schemaName].findByIdAndUpdate(toBeSaved._id, toBeSaved, (err) => {
+            $dbModels[schemaName].findByIdAndUpdate(toBeSaved._id, toBeSaved, (err) => {
                 this.databaseCallback(response, err)
             })
         } else {
-            const x = new dbModels[schemaName](toBeSaved)
+            const x = new $dbModels[schemaName](toBeSaved)
             x.save((err) => { this.databaseCallback(response, err) })
         }
     },
     delete(schemaName, ID, response) {
-        dbModels[schemaName].deleteOne({ _id: ID }, (err) => {
+        $dbModels[schemaName].deleteOne({ _id: ID }, (err) => {
             this.databaseCallback(response, err)
         })
     }

@@ -6,7 +6,7 @@
         <img :src="prayerProviderLogo" alt="Friday Prayer Provider Logo">
       </div>
       <div>
-        <khateeb-schedule-display />
+        <homepage-schedule />
       </div>
   </div>
 </template>
@@ -15,7 +15,7 @@
 export default {
   name: 'Home',
   components: {
-    khateebScheduleDisplay: () => import('../../components/khateebScheduleDisplay.vue')
+    homepageSchedule: () => import('../../components/scheduleDisplay/homepageSchedule.vue')
   },
   data() {
     return {

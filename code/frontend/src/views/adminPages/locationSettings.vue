@@ -67,6 +67,7 @@ export default {
         return {
             hasInitializedLocations: true,
             inputData: {
+                name: 'locations&Timing',
                 options: [
                     {
                         info: {
