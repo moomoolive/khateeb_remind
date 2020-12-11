@@ -1,7 +1,6 @@
+import axios from 'axios'
+
 export default {
-    khateebScheduleInfo({ commit }, khateebScheduleInfo) {
-        commit('khateebScheduleInfo', khateebScheduleInfo)
-    },
     dateInfo({ commit }, info) {
         commit('dateInfo', info)
     },
@@ -9,6 +8,8 @@ export default {
         commit('updateToken', token)
     },
     logout({ commit }) {
+        localStorage.removeItem('token')
+        delete axios.defaults.headers.common['authorization']
         commit('removeToken')
     }
 }

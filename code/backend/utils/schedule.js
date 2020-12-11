@@ -10,51 +10,7 @@ const emptyLocation = {
     monthlySchedule: { }
 }
 
-export default {
-    new(weeksInMonth, locationAndTiming) {
-        const TBD = this.toBeDecidedIndicator()
-        const tableData = locationAndTiming.options
-        const newSchedule = []
-        for (let location in tableData) {
-            newSchedule[location] = this.emptyLocation(
-                tableData[location],
-                weeksInMonth,
-                TBD
-            )
-        }
-        return {
-            columnData,
-            rows: newSchedule
-        }
-    },
-    update(weeksInMonth, locationAndTiming, schedule) {
-        const TBD = this.toBeDecidedIndicator()
-        this.removeExcessLocations(schedule.data.rows, locationAndTiming.options)
-        for (let location = 0; location < locationAndTiming.options.length; location++) {
-            if (schedule.data.rows[location]) {
-                const updates = this.cloneObject(locationAndTiming.options[location])
-                const old = this.cloneObject(schedule.data.rows[location])
-                old.info = updates.info
-                const scheduleUpdates = this.updateTimings(old.timings, updates.timings)
-                old.timings = updates.timings
-                old.monthlySchedule = this.fillMismatchedWithTBD(
-                    scheduleUpdates.mismatchedTimings,
-                    TBD,
-                    old,
-                    scheduleUpdates.diff
-                )
-                schedule.data.rows[location] = old
-            } else {
-                schedule.data.rows[location] = this.emptyLocation(
-                    locationAndTiming.options,
-                    weeksInMonth,
-                    TBD
-                )
-            }
-        }
-        $db.save('monthlySchedules', schedule)
-        return schedule
-    },
+const helpers = {
     emptyWeeklySchedule(timings, emptySlotIndicator) {
         let emptyWeek = []
         for (let timing in timings) {
@@ -152,5 +108,52 @@ export default {
             }
         }
         return returnSchema
+    }
+}
+
+export default {
+    new(weeksInMonth, locationAndTiming) {
+        const TBD = helpers.toBeDecidedIndicator()
+        const tableData = locationAndTiming.options
+        const newSchedule = []
+        for (let location in tableData) {
+            newSchedule[location] = helpers.emptyLocation(
+                tableData[location],
+                weeksInMonth,
+                TBD
+            )
+        }
+        return {
+            columnData,
+            rows: newSchedule
+        }
+    },
+    update(weeksInMonth, locationAndTiming, schedule) {
+        const TBD = helpers.toBeDecidedIndicator()
+        helpers.removeExcessLocations(schedule.data.rows, locationAndTiming.options)
+        for (let location = 0; location < locationAndTiming.options.length; location++) {
+            if (schedule.data.rows[location]) {
+                const updates = helpers.cloneObject(locationAndTiming.options[location])
+                const old = helpers.cloneObject(schedule.data.rows[location])
+                old.info = updates.info
+                const scheduleUpdates = helpers.updateTimings(old.timings, updates.timings)
+                old.timings = updates.timings
+                old.monthlySchedule = helpers.fillMismatchedWithTBD(
+                    scheduleUpdates.mismatchedTimings,
+                    TBD,
+                    old,
+                    scheduleUpdates.diff
+                )
+                schedule.data.rows[location] = old
+            } else {
+                schedule.data.rows[location] = helpers.emptyLocation(
+                    locationAndTiming.options,
+                    weeksInMonth,
+                    TBD
+                )
+            }
+        }
+        $db.save('monthlySchedules', schedule)
+        return schedule
     }
 }

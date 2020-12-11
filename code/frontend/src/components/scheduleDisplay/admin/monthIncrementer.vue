@@ -16,7 +16,10 @@ export default {
             type: Object,
             required: true
         },
-        week: Number
+        week: {
+            type: [Number, String],
+            required: true
+        }
     }
 }
 </script>

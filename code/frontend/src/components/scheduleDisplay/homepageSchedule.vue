@@ -27,6 +27,7 @@
                     {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{displayedMonthInfo.year}}
                 </h3>
             </div>
+            {{ lastUpdated }}
             <table-renderer
             :shownLocations="shownLocations"
             table="user"
@@ -58,6 +59,16 @@ export default {
                 this.initalized = true
                 this.currentSchedule = monthlySchedule
             }
+        }
+    },
+    computed: {
+        lastUpdated() {
+            const lastUpdateDate = this.currentSchedule.savedOn
+            const date = new Date(lastUpdateDate)
+            const month = date.toLocaleString('default', {month: 'long'})
+            const day = date.getDate()
+            const year = date.getFullYear()
+            return `Last Updated: ${month} ${day}, ${year}`
         }
     },
     watch: {

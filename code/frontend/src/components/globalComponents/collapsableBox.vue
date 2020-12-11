@@ -7,20 +7,15 @@
         @click="clicked()"
         >
             {{ headline }}<span style="float: right;">{{ icon }}</span><br>
-            <span
-            v-if="isUrgent === 'true'"
-            class="tag"
-            >
-                !!Urgent!!
-            </span>
-            <span v-show="false">hi there</span>
-            <span
-            v-if="isVeryImportant === 'true'"
-            class="tag"
-            style="background-color: orange;"
-            >
-                !!Important!!
-            </span>
+            <div>
+                <tag-box 
+                v-for="(tag, index) in tagDetails" :key="index"
+                :words="tag.words"
+                :symbol="tag.symbol"
+                :color='tag.color'
+                style="display: inline"
+                />
+            </div>
         </button>
         <div
         class="content"
@@ -28,7 +23,10 @@
         v-if="contentBox"
         ref="content"
         >
-            <p>{{ content }}</p>
+            <component
+            :is="componentX"
+            v-bind="options"
+            />
         </div>
     </div>
 </template>
@@ -37,29 +35,28 @@
 export default {
     name:'collapsableBox',
     props: {
-        content: {
-            type: String,
-            required: true
-        },
         headline: {
             type: String,
             required: true
         },
-        isUrgent: {
-            type: String,
-            default: 'false',
+        options: {
+            type: Object,
             required: false
         },
-        isVeryImportant: {
-            type: String,
-            default: 'false',
+        tagDetails: {
+            type: Array,
             required: false
+        },
+        pathToComponentFromSrc: {
+            type: String,
+            required: true
         }
     },
     data() {
         return {
             contentBox: false,
-            icon: '+'
+            icon: '+',
+            component: null
         }
     },
     methods: {
@@ -76,7 +73,14 @@ export default {
                 })
             }
             else return 0
+        },
+        componentX() {
+            return () => import(`../${this.pathToComponentFromSrc}.vue`)
         }
+    },
+    created() {
+        this.componentX()
+            .then((res) => { this.component = this.componentX() })
     }
 }
 </script>
@@ -100,11 +104,6 @@ export default {
   outline: none;
   font-size: 15px;
   font-weight: bold;
-}
-
-/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.collapsible:hover {
-  background-color: #ccc;
 }
 
 /* Style the collapsible content. Note: hidden by default */

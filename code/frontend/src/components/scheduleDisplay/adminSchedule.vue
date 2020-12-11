@@ -28,7 +28,9 @@
             :displayedWeek="displayData.weekOf"
             :originalSchedule="originalSchedule"
             />
-            <button @click="saveData" :disabled="isSame">save changes</button>
+            <button @click="saveData" :disabled="noSave">
+                save changes
+            </button>
         </div>
     </div>
 </template>
@@ -46,6 +48,7 @@ export default {
     },
     data() {
         return {
+            originalMonth: 0
         }
     },
     methods: {
@@ -58,6 +61,7 @@ export default {
             this.$nextTick(async () => {
                 this.fetchMonthlySchedule()
                 this.displayData.weekOf = this.fridayDates[0]
+                this.originalMonth += value
             })
         },
         updateSchedule(schedule) {
@@ -91,6 +95,12 @@ export default {
         },
         isSame() {
             return equal(this.currentSchedule.data.rows, this.originalSchedule.data.rows)
+        },
+        isPreviousMonth() {
+            return this.originalMonth < 0
+        },
+        noSave() {
+            return this.isPreviousMonth || this.isSame
         }
     },
     created() {

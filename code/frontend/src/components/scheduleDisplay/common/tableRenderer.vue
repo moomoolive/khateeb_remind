@@ -58,7 +58,7 @@ export default {
             required: true
         },
         displayedWeek: {
-            type: Number,
+            type: [Number, String],
             required: true
         },
         originalSchedule: { // to prevent errors for now

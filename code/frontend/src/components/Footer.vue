@@ -1,17 +1,18 @@
 <template>
     <div>
         <div class="topnav">
-          <router-link to="/about" exact>About</router-link>
-          <router-link 
-          :to="{ name: 'login' }"
-          v-if="!isLoggedIn"
-          >
+          <router-link to="/about" exact v-if="!isLoggedIn">
+            About
+          </router-link>
+          <router-link :to="{ name: 'login' }" v-if="!isLoggedIn">
             Admin Login
           </router-link>
-          <router-link 
-          :to="`/admin/${this.$store.state.institution}/dashboard`"
-          v-if="isLoggedIn"
-          >
+          <a
+          @click="logout()" 
+          v-if="isLoggedIn">
+            Logout
+          </a>
+          <router-link :to="`/admin/${this.$store.state.institution}/dashboard`" v-if="isLoggedIn">
             Admin Dashboard
           </router-link>
           <img style="width: 20px; float: right; padding: 1vh;" :src="logo">
@@ -27,6 +28,12 @@ export default {
         logo: require('../assets/paper-plane-solid.svg')
       }
     },
+    methods: {
+      logout() {
+        this.$store.dispatch('logout')
+        this.$router.push('/')
+      }
+    },
     computed: {
       isLoggedIn() {
         return this.$store.getters.isJWTValid
@@ -36,7 +43,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* Add a black background color to the top navigation */
 .topnav {
     margin-top: 30px;
     overflow: hidden;
