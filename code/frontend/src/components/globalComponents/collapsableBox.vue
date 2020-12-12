@@ -6,7 +6,10 @@
         style=""
         @click="clicked()"
         >
-            {{ headline }}<span style="float: right;">{{ icon }}</span><br>
+            {{ headline }}
+            <span style="float: right;" class="icon">
+                {{ icon }}
+            </span>
             <div>
                 <tag-box 
                 v-for="(tag, index) in tagLoader" :key="index"
@@ -117,6 +120,13 @@ export default {
   outline: none;
   font-size: 15px;
   font-weight: bold;
+  border-bottom: white solid 1px;
+}
+
+.icon {
+    color: $blue;
+    position: relative;
+    left: 5px;
 }
 
 /* Style the collapsible content. Note: hidden by default */

@@ -1,4 +1,5 @@
 import $dbModels from '../database/models.js'
+import $schedule from '../utils/schedule.js'
 
 export default {
     previousEntriesAndEmptySchema(previousEntries, schemaName) {
@@ -26,5 +27,13 @@ export default {
 
         }
         return locationSkeleton
+    },
+    prayerSlotKhateebsAndSchema(previousEntries) {
+        const emptySchema = $schedule.toBeDecidedIndicator()
+        const responseData = {
+            emptySchema,
+            previousEntries
+        }
+        return responseData
     }
 }

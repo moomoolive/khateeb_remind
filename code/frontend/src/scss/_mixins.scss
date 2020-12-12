@@ -1,0 +1,7 @@
+@import '_vars.scss'
+
+$list: $green, $grey, $yellow, $blue;
+
+@mixin btnColor($color) {
+    background-color: $color;
+}

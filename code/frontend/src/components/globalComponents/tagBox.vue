@@ -25,7 +25,8 @@ export default {
         },
         color: {
             type: String,
-            required: false
+            required: false,
+            default: 'goodNews'
         },
         preset: {
             type: [String, Object],
@@ -52,7 +53,8 @@ export default {
             new: {
                 words: 'New',
                 symbol: '^'
-            }
+            },
+            show: true
         }
     },
     methods: {

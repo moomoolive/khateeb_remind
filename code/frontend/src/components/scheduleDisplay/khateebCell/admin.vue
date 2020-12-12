@@ -52,8 +52,8 @@ export default {
             if (khateebs === `you haven't created any khateebs!`) {
                 this.$emit('no-khateebs')
             } else {
-                this.khateebList = khateebs
-                this.emptyKhateeb = this.toBeDecidedIndicator(khateebs)
+                this.khateebList = khateebs.previousEntries
+                this.emptyKhateeb = khateebs.emptySchema
             }
         },
         toBeDecidedIndicator(khateebArray) {

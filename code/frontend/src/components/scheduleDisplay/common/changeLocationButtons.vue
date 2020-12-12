@@ -1,19 +1,21 @@
 <template>
-    <div>
-        <button
-        @click="click('All')"
+    <div style="margin-bottom: 4vh; margin-top: 5vh;">
+        <cool-btn
+        @pushed="click('All')"
         aria-label="view schedule for all locations"
-        >
-            All locations
-        </button>
-        <button
+        buttonText="All locations"
+        color="blue"
+        style="margin-bottom: 1vh;"
+        />
+        <cool-btn
         v-for="(prayerLocationData, location_ID) in currentSchedule.data.rows"
         :key="location_ID"
-        @click="click(location_ID)"
+        @pushed="click(location_ID)"
         :aria-label="`view schedule for ${prayerLocationData.info.name}`"
-        >
-            {{ prayerLocationData.info.name }}
-        </button>
+        :buttonText="prayerLocationData.info.name"
+        color="grey"
+        class="individualLocations"
+        />
     </div>
 </template>
 
@@ -35,5 +37,10 @@ export default {
 </script>
 
 <style>
+.individualLocations {
+    display: inline;
+    margin-left: 3px;
+    margin-right: 3px;
+}
 
 </style>

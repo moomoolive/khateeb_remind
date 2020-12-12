@@ -4,13 +4,11 @@ import $db from '../database/funcs.js'
 import $dbModels from '../database/models.js'
 
 const columnData = ['Timing', 'Khateeb'] // hardcoded for now
-const emptyLocation = {
-    info: { },
-    timings: [],
-    monthlySchedule: { }
-}
 
 const helpers = {
+    emptyLocationTemplate() {
+        return $dbModels.emptySchema('locationTemplate')
+    },
     emptyWeeklySchedule(timings, emptySlotIndicator) {
         let emptyWeek = []
         for (let timing in timings) {
@@ -30,6 +28,7 @@ const helpers = {
         return this.emptyMonthlySchedule(weeksInMonth, emptyWeek)
     },
     emptyLocation(location, weeksInMonth, emptySlotIndicator) {
+        const emptyLocation = this.emptyLocationTemplate()
         const tempLocation = this.cloneObject(emptyLocation)
         tempLocation.info = location.info
         tempLocation.timings = location.timings
@@ -98,22 +97,12 @@ const helpers = {
             }
         }
         return oldLocation.monthlySchedule
-    },
-    toBeDecidedIndicator() {
-        const fullKhateebSchema = $dbModels.schemaParams('khateebs', true)
-        let returnSchema = {}
-        for (let field of fullKhateebSchema) {
-            if (field === '_id' || field === 'firstName' || field === 'lastName') {
-                returnSchema[field] = null
-            }
-        }
-        return returnSchema
     }
 }
 
 export default {
     new(weeksInMonth, locationAndTiming) {
-        const TBD = helpers.toBeDecidedIndicator()
+        const TBD = this.toBeDecidedIndicator()
         const tableData = locationAndTiming.options
         const newSchedule = []
         for (let location in tableData) {
@@ -129,7 +118,7 @@ export default {
         }
     },
     update(weeksInMonth, locationAndTiming, schedule) {
-        const TBD = helpers.toBeDecidedIndicator()
+        const TBD = this.toBeDecidedIndicator()
         helpers.removeExcessLocations(schedule.data.rows, locationAndTiming.options)
         for (let location = 0; location < locationAndTiming.options.length; location++) {
             if (schedule.data.rows[location]) {
@@ -155,5 +144,26 @@ export default {
         }
         $db.save('monthlySchedules', schedule)
         return schedule
+    },
+    toBeDecidedIndicator() {
+        const prayerSlotTemplate = $dbModels.emptySchema('prayerSlot')
+        prayerSlotTemplate.firstName = 'TBD'
+        return prayerSlotTemplate
+    },
+    updatePrayerSlotDates(currentSchedule, originalSchedule) {
+        for (let location in currentSchedule.data.rows) {
+            for (let week in currentSchedule.data.rows[location].monthlySchedule) {
+                for (let prayerSlot in currentSchedule.data.rows[location].monthlySchedule[week]) {
+                    if (
+                        currentSchedule.data.rows[location].monthlySchedule[week][prayerSlot]._id !==
+                        originalSchedule.data.rows[location].monthlySchedule[week][prayerSlot]._id
+                    ) {
+                        currentSchedule.data.rows[location].monthlySchedule[week][prayerSlot].savedOn = new Date().toUTCString()
+                    }
+
+                }
+            }
+        }
+        return currentSchedule
     }
 }

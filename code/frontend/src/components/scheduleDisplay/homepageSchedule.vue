@@ -16,18 +16,18 @@
             :displayedMonthInfo="displayedMonthInfo"
             @change="displayData.weekOf = $event"
             class="whiteSpace"
+            v-if="!isWeeklyView"
             />
             <change-location-buttons
             :currentSchedule="currentSchedule"
             @change="displayData.location = $event"
-            class="whiteSpace"
             />
+            <h4 class="lastUpdated">{{ lastUpdated }}</h4>
             <div id="headers">
                 <h3 style="margin-top: 0px; margin-bottom: 4px;">
                     {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{displayedMonthInfo.year}}
                 </h3>
             </div>
-            {{ lastUpdated }}
             <table-renderer
             :shownLocations="shownLocations"
             table="user"
@@ -89,5 +89,8 @@ export default {
     $size: 30px;
     height: $size;
     margin-bottom: $size;
+}
+.lastUpdated {
+    color: $yellow;
 }
 </style>

@@ -48,8 +48,9 @@ export default {
     overflow: hidden;
     left: 0;
     height: 5.1vh;
-    width: 100vw;
+    width: 98.2vw;
     margin: 0;
+    border-top: white 1px solid;
 }
 
 .router-link-active {

@@ -1,54 +1,16 @@
 <template>
     <div style="padding-top: 20px;">
-        <div v-for="(announcement, ID) in announcements" :key="ID">
-            <collapsable-box
-            :headline="`${dateLoader(announcement.savedOn)} || ${announcement.headline}`"
-            :options="{
-                body: announcement.content
-            }"
-            pathToComponentFromSrc='announcements/announcementBody'
-            :tagDetails="tagLoader(announcement)"
-            />
-        </div>
+        <user-announcements />
     </div>
 </template>
 
 <script>
+import userAnnouncements from '@/components/announcements/user.vue'
+
 export default {
     name: 'announcements',
-    data() {
-        return {
-            announcements: null,
-            lastVisit: this.$store.state.lastVisit
-        }
-    },
-    methods: {
-        tagLoader(announcement) {
-            let tagArray = []
-            if (announcement.important === 'true') {
-                tagArray.push('important')
-            }
-            if (announcement.urgent === 'true') {
-                tagArray.push('urgent')
-            }
-            if (this.isNew(announcement.savedOn)) {
-                tagArray.push('new')
-            }
-            return tagArray
-        },
-        dateLoader(stringDate) {
-            const date = new Date(stringDate)
-            const month = date.toLocaleString('default', {month: 'short'})
-            const day = date.getDate()
-            return `${month} ${day}`
-        },
-        isNew(announcementDate) {
-            const date = new Date(announcementDate)
-            return date > this.lastVisit
-        }
-    },
-    async created() {
-        this.announcements = await this.$API.announcements()
+    components: {
+        userAnnouncements
     }
 }
 </script>

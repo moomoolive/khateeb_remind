@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Header />
+    <Header/>
     <router-view class="displayedPage"/>
     <Footer />
   </div>
@@ -11,7 +11,6 @@ import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 
 import datetime from './utils/datetime.js'
-import API from './utils/apiCalls.js'
 
 import axios from 'axios'
 
@@ -35,18 +34,21 @@ export default {
       }
     },
     setLastVisit() {
-      const date = localStorage.getItem('lastVisit')
-      const parsedDate = new Date(date)
-      this.$store.dispatch('setLastVisit', parsedDate)
+      const dateOfLastVisit = localStorage.getItem('today')
+      if (dateOfLastVisit) this.updateLastVisit(dateOfLastVisit)
+      const dateToday = new Date().toUTCString()
+      localStorage.setItem('today', dateToday)
+    },
+    updateLastVisit(cachedDate) {
+      localStorage.setItem('lastVisit', cachedDate)
+      const parsedLastVisit = new Date(cachedDate)
+      this.$store.dispatch('setLastVisit', cachedDate)
     }
   },
   created() {
     this.setJWT()
     this.getDateInformation()
     this.setLastVisit()
-  },
-  beforeDestroy() {
-    localStorage.setItem('lastVisit', new Date())
   }
 }
 </script>
@@ -61,8 +63,12 @@ export default {
 }
 
 .displayedPage {
+  $padding: 9%;
   background-color: #fffff4;
   padding-bottom: 5%;
+  padding-top: 9% !important;
+  max-width: 1000px;
+  margin: auto;
 }
 
 div {
@@ -76,10 +82,7 @@ img {
 }
 
 body {
-  margin-top: 8%;
-  margin-bottom: 0;
-  margin-left: 0;
-  margin-right: 0;
+  margin: 0 0 0 0;
   background-color: #333;
 }
 </style>

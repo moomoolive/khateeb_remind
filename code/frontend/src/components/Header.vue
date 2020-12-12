@@ -1,13 +1,11 @@
 <template>
-    <div>
-        <div class="topnav">
-          <router-link to="/" exact>Home</router-link>
-          <router-link :to="{ name: 'announcements' }">Announcements</router-link>
-          <a class="currentDate" style="float: right; ">
-            {{ abbreviatedDayOfWeek }} {{ abbreviatedMonthName }} {{ currentDate }}, {{ abbreviatedYear }}
-          </a>
-        </div>
-    </div>
+      <div class="topnav">
+        <router-link to="/" exact>Home</router-link>
+        <router-link :to="{ name: 'announcements' }">Announcements</router-link>
+        <a class="currentDate" style="float: right; ">
+          {{ abbreviatedDayOfWeek }} {{ abbreviatedMonthName }} {{ currentDate }}, {{ abbreviatedYear }}
+        </a>
+      </div>
 </template>
 
 <script>
@@ -31,9 +29,11 @@ export default {
   overflow: hidden;
   position: fixed;
   top: 0;
-  height: 5.1vh;
+  height: 4.5vh;
   width: 100vw;
   left: 0;
+  z-index: 2;
+  border-bottom: white 1px solid;
 }
 
 .currentDate {

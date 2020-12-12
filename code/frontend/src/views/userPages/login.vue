@@ -1,41 +1,18 @@
 <template>
     <div style="padding-top: 20px;">
-        <h2>Enter Your Secret Key</h2>
-        <form @submit="submit">
-            <input type="text" v-model="secretKey"><br><br>
-            <input type="submit" value="Submit">
-        </form>
-        <h5 v-if="error">Incorrect Key</h5>
+        <login-form />
     </div>
 </template>
 
 <script>
-import API from '../../utils/apiCalls.js'
-
 import axios from 'axios'
+
+import loginForm from '@/components/login/loginForm.vue'
 
 export default {
     name: 'login',
-    data() {
-        return {
-            secretKey: null,
-            instituteName: this.$store.state.institution, //hardcoded for now
-            error: false
-        }
-    },
-    methods: {
-        async submit(event) {
-            event.preventDefault()
-            const token = await API.login(this.secretKey)
-            localStorage.setItem('token', token.token)
-            if (token.token) {
-                axios.defaults.headers.common['authorization'] = token.token
-                this.$store.dispatch('JWT_TOKEN', token.token)
-                this.$nextTick(() => {
-                    this.$router.push(`/admin/${this.instituteName}/dashboard`)
-                })
-            } else this.error = true
-        }
+    components: {
+        loginForm
     }
 }
 </script>

@@ -43,11 +43,9 @@ const funcs = {
         }
     },
     schemaVC(request) {
-        console.log(request.body)
         const urlComponents = request.originalUrl.split('/')
         const schemaName = urlComponents[2]
         const validationList = $dbModels.schemaParams(schemaName)
-        console.log(validationList)
         return validationList
     },
 }

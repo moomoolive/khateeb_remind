@@ -1,14 +1,15 @@
 <template>
     <div>
-        {{ display }}
+        <div style="display: inline; vertical-align: sub;">
+            {{ display }}
+        </div>
+        <tag-box v-if="isUpdated"/>
     </div>
 </template>
 
 <script>
-import schedule from '../../../mixins/schedule.js'
-
 export default {
-    name: 'adminKhateebDisplay',
+    name: 'userKhateebDisplay',
     props: {
         schedule: {
             type: Object,
@@ -23,27 +24,17 @@ export default {
             required: true
         },
         originalSchedule: {
-            type: Object,
-            required: true
+            type: null,
+            required: false
         }
     },
     data() {
         return {
-            isMounted: false
+            isMounted: false,
+            isUpdated: null
         }
     },
     methods: {
-        tbd() {
-            let khateebData = this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
-            let allNull = true
-            for (let field in khateebData) {
-                if (khateebData[field]) allNull = false
-            }
-            if (allNull) {
-                khateebData.firstName = 'TBD'
-                khateebData.lastName = ''
-            }
-        }
     },
     computed: {
         display() {
@@ -55,10 +46,13 @@ export default {
         }
     },
     created() {
-        this.tbd()
+        const x = this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
+        if (x.savedOn) {
+            this.isUpdated = x.savedOn > this.$store.state.lastVisit
+        }
     },
     mounted() {
-        this.isMounted = true
+        this.$nextTick(() => { this.isMounted = true })
     }
 }
 </script>

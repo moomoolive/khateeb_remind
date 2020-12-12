@@ -38,7 +38,12 @@ router.get(routerGroup2URL + '/:fullOrNot', (req, res) => {
     $dbModels.khateebs.find({}, (err, khateebs) => {
         if (err) console.log(err)
         else {
-            const responseData = $responses.previousEntriesAndEmptySchema(khateebs, routerGroup2)
+            let responseData
+            if (x) {
+                responseData = $responses.prayerSlotKhateebsAndSchema(khateebs)
+            } else {
+                responseData = $responses.previousEntriesAndEmptySchema(khateebs, routerGroup2)
+            }
             res.json(responseData)
         }
     }).select(x)
@@ -101,8 +106,9 @@ router.get(routerGroup4URL + '/:monthToQuery/:fridayDates', (req, res) => {
 })
 
 router.post(routerGroup4URL, (req, res) => {
-    // const originalSchedule = req.body.original >> soon to be used for updates
+    const updatedSchedule = $schedule.updatePrayerSlotDates(req.body, req.body.original)
     delete req.body.original
+    console.log(updatedSchedule)
     $db.save(routerGroup4, req.body, res)
 })
 

@@ -41,6 +41,17 @@ const schemas = {
         hour: String,
         minutes: String,
         AMorPM: String
+    }),
+    location: new mongoose.Schema({
+        info: Object,
+        timings: Array,
+        monthlySchedule: Object
+    }),
+    prayerSlot: new mongoose.Schema({
+        _id: String,
+        firstName: String,
+        lastName: String,
+        savedOn: Date
     })
  }
 
@@ -52,6 +63,8 @@ const schemas = {
     locationDetails: mongoose.model('locationDetail', schemas.locationInfo),
     timingTemplates: mongoose.model('timingTemplate', schemas.timingTemplate),
     locationMetas: mongoose.model('locationMeta', schemas.locationMeta),
+    locationTemplate: mongoose.model('template', schemas.location),
+    prayerSlot: mongoose.model('prayerSlot', schemas.prayerSlot),
     schemaParams(schemaName, full=false) {
         const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
         if (!full) {
