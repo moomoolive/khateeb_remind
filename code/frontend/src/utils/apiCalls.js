@@ -57,7 +57,7 @@ export default {
             })
             return responseData
     },
-    async updateAnnouncements(payload) {
+    async updateAnnouncement(payload) {
         await axios.post(this.API_SERVER + this.adminRoutes + '/announcements', payload)
             .then((response) => {
                 console.log(response)

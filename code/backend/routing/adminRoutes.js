@@ -3,6 +3,7 @@ import $dbModels from '../database/models.js'
 import { middleware } from '../utils/middleware.js'
 import $schedule from '../utils/schedule.js'
 import $db from '../database/funcs.js'
+import $responses from '../utils/responses.js'
 
 const router = express.Router()
 
@@ -14,7 +15,10 @@ const routerGroup1URL = `/${routerGroup1}`
 router.get(routerGroup1URL, (req, res) => {
     $dbModels.announcements.find({}, (err, announcements) => {
         if (err) $db.databaseErrorCallback(err, res)
-        else res.json(announcements)
+        else {
+            const responseData = $responses.previousEntriesAndEmptySchema(announcements, routerGroup1)
+            res.json(responseData)
+        }
     })
 })
 
@@ -34,7 +38,8 @@ router.get(routerGroup2URL + '/:fullOrNot', (req, res) => {
     $dbModels.khateebs.find({}, (err, khateebs) => {
         if (err) console.log(err)
         else {
-            khateebs ? res.json(khateebs) : res.json(`you haven't created any khateebs!`)
+            const responseData = $responses.previousEntriesAndEmptySchema(khateebs, routerGroup2)
+            res.json(responseData)
         }
     }).select(x)
 })
@@ -53,7 +58,14 @@ const routerGroup3URL = `/${routerGroup3}`
 router.get(routerGroup3URL + '/:settingName', (req, res) => {
     $dbModels.settings.findOne({name: req.params.settingName}, (err, locationAndTiming) => {
         if (err) console.log(err)
-        else res.json(locationAndTiming)
+        else {
+            const emptySchema = $responses.emptyLocationTimingTemplate()
+            const responseData = {
+                emptySchema,
+                previousEntries: locationAndTiming
+            }
+            res.json(responseData)
+        }
     })
 })
 

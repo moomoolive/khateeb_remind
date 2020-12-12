@@ -19,32 +19,20 @@ export default {
     data() {
         return {
             announcements: null,
-            tagTemplates: {
-                important: {
-                    words: 'Imporant',
-                    symbol: '*',
-                    color: 'important'
-                },
-                urgent: {
-                    words: 'Urgent',
-                    symbol: '!',
-                    color: 'urgent'
-                },
-                new: {
-                    words: 'New',
-                    symbol: '^'
-                }
-            }
+            lastVisit: this.$store.state.lastVisit
         }
     },
     methods: {
         tagLoader(announcement) {
             let tagArray = []
             if (announcement.important === 'true') {
-                tagArray.push(this.tagTemplates.important)
+                tagArray.push('important')
             }
             if (announcement.urgent === 'true') {
-                tagArray.push(this.tagTemplates.urgent)
+                tagArray.push('urgent')
+            }
+            if (this.isNew(announcement.savedOn)) {
+                tagArray.push('new')
             }
             return tagArray
         },
@@ -53,6 +41,10 @@ export default {
             const month = date.toLocaleString('default', {month: 'short'})
             const day = date.getDate()
             return `${month} ${day}`
+        },
+        isNew(announcementDate) {
+            const date = new Date(announcementDate)
+            return date > this.lastVisit
         }
     },
     async created() {

@@ -27,14 +27,26 @@ export default {
         upcomingFridayInfo: datetime.upcomingFriday()
       }
       this.$store.dispatch('dateInfo', info)
+    },
+    setJWT() {
+      const token = localStorage.getItem('token')
+      if (token) {
+        axios.defaults.headers.common['authorization'] = token
+      }
+    },
+    setLastVisit() {
+      const date = localStorage.getItem('lastVisit')
+      const parsedDate = new Date(date)
+      this.$store.dispatch('setLastVisit', parsedDate)
     }
   },
   created() {
-    const token = localStorage.getItem('token')
-    if (token) {
-      axios.defaults.headers.common['authorization'] = token
-    }
+    this.setJWT()
     this.getDateInformation()
+    this.setLastVisit()
+  },
+  beforeDestroy() {
+    localStorage.setItem('lastVisit', new Date())
   }
 }
 </script>

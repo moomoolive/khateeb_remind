@@ -1,8 +1,10 @@
 <template>
     <div>
-        <p :class="'tag ' + color">
-            <span :class='"icon " + color'>{{ symbol }}</span>
-            {{ words }}
+        <p :class="'tag ' + contentLoader('color')">
+            <span :class='"icon " + contentLoader("color")'>
+                {{ contentLoader('symbol') }}
+            </span>
+            {{ contentLoader('words') }}
         </p>
     </div>
 </template>
@@ -13,15 +15,66 @@ export default {
     props: {
         words: {
             type: String,
-            required: true
+            required: false,
+            default: 'New'
         },
         symbol: {
             type: String,
-            required: true
+            required: false,
+            default: '^'
         },
         color: {
             type: String,
             required: false
+        },
+        preset: {
+            type: [String, Object],
+            required: false
+        }
+    },
+    data() {
+        return {
+            important: {
+                words: 'Imporant',
+                symbol: '*',
+                color: 'important'
+            },
+            urgent: {
+                words: 'Urgent',
+                symbol: '!',
+                color: 'urgent'
+            },
+            good: {
+                words: 'All Good',
+                symbol: ':)',
+                color: 'goodNews'
+            },
+            new: {
+                words: 'New',
+                symbol: '^'
+            }
+        }
+    },
+    methods: {
+        contentLoader(field) {
+            const x = typeof(this.preset) == 'string' ? this.presetLoader[field] : this[field]
+            return x
+        }
+    },
+    computed: {
+        presetLoader() {
+            if (this.preset === 'urgent') {
+                return this.urgent
+            }
+            else if (this.preset === 'important') {
+                return this.important
+            }
+            else if (this.preset === 'good') {
+                return this.good
+            }
+            else if (this.preset === 'new') {
+                return this.new
+            }
         }
     }
 }
@@ -55,7 +108,6 @@ div {
 .icon {
     $top: 4px;
     pointer-events: auto;
-    padding-right: $top;
     padding-left: $top;
     margin-right: 6px;
     color: #ccc;

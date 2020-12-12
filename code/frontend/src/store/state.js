@@ -15,5 +15,6 @@ export default {
         }
     },
     JWT_TOKEN: localStorage.getItem('token') || null,
-    institution: 'uofc' //hardcoded
+    institution: 'uofc', //hardcoded
+    lastVisit: null
 }

@@ -15,7 +15,6 @@ const schemas = {
         active: String,
         email: String,
         dropouts: String,
-        comments: String,
         savedOn: Date
     }),
     announcement: new mongoose.Schema({
@@ -27,8 +26,21 @@ const schemas = {
     }),
     setting: new mongoose.Schema({
         name: String,
-        options: Object,
+        options: mongoose.Schema.Types.Mixed,
         savedOn: Date
+    }),
+    locationInfo: new mongoose.Schema({
+        info: Object,
+        timings: Array
+    }),
+    locationMeta: new mongoose.Schema({
+        name: String,
+        address: String
+    }),
+    timingTemplate: new mongoose.Schema({
+        hour: String,
+        minutes: String,
+        AMorPM: String
     })
  }
 
@@ -37,6 +49,9 @@ const schemas = {
     announcements: mongoose.model('announcement', schemas.announcement),
     monthlySchedules: mongoose.model('monthlySchedule', schemas.scheduleEntry),
     khateebs: mongoose.model('khateeb', schemas.khateeb),
+    locationDetails: mongoose.model('locationDetail', schemas.locationInfo),
+    timingTemplates: mongoose.model('timingTemplate', schemas.timingTemplate),
+    locationMetas: mongoose.model('locationMeta', schemas.locationMeta),
     schemaParams(schemaName, full=false) {
         const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
         if (!full) {
@@ -49,6 +64,28 @@ const schemas = {
             const IDParam = fullSchemaParams.pop()
         }
         return fullSchemaParams
+    },
+    emptySchema(schemaName, mixed = {}) {
+        const fullSchemaParams = this[schemaName].schema.paths
+        let schema = {}
+        for (let param in fullSchemaParams) {
+            let paramObject = fullSchemaParams[param]
+            switch(paramObject.instance) {
+                case 'String':
+                    schema[param] = ''
+                    break;
+                case 'Number':
+                    if (param !== '__v') schema[param] = '0'
+                    break;
+                case 'Mixed':
+                    schema[param] = mixed
+                    break;
+                case 'Array':
+                    schema[param] = []
+                    break;
+            }
+        }
+        return schema
     }
 }
 

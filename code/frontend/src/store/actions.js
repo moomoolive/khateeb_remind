@@ -11,5 +11,8 @@ export default {
         localStorage.removeItem('token')
         delete axios.defaults.headers.common['authorization']
         commit('removeToken')
+    },
+    setLastVisit({ commit }, date) {
+        commit('lastVisit', date)
     }
 }

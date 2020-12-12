@@ -9,5 +9,6 @@ export default {
         state.date.upcomingFriday = info.upcomingFridayInfo
     },
     updateToken(state, token) { state.JWT_TOKEN = token },
-    removeToken(state) { state.JWT_TOKEN = null }
+    removeToken(state) { state.JWT_TOKEN = null },
+    lastVisit(state, date) { state.lastVisit = date }
 }

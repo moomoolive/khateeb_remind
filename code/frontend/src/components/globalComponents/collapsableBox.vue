@@ -9,7 +9,8 @@
             {{ headline }}<span style="float: right;">{{ icon }}</span><br>
             <div>
                 <tag-box 
-                v-for="(tag, index) in tagDetails" :key="index"
+                v-for="(tag, index) in tagLoader" :key="index"
+                :preset="tag"
                 :words="tag.words"
                 :symbol="tag.symbol"
                 :color='tag.color'
@@ -44,7 +45,7 @@ export default {
             required: false
         },
         tagDetails: {
-            type: Array,
+            type: [Array, String],
             required: false
         },
         pathToComponentFromSrc: {
@@ -76,6 +77,18 @@ export default {
         },
         componentX() {
             return () => import(`../${this.pathToComponentFromSrc}.vue`)
+        },
+        tagLoader() {
+            if (this.tagDetails === 'default') return [{}];
+            else return this.tagDetails
+        },
+        presetLoader() {
+            const presetTypes = ['important', 'urgent']
+            for (let preset in presetTypes) {
+                if (this.tagDetails[0] === preset) {
+                    return this.tagDetails
+                }
+            }
         }
     },
     created() {
