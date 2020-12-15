@@ -6,7 +6,7 @@
             :options="{
                 body: announcement.content
             }"
-            pathToComponentFromSrc='announcements/announcementBody'
+            pathToComponentFromComponents='announcements/announcementBody'
             :tagDetails="tagLoader(announcement)"
             />
         </div>

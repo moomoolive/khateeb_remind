@@ -14,9 +14,12 @@
                 <option value="New">Create New Khateeb</option>
             </select>
         </div>
-        <button v-if="selected !== 'New'" @click="remove()">
-            Delete Khateeb
-        </button>
+        <cool-btn
+            @pushed="remove()"
+            v-if="selected !== 'New'"
+            buttonText="Delete this Khateeb"
+            color="red"
+        />
         <div v-for="(property, key) in textFields" :key="key">
             <label :for="key">{{ key }}: </label>
             <div>
@@ -24,14 +27,17 @@
             </div>
         </div>
         <div>
-            active: <input type="checkbox" v-model="inputData.active">
+            Active: <input type="checkbox" v-model="inputData.active">
         </div>
         <div>
             Dropouts: {{ inputData.dropouts }}
         </div>
-        <button @click="submit" :disabled="notReadyToSubmit">
-            Submit
-        </button>
+        <cool-btn
+            color="grey"
+            @pushed="submit()"
+            buttonText="Submit"
+            :isDisabled="notReadyToSubmit"
+        />
     </div>
 </template>
 
@@ -87,5 +93,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+div {
+    margin-top: 10px;
+}
 
 </style>

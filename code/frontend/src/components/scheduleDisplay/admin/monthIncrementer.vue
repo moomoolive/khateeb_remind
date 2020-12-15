@@ -1,10 +1,20 @@
 <template>
     <div>
-       <h3 style="margin-top: 0px; margin-bottom: 4px;">
-            <button @click="$emit('hit', 'up')">Add month</button>
+       <h3 style="margin-bottom: 4px; margin-top: 0;">
             {{ display.month }} {{ week }}, {{ display.year }}
-            <button @click="$emit('hit', 'down')">Less month</button>
         </h3>
+        <cool-btn
+        buttonText="Next Month"
+        color="yellow"
+        class="buttons"
+        @pushed="$emit('hit', 'up')"
+        />
+        <cool-btn
+        buttonText="Previous Month"
+        color="yellow"
+        class="buttons"
+        @pushed="$emit('hit', 'down')"
+        />
     </div>
 </template>
 
@@ -25,5 +35,8 @@ export default {
 </script>
 
 <style>
-
+.buttons {
+    display: inline;
+    margin: 3px;
+}
 </style>

@@ -6,17 +6,26 @@
         style="display: inline;"
         >
             <p>
-                <button 
-                @click="incrementTime({property, locationIndex, timingIndex }, 1)"
-                >
-                    +
-                </button><br>
+                <cool-btn
+                    buttonText="+"
+                    @pushed="incrementTime(
+                        {
+                            property, locationIndex, timingIndex
+                        },
+                        1
+                    )"
+                />
                 {{ value }}<br>
-                <button
-                @click="incrementTime({ property, locationIndex, timingIndex }, -1)"
-                >
-                    -
-                </button>
+                <cool-btn
+                    buttonText="-"
+                    color="red"
+                    @pushed="incrementTime(
+                        {
+                            property, locationIndex, timingIndex
+                        },
+                        -1
+                    )"
+                />
             </p>
         </div>
     </div>

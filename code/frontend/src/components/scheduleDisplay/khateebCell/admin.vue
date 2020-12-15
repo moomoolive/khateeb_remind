@@ -67,13 +67,29 @@ export default {
             const originalData = JSON.parse(JSON.stringify(this.originalSchedule.monthlySchedule[this.displayedWeek][index]))
             this.schedule.monthlySchedule[this.displayedWeek].splice(index, 1, originalData)
         },
+        deleteExcessValues() {
+            const x = this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
+            if (x.savedOn) delete x.savedOn
+        }
+    },
+    computed: {
+        x() {
+            return this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
+        }
     },
     created() {
+        this.deleteExcessValues()
         this.fetchKhateebs()
     }
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+button {
+    background-color: $grey;
+    color: white;
+    border: solid black 1px;
+    outline: none;
+    margin-left: 3px;
+}
 </style>

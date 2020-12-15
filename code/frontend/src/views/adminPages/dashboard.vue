@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>Hello</h2>
+        <h2>Coming Soon ISA...</h2>
     </div>
 </template>
 

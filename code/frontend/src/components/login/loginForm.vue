@@ -1,43 +1,76 @@
 <template>
     <div style="padding-top: 20px;">
-        <h2>Enter Your Secret Key</h2>
-        <form @submit="submit">
+        <h2>Enter Secret Key</h2>
+        <form>
             <input type="text" v-model="secretKey"><br><br>
-            <input type="submit" value="Submit">
         </form>
+        <cool-btn
+        buttonText="Submit"
+        @pushed="submit()"
+        :isDisabled="noInput"
+        />
         <h5 v-if="error">Incorrect Key</h5>
+        <cool-btn
+            style="margin-top: 20px;"
+            color="yellow"
+            buttonText="First Time?"
+            @pushed="$emit('alt', 'first')"
+            v-if="!passwordExists"
+        />
+        <cool-btn
+            style="margin-top: 20px;"
+            color='blue'
+            buttonText="Forgot Password?"
+            @pushed="$emit('alt', 'text')"
+            v-if="passwordExists"
+        />
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 
-export default {
-    name: 'login',
+export default{
+    name: 'loginForm',
         data() {
             return {
                 secretKey: null,
-                instituteName: this.$store.state.institution, //hardcoded for now
-                error: false
+                instituteName: this.$store.state.institution,
+                error: false,
+                passwordExists: false
             }
         },
         methods: {
-            async submit(event) {
-                event.preventDefault()
+            async submit() {
                 const token = await this.$API.login(this.secretKey)
-                localStorage.setItem('token', token.token)
-                if (token.token) {
+                if (token) {
+                    localStorage.setItem('token', token.token)
                     axios.defaults.headers.common['authorization'] = token.token
                     this.$store.dispatch('JWT_TOKEN', token.token)
                     this.$nextTick(() => {
                         this.$router.push(`/admin/${this.instituteName}/dashboard`)
                     })
                 } else this.error = true
+            },
+            async password() {
+                const response = await this.$API.passwordExists()
+                if ( response === 'exists') this.passwordExists = true
             }
+        },
+        computed: {
+            noInput() {
+                return this.secretKey <= 0
+            }
+        },
+        created() {
+            this.password()
         }
 }
 </script>
 
 <style>
+input {
+    border: solid black 1px;
+}
 
 </style>

@@ -21,6 +21,7 @@
             <change-location-buttons
             :currentSchedule="currentSchedule"
             @change="displayData.location = $event"
+            v-if="currentSchedule.data.rows.length > 1"
             />
             <h4 class="lastUpdated">{{ lastUpdated }}</h4>
             <div id="headers">

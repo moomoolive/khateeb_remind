@@ -1,6 +1,6 @@
 <template>
     <div style="padding-top: 20px;">
-        set schedule<br>
+        <h2>Set Schedule</h2>
         <h2 v-if="!initalized">
             {{ errorMsg }}
         </h2>
@@ -14,7 +14,6 @@
             <change-location-buttons
             :currentSchedule="currentSchedule"
             @change="displayData.location = $event"
-            class="whiteSpace"
             />
             <month-incrementer
             :display="displayedMonthInfo"
@@ -27,10 +26,15 @@
             :schedule="currentSchedule"
             :displayedWeek="displayData.weekOf"
             :originalSchedule="originalSchedule"
+            @no-khateebs="initalized = false"
             />
-            <button @click="saveData" :disabled="noSave">
-                save changes
-            </button>
+            <cool-btn
+                style="margin-top: 20px;"
+                @pushed="saveData()"
+                color='grey'
+                buttonText="Save Changes"
+                :isDisabled="noSave"
+            />
         </div>
     </div>
 </template>

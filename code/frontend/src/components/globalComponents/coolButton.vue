@@ -70,6 +70,12 @@ export default {
         border: 0.1vh solid $blue;
       }
     }
+    &.red {
+      background-color: $red;
+      &:hover {
+        border: 0.1vh solid $red;
+      }
+    }
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;

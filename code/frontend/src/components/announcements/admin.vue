@@ -9,24 +9,31 @@
             <option value="New">New</option>
         </select>
         <div>
-            {{ selected === 'New' ? dateDisplay(inputData.savedOn) : dateDisplay(inputData.savedOn, false) }}<br>
-            headline: 
+            Headline: <br>
             <input v-model="inputData.headline" type="text"> 
         </div>
-        <button v-if="selected !== 'New'" @click="remove()">
-            Delete This announcement
-        </button>
+        <cool-btn
+            color="red"
+            @pushed="remove()"
+            v-if="selected !== 'New'"
+            buttonText="Delete this Announcement"
+        />
         <div>
-            <label>body of your announcement:</label>
+            <label>Body of your announcement:<br></label>
             <textarea v-model="inputData.content"></textarea>
         </div>
         <div>
             <input type="checkbox" id="urgent" name="vehicle1" v-model="inputData.urgent">
-            <label for="urgent"> Is it Urgent??</label>
+            <label for="urgent"> Is it Urgent??</label><br>
             <input type="checkbox" id="important" v-model="inputData.important">
             <label for="important">Is It Very Important??</label>
         </div>
-        <button :disabled="!readyToSubmit" @click="submit">Submit</button>
+        <cool-btn
+            buttonText="Submit"
+            color="grey"
+            :isDisabled="!readyToSubmit"
+            @pushed="submit()"
+        />
     </div>
 </template>
 
@@ -86,4 +93,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+div {
+    margin-top: 15px;
+}
+
+textarea {
+    height: 15vh;
+    width: 50vw;
+    max-width: 800px;
+}
 </style>

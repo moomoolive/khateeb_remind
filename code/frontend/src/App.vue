@@ -79,6 +79,8 @@ div {
 img {
   min-width: 0px;
   min-height: 0px;
+  max-width: 1000px;
+  max-height: 1000px;
 }
 
 body {

@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import $dbModels from '../database/models.js'
 import $httpCodes from '../utils/httpCodes.js'
 import ENV from '../app.js'
+import $db from '../database/funcs.js'
 
 const router = express.Router()
 
@@ -21,7 +22,7 @@ router.get('/', (req, res) => {
 })
 
 router.get('/announcements', (req, res) => {
-    const maxDisplayedAnnouncements = 5
+    const maxDisplayedAnnouncements = 10
     const mostRecent = { _id: -1 }
     $dbModels.announcements.find({}, (err, announcements) => {
         if (err) console.log(err)
@@ -29,25 +30,23 @@ router.get('/announcements', (req, res) => {
     }).limit(maxDisplayedAnnouncements).sort(mostRecent)
 })
 
-router.post('/authenicate', (req, res) => {
-    try {
-        const key = req.body.key
-        if (key === ENV.LOGIN_KEY) {
-            const secsPerMin = 60
-            const minPerHour = 60
-            const hourPerDay = 24
-            const thirtyDays = 30 * secsPerMin * minPerHour * hourPerDay
-            const repsonse = {
-                token: jwt.sign({ user: 'admin' }, ENV.JWT_SECRET, { expiresIn:  thirtyDays}),
-                msg: "You've been successfully logged in!"
-            }
-            res.json(repsonse)
-        } else {
-            res.status($httpCodes.unauthorized)
-            res.json({token: null, msg: 'Unauthorized'})
+router.post('/authenicate', async (req, res) => {
+    console.log(req.body)
+    const key = req.body.key
+    const password = await $db.getPassword()
+    console.log(password)
+    if (key === password) {
+        //console.log('hi')
+        const secsPerMin = 60
+        const minPerHour = 60
+        const hourPerDay = 24
+        const thirtyDays = 30 * secsPerMin * minPerHour * hourPerDay
+        const repsonse = {
+            token: jwt.sign({ user: 'admin' }, ENV.JWT_SECRET, { expiresIn:  thirtyDays}),
+            msg: "You've been successfully logged in!"
         }
-    }
-    catch {
+        res.json(repsonse)
+    } else {
         res.status($httpCodes.unauthorized)
         res.json({token: null, msg: 'Unauthorized'})
     }

@@ -6,11 +6,11 @@ const adminRoutes = [
         children: [
               {
                 path: 'dashboard',
-                component: () => import('../views/adminPages/adminDashboard.vue')
+                component: () => import('../views/adminPages/dashboard.vue')
               },
               {
                 path: 'schedule',
-                component: () => import('../views/adminPages/scheduleSetter.vue')
+                component: () => import('../views/adminPages/schedule.vue')
               },
               {
                 path: 'announcements',
@@ -21,8 +21,8 @@ const adminRoutes = [
                 component: () => import('../views/adminPages/khateebs.vue')
               },
               {
-                path: 'location-settings',
-                component: () => import('../views/adminPages/locationSettings.vue')
+                path: 'settings',
+                component: () => import('../views/adminPages/settings.vue')
               }
         ],
         meta: {

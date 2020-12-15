@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="background-color: white;">
         <button
         type="button" 
         :class="`collapsible`"
@@ -23,7 +23,12 @@
         </button>
         <div
         class="content"
-        :style="`max-height: ${maxHeight};`"
+        :style="`
+            max-height: ${maxHeight};
+            overflow: hidden;
+            transition: max-height 1s ease-out;
+            width: ${contentWidth}%;
+        `"
         v-if="contentBox"
         ref="content"
         >
@@ -51,9 +56,14 @@ export default {
             type: [Array, String],
             required: false
         },
-        pathToComponentFromSrc: {
+        pathToComponentFromComponents: {
             type: String,
             required: true
+        },
+        contentWidth: {
+            type: Number,
+            required: false,
+            default: 100
         }
     },
     data() {
@@ -79,7 +89,7 @@ export default {
             else return 0
         },
         componentX() {
-            return () => import(`../${this.pathToComponentFromSrc}.vue`)
+            return () => import(`../${this.pathToComponentFromComponents}.vue`)
         },
         tagLoader() {
             if (this.tagDetails === 'default') return [{}];
@@ -131,8 +141,9 @@ export default {
 
 /* Style the collapsible content. Note: hidden by default */
 .content {
-  overflow: hidden;
-  background-color: #f1f1f1;
+    overflow: hidden;
+    background-color: #f1f1f1;
+    margin: auto;
 }
 
 p {

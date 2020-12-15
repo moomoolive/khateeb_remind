@@ -1,9 +1,11 @@
 import axios from 'axios'
+import initialize from './API/initialize.js'
 
 export default {
     API_SERVER: process.env.VUE_APP_API_SERVER_URL || 'http://localhost:5000',
     generalRoutes: '/general',
     adminRoutes: '/admin',
+    ...initialize,
     async monthlySchedule() {
         let responseData
         await axios.get(this.API_SERVER + this.generalRoutes + '/')
@@ -106,7 +108,7 @@ export default {
                 window.alert('There was a problem saving your changes')
             })
     },
-    async updateLocationAndTiming(payload) {
+    async updateSetting(payload) {
         await axios.post(this.API_SERVER + this.adminRoutes + '/settings', payload)
             .then((response) => {
                 console.log(response)
@@ -116,7 +118,7 @@ export default {
                 window.alert('There was a problem saving your changes')
             })
     },
-    async getLocationAndTiming(setting) {
+    async getSetting(setting) {
         console.log(setting)
         let responseData
         await axios.get(this.API_SERVER + this.adminRoutes + `/settings/${setting}`)

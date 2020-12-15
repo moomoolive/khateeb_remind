@@ -1,13 +1,26 @@
 <template>
     <div style="padding-top: 20px;">
         <div>
-            <button @click="click('schedule')">set schedule</button>
-            <button @click="click('dashboard')">Dashboard/Admin Home</button>
-            <button @click="click('announcements')">Announcements</button>
-            <button @click="click('khateebs')">Khateebs</button>
-            <button @click="click('location-settings')">Location Settings</button>
+            <cool-btn
+                buttonText="Dashboard/Admin Home"
+                @pushed="click('dashboard')"
+                :isDisabled="isCurrentRoute('dashboard')"
+            />
         </div>
-        <router-view></router-view>
+        <div 
+            style="margin-top: 10px;"
+            v-for="(buttonGroup, index) in buttonLinks" :key="index"
+        >
+            <cool-btn
+                v-for="link in buttonGroup" :key="link"
+                :buttonText="buttonText(link)"
+                :isDisabled="isCurrentRoute(link)"
+                color="blue"
+                @pushed="click(link)"
+                class="buttonLinks"
+                />
+        </div>
+        <router-view class="displayedAdminPage"></router-view>
     </div>
 </template>
 
@@ -16,17 +29,48 @@ export default {
     name: 'adminParentRoute',
     data() {
         return {
-            instituteName: this.$store.state.institution
+            instituteName: this.$store.state.institution,
+            buttonLinks: [
+                ['schedule', 'announcements', 'khateebs'],
+                ['settings']
+            ],
+            selected: null
         }
     },
     methods: {
         click(extension) {
             this.$router.push(`/admin/${this.instituteName}/${extension}`)
+            this.selected = extension
+        },
+        buttonText(linkName) {
+            const splittedLink = linkName.split('-')
+            let result = ''
+            for (let word of splittedLink) {
+                const capitalized = word.charAt(0).toUpperCase() + word.slice(1)
+                result += `${capitalized} `
+            }
+            return result
+        },
+        isCurrentRoute(routeName) {
+            return routeName === this.selected
         }
+    },
+    created() {
+        this.selected = this.$router.currentRoute.fullPath.split('/')[3]
     }
 }
 </script>
 
 <style>
+.buttonLinks {
+    display: inline;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
 
+.displayedAdminPage {
+    margin-top: 20px !important;
+    border-top: black 2px solid;
+}
 </style>

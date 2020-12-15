@@ -4,6 +4,19 @@ import $dbModels from '../database/models.js'
 
 const JWT_SECRET = 'secret'
 
+const helpers = {
+    confirmOldPassword(request, response, next) {
+        const oldPassword = 'blah' // will be in db
+        if (request.body.confirm === oldPassword) {
+            delete request.body.confirm
+            next()
+        } else {
+            response.status($httpCodes.unauthorized)
+            response.json('Incorrect Credentials')
+        }
+    }
+}
+
 const funcs = {
     authAdmin(request, response, next) {
         const token = request.headers.authorization
@@ -13,6 +26,11 @@ const funcs = {
                 response.json('Unauthorized')
             } else next()  
         })
+    },
+    isPassword(request, response, next) {
+        if (request.body.name === 'password') {
+            helpers.confirmOldPassword(request, response, next)
+        } else next()
     },
     generalError(err, request, response, next) {
         console.log(err)

@@ -46,9 +46,11 @@ export default {
         }
     },
     created() {
-        const x = this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
+        let x = this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
         if (x.savedOn) {
-            this.isUpdated = x.savedOn > this.$store.state.lastVisit
+            x = new Date(x.savedOn)
+            const y = new Date(this.$store.state.lastVisit)
+            this.isUpdated = x > y
         }
     },
     mounted() {

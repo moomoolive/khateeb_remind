@@ -61,20 +61,20 @@ const routerGroup3 = 'settings'
 const routerGroup3URL = `/${routerGroup3}`
 
 router.get(routerGroup3URL + '/:settingName', (req, res) => {
-    $dbModels.settings.findOne({name: req.params.settingName}, (err, locationAndTiming) => {
+    $dbModels.settings.findOne({name: req.params.settingName}, (err, setting) => {
         if (err) console.log(err)
         else {
-            const emptySchema = $responses.emptyLocationTimingTemplate()
-            const responseData = {
-                emptySchema,
-                previousEntries: locationAndTiming
+            let responseData = $responses.previousEntriesAndEmptySchema(setting, routerGroup3)
+            if (req.params.settingName === "locations&Timing") {
+                const emptySchema = $responses.emptyLocationTimingTemplate()
+                responseData.emptySchema = emptySchema
             }
             res.json(responseData)
         }
     })
 })
 
-router.post(routerGroup3URL, (req, res) => {
+router.post(routerGroup3URL, middleware.isPassword, (req, res) => {
     $db.save(routerGroup3, req.body, res)
 })
 

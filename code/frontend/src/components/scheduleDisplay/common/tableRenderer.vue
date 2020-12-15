@@ -34,7 +34,7 @@
                     :originalSchedule="
                         !originalSchedule ? null : originalSchedule.data.rows[locationID]
                     "
-                    @no-khateebs="initalized = false"
+                    @no-khateebs="$emit('no-khateebs')"
                     />
                 </th>
             </tr>

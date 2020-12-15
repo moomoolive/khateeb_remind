@@ -28,5 +28,13 @@ export default {
         $dbModels[schemaName].deleteOne({ _id: ID }, (err) => {
             this.databaseCallback(response, err)
         })
+    },
+    async getPassword() {
+        await $dbModels.settings.findOne({name: 'password'}, {_id: false}, (err, password) => {
+            if (err) console.log(err)
+            else {
+                if (password.options) return password.options
+            }
+        }).select(['options'])
     }
 }
