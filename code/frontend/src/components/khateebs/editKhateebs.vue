@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import adminForms from '../mixins/adminForms.js'
+import adminForms from '@/mixins/adminForms.js'
 
 export default {
     name: 'editKhateebs',
@@ -69,7 +69,7 @@ export default {
             return fields
         },
         inputFieldsWithoutID() {
-            const x = JSON.parse(JSON.stringify(this.inputData))
+            const x = this._.deepCopy(this.inputData)
             delete x._id
             delete x.__v
             delete x.savedOn

@@ -12,7 +12,7 @@
                     location: location,
                     locationIndex: locationIndex
                 }"
-                pathToComponentFromComponents='settings/locationTiming/locationRenderer'
+                pathToComponentFromComponents='settings/locationTiming/subcomponents/locationRenderer'
             />
         </div>
         <cool-btn
@@ -41,7 +41,7 @@ export default {
     },
     methods: {
         addNewLocation() {
-            const newLocation = JSON.parse(JSON.stringify(this.emptyLocation))
+            const newLocation = this._.deepCopy(this.emptyLocation)
             this.inputData.options.push(newLocation)
         },
         async save() {
@@ -49,7 +49,7 @@ export default {
         },
         loadInPreviousEntries(previousEntries) {
             this.inputData = previousEntries
-            this.cachedLocations = JSON.parse(JSON.stringify(this.inputData.options))
+            this.cachedLocations = this._.deepCopy(this.inputData.options)
         },
         loadInEmpty(emptySchema) {
             this.hasInitializedLocations = false
@@ -59,7 +59,7 @@ export default {
             const locations =  await this.$API.getSetting('locations&Timing')
             if (locations.previousEntries) this.loadInPreviousEntries(locations.previousEntries)
             else this.loadInEmpty(locations.emptySchema)
-            this.emptyLocation = JSON.parse(JSON.stringify(locations.emptySchema))
+            this.emptyLocation = this._.deepCopy(locations.emptySchema)
         }
     },
     computed: {

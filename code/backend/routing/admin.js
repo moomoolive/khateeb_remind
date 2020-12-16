@@ -112,4 +112,4 @@ router.post(routerGroup4URL, (req, res) => {
     $db.save(routerGroup4, req.body, res)
 })
 
-export {router as adminRoutes}
+export { router as admin }

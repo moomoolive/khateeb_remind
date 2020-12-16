@@ -38,7 +38,7 @@ const funcs = {
         response.json("Are servers aren't responding right now, try later...")
     },
     noEmptyBody(request, response, next) {
-        if (Object.keys(request.body).length === 0) {
+        if (Object.keys(request.body).length === 0 && request.path !== '/text/hub') {
             response.status($httpCodes.notAcceptable)
             response.json(`You cannot send an empty request body to this route!`)
         } else next()

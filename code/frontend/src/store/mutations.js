@@ -5,7 +5,6 @@ export default {
         state.khateebSchedule = khateebScheduleInfo
     },
     dateInfo(state, info) {
-        state.date.currentDate = info.currentDateInfo
         state.date.upcomingFriday = info.upcomingFridayInfo
     },
     updateToken(state, token) { state.JWT_TOKEN = token },

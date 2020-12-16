@@ -4,11 +4,12 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 
-import API from '../src/utils/apiCalls.js'
+import API from '@/utils/API/index.js'
+import funcs from '@/utils/funcs.js'
 
-// global imports
-import globalComponents from './components/globalComponents/index.js'
+import globalComponents from '@/components/globalComponents/index.js'
 Vue.prototype.$API = API
+Vue.prototype._ = funcs
 
 Vue.config.productionTip = false
 

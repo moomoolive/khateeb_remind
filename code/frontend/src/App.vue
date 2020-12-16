@@ -22,7 +22,6 @@ export default {
   methods: {
     getDateInformation() {
       const info = {
-        currentDateInfo: datetime.currentDate(),
         upcomingFridayInfo: datetime.upcomingFriday()
       }
       this.$store.dispatch('dateInfo', info)

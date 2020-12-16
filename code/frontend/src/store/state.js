@@ -1,11 +1,5 @@
 export default {
     date: {
-        currentDate: {
-            month: null,
-            year: null,
-            date: null,
-            dayOfTheWeek: null
-        },
         upcomingFriday: {
             dayOfTheWeek: null,
             month: null,

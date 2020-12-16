@@ -17,7 +17,7 @@ export default {
     },
     methods: {
         cacheOriginalSchedule() {
-            this.originalSchedule = JSON.parse(JSON.stringify(this.currentSchedule))
+            this.originalSchedule = this._.deepCopy(this.currentSchedule)
         }
     },
     components: {

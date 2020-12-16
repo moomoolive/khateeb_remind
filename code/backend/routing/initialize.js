@@ -19,4 +19,4 @@ router.get('/pass-exists', (req, res) => {
     else res.json('None')
 })
 
-export { router as initializeRoutes }
+export { router as initialize }

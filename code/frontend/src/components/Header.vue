@@ -13,11 +13,18 @@ export default {
     name: 'Header',
     data() {
       return {
-        currentDate: this.$store.state.date.currentDate.date,
-        abbreviatedMonthName: this.$store.state.date.currentDate.month.slice(0,3),
-        abbreviatedDayOfWeek: this.$store.state.date.currentDate.dayOfTheWeek.slice(0,3),
-        abbreviatedYear: `'${this.$store.state.date.currentDate.year - 2_000}`,
+        currentDate: '',
+        abbreviatedMonthName: '',
+        abbreviatedDayOfWeek: '',
+        abbreviatedYear: '',
       }
+    },
+    created() {
+      const x = new Date()
+      this.currentDate = x.getDate()
+      this.abbreviatedMonthName = x.toLocaleString('default', { month: 'short' })
+      this.abbreviatedDayOfWeek = x.toLocaleString('default', { weekday: 'short' })
+      this.abbreviatedYear = `'${x.getFullYear() - 2_000}`
     }
 }
 </script>

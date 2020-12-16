@@ -11,11 +11,11 @@ export default {
         assignAPIData(APIData) {
             console.log(APIData)
             this.inputData = APIData.emptySchema
-            this.emptySchema = JSON.parse(JSON.stringify(this.inputData))
+            this.emptySchema = this._.deepCopy(this.inputData)
             this.previousEntries = APIData.previousEntries
         },
         resetForm() {
-            this.inputData = JSON.parse(JSON.stringify(this.emptySchema))
+            this.inputData = this._.deepCopy(this.emptySchema)
             this.selected = 'New'
         },
         async remove() {
@@ -37,7 +37,7 @@ export default {
             if (newValue === 'New') {
                 this.resetForm()
             } else {
-                this.inputData = JSON.parse(JSON.stringify(this.previousEntries[newValue]))
+                this.inputData = this._.deepCopy(this.previousEntries[newValue])
             }
         }
     }

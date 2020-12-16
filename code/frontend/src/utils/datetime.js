@@ -1,12 +1,4 @@
 const datetime = {
-    monthList: [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ],
-    weekDayList: [
-        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-        "Saturday"
-    ],
     upcomingFriday() {
         let upcomingFriday = new Date()
         const dayOfTheWeek = upcomingFriday.getDay()
@@ -24,43 +16,31 @@ const datetime = {
 
         const returnDate = {
             dayOfTheWeek: 'Friday',
-            month: this.monthList[upcomingFriday.getMonth()],
+            month: upcomingFriday.toLocaleString('default', { month: 'long' }),
             date: upcomingFriday.getDate(),
             year: upcomingFriday.getFullYear(),
             daysTill: dayCount
         }
         return returnDate
     },
-    currentDate() {
-        const x = new Date()
-
-        const returnDate = {
-            month: this.monthList[x.getMonth()],
-            year: x.getFullYear(),
-            date: x.getDate(),
-            dayOfTheWeek: this.weekDayList[x.getDay()]
-          }
-        
-        return returnDate
-    },
     allUpcomingFridays(input) {
         const date = new Date(input.getTime())
-        const month = date.getMonth()
+        let month = date.getMonth()
         let fridays = []
-
         date.setDate(1)
 
-        while (date.getDay() !== 5) {
+        const friday = 5
+        while (date.getDay() !== friday) {
             date.setDate(date.getDate() + 1)
         }
 
+        const monthName = date.toLocaleString('default', { month: 'long' })
+        const year = date.getFullYear()
+        const week = 7
         while (date.getMonth() === month) {
-            let oneFriday = new Date(date.getTime())
-            let calendarDate = oneFriday.getDate()
-            let year = oneFriday.getFullYear()
-            let month = this.monthList[oneFriday.getMonth()]
-            fridays.push(`${calendarDate} ${month} ${year}`)
-            date.setDate(date.getDate() + 7)
+            let oneFriday = new Date(date.getTime()).getDate()
+            fridays.push(`${oneFriday} ${monthName} ${year}`)
+            date.setDate(date.getDate() + week)
         }
         return fridays
     }

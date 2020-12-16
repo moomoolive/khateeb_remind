@@ -18,8 +18,6 @@
 </template>
 
 <script>
-import API from '../../../utils/apiCalls.js'
-
 export default {
     name: 'adminKhateebDisplay',
     props: {
@@ -48,7 +46,7 @@ export default {
     },
     methods: {
         async fetchKhateebs() {
-            const khateebs = await API.getKhateebs('no')
+            const khateebs = await this.$API.getKhateebs('no')
             if (khateebs === `you haven't created any khateebs!`) {
                 this.$emit('no-khateebs')
             } else {
@@ -57,14 +55,14 @@ export default {
             }
         },
         toBeDecidedIndicator(khateebArray) {
-            const randomKhateeb = JSON.parse(JSON.stringify(khateebArray[0]))
+            const randomKhateeb = this._.deepCopy(khateebArray[0])
             for (let field in randomKhateeb) {
                 randomKhateeb[field] = null
             }
             return randomKhateeb
         },
         revertToOriginal(index) {
-            const originalData = JSON.parse(JSON.stringify(this.originalSchedule.monthlySchedule[this.displayedWeek][index]))
+            const originalData = this._.deepCopy(this.originalSchedule.monthlySchedule[this.displayedWeek][index])
             this.schedule.monthlySchedule[this.displayedWeek].splice(index, 1, originalData)
         },
         deleteExcessValues() {

@@ -76,8 +76,8 @@ export default {
             const toBeDecidedIndicator = 'TBD'
             if (window.confirm("Are you sure you want to save these changes?")) {
                 this.currentSchedule.month = this.originalSchedule.month = this.currentScheduleKey
-                const payload = JSON.parse(JSON.stringify(this.currentSchedule))
-                payload.original = JSON.parse(JSON.stringify(this.originalSchedule))
+                const payload = this._.deepCopy(this.currentSchedule)
+                payload.original = this._.deepCopy(this.originalSchedule)
                 this.$API.sendUpdatedSchedule(payload)
                 this.cacheOriginalSchedule()
             }

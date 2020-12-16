@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import logoDisplay from '@/components/logoDisplay.vue'
+import logoDisplay from '@/components/misc/logoDisplay.vue'
 import homepageSchedule from '@/components/scheduleDisplay/homepageSchedule.vue'
 
 export default {

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import editKhateebs from '../../components/editKhateebs.vue'
+import editKhateebs from '@/components/khateebs/editKhateebs.vue'
 
 export default {
     name: 'khateebs',
