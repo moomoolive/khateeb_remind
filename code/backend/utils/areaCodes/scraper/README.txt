@@ -1,3 +1,3 @@
 To run scraper open terminal in this folder and run:
 
-scrapy crawl scraper -o ../organizeCodes/codes.json
+scrapy crawl scraper -o ../organize_codes/codes.json

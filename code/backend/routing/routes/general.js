@@ -1,8 +1,8 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
-import $dbModels from '../database/models.js'
-import $httpCodes from '../utils/httpCodes.js'
-import ENV from '../app.js'
+import $dbModels from '../../database/models.js'
+import $httpCodes from '../../utils/httpCodes.js'
+import env from '../../app.js'
 
 const router = express.Router()
 
@@ -41,7 +41,7 @@ router.post('/authenicate', async (req, res) => {
             const hourPerDay = 24
             const thirtyDays = 30 * secsPerMin * minPerHour * hourPerDay
             const repsonse = {
-                token: jwt.sign({ user: 'admin' }, ENV.JWT_SECRET, { expiresIn:  thirtyDays}),
+                token: jwt.sign({ user: 'admin' }, env.jwt, { expiresIn:  thirtyDays}),
                 msg: "You've been successfully logged in!"
             }
             res.json(repsonse)

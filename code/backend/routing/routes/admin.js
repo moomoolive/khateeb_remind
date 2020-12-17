@@ -1,9 +1,9 @@
 import express from 'express'
-import $dbModels from '../database/models.js'
-import { middleware } from '../utils/middleware.js'
-import $schedule from '../utils/schedule.js'
-import $db from '../database/funcs.js'
-import $responses from '../utils/responses.js'
+import $dbModels from '../../database/models.js'
+import { middleware } from '../../utils/middleware.js'
+import $schedule from '../../utils/schedule.js'
+import $db from '../../database/funcs.js'
+import $responses from '../../utils/responses.js'
 
 const router = express.Router()
 
@@ -65,8 +65,13 @@ router.get(routerGroup3URL + '/:settingName', (req, res) => {
         if (err) console.log(err)
         else {
             let responseData = $responses.previousEntriesAndEmptySchema(setting, routerGroup3)
+            // to be changed
             if (req.params.settingName === "locations&Timing") {
                 const emptySchema = $responses.emptyLocationTimingTemplate()
+                responseData.emptySchema = emptySchema
+            }
+            if (req.params.settingName === 'adminProfile') {
+                const emptySchema = $responses.adminProfile()
                 responseData.emptySchema = emptySchema
             }
             res.json(responseData)

@@ -58,9 +58,6 @@ export default {
             phoneNumberNotValid: null
         }
     },
-    methods: {
-
-    },
     computed: {
         khateebName() {
             return this.selected === 'New' ? this.selected : `${this.inputData.firstName} ${this.inputData.lastName}`

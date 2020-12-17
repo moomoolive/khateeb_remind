@@ -3,7 +3,7 @@
         <collapsable-box
             v-for="(tab, index) in tabList.tabs" :key="index"
             :pathToComponentFromComponents="`${tabList.baseURL}${tab.path}`"
-            :headline="tab.headline"
+            :headline="parsedName(tab.path)"
         />
     </div>
 </template>
@@ -14,14 +14,22 @@ export default {
     data() {
         return {
             tabList: {
-                baseURL: 'settings/adminPerson/subcomponents', 
+                baseURL: 'settings/adminIdentity/subcomponents', 
                 tabs: [
                 {
-                    headline: 'Update Password',
                     path: `/updatePassword`
+                },
+                {
+                    path: `/adminDetails`
                 }
             ]
             }
+        }
+    },
+    methods: {
+        parsedName(relativePath) {
+            const x = relativePath.slice(1)
+            return this._.parseCamelCase(x, 'title')
         }
     }
 }

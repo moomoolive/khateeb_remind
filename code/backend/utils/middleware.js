@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
+
 import $httpCodes from './httpCodes.js'
 import $dbModels from '../database/models.js'
-
-const JWT_SECRET = 'secret'
+import env from '../app.js'
 
 const helpers = {
     confirmOldPassword(request, response, next) {
@@ -20,7 +20,7 @@ const helpers = {
 const funcs = {
     authAdmin(request, response, next) {
         const token = request.headers.authorization
-        jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        jwt.verify(token, env.jwt, (err, decoded) => {
             if (err || decoded.user !== "admin") {
                 response.status($httpCodes.unauthorized)
                 response.json('Unauthorized')

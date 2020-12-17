@@ -2,7 +2,7 @@
     <div style="padding-top: 10px;">
         <collapsable-box
             v-for="(setting, index) in settingsTabs.tabs" :key="index"
-            :headline="setting.headline"
+            :headline="_.parseCamelCase(setting.componentName, 'title')"
             :options="{
                 settingName: setting.componentName,
                 groupSave: setting.groupSave
@@ -23,13 +23,11 @@ export default {
                 path: 'settings/template',
                 tabs: [
                     {
-                        headline: 'Location and Timing',
                         componentName: 'locationTiming',
                         groupSave: true
                     },
                     {
-                        headline: 'Administrator Identity',
-                        componentName: 'adminPerson',
+                        componentName: 'adminIdentity',
                         groupSave: false
                     }
                 ]

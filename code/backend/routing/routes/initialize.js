@@ -1,11 +1,11 @@
 import express from 'express'
-import ENV from '../app.js'
-import $db from '../database/funcs.js'
+import env from '../../app.js'
+import $db from '../../database/funcs.js'
 
 const router = express.Router()
 
 router.post('/password', (req, res) => {
-    if (req.body.API === ENV.API_KEY) {
+    if (req.body.API === env.emergency_key) {
         $db.save('settings', req.body.data, res)
     } else {
         res.status(401)

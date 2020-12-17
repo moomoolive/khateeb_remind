@@ -8,7 +8,6 @@ class Node:
 class linked_list:
     def __init__(self):
         self.head = None
-        self.count = 0
     
     def create(self, array_of_vals):
         for index, value in enumerate(array_of_vals):
@@ -28,7 +27,6 @@ class linked_list:
                     break
                 last_entry = last_entry.next
             last_entry.next = new_entry
-            self.count += 1
     
     def replace_head(self, entry):
         entry.next = self.head
@@ -37,6 +35,14 @@ class linked_list:
     def insert_node(self, previous, new):
         new.next = previous.next
         previous.next = new
+    
+    def delete_duplicates(self):
+        val = self.head
+        while val is not None:
+            if val.next is not None and val.data == val.next.data:
+                    val.next = val.next.next
+                    continue
+            val = val.next
 
     def print(self):
         printval = self.head
@@ -44,14 +50,19 @@ class linked_list:
             print(printval.data, end=" ")
             printval = printval.next
     
-    def countN(self):
-        print(f'This linked list has: {self.count} nodes')
+    def length(self):
+        val = self.head
+        count = 0
+        while val is not None:
+            count += 1
+            val = val.next
+        return count
 
     def get_index(self, index):
         count = 0
         val = self.head
         while val is not None:
-            count += 1
             if (count >= index):
                 return val.data
+            count += 1
             val = val.next

@@ -35,5 +35,12 @@ export default {
             previousEntries
         }
         return responseData
+    },
+    // temporary function
+    adminProfile() {
+        const adminSchema = $dbModels.emptySchema('admin')
+        let settingsSchema = $dbModels.emptySchema('settings')
+        settingsSchema.options = adminSchema
+        return settingsSchema
     }
 }

@@ -17,7 +17,7 @@ export default {
     name: "settingsTemplate",
     components: {
         'locationTiming': () => import('@/components/settings/locationTiming/main.vue'),
-        'adminPerson': () => import('@/components/settings/adminPerson/main.vue')
+        'adminIdentity': () => import('@/components/settings/adminIdentity/main.vue')
     },
     props: {
         settingName: {

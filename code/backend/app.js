@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
+import twilio from 'twilio'
 
 import { middleware } from './utils/middleware.js'
 import { routes } from './routing/index.js'
@@ -9,7 +10,9 @@ import { dbSettings } from './database/settings.js'
 const PORT = process.env.PORT || 5_000
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
 const JWT_SECRET = process.env.JWT_SECRET || 'secret'
-const API_KEY = process.env.API_KEY || '1234'
+const EMERGENCY_KEY = process.env.EMERGENCY_KEY || '1234'
+const TEXT = twilio(process.env.TWILIO_USER, process.env.TWILIO_KEY)
+const PHONE = process.env.TWILIO_NUMBER
 
 const app = express()
 mongoose.connect(DATABASE, { ...dbSettings })
@@ -32,4 +35,9 @@ db.once('open', () => { console.log(`Database listening on ${DATABASE}`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
 app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })
 
-export default { JWT_SECRET, API_KEY }
+export default { 
+    jwt: JWT_SECRET,
+    emergency_key: EMERGENCY_KEY,
+    text: TEXT,
+    phone: PHONE
+}

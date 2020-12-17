@@ -1,8 +1,8 @@
-import { misc } from './misc.js'
-import { general } from './general.js'
-import { admin } from './admin.js'
-import { initialize } from './initialize.js'
-import { text } from './text.js'
+import { misc } from './routes/misc.js'
+import { general } from './routes/general.js'
+import { admin } from './routes/admin.js'
+import { initialize } from './routes/initialize.js'
+import { text } from './routes/text.js'
 
 const routesList = {
     misc,
