@@ -64,4 +64,10 @@ router.post('/save-pass', middleware.validationCheck(['token', 'passwordInfo']),
     })
 })
 
+router.post('/area-code', [middleware.validationCheck(['code']), middleware.authAdmin],
+    (req, res) => {
+        console.log(req.body)
+        res.json('exists')
+})
+
 export { router as misc }

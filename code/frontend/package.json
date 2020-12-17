@@ -53,7 +53,8 @@
       "vue/no-parsing-error": 0,
       "vue/valid-v-bind": 0,
       "vue/no-reserved-keys": 0,
-      "vue/require-valid-default-prop": 0
+      "vue/require-valid-default-prop": 0,
+      "vue/no-async-in-computed-properties": 0
     },
     "overrides": [
       {

@@ -21,10 +21,14 @@
             color="red"
         />
         <div v-for="(property, key) in textFields" :key="key">
-            <label :for="key">{{ key }}: </label>
+            <label :for="key">{{ _.parseCamelCase(key, 'title') }}: </label>
             <div>
                 <input type="text" :id="key" v-model="inputData[key]">
             </div>
+            <h4 v-if="validations[key]">
+                {{ `Invalid ${key === 'phoneNumber' ? 'canadian' : ''} 
+                ${_.parseCamelCase(key)}` }}
+            </h4>
         </div>
         <div>
             Active: <input type="checkbox" v-model="inputData.active">
@@ -43,13 +47,15 @@
 
 <script>
 import adminForms from '@/mixins/adminForms.js'
+import validation from '@/utils/validationChecks/index.js'
 
 export default {
     name: 'editKhateebs',
     mixins: [adminForms],
     data() {
         return {
-            formName: 'Khateeb'
+            formName: 'Khateeb',
+            phoneNumberNotValid: null
         }
     },
     methods: {
@@ -79,15 +85,31 @@ export default {
             if (this.inputData.firstName) {
                 const firstNameIsEmpty = this.inputData.firstName.length  < 1
                 const lastNameIsEmpty = this.inputData.lastName.length < 1
-                const phoneNumberIsIncomplete = this.inputData.phoneNumber.length !== 10
-                return firstNameIsEmpty || lastNameIsEmpty || phoneNumberIsIncomplete
+                return firstNameIsEmpty || lastNameIsEmpty || this.phoneNumberNotValid
             } else return true
+        },
+        validations() {
+                return {
+                    phoneNumber: this.phoneNumberNotValid
+                }
+        },
+        phoneNumber() {
+            if (this.inputData.phoneNumber) return this.inputData.phoneNumber
+            else return ''
+        }
+    },
+    watch: {
+        async phoneNumber() {
+            this.phoneNumberNotValid = await validation.phoneNumber(this.inputData.phoneNumber)
         }
     },
     async created() {
         const data = await this.$API.getKhateebs('yes')
         data.emptySchema.active = true
         this.assignAPIData(data)
+    },
+    updated() {
+        this.phoneNumberNotValid = validation.phoneNumberLength(this.inputData.phoneNumber)
     }
 }
 </script>
