@@ -117,4 +117,9 @@ router.post(routerGroup4URL, (req, res) => {
     $db.save(routerGroup4, req.body, res)
 })
 
+router.get('/blah', (req, res) => {
+    const z = $dbModels.schemasPlus('locationAndTimings')
+    res.json(z)
+})
+
 export { router as admin }
