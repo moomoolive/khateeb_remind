@@ -48,18 +48,19 @@ export default {
             await this.$API.updateSetting(this.inputData)
         },
         loadInPreviousEntries(previousEntries) {
-            this.inputData = previousEntries
+            this.inputData = previousEntries[0]
             this.cachedLocations = this._.deepCopy(this.inputData.options)
         },
         loadInEmpty(emptySchema) {
             this.hasInitializedLocations = false
-            this.inputData.options.push(emptySchema)
+            this.inputData = emptySchema
         },
         async loadAPIData() {
-            const locations =  await this.$API.getSetting('locations&Timing')
-            if (locations.previousEntries) this.loadInPreviousEntries(locations.previousEntries)
+            const locations =  await this.$API.getSetting('locationAndTimings')
+            console.log(locations)
+            if (locations.previousEntries[0]) this.loadInPreviousEntries(locations.previousEntries)
             else this.loadInEmpty(locations.emptySchema)
-            this.emptyLocation = this._.deepCopy(locations.emptySchema)
+            this.emptyLocation = this._.deepCopy(locations.emptySchema.options[0])
         }
     },
     computed: {

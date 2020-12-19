@@ -29,6 +29,10 @@ export default {
                     {
                         componentName: 'adminIdentity',
                         groupSave: false
+                    },
+                    {
+                        componentName: 'textService',
+                        groupSave: false
                     }
                 ]
             }

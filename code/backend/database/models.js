@@ -1,126 +1,8 @@
 import mongoose from 'mongoose'
 
-const schemas = {   
-    scheduleEntry: new mongoose.Schema({
-        month: String,
-        data: Object,
-        savedOn: Date
-    }),
-    khateeb: new mongoose.Schema({
-        firstName: String,
-        lastName: String,
-        phoneNumber: String,
-        active: String,
-        email: String,
-        dropouts: String,
-        savedOn: Date
-    }),
-    announcement: new mongoose.Schema({
-        headline: String,
-        content: String,
-        important: String,
-        urgent: String,
-        savedOn: Date
-    }),
-    setting: new mongoose.Schema({
-        name: String,
-        options: mongoose.Schema.Types.Mixed,
-        savedOn: Date
-    }),
-    locationInfo: new mongoose.Schema({
-        info: Object,
-        timings: Array
-    }),
-    locationMeta: new mongoose.Schema({
-        name: String,
-        address: String
-    }),
-    timingTemplate: new mongoose.Schema({
-        hour: String,
-        minutes: String,
-        AMorPM: String
-    }),
-    location: new mongoose.Schema({
-        info: Object,
-        timings: Array,
-        monthlySchedule: Object
-    }),
-    prayerSlot: new mongoose.Schema({
-        _id: String,
-        firstName: String,
-        lastName: String,
-        savedOn: Date
-    }),
-    admin: new mongoose.Schema({
-        firstName: String,
-        lastName: String,
-        phoneNumber: String,
-        email: String,
-        savedOn: Date
-    }),
-    locationAndTiming: new mongoose.Schema({
-        options: [
-            {
-                info: {
-                    name: String,
-                    address: String
-                },
-                timings:[
-                    {
-                        hour: String,
-                        minutes: String,
-                        AMorPM: String
-                    }
-                ]
-            }
-        ]
-    })
- }
+import schema from './schematics/index.js'
 
- const discriminators = {
-    settings: mongoose.model('setting', schemas.setting)
- }
-
- const models = {
-    settings: mongoose.model('setting', schemas.setting),
-    locationAndTimings: discriminators.settings.discriminator(
-        'locationAndTimings',
-        schemas.locationAndTiming
-    ),
-    x: schemas.locationAndTiming,
-    announcements: mongoose.model('announcement', schemas.announcement),
-    monthlySchedules: mongoose.model('monthlySchedule', schemas.scheduleEntry),
-    khateebs: mongoose.model('khateeb', schemas.khateeb),
-    locationDetails: mongoose.model('locationDetail', schemas.locationInfo),
-    timingTemplates: mongoose.model('timingTemplate', schemas.timingTemplate),
-    locationMetas: mongoose.model('locationMeta', schemas.locationMeta),
-    locationTemplate: mongoose.model('template', schemas.location),
-    prayerSlot: mongoose.model('prayerSlot', schemas.prayerSlot),
-    admin: mongoose.model('admin', schemas.admin),
-    schemaParams(schemaName, full=false) {
-        const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
-        if (!full) {
-            for (let param in fullSchemaParams) {
-                let x = fullSchemaParams[param]
-                if (x == '__v' || x == 'savedOn') {
-                    fullSchemaParams.splice(param, 1)
-                }
-            }
-            const IDParam = fullSchemaParams.pop()
-        }
-        return fullSchemaParams
-    },
-    emptySchema(schemaName, mixed = {}) {
-        const fullSchemaParams = this[schemaName].schema.paths
-        let schema = {}
-        for (let param in fullSchemaParams) {
-            let paramObject = fullSchemaParams[param]
-            if (param !== '__v' && param !== '_id' && param !== 'savedOn') {
-                schema[param] = this.fillSchemaField(paramObject.instance)
-            }
-        }
-        return schema
-    },
+const helpers = {
     fillSchemaField(dataType, mixed = {}) {
         let x = null
         switch(dataType) {
@@ -147,8 +29,8 @@ const schemas = {
     },
     fetchSchemaModels(schemaName) {
         return {
-            parent: this.emptySchema(schemaName),
-            child: this[schemaName].schema.childSchemas
+            parent: models.emptySchema(schemaName),
+            child: schema[schemaName].schema.childSchemas
         }
     },
     fillInChild(keys, parent, field, child) {
@@ -158,7 +40,10 @@ const schemas = {
             if (finalLevel) {
                 let dataType = child.schema.paths[field].instance
                 if (dataType !== 'ObjectID') {
-                    childSchemaField[keys[x]] = this.fillSchemaField(dataType)
+                    if (keys[x] === 'AMorPM')  childSchemaField[keys[x]] = 'PM'
+                    else if (keys[x] === 'hour')  childSchemaField[keys[x]] = 12
+                    else if (keys[x] === 'minutes')  childSchemaField[keys[x]] = '00'
+                    else childSchemaField[keys[x]] = this.fillSchemaField(dataType)
                 }
             } else {
                 childSchemaField = childSchemaField[keys[x]]
@@ -187,22 +72,71 @@ const schemas = {
     },
     findChildSchemas(topLevelParent) {
         let CSchemas = []
-        const parentParams = this[topLevelParent].schema.paths
+        const parentParams = schema[topLevelParent].schema.paths
         for (let field in parentParams) {
             if (parentParams[field].caster) {
                 CSchemas.push(field)
             }
         }
         return CSchemas
+    }
+}
+
+const models = {
+    settings: mongoose.model('setting', schema.setting),
+    locationAndTimings: schema.settings.discriminator(
+        'locationAndTimings',
+        schema.locationAndTiming
+    ),
+    password: schema.settings.discriminator(
+        'password',
+        schema.password
+    ),
+    adminProfile: schema.settings.discriminator(
+        'adminProfile',
+        schema.admin
+    ),
+    announcements: mongoose.model('announcement', schema.announcement),
+    monthlySchedules: mongoose.model('monthlySchedule', schema.scheduleEntry),
+    khateebs: mongoose.model('khateeb', schema.khateeb),
+    locationTemplate: mongoose.model('template', schema.location),
+    prayerSlot: mongoose.model('prayerSlot', schema.prayerSlot),
+    schemaParams(schemaName, full=false) {
+        console.log(schemaName)
+        const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
+        if (!full) {
+            console.log(fullSchemaParams)
+            const notFull = fullSchemaParams.filter((param) => {
+                return param !== '__v' && param !== '_id' && param !== 'savedOn'
+            })
+            return notFull
+        } else return fullSchemaParams
+    },
+    emptySchema(schemaName) {
+        const fullSchemaParams = this[schemaName].schema.paths
+        let schema = {}
+        for (let param in fullSchemaParams) {
+            if (param !== '__v' && param !== '_id' && param !== 'savedOn') {
+                const paramList = param.split('.')
+                const paramObject = fullSchemaParams[param]
+                if (paramList.length > 1) {
+                    if (!schema[paramList[0]]) schema[paramList[0]] = {}
+                    schema[paramList[0]][paramList[1]] = helpers.fillSchemaField(paramObject.instance)
+                } else {
+                    schema[param] = helpers.fillSchemaField(paramObject.instance)
+                }
+            }
+        }
+        return schema
     },
     schemasPlus(schemaName) {
-        let schemas = this.fetchSchemaModels(schemaName)
-        const CSchemas = this.findChildSchemas(schemaName)
+        let schemas = helpers.fetchSchemaModels(schemaName)
+        const CSchemas = helpers.findChildSchemas(schemaName)
         if (schemas.child.length > 0) {
             for (let x = 0; x < CSchemas.length; x++) {
                 const parent = schemas.parent[CSchemas[x]]
                 const child = schemas.child[0]
-                this.createEmptySchema(parent, child)
+                helpers.createEmptySchema(parent, child)
             }
         }
         if (typeof(schemas.parent.__t) === 'string') schemas.parent.__t = schemaName

@@ -34,5 +34,10 @@ export default {
             })
             .catch((err) => { console.log(err) })
         return responseData
+    },
+    async checkTextService() {
+        await axios.get(baseUrl + '/check-text-service')
+            .then((res) => { console.log(res) })
+            .catch((err) => { console.log(err) })
     }
 }

@@ -5,7 +5,7 @@
         :key="property"
         style="display: inline;"
         >
-            <p>
+            <p v-if="property !== '_id'">
                 <cool-btn
                     buttonText="+"
                     @pushed="incrementTime(

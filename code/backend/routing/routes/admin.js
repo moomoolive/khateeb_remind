@@ -1,4 +1,5 @@
 import express from 'express'
+
 import $dbModels from '../../database/models.js'
 import { middleware } from '../../utils/middleware.js'
 import $schedule from '../../utils/schedule.js'
@@ -61,19 +62,11 @@ const routerGroup3 = 'settings'
 const routerGroup3URL = `/${routerGroup3}`
 
 router.get(routerGroup3URL + '/:settingName', (req, res) => {
-    $dbModels.settings.findOne({name: req.params.settingName}, (err, setting) => {
+    const settingName = req.params.settingName
+    $dbModels[settingName].find({}, (err, setting) => {
         if (err) console.log(err)
         else {
-            let responseData = $responses.previousEntriesAndEmptySchema(setting, routerGroup3)
-            // to be changed
-            if (req.params.settingName === "locations&Timing") {
-                const emptySchema = $responses.emptyLocationTimingTemplate()
-                responseData.emptySchema = emptySchema
-            }
-            if (req.params.settingName === 'adminProfile') {
-                const emptySchema = $responses.adminProfile()
-                responseData.emptySchema = emptySchema
-            }
+            let responseData = $responses.previousEntriesAndEmptySchema(setting, settingName)
             res.json(responseData)
         }
     })
@@ -90,7 +83,7 @@ router.get(routerGroup4URL + '/:monthToQuery/:fridayDates', (req, res) => {
     $dbModels.monthlySchedules.findOne({month : req.params.monthToQuery}, (err, schedule) => {
         if (err) console.log(err)
         else {
-            $dbModels.settings.findOne({name: 'locations&Timing'}, (err, locationAndTiming) => {
+            $dbModels.locationAndTimings.findOne({}, (err, locationAndTiming) => {
                 const fridayDates = req.params.fridayDates.split(',')
                 if (err) console.log(err)
                 else if (!schedule) {

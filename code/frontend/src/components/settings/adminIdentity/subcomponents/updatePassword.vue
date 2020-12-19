@@ -23,15 +23,15 @@ export default {
     data() {
         return {
             inputData: {
-                name: 'password',
+                __t: 'password',
                 options: '',
                 confirm: ''
             }
         }
     },
     methods: {
-        submit() {
-            return this.$API.updateSetting(this.inputData)
+        async submit() {
+            const res = await this.$API.updateSetting(this.inputData)
         }
     },
     computed: {

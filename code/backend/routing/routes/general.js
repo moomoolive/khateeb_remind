@@ -1,8 +1,10 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
+
 import $dbModels from '../../database/models.js'
 import $httpCodes from '../../utils/httpCodes.js'
 import env from '../../app.js'
+import $db from '../../database/funcs.js'
 
 const router = express.Router()
 
@@ -31,12 +33,9 @@ router.get('/announcements', (req, res) => {
 
 router.post('/authenicate', async (req, res) => {
     const key = req.body.key
-    $dbModels.settings.findOne({ name: 'password' }, { _id: false }, (err, password) => {
-        if (err) console.log(err)
-        else {
-            //console.log(password)
-        if (key === password.options && password.options) {
-            const secsPerMin = 60
+    const password = await $db.getPassword()
+    if (password && key === password) {
+        const secsPerMin = 60
             const minPerHour = 60
             const hourPerDay = 24
             const thirtyDays = 30 * secsPerMin * minPerHour * hourPerDay
@@ -45,12 +44,10 @@ router.post('/authenicate', async (req, res) => {
                 msg: "You've been successfully logged in!"
             }
             res.json(repsonse)
-        } else {
-            res.status($httpCodes.unauthorized)
-            res.json({token: null, msg: 'Unauthorized'})
-        }
-            }
-    }).select(['options'])
+    } else {
+        res.status($httpCodes.unauthorized)
+        res.json({token: null, msg: 'Unauthorized'})
+    }
 })
 
 export { router as general }

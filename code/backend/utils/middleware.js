@@ -3,10 +3,11 @@ import jwt from 'jsonwebtoken'
 import $httpCodes from './httpCodes.js'
 import $dbModels from '../database/models.js'
 import env from '../app.js'
+import $db from '../database/funcs.js'
 
 const helpers = {
-    confirmOldPassword(request, response, next) {
-        const oldPassword = 'blah' // will be in db
+    async confirmOldPassword(request, response, next) {
+        const oldPassword = await $db.getPassword()
         if (request.body.confirm === oldPassword) {
             delete request.body.confirm
             next()
@@ -28,7 +29,7 @@ const funcs = {
         })
     },
     isPassword(request, response, next) {
-        if (request.body.name === 'password') {
+        if (request.body.__t === 'password') {
             helpers.confirmOldPassword(request, response, next)
         } else next()
     },
@@ -64,6 +65,7 @@ const funcs = {
         const urlComponents = request.originalUrl.split('/')
         const schemaName = urlComponents[2]
         const validationList = $dbModels.schemaParams(schemaName)
+        console.log(validationList)
         return validationList
     },
 }
