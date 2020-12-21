@@ -17,7 +17,7 @@
                 class="blue buttonLinks"
                 @click="click(link)"
             >
-                {{ buttonText(link) }}
+                {{ _.parseCamelCase(link) }}
             </button>
         </div>
     </div>
@@ -40,15 +40,6 @@ export default {
         click(extension) {
             this.$router.push(`/admin/${this.instituteName}/${extension}`)
             this.selected = extension
-        },
-        buttonText(linkName) {
-            const splittedLink = linkName.split('-')
-            let result = ''
-            for (let word of splittedLink) {
-                const capitalized = word.charAt(0).toUpperCase() + word.slice(1)
-                result += `${capitalized} `
-            }
-            return result
         },
         isCurrentRoute(routeName) {
             return routeName === this.selected

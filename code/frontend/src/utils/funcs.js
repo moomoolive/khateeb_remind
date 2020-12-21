@@ -2,7 +2,7 @@ export default {
     deepCopy(item) {
         return JSON.parse(JSON.stringify(item))
     },
-    parseCamelCase(camelCase, format='toLower') {
+    parseCamelCase(camelCase, format='title') {
         const parsed = camelCase.split(/(?=[A-Z])/)
         let phrase = ''
         for (let word of parsed) {

@@ -24,7 +24,7 @@ button {
 
     $marginOne: 1vh;
     margin: $marginOne $marginOne $marginOne $marginOne;
-    &:hover{
+    &:hover {
       background-color: white !important;
       color: black !important;
       border: 0.1vh solid getColor("green");

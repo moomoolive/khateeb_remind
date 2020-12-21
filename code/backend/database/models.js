@@ -30,7 +30,7 @@ const helpers = {
     fetchSchemaModels(schemaName) {
         return {
             parent: models.emptySchema(schemaName),
-            child: schema[schemaName].schema.childSchemas
+            child: models[schemaName].schema.childSchemas
         }
     },
     fillInChild(keys, parent, field, child) {
@@ -72,7 +72,7 @@ const helpers = {
     },
     findChildSchemas(topLevelParent) {
         let CSchemas = []
-        const parentParams = schema[topLevelParent].schema.paths
+        const parentParams = models[topLevelParent].schema.paths
         for (let field in parentParams) {
             if (parentParams[field].caster) {
                 CSchemas.push(field)

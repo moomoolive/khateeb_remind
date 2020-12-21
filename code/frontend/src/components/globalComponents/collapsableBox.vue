@@ -1,7 +1,6 @@
 <template>
     <div style="background-color: white;">
         <button
-        type="button" 
         :class="`collapsible`"
         style=""
         @click="clicked()"
@@ -118,7 +117,11 @@ export default {
     border-radius: 5px;
 }
 
-/* Style the button that is used to open and close the collapsible content */
+button:hover {
+    background-color: getColor("grey") !important;
+    color: $whiteText !important;
+}
+
 .collapsible {
   background-color: getColor("grey");
   color: white;
@@ -139,7 +142,6 @@ export default {
     left: 5px;
 }
 
-/* Style the collapsible content. Note: hidden by default */
 .content {
     overflow: hidden;
     background-color: #f1f1f1;

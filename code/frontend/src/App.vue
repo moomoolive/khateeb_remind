@@ -53,39 +53,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@/scss/styleSheets/buttons.scss';
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-.displayedPage {
-  $padding: 9%;
-  background-color: getColor("offWhite");
-  padding-bottom: 5%;
-  padding-top: 9% !important;
-  max-width: 1000px;
-  margin: auto;
-}
-
-div {
-  height: 100%;
-  width: 100%;
-}
-
-img {
-  min-width: 0px;
-  min-height: 0px;
-  max-width: 1000px;
-  max-height: 1000px;
-}
-
-body {
-  margin: 0 0 0 0;
-  background-color: getColor("grey");
-}
+@import '~@/scss/styleSheets/App.scss';
 </style>
