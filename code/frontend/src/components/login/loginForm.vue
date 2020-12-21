@@ -4,26 +4,27 @@
         <form>
             <input type="text" v-model="secretKey"><br><br>
         </form>
-        <cool-btn
-        buttonText="Submit"
-        @pushed="submit()"
-        :isDisabled="noInput"
-        />
+        <button
+            @click="submit()"
+            :disabled="noInput"
+        >
+            Submit
+        </button><br>
         <h5 v-if="error">Incorrect Key</h5>
-        <cool-btn
-            style="margin-top: 20px;"
-            color="yellow"
-            buttonText="First Time?"
-            @pushed="$emit('alt', 'first')"
+        <button
+            class="yellow"
+            @click="$emit('alt', 'first')"
             v-if="!passwordExists"
-        />
-        <cool-btn
-            style="margin-top: 20px;"
-            color='blue'
-            buttonText="Forgot Password?"
-            @pushed="$emit('alt', 'text')"
+        >
+            First Time?
+        </button>
+        <button
+            class='blue'
+            @click="$emit('alt', 'text')"
             v-if="passwordExists"
-        />
+        >
+            Forgot Password?
+        </button>
     </div>
 </template>
 

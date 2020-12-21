@@ -28,13 +28,13 @@
             :originalSchedule="originalSchedule"
             @no-khateebs="initalized = false"
             />
-            <cool-btn
-                style="margin-top: 20px;"
-                @pushed="saveData()"
-                color='grey'
-                buttonText="Save Changes"
-                :isDisabled="noSave"
-            />
+            <button
+                @click="saveData()"
+                class='grey'
+                :disabled="noSave"
+            >
+                Save Changes
+            </button>
         </div>
     </div>
 </template>

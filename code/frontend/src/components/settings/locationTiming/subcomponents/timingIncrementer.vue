@@ -6,26 +6,27 @@
         style="display: inline;"
         >
             <p v-if="property !== '_id'">
-                <cool-btn
-                    buttonText="+"
-                    @pushed="incrementTime(
+                <button
+                    @click="incrementTime(
                         {
                             property, locationIndex, timingIndex
                         },
                         1
                     )"
-                />
+                >
+                    +
+                </button>
                 {{ value }}<br>
-                <cool-btn
-                    buttonText="-"
-                    color="red"
+                <button
                     @pushed="incrementTime(
                         {
                             property, locationIndex, timingIndex
                         },
                         -1
                     )"
-                />
+                >
+                    -
+                </button>
             </p>
         </div>
     </div>

@@ -34,6 +34,7 @@ router.get('/announcements', (req, res) => {
 router.post('/authenicate', async (req, res) => {
     const key = req.body.key
     const password = await $db.getPassword()
+    console.log(password)
     if (password && key === password) {
         const secsPerMin = 60
             const minPerHour = 60

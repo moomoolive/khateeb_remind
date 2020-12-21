@@ -1,16 +1,16 @@
 <template>
     <div>
-        <cool-btn
-            style="padding-top: 10px;"
-            @pushed="deleteTiming(locationIndex, timingIndex)"
-            color="yellow"
-            buttonText="Delete This Timing"
-        />
-        <cool-btn
-            style="padding-top: 10px;"
-            @pushed="addNewTiming(locationIndex, timingIndex)"
-            buttonText="Add Timing Here"
-        />
+        <button
+            @click="deleteTiming(locationIndex, timingIndex)"
+            class="yellow"
+        >
+            Delete This Timing
+        </button>
+        <button
+            @click="addNewTiming(locationIndex, timingIndex)"
+        >
+            Add Timing Here
+        </button>
     </div>
 </template>
 

@@ -3,18 +3,18 @@
        <h3 style="margin-bottom: 4px; margin-top: 0;">
             {{ display.month }} {{ week }}, {{ display.year }}
         </h3>
-        <cool-btn
-        buttonText="Next Month"
-        color="yellow"
-        class="buttons"
-        @pushed="$emit('hit', 'up')"
-        />
-        <cool-btn
-        buttonText="Previous Month"
-        color="yellow"
-        class="buttons"
-        @pushed="$emit('hit', 'down')"
-        />
+        <button
+            class="yellow"
+            @click="$emit('hit', 'up')"
+        >
+            Next Month
+        </button>
+        <button
+            class="yellow"
+            @click="$emit('hit', 'down')"
+        >
+            Previous Month
+        </button>
     </div>
 </template>
 

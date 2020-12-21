@@ -15,11 +15,11 @@
                 pathToComponentFromComponents='settings/locationTiming/subcomponents/locationRenderer'
             />
         </div>
-        <cool-btn
-            @pushed="addNewLocation()"
-            style="margin-top: 20px"
-            buttonText="Add New Location"
-        />
+        <button
+            @click="addNewLocation()"
+        >
+            Add New Location
+        </button>
     </div>
 </template>
 

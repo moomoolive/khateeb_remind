@@ -1,28 +1,29 @@
 <template>
-    <div style="padding-top: 20px;">
-        <cool-btn
-            color="yellow"
-            buttonText="Back to Login"
-            @pushed="$emit('back')"
-        />
-        <cool-btn
-            style="padding-top: 20px;"
-            color="blue"
-            buttonText="Click to Send Verification Text"
-            @pushed="sendText()"
+    <div>
+        <button
+            class="yellow"
+            @click="$emit('back')"
+        >
+            Back to Login
+        </button><br>
+        <button
+            class="blue"
+            @click="sendText()"
             v-if="!resetPassword"
-        />
+        >
+            Click to Send Verification Text
+        </button>
         <div v-if="responseRecieved">
             <h2>{{ msg.headline }}</h2>
             <h3>{{ msg.rest }}</h3>
             <div v-if="textSent">
                 <input type="text" v-model="code">
-                    <cool-btn
-                        style="padding-top: 20px;"
-                        color="grey"
-                        buttonText="Submit"
-                        @pushed="verifyCode()"
-                    />
+                    <button
+                        class="grey"
+                        @click="verifyCode()"
+                    >
+                        Submit
+                    </button>
                 </div>
                 <h4 v-if="invalidCode">That's the wrong code</h4>
         </div>
@@ -30,13 +31,13 @@
             <h3>Enter Your New Password:</h3>
             <input type="text" v-model="password.new">
             <h3>Confirm Password:</h3>
-            <input type="text" v-model="password.confirm">
-            <cool-btn
-                buttonText="Submit"
-                style="padding-top: 20px;"
-                :isDisabled="passwordMismatch"
+            <input type="text" v-model="password.confirm"><br>
+            <button
+                :disabled="passwordMismatch"
                 @pushed="savePassword()"
-            />
+            >
+                Submit
+            </button>
         </div>
     </div>
 </template>

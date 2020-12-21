@@ -14,12 +14,13 @@
                 <option value="New">Create New Khateeb</option>
             </select>
         </div>
-        <cool-btn
-            @pushed="remove()"
+        <button
+            @click="remove()"
             v-if="selected !== 'New'"
-            buttonText="Delete this Khateeb"
-            color="red"
-        />
+            class="red"
+        >
+            Delete this Khateeb
+        </button>
         <div v-for="(property, key) in textFields" :key="key">
             <label :for="key">{{ _.parseCamelCase(key, 'title') }}: </label>
             <div>
@@ -36,12 +37,14 @@
         <div>
             Dropouts: {{ inputData.dropouts }}
         </div>
-        <cool-btn
-            color="grey"
-            @pushed="submit()"
+        <button
+            class="grey"
+            @click="submit()"
             buttonText="Submit"
-            :isDisabled="notReadyToSubmit"
-        />
+            :disabled="notReadyToSubmit"
+        >
+            Submit
+        </button>
     </div>
 </template>
 

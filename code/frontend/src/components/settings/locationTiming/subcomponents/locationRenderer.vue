@@ -1,11 +1,11 @@
 <template>
     <div style="padding-top: 20px; padding-bottom: 20px;">
-            <cool-btn
-                @pushed="deleteLocation(locationIndex)"
-                color="red"
-                buttonText="Delete this location"
-                style="padding-bottom: 20px"
-            />
+            <button
+                class="red"
+                @click="deleteLocation(locationIndex)"
+            >
+                Delete This Location
+            </button>
             <div>
                 Name: <input v-model="location.info.name"><br><br>
                 Address: <input v-model="location.info.address">

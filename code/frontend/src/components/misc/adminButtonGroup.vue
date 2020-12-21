@@ -1,24 +1,24 @@
 <template>
     <div style="padding-top: 20px;">
         <div>
-            <cool-btn
-                buttonText="Dashboard/Admin Home"
-                @pushed="click('dashboard')"
-                :isDisabled="isCurrentRoute('dashboard')"
-            />
+            <button
+                @click="click('dashboard')"
+                :disabled="isCurrentRoute('dashboard')"
+            >
+                Dashboard/Admin Home
+            </button>
         </div>
         <div 
-            style="margin-top: 10px;"
             v-for="(buttonGroup, index) in buttonLinks" :key="index"
         >
-            <cool-btn
+            <button
                 v-for="link in buttonGroup" :key="link"
-                :buttonText="buttonText(link)"
-                :isDisabled="isCurrentRoute(link)"
-                color="blue"
-                @pushed="click(link)"
-                class="buttonLinks"
-                />
+                :disabled="isCurrentRoute(link)"
+                class="blue buttonLinks"
+                @click="click(link)"
+            >
+                {{ buttonText(link) }}
+            </button>
         </div>
     </div>
 </template>

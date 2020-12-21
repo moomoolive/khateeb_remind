@@ -13,7 +13,11 @@
                 TBD
             </option>
         </select>
-        <button @click="revertToOriginal(prayerTiming)">Revert</button>
+        <button 
+            @click="revertToOriginal(prayerTiming)"
+        >
+            Revert
+        </button>
     </div>
 </template>
 
@@ -84,7 +88,7 @@ export default {
 
 <style lang="scss" scoped>
 button {
-    background-color: $grey;
+    background-color: getColor("grey");
     color: white;
     border: solid black 1px;
     outline: none;

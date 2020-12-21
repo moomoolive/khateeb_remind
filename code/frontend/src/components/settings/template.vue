@@ -1,13 +1,13 @@
 <template>
     <div style="padding-top: 10px;">
-        <cool-btn
+        <button
             v-if="groupSave"
-            @pushed="save()"
-            :isDisabled="isDisabled"
-            buttonText="Save"
-            color="grey"
-            style='margin-bottom: 10px;'
-        />
+            @click="save()"
+            :disabled="isDisabled"
+            class="grey"
+        >
+            Save
+        </button>
         <component ref="child" :is="settingName" />
     </div>
 </template>

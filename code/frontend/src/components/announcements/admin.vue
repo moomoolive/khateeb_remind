@@ -12,12 +12,13 @@
             Headline: <br>
             <input v-model="inputData.headline" type="text"> 
         </div>
-        <cool-btn
-            color="red"
-            @pushed="remove()"
+        <button
+            class="red"
+            @click="remove()"
             v-if="selected !== 'New'"
-            buttonText="Delete this Announcement"
-        />
+        >
+            Delete this Announcement
+        </button>
         <div>
             <label>Body of your announcement:<br></label>
             <textarea v-model="inputData.content"></textarea>
@@ -28,12 +29,13 @@
             <input type="checkbox" id="important" v-model="inputData.important">
             <label for="important">Is It Very Important??</label>
         </div>
-        <cool-btn
-            buttonText="Submit"
-            color="grey"
-            :isDisabled="!readyToSubmit"
-            @pushed="submit()"
-        />
+        <button
+            class="grey"
+            :disabled="!readyToSubmit"
+            @click="submit()"
+        >
+            Submit
+        </button>
     </div>
 </template>
 

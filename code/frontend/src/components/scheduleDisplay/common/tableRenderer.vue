@@ -74,7 +74,7 @@ export default {
             type: [Number, String],
             required: true
         },
-        originalSchedule: { // to prevent errors for now
+        originalSchedule: {
             type: [Object],
             required: false
         }
@@ -104,25 +104,25 @@ table {
 }
 
 .columnIdentifiers {
-    background-color: $green;
+    background-color: getColor("green");
     color: $whiteText;
 }
 
 .locationName {
-    background-color: $blue;
+    background-color: getColor("blue");
     color: white;
 }
 
 .locationAddress {
-    background-color: $yellow;
+    background-color: getColor("yellow");
 }
 
 .tableBackground {
-    background-color: $grey;
+    background-color: getColor("grey");
     border-radius: 4px;
 }
 
 .khateebs {
-    background-color: $offWhite;
+    background-color: getColor("offWhite");
 }
 </style>

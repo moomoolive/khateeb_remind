@@ -92,6 +92,6 @@ export default {
     margin-bottom: $size;
 }
 .lastUpdated {
-    color: $yellow;
+    color: getColor("yellow");
 }
 </style>

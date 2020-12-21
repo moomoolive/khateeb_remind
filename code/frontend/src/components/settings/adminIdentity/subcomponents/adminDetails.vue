@@ -8,12 +8,12 @@
             Phone Number:<br><br>
             <input type="text" v-model="inputData.options.phoneNumber">
         </div>
-        <cool-btn
-            style="padding-top: 20px;"
-            color="grey"
-            buttonText="Submit"
-            @pushed="submit()"
-        />
+        <button
+            class="grey"
+            @click="submit()"
+        >
+            Submit
+        </button>
     </div>
 </template>
 

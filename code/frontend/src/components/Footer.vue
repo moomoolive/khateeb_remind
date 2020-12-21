@@ -54,7 +54,7 @@ export default {
 }
 
 .router-link-active {
-    background-color: #4CAF50;
+    background-color: getColor("green");
     color: white;
 }
 

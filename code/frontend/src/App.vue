@@ -53,6 +53,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~@/scss/styleSheets/buttons.scss';
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -63,7 +65,7 @@ export default {
 
 .displayedPage {
   $padding: 9%;
-  background-color: #fffff4;
+  background-color: getColor("offWhite");
   padding-bottom: 5%;
   padding-top: 9% !important;
   max-width: 1000px;
@@ -84,6 +86,6 @@ img {
 
 body {
   margin: 0 0 0 0;
-  background-color: #333;
+  background-color: getColor("grey");
 }
 </style>

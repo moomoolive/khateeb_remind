@@ -30,9 +30,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* Add a black background color to the top navigation */
 .topnav {
-  background-color: #333;
+  background-color: getColor("grey");
   overflow: hidden;
   position: fixed;
   top: 0;
@@ -50,12 +49,11 @@ export default {
 }
 
 .router-link-active {
-    background-color: #4CAF50;
+    background-color: getColor("green");
     color: white;
     padding: 0;
 }
 
-/* Style the links inside the navigation bar */
 .topnav a {
   float: left;
   color: #f2f2f2;
@@ -66,7 +64,6 @@ export default {
   font-weight: bold;
 }
 
-/* Change the color of links on hover */
 .topnav a:hover {
   background-color: #ddd;
   color: black;

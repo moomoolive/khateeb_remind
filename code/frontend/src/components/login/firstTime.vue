@@ -1,19 +1,20 @@
 <template>
     <div style="padding-top: 20px;">
-        <cool-btn
-            color="yellow"
-            buttonText="Back to Login"
-            @pushed="$emit('back')"
-        />
+        <button
+            class="yellow"
+            @click="$emit('back')"
+        >
+            Back to Login
+        </button>
         <h2>Enter Your API Security Key</h2>
         <input type="text" v-model="API">
         <h2>Enter Your First Password</h2>
-        <input type="text" v-model="data.options">
-        <cool-btn
-            style="margin-top: 10px;"
-            buttonText="Submit"
+        <input type="text" v-model="data.options"><br>
+        <button
             @pushed="submit()"
-        />
+        >
+            Submit
+        </button>
     </div>
 </template>
 

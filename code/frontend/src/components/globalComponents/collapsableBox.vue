@@ -120,7 +120,7 @@ export default {
 
 /* Style the button that is used to open and close the collapsible content */
 .collapsible {
-  background-color: #333;
+  background-color: getColor("grey");
   color: white;
   cursor: pointer;
   padding: 18px;
@@ -134,7 +134,7 @@ export default {
 }
 
 .icon {
-    color: $blue;
+    color: getColor("blue");
     position: relative;
     left: 5px;
 }
