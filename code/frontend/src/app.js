@@ -5,7 +5,7 @@ import router from './router'
 import store from './store'
 
 import API from '@/utils/API/index.js'
-import funcs from '@/utils/general/index.js'
+import funcs from '@/utils/general/main.js'
 
 import globalComponents from '@/components/globalComponents/index.js'
 Vue.prototype.$API = API

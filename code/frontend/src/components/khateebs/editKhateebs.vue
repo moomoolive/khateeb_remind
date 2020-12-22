@@ -50,7 +50,7 @@
 
 <script>
 import adminForms from '@/mixins/adminForms.js'
-import validation from '@/utils/validationChecks/index.js'
+import validation from '@/utils/validationChecks/main.js'
 
 export default {
     name: 'editKhateebs',

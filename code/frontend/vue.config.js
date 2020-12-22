@@ -1,5 +1,3 @@
-const path = require('path')
-
 module.exports = {
     css: {
         loaderOptions : {
@@ -8,6 +6,11 @@ module.exports = {
                     @import "@/scss/_consts.scss";
                 `
             }
+        }
+    },
+    pages: {
+        index: {
+            entry: 'src/app.js'
         }
     }
 }

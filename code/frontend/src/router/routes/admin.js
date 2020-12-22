@@ -2,27 +2,27 @@ const adminRoutes = [
     {
         path: '/admin/:institute',
         name: 'admin',
-        component: () => import('../views/adminPages/admin.vue'),
+        component: () => import('@/views/admin/admin.vue'),
         children: [
               {
                 path: 'dashboard',
-                component: () => import('../views/adminPages/dashboard.vue')
+                component: () => import('@/views/admin/dashboard.vue')
               },
               {
                 path: 'schedule',
-                component: () => import('../views/adminPages/schedule.vue')
+                component: () => import('@/views/admin/schedule.vue')
               },
               {
                 path: 'announcements',
-                component: () => import('../views/adminPages/announcements.vue')
+                component: () => import('@/views/admin/announcements.vue')
               },
               {
                 path: 'khateebs',
-                component: () => import('../views/adminPages/khateebs.vue')
+                component: () => import('@/views/admin/khateebs.vue')
               },
               {
                 path: 'settings',
-                component: () => import('../views/adminPages/settings.vue')
+                component: () => import('@/views/admin/settings.vue')
               }
         ],
         meta: {

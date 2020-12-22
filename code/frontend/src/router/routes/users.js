@@ -1,4 +1,4 @@
-import Home from '../views/userPages/Home.vue'
+import Home from '@/views/users/Home.vue'
 
 export default [
     {
@@ -9,16 +9,16 @@ export default [
     {
         path: '/about',
         name: 'about',
-        component: () => import ('../views/userPages/about.vue')
+        component: () => import ('@/views/users/about.vue')
     },
     {
         path: '/announcements',
         name: 'announcements',
-        component: () => import (/* webpackPrefetch: true */ '../views/userPages/announcements.vue')
+        component: () => import (/* webpackPrefetch: true */ '@/views/users/announcements.vue')
     },
     {
         path: '/login',
         name: 'login',
-        component: () => import ('../views/userPages/login.vue')
+        component: () => import ('@/views/users/login.vue')
     }
 ]

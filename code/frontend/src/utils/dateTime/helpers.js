@@ -2,9 +2,7 @@ const friday = 5
 
 export default {
     findUpcomingFriday(date=new Date()) {
-        console.log('hi')
-        const currentDate = date.getDay()
-        while (currentDate !== friday) {
+        while (date.getDay() !== friday) {
             date.setDate(date.getDate() + 1)
         }
         return date

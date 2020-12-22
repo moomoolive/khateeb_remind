@@ -1,4 +1,4 @@
-import datetime from '../utils/dateTime/index.js'
+import datetime from '../utils/dateTime/main.js'
 import common from '../components/scheduleDisplay/common/index.js'
 
 export default {
@@ -33,25 +33,18 @@ export default {
             } else return this.currentSchedule.data.rows
         },
         displayedMonthInfo() {
-            const firstFridayOfMonth = this.fridays[0].split(' ')
-            const returnValue = {
-                month: firstFridayOfMonth[1],
-                year: firstFridayOfMonth[2],
-                abbreviatedMonthName: firstFridayOfMonth[1].slice(0,3)
+            const firstFridayOfMonth = this.fridays[0]
+            return {
+                month: firstFridayOfMonth.toLocaleString('default', { month: 'long' }),
+                year: firstFridayOfMonth.getFullYear(),
+                abbreviatedMonthName: firstFridayOfMonth.toLocaleString('default', { month: 'short' })
             }
-            return returnValue
         },
         fridays() {
             return datetime.allUpcomingFridays(this.month)
         },
         fridayDates() {
-            let splitDates = []
-            let entry
-            for (entry of this.fridays) {
-                const x = entry.split(' ')
-                splitDates.push(x[0])
-            }
-            return splitDates
+            return this.fridays.map(friday => friday.getDate())
         }
     }
 }

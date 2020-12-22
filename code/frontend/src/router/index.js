@@ -2,8 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store/index.js'
 
-import adminRoutes from './admin.js'
-import userRoutes from './users.js'
+import admin from './routes/admin.js'
+import users from './routes/users.js'
 
 Vue.use(VueRouter)
 
@@ -13,8 +13,8 @@ const routes = [
     name: 'Not Found',
     component: () => import ('../views/404.vue')
   }, 
-  ...adminRoutes,
-  ...userRoutes
+  ...admin,
+  ...users
 ]
 
 const router = new VueRouter({

@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import validation from '@/utils/validationChecks/index.js'
+import validation from '@/utils/validationChecks/main.js'
 // to be continued in a better manner
 export default {
     name: 'phoneNumberInput',
