@@ -53,5 +53,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@/scss/styleSheets/App.scss';
+@import '~@/scss/App/index.scss';
 </style>
