@@ -2,7 +2,7 @@
     <div style="padding-top: 10px;">
         <collapsable-box
             v-for="(setting, index) in settingsTabs.tabs" :key="index"
-            :headline="_.parseCamelCase(setting.componentName, 'title')"
+            :headline="_.stringFormat(setting.componentName, 'title')"
             :options="{
                 settingName: setting.componentName,
                 groupSave: setting.groupSave

@@ -22,13 +22,13 @@
             Delete this Khateeb
         </button>
         <div v-for="(property, key) in textFields" :key="key">
-            <label :for="key">{{ _.parseCamelCase(key, 'title') }}: </label>
+            <label :for="key">{{ _.stringFormat(key, 'title') }}: </label>
             <div>
                 <input type="text" :id="key" v-model="inputData[key]">
             </div>
             <h4 v-if="validations[key]">
                 {{ `Invalid ${key === 'phoneNumber' ? 'canadian' : ''} 
-                ${_.parseCamelCase(key)}` }}
+                ${_.stringFormat(key)}` }}
             </h4>
         </div>
         <div>

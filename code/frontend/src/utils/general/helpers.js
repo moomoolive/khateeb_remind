@@ -1,0 +1,21 @@
+const subHelpers = {
+    toXCase(arrayOfWords, format) {
+        return arrayOfWords.map((word) =>
+            format === 'title' ? 
+                word.charAt(0).toUpperCase() + word.slice(1) : word[format + 'Case']()
+        )
+    },
+    arrayToString(arrayOfWords) {
+        return arrayOfWords.reduce((total, word) => total += ` ${word}`)
+    }
+}
+
+export default {
+    camelCaseToArray(camelCase) {
+        return camelCase.split(/(?=[A-Z])/)
+    },
+    arrayToString(arrayOfWords, format) {
+        const modifiedArray = subHelpers.toXCase(arrayOfWords, format)
+        return subHelpers.arrayToString(modifiedArray)
+    }
+}

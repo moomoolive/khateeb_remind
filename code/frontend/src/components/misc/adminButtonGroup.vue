@@ -17,7 +17,7 @@
                 class="blue buttonLinks"
                 @click="click(link)"
             >
-                {{ _.parseCamelCase(link) }}
+                {{ _.stringFormat(link) }}
             </button>
         </div>
     </div>

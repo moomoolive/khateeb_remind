@@ -1,7 +1,7 @@
 <template>
     <div style="padding-top: 20px; padding-bottom: 20px;">
         <div v-for="(field, name) in fields" :key="name">
-            {{ _.parseCamelCase(name, 'title') }}:<br><br>
+            {{ _.stringFormat(name, 'title') }}:<br><br>
             <input type="text" v-model="inputData.options[name]"><br><br>
         </div>
         <div>
