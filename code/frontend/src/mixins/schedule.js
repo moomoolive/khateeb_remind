@@ -1,4 +1,4 @@
-import datetime from '../utils/datetime.js'
+import datetime from '../utils/dateTime/index.js'
 import common from '../components/scheduleDisplay/common/index.js'
 
 export default {

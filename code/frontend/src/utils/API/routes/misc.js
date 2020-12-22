@@ -39,5 +39,12 @@ export default {
         await axios.get(baseUrl + '/check-text-service')
             .then((res) => { console.log(res) })
             .catch((err) => { console.log(err) })
+    },
+    async checkValidCanadianAreaCode(code) {
+        let response
+        await axios.post(baseUrl + '/area-code', { code })
+            .then((res) => { response = res.data !== 'exists' })
+            .catch((err) => { console.log(err) })
+        return response
     }
 }

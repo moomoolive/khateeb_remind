@@ -1,5 +1,13 @@
-const datetime = {
+import helpers from './helpers.js'
+
+export default {
     upcomingFriday() {
+        /*
+        const upcomingFriday = helpers.findUpcomingFriday()
+        return {
+            blah blah blah
+        }
+        */
         let upcomingFriday = new Date()
         const dayOfTheWeek = upcomingFriday.getDay()
         let dayCount = 0
@@ -24,6 +32,10 @@ const datetime = {
         return returnDate
     },
     allUpcomingFridays(input) {
+        /*
+        const firstFriday = helpers.findFirstFridayOfMonth()
+        return helpers.findAllFridaysInMonth()
+        */
         const date = new Date(input.getTime())
         let month = date.getMonth()
         let fridays = []
@@ -45,6 +57,4 @@ const datetime = {
         return fridays
     }
 }
-
-export default datetime
 

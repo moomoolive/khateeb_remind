@@ -10,7 +10,7 @@
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 
-import datetime from './utils/datetime.js'
+import datetime from './utils/dateTime/index.js'
 
 import axios from 'axios'
 
