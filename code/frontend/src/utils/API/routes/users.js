@@ -1,32 +1,22 @@
 import axios from 'axios'
 
-import API_URL from './vars'
-
+import API_URL from './consts.js'
 const baseUrl = API_URL + '/general'
 
 export default {
-    async monthlySchedule() {
-        let responseData
-        await axios.get(baseUrl  + '/')
-            .then((res) => { responseData = res.data })
-            .catch((err) => { console.log(err) })
-        return responseData
+    monthlySchedule() {
+        return axios.get(baseUrl  + '/')
+            .then(res =>  res.data )
+            .catch(err => { console.log(err) })
     },
-    async announcements() {
-        let responseData
-        await axios.get(baseUrl  + '/announcements')
-            .then((res) => { responseData = res.data })
-            .catch((err) => { console.log(err) })
-        return responseData
+    announcements() {
+        return axios.get(baseUrl  + '/announcements')
+            .then(res => res.data )
+            .catch(err => { console.log(err) })
     },
-    async login(secretKey) {
-        let responseData
-        const requestData = {key: secretKey}
-        await axios.post(baseUrl  + '/authenicate', requestData)
-            .then((res) => {
-                responseData = res.data
-            })
-            .catch((err) => { console.log(err) })
-        return responseData
+    login(secretKey) {
+        return axios.post(baseUrl  + '/authenicate', {key: secretKey})
+            .then(res => res.data)
+            .catch(err => { console.log(err) })
     }
 }

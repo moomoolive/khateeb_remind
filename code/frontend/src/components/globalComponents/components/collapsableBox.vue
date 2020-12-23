@@ -88,7 +88,7 @@ export default {
             else return 0
         },
         componentX() {
-            return () => import(`../${this.pathToComponentFromComponents}.vue`)
+            return () => import(`@/components/${this.pathToComponentFromComponents}.vue`)
         },
         tagLoader() {
             if (this.tagDetails === 'default') return [{}];

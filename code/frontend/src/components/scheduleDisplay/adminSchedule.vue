@@ -78,14 +78,14 @@ export default {
                 this.currentSchedule.month = this.originalSchedule.month = this.currentScheduleKey
                 const payload = this._.deepCopy(this.currentSchedule)
                 payload.original = this._.deepCopy(this.originalSchedule)
-                this.$API.sendUpdatedSchedule(payload)
+                this.$API.updatedSchedule(payload)
                 this.cacheOriginalSchedule()
             }
         },
         async fetchMonthlySchedule() {
             const scheduleFor = `${this.currentScheduleKey}`
             const fridayDates = this.fridayDates
-            const data = await this.$API.fetchMonthlySchedules(scheduleFor, fridayDates)
+            const data = await this.$API.getMonthlySchedule(scheduleFor, fridayDates)
             if (data === 'No locations or timings were found!') this.errorMsg = data
             else {
                 this.updateSchedule(data)

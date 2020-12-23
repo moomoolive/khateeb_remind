@@ -54,8 +54,8 @@
 export default {
     name: 'tableRender',
     components: {
-        'admin': () => import('../khateebCell/admin.vue'),
-        'user': () => import('../khateebCell/user.vue')
+        'admin': () => import('@/components/scheduleDisplay/khateebCell/admin.vue'),
+        'user': () => import('@/components/scheduleDisplay/khateebCell/user.vue')
     },
     props: {
         table: {
@@ -88,41 +88,6 @@ export default {
 }
 </script>
 
-<style lang="scss">
-table, th, td {
-  border: 1px solid black;
-}
-
-th {
-    height: 30px;
-}
-
-table {
-    margin-top: 10px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.columnIdentifiers {
-    background-color: getColor("green");
-    color: $whiteText;
-}
-
-.locationName {
-    background-color: getColor("blue");
-    color: white;
-}
-
-.locationAddress {
-    background-color: getColor("yellow");
-}
-
-.tableBackground {
-    background-color: getColor("grey");
-    border-radius: 4px;
-}
-
-.khateebs {
-    background-color: getColor("offWhite");
-}
+<style lang="scss" scoped>
+@import '~@/scss/components/scheduleTables.scss';
 </style>

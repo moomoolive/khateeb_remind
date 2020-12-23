@@ -1,50 +1,32 @@
 import axios from 'axios'
 
-import API_URL from './vars'
-
+import API_URL from './consts.js'
 const baseUrl = API_URL + '/misc'
 
 export default {
-    async requestVerificationCode() {
-        let responseData;
-        await axios.get(baseUrl + '/reset-pass')
-            .then((res) => {
-                responseData = res.data
-                console.log(res.data) 
-            })
-            .catch((err) => { console.log(err) })
-        return responseData
+    requestVerificationCode() {
+        return axios.get(baseUrl + '/reset-pass')
+            .then(res => res.data)
+            .catch(err => { console.log(err) })
     },
-    async sendVerificationCode(code) {
-        let responseData
-        await axios.post(baseUrl + '/verify-admin-text', { code })
-            .then((res) => {
-                responseData = res.data
-                console.log(res.data)
-            })
-            .catch((err) => { console.log(err) })
-        return responseData
+    sendVerificationCode(code) {
+        return axios.post(baseUrl + '/verify-admin-text', { code })
+            .then(res => res.data)
+            .catch(err => { console.log(err) })
     },
-    async savePassword(payload) {
-        let responseData
-        await axios.post(baseUrl + '/save-pass', payload)
-            .then((res) => {
-                console.log(res.data)
-                responseData = res.data
-            })
-            .catch((err) => { console.log(err) })
-        return responseData
+    savePassword(payload) {
+        return axios.post(baseUrl + '/save-pass', payload)
+            .then(res => res.data)
+            .catch(err => { console.log(err) })
     },
-    async checkTextService() {
-        await axios.get(baseUrl + '/check-text-service')
-            .then((res) => { console.log(res) })
-            .catch((err) => { console.log(err) })
+    checkTextService() {
+        axios.get(baseUrl + '/check-text-service')
+            .then(res => { console.log(res) })
+            .catch(err => { console.log(err) })
     },
-    async checkValidCanadianAreaCode(code) {
-        let response
-        await axios.post(baseUrl + '/area-code', { code })
-            .then((res) => { response = res.data !== 'exists' })
-            .catch((err) => { console.log(err) })
-        return response
+    checkValidCanadianAreaCode(code) {
+        return axios.post(baseUrl + '/area-code', { code })
+            .then(res => res.data !== 'exists' )
+            .catch(err => { console.log(err) })
     }
 }

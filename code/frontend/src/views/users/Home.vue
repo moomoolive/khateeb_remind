@@ -18,16 +18,6 @@ export default {
   components: {
     homepageSchedule,
     logoDisplay
-  },
-  data() {
-    return {
-    }
-  },
-  methods: {
-    
-  },
-  created() {
-    
   }
 }
 </script>

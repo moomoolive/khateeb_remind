@@ -22,7 +22,7 @@
             Delete this Khateeb
         </button>
         <div v-for="(property, key) in textFields" :key="key">
-            <label :for="key">{{ _.stringFormat(key, 'title') }}: </label>
+            <label :for="key">{{ _.stringFormat(key) }}: </label>
             <div>
                 <input type="text" :id="key" v-model="inputData[key]">
             </div>

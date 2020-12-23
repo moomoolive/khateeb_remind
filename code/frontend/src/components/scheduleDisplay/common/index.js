@@ -1,6 +1,6 @@
-import tableRenderer from './tableRenderer.vue'
-import changeWeekButtons from './changeWeekButtons.vue'
-import changeLocationButtons from './changeLocationButtons.vue'
+import tableRenderer from './components/tableRenderer.vue'
+import changeWeekButtons from './components/changeWeekButtons.vue'
+import changeLocationButtons from './components/changeLocationButtons.vue'
 
 export default {
     tableRenderer,
