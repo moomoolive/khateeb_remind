@@ -13,4 +13,12 @@ $themeColors: (
     @return map.get($themeColors, $name);
 }
 
+$opaqueThemeColors: (
+    "blue": rgba(33, 150, 243, 0.2)
+);
+
+@function getOpaqueColor($name) {
+    @return map.get($opaqueThemeColors, $name)
+}
+
 $whiteText: #f2f2f2;

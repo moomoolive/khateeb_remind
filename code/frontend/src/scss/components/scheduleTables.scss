@@ -3,34 +3,50 @@ table, th, td {
 }
 
 th {
-    height: 30px;
+    height: 6vh;
+    width: 50%;
 }
 
 table {
     margin-top: 10px;
     margin-left: auto;
     margin-right: auto;
+    width: 90vw;
 }
 
 .columnIdentifiers {
     background-color: getColor("green");
     color: $whiteText;
+    font-size: 3vh;
 }
 
+$locationMetaFontSize: 3vh;
+
 .locationName {
-    background-color: getColor("blue");
+    background: linear-gradient(
+        to right,
+        getColor("blue"),
+        getColor("red")
+    );
     color: white;
+    font-size: $locationMetaFontSize;
 }
 
 .locationAddress {
     background-color: getColor("yellow");
+    font-size: $locationMetaFontSize;
 }
 
-.tableBackground {
+.table {
     background-color: getColor("grey");
     border-radius: 4px;
+    margin-bottom: 8vh;
 }
 
 .khateebs {
-    background-color: getColor("offWhite");
+    background: linear-gradient(
+        getColor("blue"),
+        getColor("yellow")
+    );
+    font-size: 2.5vh;
 }

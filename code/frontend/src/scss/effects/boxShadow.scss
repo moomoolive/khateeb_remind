@@ -1,0 +1,24 @@
+@function boxPosition($left) {
+    @if $left {
+      @return -1;
+    } @else {
+      @return 1;
+    }
+  };
+  
+  @function individualBoxShadow($number, $const, $color) {
+    $bShadow: 5px;
+    @return getOpaqueColor($color) ($const * $number * $bShadow) ($number * $bShadow)
+  };
+  
+  @mixin boxShadow($color, $left: true) {
+    $bShadow: 5px;
+    $const: boxPosition($left);
+    $boxList: ();
+    @for $i from 1 through 5 {
+      $x: individualBoxShadow($i, $const, $color);
+      $boxList: append($boxList, $x, comma)
+    }
+  
+    box-shadow: $boxList;
+  };

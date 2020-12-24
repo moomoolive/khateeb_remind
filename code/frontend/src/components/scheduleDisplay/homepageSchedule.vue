@@ -4,38 +4,40 @@
            {{ errorMsg }}
         </div>
         <div v-if="initalized">
-            <slider-button
-            leftMessage="This Week"
-            rightMessage="This Month"
-            altText="Toggle between weekly and monthly view"
-            @slider-toggled="isWeeklyView = !isWeeklyView"
-            style="margin-top: 20px; margin-bottom: 20px;"
-            />
-            <change-week-buttons
-            :fridayDates="fridayDates"
-            :displayedMonthInfo="displayedMonthInfo"
-            @change="displayData.weekOf = $event"
-            class="whiteSpace"
-            v-if="!isWeeklyView"
-            />
-            <change-location-buttons
-            :currentSchedule="currentSchedule"
-            @change="displayData.location = $event"
-            v-if="currentSchedule.data.rows.length > 1"
-            />
-            <h4 class="lastUpdated">{{ lastUpdated }}</h4>
-            <div id="headers">
-                <h3 style="margin-top: 0px; margin-bottom: 4px;">
-                    {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{displayedMonthInfo.year}}
-                </h3>
+            <div class="controls">
+                <slider-button
+                leftMessage="This Week"
+                rightMessage="This Month"
+                altText="Toggle between weekly and monthly view"
+                @slider-toggled="isWeeklyView = !isWeeklyView"
+                class="controlSplit"
+                />
+                <change-week-buttons
+                :fridayDates="fridayDates"
+                :displayedMonthInfo="displayedMonthInfo"
+                @change="displayData.weekOf = $event"
+                v-if="!isWeeklyView"
+                class="controlSplit"
+                />
+                <change-location-buttons
+                :currentSchedule="currentSchedule"
+                @change="displayData.location = $event"
+                v-if="currentSchedule.data.rows.length > 1"
+                />
             </div>
-            <table-renderer
-            :shownLocations="shownLocations"
-            table="user"
-            :schedule="currentSchedule"
-            :displayedWeek="displayData.weekOf"
-            :originalSchedule="originalSchedule"
-            />
+            <div class="display">
+                <h3 class="dateHeader">
+                        {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{displayedMonthInfo.year}}
+                </h3>
+                <h4 class="lastUpdated">{{ lastUpdated }}</h4>
+                <table-renderer
+                :shownLocations="shownLocations"
+                table="user"
+                :schedule="currentSchedule"
+                :displayedWeek="displayData.weekOf"
+                :originalSchedule="originalSchedule"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -87,12 +89,44 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.whiteSpace {
-    $size: 30px;
-    height: $size;
-    margin-bottom: $size;
+.display {
+    margin-top: 6vh;
 }
+
+.controls {
+    margin-top: 5vh;
+    border: solid 1px getColor("blue");
+    border-radius: 4px;
+    width: 90vw;
+    margin-left: auto;
+    margin-right: auto;
+    background: linear-gradient(
+        to right,
+        getColor("red"),
+        getColor("yellow")
+    )
+}
+
+.controlSplit {
+    $padding: 1vh;
+    border-bottom: 
+        getColor("grey") 
+        solid 
+        0.4vh;
+    width: 90%;
+    margin: 0 auto 0 auto;
+    padding: $padding 0 $padding 0;
+}
+
 .lastUpdated {
     color: getColor("yellow");
+    margin-top: 0;
+    font-size: 2.5vh;
+    margin-bottom: 6vh;
+}
+
+.dateHeader {
+    margin-bottom: 1vh;
+    font-size: 4vh;
 }
 </style>

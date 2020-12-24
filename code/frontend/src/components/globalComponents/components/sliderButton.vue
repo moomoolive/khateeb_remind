@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="margin-top: 2vh;">
         <p style="display: inline-block;">{{ leftMessage }}</p>
         <label class="switch" :aria-label="altText">
             <input type="checkbox">

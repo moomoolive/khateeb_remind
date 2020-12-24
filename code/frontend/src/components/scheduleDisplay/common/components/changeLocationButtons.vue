@@ -1,5 +1,5 @@
 <template>
-    <div style="margin-bottom: 4vh; margin-top: 5vh;">
+    <div>
         <button
             @click="click('All')"
             aria-label="view schedule for all locations"

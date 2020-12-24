@@ -1,8 +1,8 @@
 <template>
     <div class="logoContainer">
-        <img :src="institutionLogo" alt="Overarching Institution Logo">
-        <p style="font-size: 4.5vh; font-weight: bold;">+</p>
-        <img :src="prayerProviderLogo" alt="Friday Prayer Provider Logo">
+        <img :src="institutionLogo" alt="Overarching Institution Logo" class="left">
+        <p style="font-size: 4.5vh; font-weight: bold; margin-top: 2vh;">+</p>
+        <img :src="prayerProviderLogo" alt="Friday Prayer Provider Logo" class="right">
       </div>
 </template>
 
@@ -19,6 +19,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/scss/effects/boxShadow.scss";
 .logoContainer {
   display: flex;
   align-items: center;
@@ -36,5 +37,12 @@ img {
   margin: 1vh 2vh 1vh 2vh;
   height: $imgDimensions;
   width: $imgDimensions;
+  border: solid black 0.1vh;
+  &.left {
+    @include boxShadow("blue");
+  }
+  &.right {
+    @include boxShadow("blue", false)
+  }
 }
 </style>

@@ -3,8 +3,7 @@
         <table
             v-for="(prayerLocation, locationID) in shownLocations"
             :key="locationID"
-            style="width: 95%;"
-            class="tableBackground"
+            class="table"
         >
             <tr>
                 <th
