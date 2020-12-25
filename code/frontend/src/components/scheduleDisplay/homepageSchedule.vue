@@ -4,6 +4,12 @@
            {{ errorMsg }}
         </div>
         <div v-if="initalized">
+            <div>
+                <h3 class="dateHeader">
+                        {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{displayedMonthInfo.year}}
+                </h3>
+                <h4 class="lastUpdated">{{ lastUpdated }}</h4>
+            </div>
             <div class="controls">
                 <slider-button
                 leftMessage="This Week"
@@ -26,10 +32,6 @@
                 />
             </div>
             <div class="display">
-                <h3 class="dateHeader">
-                        {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{displayedMonthInfo.year}}
-                </h3>
-                <h4 class="lastUpdated">{{ lastUpdated }}</h4>
                 <table-renderer
                 :shownLocations="shownLocations"
                 table="user"
@@ -89,6 +91,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$boxSize: 92%;
 .display {
     margin-top: 6vh;
 }
@@ -97,11 +100,11 @@ export default {
     margin-top: 5vh;
     border: solid 1px getColor("blue");
     border-radius: 4px;
-    width: 90vw;
+    width: $boxSize;
     margin-left: auto;
     margin-right: auto;
     background: linear-gradient(
-        to right,
+        to left,
         getColor("red"),
         getColor("yellow")
     )
@@ -119,7 +122,7 @@ export default {
 }
 
 .lastUpdated {
-    color: getColor("yellow");
+    color: darken(getColor("yellow"), 7%);
     margin-top: 0;
     font-size: 2.5vh;
     margin-bottom: 6vh;

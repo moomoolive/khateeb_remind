@@ -11,7 +11,7 @@ table {
     margin-top: 10px;
     margin-left: auto;
     margin-right: auto;
-    width: 90vw;
+    width: 92%;
 }
 
 .columnIdentifiers {
@@ -45,8 +45,18 @@ $locationMetaFontSize: 3vh;
 
 .khateebs {
     background: linear-gradient(
+        to right,
         getColor("blue"),
-        getColor("yellow")
+        getColor("offWhite")
+    );
+    font-size: 2.5vh;
+}
+
+.timings {
+    background: linear-gradient(
+        to left,
+        getColor("blue"),
+        getColor("offWhite")
     );
     font-size: 2.5vh;
 }

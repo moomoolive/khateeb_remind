@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="body">
         <p>{{ body }}</p>
     </div>
 </template>
@@ -16,6 +16,13 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.body {
+    text-align: left;
+}
+
+p {
+    font-size: 1.7vh;
+}
 
 </style>

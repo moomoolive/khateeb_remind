@@ -8,7 +8,7 @@
   
   @function individualBoxShadow($number, $const, $color) {
     $bShadow: 5px;
-    @return getOpaqueColor($color) ($const * $number * $bShadow) ($number * $bShadow)
+    @return themeRGBA($color, 0.35) ($const * $number * $bShadow) ($number * $bShadow)
   };
   
   @mixin boxShadow($color, $left: true) {

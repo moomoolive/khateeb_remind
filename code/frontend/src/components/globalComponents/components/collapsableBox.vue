@@ -1,5 +1,5 @@
 <template>
-    <div style="background-color: white;">
+    <div>
         <button
         :class="`collapsible`"
         style=""
@@ -9,33 +9,28 @@
             <span style="float: right;" class="icon">
                 {{ icon }}
             </span>
-            <div>
+            <div class="tag">
                 <tag-box 
-                v-for="(tag, index) in tagLoader" :key="index"
-                :preset="tag"
-                :words="tag.words"
-                :symbol="tag.symbol"
-                :color='tag.color'
-                style="display: inline"
+                v-for="(tag, index) in tagDetails" :key="index"
+                :info="tag"
+                style="display: inline;"
                 />
             </div>
         </button>
-        <div
-        class="content"
-        :style="`
-            max-height: ${maxHeight};
-            overflow: hidden;
-            transition: max-height 1s ease-out;
-            width: ${contentWidth}%;
-        `"
-        v-if="contentBox"
-        ref="content"
-        >
-            <component
-            :is="componentX"
-            v-bind="options"
-            />
-        </div>
+        <transition name="dropdown">
+            <div
+            class="content"
+            :style="`
+                width: ${contentWidth}%;
+            `"
+            v-if="contentBox"
+            >
+                <component
+                :is="componentX"
+                v-bind="options"
+                />
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -62,7 +57,7 @@ export default {
         contentWidth: {
             type: Number,
             required: false,
-            default: 100
+            default: 95
         }
     },
     data() {
@@ -79,77 +74,13 @@ export default {
         }
     },
     computed: {
-        maxHeight() {
-            if (this.contentBox) {
-                this.$nextTick(() => {
-                    return this.$refs.content.scrollHeight
-                })
-            }
-            else return 0
-        },
         componentX() {
             return () => import(`@/components/${this.pathToComponentFromComponents}.vue`)
-        },
-        tagLoader() {
-            if (this.tagDetails === 'default') return [{}];
-            else return this.tagDetails
-        },
-        presetLoader() {
-            const presetTypes = ['important', 'urgent']
-            for (let preset in presetTypes) {
-                if (this.tagDetails[0] === preset) {
-                    return this.tagDetails
-                }
-            }
         }
-    },
-    created() {
-        this.componentX()
-            .then((res) => { this.component = this.componentX() })
     }
 }
 </script>
 
 <style lang="scss" scoped>
-.tag {
-    background-color: red;
-    padding: 0.1vh;
-    border-radius: 5px;
-}
-
-button:hover {
-    background-color: getColor("grey") !important;
-    color: $whiteText !important;
-}
-
-.collapsible {
-  background-color: getColor("grey");
-  color: white;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
-  font-weight: bold;
-  border-bottom: white solid 1px;
-}
-
-.icon {
-    color: getColor("blue");
-    position: relative;
-    left: 5px;
-}
-
-.content {
-    overflow: hidden;
-    background-color: #f1f1f1;
-    margin: auto;
-}
-
-p {
-    font-size: 1.5vh;
-    text-align: left;
-}
+@import '~@/scss/components/collapsableBox.scss';
 </style>

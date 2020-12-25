@@ -1,0 +1,62 @@
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.7s ease-in;
+}
+.dropdown-enter,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+button:hover {
+    background-color: getColor("grey") !important;
+    color: $whiteText !important;
+}
+
+.tag {
+  margin-top: 1vh;
+}
+
+.collapsible {
+  background-color: getColor("grey");
+  color: white;
+  cursor: pointer;
+  padding: 2vh;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 2vh;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0;
+  width: 98%;
+}
+
+.icon {
+    color: getColor("blue");
+    position: relative;
+    left: 5px;
+}
+
+.content {
+    background: linear-gradient(
+        to right,
+        themeRGBA("green", 0.2),
+        themeRGBA("green", 0.5)
+    );
+    $padding: 1.5vh;
+    padding-top: $padding;
+    padding-bottom: $padding;
+    overflow: hidden;
+    $rad: 4px;
+    border-bottom-left-radius: $rad;
+    border-bottom-right-radius: $rad;
+    margin: auto;
+}
+
+p {
+    font-size: 1.5vh;
+    text-align: left;
+}

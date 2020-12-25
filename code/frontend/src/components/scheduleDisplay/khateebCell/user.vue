@@ -3,7 +3,7 @@
         <div style="display: inline; vertical-align: sub;">
             {{ display }}
         </div>
-        <tag-box v-if="isUpdated"/>
+        <tag-box info="new" v-if="isUpdated"/>
     </div>
 </template>
 

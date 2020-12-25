@@ -31,7 +31,7 @@ export default {
 
 <style lang="scss" scoped>
 .topnav {
-  background-color: getColor("grey");
+  background-color: lighten(getColor("grey"), 5%);
   overflow: hidden;
   position: fixed;
   top: 0;
@@ -39,7 +39,6 @@ export default {
   width: 100vw;
   left: 0;
   z-index: 2;
-  border-bottom: white 1px solid;
 }
 
 .currentDate {

@@ -6,19 +6,17 @@ $themeColors: (
     "yellow":  #F3C620,
     "blue": #2196F3,
     "red": #f44336,
-    "offWhite":  #fffff4
+    "offWhite":  #FDFDFD
 );
 
 @function getColor($name) {
     @return map.get($themeColors, $name);
 }
 
-$opaqueThemeColors: (
-    "blue": rgba(33, 150, 243, 0.2)
-);
+@function themeRGBA($name, $opacity) {
+    $hex: getColor($name);
+    @return rgba($hex, $opacity)
+};
 
-@function getOpaqueColor($name) {
-    @return map.get($opaqueThemeColors, $name)
-}
 
 $whiteText: #f2f2f2;

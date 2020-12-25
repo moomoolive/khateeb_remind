@@ -44,13 +44,15 @@ export default {
 
 <style lang="scss" scoped>
 .topnav {
+    background-color: lighten(getColor("grey"), 5%);
     margin-top: 30px;
     overflow: hidden;
     left: 0;
     height: 5.1vh;
     width: 98.2vw;
     margin: 0;
-    border-top: white 1px solid;
+    padding-left: 0.8vw;
+    overflow: hidden;
 }
 
 .router-link-active {
@@ -58,7 +60,6 @@ export default {
     color: white;
 }
 
-/* Style the links inside the navigation bar */
 .topnav a {
   float: left;
   color: #f2f2f2;
@@ -69,7 +70,6 @@ export default {
   font-weight: bold;
 }
 
-/* Change the color of links on hover */
 .topnav a:hover {
   background-color: #ddd;
   color: black;
