@@ -48,9 +48,11 @@ export default {
         else this.databaseSuccess(response)
     },
     save(schemaName, toBeSaved, response=false) {
+        console.log(toBeSaved)
         helpers.saveDateOfEntry(toBeSaved)
-        const ifPhoneNumberExists = toBeSaved.phoneNumber || toBeSaved.options.phoneNumber
-        if (ifPhoneNumberExists) helpers.verifyCountryCode(toBeSaved)
+        // needs to be fixed here
+        /*const ifPhoneNumberExists = toBeSaved.phoneNumber || toBeSaved.options.phoneNumber
+        if (ifPhoneNumberExists) helpers.verifyCountryCode(toBeSaved) */
         const previousEntry = toBeSaved._id
         const isSetting = toBeSaved.__t
         if (previousEntry) {

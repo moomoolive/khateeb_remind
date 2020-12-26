@@ -8,9 +8,16 @@
   transform: translateY(30px);
 }
 
-button:hover {
+.active { @include blinkingAnimation(5s); }
+
+button {
+  &:focus {
+    animation: none !important;
+  }
+  &:hover {
     background-color: getColor("grey") !important;
-    color: $whiteText !important;
+    color: getColor("offWhite") !important;
+  }
 }
 
 .tag {

@@ -44,6 +44,7 @@ export default{
         methods: {
             async submit() {
                 const token = await this.$API.login(this.secretKey)
+                if (!token) this.$emit("alt", "no API response")
                 if (token) {
                     localStorage.setItem('token', token.token)
                     axios.defaults.headers.common['authorization'] = token.token

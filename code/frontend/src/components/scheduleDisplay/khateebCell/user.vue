@@ -3,7 +3,13 @@
         <div style="display: inline; vertical-align: sub;">
             {{ display }}
         </div>
-        <tag-box info="new" v-if="isUpdated"/>
+        <div class="tag">
+            <tag-box 
+                info="new" 
+                v-if="isUpdated"
+                :isWiggling="true"
+            />
+        </div>
     </div>
 </template>
 
@@ -50,7 +56,7 @@ export default {
         if (x.savedOn) {
             x = new Date(x.savedOn)
             const y = new Date(this.$store.state.lastVisit)
-            this.isUpdated = x > y
+            this.isUpdated = x < y
         }
     },
     mounted() {
@@ -59,6 +65,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.tag {
+    padding-bottom: 1vh !important;
+}
 
 </style>

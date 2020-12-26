@@ -1,7 +1,8 @@
 <template>
-    <div style="padding-top: 20px;">
+    <div>
         <admin-button-group />
-        <router-view class="displayedAdminPage"></router-view>
+        <div class="separator"></div>
+        <router-view class="pages"></router-view>
     </div>
 </template>
 
@@ -16,9 +17,21 @@ export default {
 }
 </script>
 
-<style>
-.displayedAdminPage {
-    margin-top: 20px !important;
-    border-top: black 2px solid;
+<style lang="scss" scoped>
+.pages {
+    margin-top: 4vh;
+}
+
+.separator {
+    margin-top: 3vh !important;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: 0.5vh solid;
+    border-image: linear-gradient(
+        to right,
+        themeRGBA("red", 0.5), 
+        themeRGBA("blue", 0.5)
+    ) 1;
 }
 </style>

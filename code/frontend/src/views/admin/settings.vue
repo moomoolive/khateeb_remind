@@ -1,8 +1,8 @@
 <template>
-    <div style="padding-top: 10px;">
+    <div>
         <collapsable-box
             v-for="(setting, index) in settingsTabs.tabs" :key="index"
-            :headline="_.stringFormat(setting.componentName, 'title')"
+            :headline="_.stringFormat(setting.componentName)"
             :options="{
                 settingName: setting.componentName,
                 groupSave: setting.groupSave

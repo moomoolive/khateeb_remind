@@ -6,7 +6,7 @@ $tags: (
 
 @mixin tagBackground($color) {
     background-color: getColor($color) !important;
-    padding: 0.8vh;
+    color: black;
 }
 
 @mixin tagIcon($color) {
@@ -34,9 +34,11 @@ div {
     pointer-events: none;
     background-color: #242424 !important;
     padding: 0.8vh;
-    color: black;
+    color: getColor("offWhite");
     margin: 0 1vh 0 0;
     @include tag('background');
+    /* not sure why it's not working */
+    &.wiggle { @include wiggleAnimation(0.5s); }
 }
 
 .words {

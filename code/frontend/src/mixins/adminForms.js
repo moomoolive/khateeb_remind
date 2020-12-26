@@ -1,3 +1,6 @@
+import formRenderer from '@/components/forms/formRenderer.vue'
+import previousEntriesDropdown from '@/components/forms/previousEntriesDropdown.vue'
+
 export default {
     data() {
         return {
@@ -7,9 +10,12 @@ export default {
             emptySchema: {}
         }
     },
+    components: {
+        formRenderer,
+        previousEntriesDropdown
+    },
     methods: {
         assignAPIData(APIData) {
-            console.log(APIData)
             this.inputData = APIData.emptySchema
             this.emptySchema = this._.deepCopy(this.inputData)
             this.previousEntries = APIData.previousEntries

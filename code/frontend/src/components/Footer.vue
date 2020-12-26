@@ -1,21 +1,24 @@
 <template>
     <div>
         <div class="topnav">
+          <router-link :to="{ name: 'login' }" v-if="!isLoggedIn">
+            Admin Login
+          </router-link>
           <router-link to="/about" exact v-if="!isLoggedIn">
             About
           </router-link>
-          <router-link :to="{ name: 'login' }" v-if="!isLoggedIn">
-            Admin Login
+          <router-link :to="`/admin/${this.$store.state.institution}/dashboard`" v-if="isLoggedIn">
+            Admin Dashboard
           </router-link>
           <a
           @click="logout()" 
           v-if="isLoggedIn">
             Logout
           </a>
-          <router-link :to="`/admin/${this.$store.state.institution}/dashboard`" v-if="isLoggedIn">
-            Admin Dashboard
-          </router-link>
-          <img style="width: 20px; float: right; padding: 1vh;" :src="logo">
+          <img 
+            class="logo" 
+            :src="require('../assets/khateebRemindLogo.svg')"
+          >
         </div>
     </div>
 </template>
@@ -23,11 +26,6 @@
 <script>
 export default {
     name: 'Footer',
-    data() {
-      return {
-        logo: require('../assets/paper-plane-solid.svg')
-      }
-    },
     methods: {
       logout() {
         this.$store.dispatch('logout')
@@ -43,6 +41,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.logo {
+  width: 3.3vh;
+  float: right; 
+  padding: 1vh;
+}
+
 .topnav {
     background-color: lighten(getColor("grey"), 5%);
     margin-top: 30px;

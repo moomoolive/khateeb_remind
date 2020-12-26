@@ -3,9 +3,15 @@
       <div class="logo">
         <logo-display />
       </div>
-      <div class="schedule">
-        <homepage-schedule />
+      <div class="gradient1" v-show="scheduleExists">
+        <homepage-schedule @schedule="scheduleExists = $event"/>
       </div>
+      <msg-with-pic
+        msg="It should be up soon insha'Allah"
+        gif="flyingPlanes"
+        title="This month's schedule hasn't been created yet"
+        v-if="!scheduleExists"
+      />
   </div>
 </template>
 
@@ -18,6 +24,11 @@ export default {
   components: {
     homepageSchedule,
     logoDisplay
+  },
+  data() {
+    return {
+      scheduleExists: true
+    }
   }
 }
 </script>
@@ -26,18 +37,6 @@ export default {
 .logo {
   margin-bottom: 15vh;
 }
-
-.schedule {
-  $padding: 3vh;
-  width: 90%;
-  padding-top: $padding;
-  padding-bottom: $padding;
-  margin-left: auto;
-  margin-right: auto;
-  background: linear-gradient(
-    to right,
-    themeRGBA("blue", 0.5),
-    getColor("offWhite")
-  );
-}
+@import '~@/scss/miscStyles/gradientBackgrounds.scss';
+@include gradient1("blue");
 </style>

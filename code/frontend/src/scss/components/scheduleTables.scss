@@ -5,6 +5,11 @@ table, th, td {
 th {
     height: 6vh;
     width: 50%;
+    padding-bottom: 1vh;
+}
+
+tr {
+    height: 7.5vh;
 }
 
 table {
@@ -16,7 +21,7 @@ table {
 
 .columnIdentifiers {
     background-color: getColor("green");
-    color: $whiteText;
+    color: getColor("offWhite");
     font-size: 3vh;
 }
 

@@ -49,6 +49,8 @@ export default {
     },
     async created() {
         this.announcements = await this.$API.announcements()
+        if (this.announcements.length < 1 || !this.announcements) this.$emit('announcements', false)
+        this.$emit('announcements', true)
     }
 }
 </script>

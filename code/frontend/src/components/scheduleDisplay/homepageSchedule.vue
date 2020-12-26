@@ -1,9 +1,6 @@
 <template>
     <div>
-        <div v-if="!initalized">
-           {{ errorMsg }}
-        </div>
-        <div v-if="initalized">
+        <div v-if="currentSchedule">
             <div>
                 <h3 class="dateHeader">
                         {{ displayedMonthInfo.month }} {{ displayData.weekOf }}, {{displayedMonthInfo.year}}
@@ -58,23 +55,27 @@ export default {
     methods: {
         async getSchedule() {
             const monthlySchedule = await this.$API.monthlySchedule()
-            console.log(monthlySchedule)
-            if (monthlySchedule === `This month's schedule hasn't been created yet`) {
-                this.errorMsg = monthlySchedule
+            if (
+                monthlySchedule === `This month's schedule hasn't been created yet` ||
+                !monthlySchedule
+                ) {
+                this.$emit('schedule', false)
             } else {
-                this.initalized = true
+                this.$emit('schedule', true)
                 this.currentSchedule = monthlySchedule
             }
         }
     },
     computed: {
         lastUpdated() {
-            const lastUpdateDate = this.currentSchedule.savedOn
-            const date = new Date(lastUpdateDate)
-            const month = date.toLocaleString('default', {month: 'long'})
-            const day = date.getDate()
-            const year = date.getFullYear()
-            return `Last Updated: ${month} ${day}, ${year}`
+            if (this.currentSchedule) {
+                const lastUpdateDate = this.currentSchedule.savedOn
+                const date = new Date(lastUpdateDate)
+                const month = date.toLocaleString('default', {month: 'long'})
+                const day = date.getDate()
+                const year = date.getFullYear()
+                return `Last Updated: ${month} ${day}, ${year}`
+            }
         }
     },
     watch: {
@@ -91,34 +92,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$boxSize: 92%;
+@import "~@/scss/components/scheduleControls.scss";
 .display {
     margin-top: 6vh;
-}
-
-.controls {
-    margin-top: 5vh;
-    border: solid 1px getColor("blue");
-    border-radius: 4px;
-    width: $boxSize;
-    margin-left: auto;
-    margin-right: auto;
-    background: linear-gradient(
-        to left,
-        getColor("red"),
-        getColor("yellow")
-    )
-}
-
-.controlSplit {
-    $padding: 1vh;
-    border-bottom: 
-        getColor("grey") 
-        solid 
-        0.4vh;
-    width: 90%;
-    margin: 0 auto 0 auto;
-    padding: $padding 0 $padding 0;
 }
 
 .lastUpdated {

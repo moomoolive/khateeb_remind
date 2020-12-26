@@ -1,40 +1,43 @@
 <template>
-    <div style="padding-top: 20px;">
-        <h2>Set Schedule</h2>
+    <div>
         <h2 v-if="!initalized">
             {{ errorMsg }}
         </h2>
         <div v-if="initalized">
-            <change-week-buttons
-            :fridayDates="fridayDates"
-            :displayedMonthInfo="displayedMonthInfo"
-            @change="displayData.weekOf = $event"
-            class="whiteSpace"
-            />
-            <change-location-buttons
-            :currentSchedule="currentSchedule"
-            @change="displayData.location = $event"
-            />
             <month-incrementer
-            :display="displayedMonthInfo"
-            :week="displayData.weekOf"
-            @hit="$event === 'up' ? incrementMonth(1) : incrementMonth(-1);"
+                :display="displayedMonthInfo"
+                :week="displayData.weekOf"
+                @hit="$event === 'up' ? incrementMonth(1) : incrementMonth(-1);"
             />
-            <table-renderer
-            :shownLocations="shownLocations"
-            table="admin"
-            :schedule="currentSchedule"
-            :displayedWeek="displayData.weekOf"
-            :originalSchedule="originalSchedule"
-            @no-khateebs="initalized = false"
-            />
-            <button
-                @click="saveData()"
-                class='grey'
-                :disabled="noSave"
-            >
-                Save Changes
-            </button>
+            <div class="controls">
+                <change-week-buttons
+                    :fridayDates="fridayDates"
+                    :displayedMonthInfo="displayedMonthInfo"
+                    @change="displayData.weekOf = $event"
+                    class="controlSplit"
+                />
+                <change-location-buttons
+                    :currentSchedule="currentSchedule"
+                    @change="displayData.location = $event"
+                />
+            </div>
+            <div class="genSpace">
+                <table-renderer
+                    :shownLocations="shownLocations"
+                    table="admin"
+                    :schedule="currentSchedule"
+                    :displayedWeek="displayData.weekOf"
+                    :originalSchedule="originalSchedule"
+                    @no-khateebs="initalized = false"
+                />
+                <button
+                    @click="saveData()"
+                    class='grey'
+                    :disabled="noSave"
+                >
+                    Save Changes
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -114,9 +117,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.whiteSpace {
-    $size: 30px;
-    height: $size;
-    margin-bottom: $size;
+@import '~@/scss/components/scheduleControls.scss';
+
+.genSpace {
+    margin-top: 3vh;
+}
+
+button {
+    margin-top: 0;
 }
 </style>

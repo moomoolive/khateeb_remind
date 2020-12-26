@@ -20,33 +20,3 @@ body {
     margin: 0 0 0 0;
     background-color: getColor("grey");
 }
-
-input[type=text] {
-    border: none;
-    border-bottom: solid black 0.5vh;
-    height: 3vh;
-    width: 35vh;
-    background-color: themeRGBA("grey", 0.8);
-    animation: border-gradient 8s ease infinite;
-    @keyframes border-gradient {
-        0% {
-            border-color: getColor("blue");
-        }
-        25% {
-            border-color: getColor("green");
-        }
-        50% {
-            border-color: getColor("red");
-        }
-        75% {
-            border-color: getColor("yellow");
-        }
-        100% {
-            border-color: getColor("blue");
-        }
-    }
-    &:focus {
-        outline: none;
-        background-color: themeRGBA("grey", 0.6);
-    }
-}

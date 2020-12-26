@@ -1,37 +1,24 @@
 <template>
-    <div style="padding-top: 30px;">
-        <select v-model="selected" >
-            <option
-            v-for="(announcement, ID) in previousEntries" :key="ID"
-            :value="ID">
-                {{ dateDisplay(inputData.savedOn, false) }} || {{ announcement.headline }}
-            </option>
-            <option value="New">New</option>
-        </select>
-        <div>
-            Headline: <br>
-            <input v-model="inputData.headline" type="text"> 
-        </div>
-        <button
-            class="red"
-            @click="remove()"
-            v-if="selected !== 'New'"
-        >
-            Delete this Announcement
-        </button>
-        <div>
-            <label>Body of your announcement:<br></label>
-            <textarea v-model="inputData.content"></textarea>
-        </div>
-        <div>
-            <input type="checkbox" id="urgent" name="vehicle1" v-model="inputData.urgent">
-            <label for="urgent"> Is it Urgent??</label><br>
-            <input type="checkbox" id="important" v-model="inputData.important">
-            <label for="important">Is It Very Important??</label>
-        </div>
+    <div class="gradient1">
+        <previous-entries-dropdown 
+            :inputData="inputData"
+            :previousEntries="previousEntries"
+            :selected="selected"
+            @changed="selected = $event"
+            :displayName="['headline']"
+        />
+        {{ previousEntries[selected] ? dateDisplay(previousEntries[selected].savedOn, false) : '' }}
+        <form-renderer
+            :inputData="inputData"
+            :bigText="['content']"
+            :textFieldInvalidMsg="{
+                headline: `default`,
+                content: `default`
+            }"
+        />
         <button
             class="grey"
-            :disabled="!readyToSubmit"
+            :disabled="notReadyToSubmit"
             @click="submit()"
         >
             Submit
@@ -40,7 +27,7 @@
 </template>
 
 <script>
-import adminForm from '../../mixins/adminForms.js'
+import adminForm from '@/mixins/adminForms.js'
 
 export default {
     name: 'adminAnnouncements',
@@ -62,12 +49,16 @@ export default {
         }
     },
     computed: {
-        readyToSubmit() {
+        notReadyToSubmit() {
             if (this.inputData.headline) {
-                const headlineIsNotEmpty = this.inputData.headline.length > 0
-                const bodyIsNotEmpty = this.inputData.content.length > 0
-                return headlineIsNotEmpty && bodyIsNotEmpty
-            }
+                return this.headlineNotValid || this.contentNotValid
+            } else return true
+        },
+        headlineNotValid() {
+            return this.inputData.headline.length < 1
+        },
+        contentNotValid() {
+            return this.inputData.content.length < 1
         },
         important() {
             return this.inputData.important
@@ -95,13 +86,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-div {
-    margin-top: 15px;
-}
+@import '~@/scss/miscStyles/gradientBackgrounds.scss';
+@include gradient1("yellow");
 
-textarea {
-    height: 15vh;
-    width: 50vw;
-    max-width: 800px;
-}
 </style>

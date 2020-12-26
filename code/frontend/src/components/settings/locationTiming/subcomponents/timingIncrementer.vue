@@ -1,34 +1,40 @@
 <template>
     <div>
-        <div 
-        v-for="(value, property) in location.timings[timingIndex]"
-        :key="property"
-        style="display: inline;"
-        >
-            <p v-if="property !== '_id'">
-                <button
-                    @click="incrementTime(
-                        {
-                            property, locationIndex, timingIndex
-                        },
-                        1
-                    )"
+        <table>
+            <tr>
+                <th 
+                    v-for="(value, property) in location.timings[timingIndex]"
+                    :key="property"
                 >
-                    +
-                </button>
-                {{ value }}<br>
-                <button
-                    @pushed="incrementTime(
-                        {
-                            property, locationIndex, timingIndex
-                        },
-                        -1
-                    )"
-                >
-                    -
-                </button>
-            </p>
-        </div>
+                    <div 
+                        v-if="property !== '_id'"
+                    >
+                        <button
+                            @click="incrementTime(
+                                {
+                                    property, locationIndex, timingIndex
+                                },
+                                1
+                            )"
+                        >
+                            +
+                        </button>
+                        <p>{{ value }}</p>
+                        <button
+                            class="red"
+                            @click="incrementTime(
+                                {
+                                    property, locationIndex, timingIndex
+                                },
+                                -1
+                            )"
+                        >
+                            -
+                        </button>
+                    </div>
+                </th>
+            </tr>
+        </table>
     </div>
 </template>
 
@@ -99,6 +105,20 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+button {
+    margin: 0;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+th {
+    $padding: 1vh;
+    padding-left: $padding;
+    padding-right: $padding;
+}
 
 </style>

@@ -1,8 +1,11 @@
 <template>
-    <div style="padding-top: 20px;">
-        <h2>Page Not Found</h2>
-        <img style="width: 20vh;" :src="image">
-        <div style="padding-top: 20px;">
+    <div class="space">
+        <msg-with-pic
+            title="Ooops..."
+            msg="The page you searched for doesn't exist!"
+            gif="personThrowingPlane"
+        />
+        <div class="button">
             <button>
                 <router-link to="/">Go to Home</router-link>
             </button>
@@ -12,15 +15,17 @@
 
 <script>
 export default {
-    name: 'Page Not Found',
-    data() {
-        return {
-            image: require('../assets/airplaneFlying.png')
-        }
-    }
+    name: 'pageNotFound'
 }
 </script>
 
 <style>
+.space {
+    margin-top: 4vh;
+}
+
+.button {
+    margin-top: 2vh;
+}
 
 </style>

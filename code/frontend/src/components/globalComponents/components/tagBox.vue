@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p :class="'tag ' + contentLoader('color')">
+        <p :class="`tag ${contentLoader('color')} ${isWiggling ? `wiggle` : ``}` ">
             <span :class='"icon " + contentLoader("color")'>
                 {{ contentLoader('symbol') }}
             </span>
@@ -18,6 +18,11 @@ export default {
         info: {
             type: [String, Object],
             required: false
+        },
+        isWiggling: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     data() {

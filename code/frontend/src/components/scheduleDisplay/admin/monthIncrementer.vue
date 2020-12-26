@@ -1,8 +1,8 @@
 <template>
     <div>
-       <h3 style="margin-bottom: 4px; margin-top: 0;">
+       <h2>
             {{ display.month }} {{ week }}, {{ display.year }}
-        </h3>
+        </h2>
         <button
             class="yellow"
             @click="$emit('hit', 'up')"

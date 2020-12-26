@@ -1,6 +1,6 @@
 <template>
-    <div style="padding-top: 20px;">
-        <div>
+    <div class="buttonGroup">
+        <div class="dashboard">
             <button
                 @click="click('dashboard')"
                 :disabled="isCurrentRoute('dashboard')"
@@ -57,5 +57,13 @@ export default {
     margin-left: 5px;
     margin-right: 5px;
     margin-top: 5px;
+}
+
+.dashboard {
+    margin-bottom: 3vh;
+}
+
+.buttonGroup {
+    margin-top: 2.5vh;
 }
 </style>

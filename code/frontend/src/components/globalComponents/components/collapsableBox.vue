@@ -1,8 +1,7 @@
 <template>
     <div>
         <button
-        :class="`collapsible`"
-        style=""
+        :class="`collapsible ${isActive ? `active` : ``}`"
         @click="clicked()"
         >
             {{ headline }}
@@ -20,10 +19,8 @@
         <transition name="dropdown">
             <div
             class="content"
-            :style="`
-                width: ${contentWidth}%;
-            `"
-            v-if="contentBox"
+            :style="`width: ${contentWidth}%;`"
+            v-if="isActive"
             >
                 <component
                 :is="componentX"
@@ -62,15 +59,15 @@ export default {
     },
     data() {
         return {
-            contentBox: false,
+            isActive: false,
             icon: '+',
             component: null
         }
     },
     methods: {
         clicked() {
-            this.contentBox = !this.contentBox
-            this.contentBox ? this.icon = "-" : this.icon = "+"
+            this.isActive = !this.isActive
+            this.isActive ? this.icon = "-" : this.icon = "+"
         }
     },
     computed: {

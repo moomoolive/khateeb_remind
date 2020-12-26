@@ -1,11 +1,11 @@
 <template>
     <div>
         <select 
-        v-model="schedule.monthlySchedule[displayedWeek][prayerTiming]" 
+            v-model="schedule.monthlySchedule[displayedWeek][prayerTiming]" 
         >
             <option
-            v-for="(khateeb, khateebNumber) in khateebList" :key="khateebNumber"
-            :value="khateeb"
+                v-for="(khateeb, khateebNumber) in khateebList" :key="khateebNumber"
+                :value="khateeb"
             >
                 {{ khateeb.firstName }} {{ khateeb.lastName }}
             </option>
@@ -15,6 +15,7 @@
         </select>
         <button 
             @click="revertToOriginal(prayerTiming)"
+            class="grey"
         >
             Revert
         </button>
@@ -88,10 +89,8 @@ export default {
 
 <style lang="scss" scoped>
 button {
-    background-color: getColor("grey");
-    color: white;
-    border: solid black 1px;
-    outline: none;
-    margin-left: 3px;
+    margin-top: 0.3vh;
+    margin-bottom: 0;
+    height: 4vh;
 }
 </style>

@@ -81,15 +81,12 @@ const helpers = {
         return { mismatchedTimings, diff: shavedTimings.diff }
     },
     fillMismatchedWithTBD(mismatchedTimings, emptySlotIndicator, oldLocation, diff) {
-        console.log(oldLocation)
-        console.log(diff)
         for (let week in oldLocation.monthlySchedule) {
             for (let x = 0; x < diff; x++) {
                 oldLocation.monthlySchedule[week].pop()
             }
             let y = 0
             for (let x = 0; x < oldLocation.timings.length; x++) {
-                console.log('hi')
                 if (x === mismatchedTimings[y] || !oldLocation.monthlySchedule[week][x]) {
                     oldLocation.monthlySchedule[week][x] = emptySlotIndicator
                     if (x === mismatchedTimings[y]) y++
