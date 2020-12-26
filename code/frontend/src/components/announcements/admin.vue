@@ -11,9 +11,9 @@
         <form-renderer
             :inputData="inputData"
             :bigText="['content']"
+            :groupInvalidation="groupInvalidation"
             :textFieldInvalidMsg="{
-                headline: `default`,
-                content: `default`
+                content: 'Content cannot be empty'
             }"
         />
         <button
@@ -28,13 +28,17 @@
 
 <script>
 import adminForm from '@/mixins/adminForms.js'
+import invalidations from '@/mixins/invalidations/index.js'
 
 export default {
     name: 'adminAnnouncements',
-    mixins: [adminForm],
+    mixins: [adminForm, invalidations.emptyField],
     data() {
         return {
-            formName: 'Announcement'
+            formName: 'Announcement',
+            groupInvalidation: {
+                emptyField: ['content', 'headline']
+            }
         }
     },
     methods: {
@@ -51,14 +55,8 @@ export default {
     computed: {
         notReadyToSubmit() {
             if (this.inputData.headline) {
-                return this.headlineNotValid || this.contentNotValid
+                return this.emptyField.headline || this.emptyField.content
             } else return true
-        },
-        headlineNotValid() {
-            return this.inputData.headline.length < 1
-        },
-        contentNotValid() {
-            return this.inputData.content.length < 1
         },
         important() {
             return this.inputData.important
@@ -78,7 +76,7 @@ export default {
         }
     },
     async created() {
-        const data = await this.$API.getAnnouncements()
+        const data = await this.$API.admin.getAnnouncements()
         data.emptySchema.urgent = data.emptySchema.important = false
         this.assignAPIData(data)
     }

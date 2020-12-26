@@ -51,7 +51,7 @@ export default {
     },
     methods: {
         async fetchKhateebs() {
-            const khateebs = await this.$API.getKhateebs('no')
+            const khateebs = await this.$API.admin.getKhateebs('no')
             if (khateebs === `you haven't created any khateebs!`) {
                 this.$emit('no-khateebs')
             } else {

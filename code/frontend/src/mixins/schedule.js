@@ -11,7 +11,7 @@ export default {
             currentSchedule: null,
             errorMsg: null,
             initalized: false,
-            month: new Date(),
+            month: datetime.upcomingFriday(true),
             originalSchedule: null
         }
     },

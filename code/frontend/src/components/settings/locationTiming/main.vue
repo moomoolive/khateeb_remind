@@ -45,7 +45,10 @@ export default {
             this.inputData.options.push(newLocation)
         },
         async save() {
-            await this.$API.updateSetting(this.inputData)
+            const response = await this.$API.admin.updateSetting(this.inputData)
+            if (response === 'Changes successfully made!') {
+                    this.$store.dispatch('adminSavedChangesScreen', true)
+            }
         },
         loadInPreviousEntries(previousEntries) {
             this.inputData = previousEntries[0]
@@ -56,7 +59,7 @@ export default {
             this.inputData = emptySchema
         },
         async loadAPIData() {
-            const locations =  await this.$API.getSetting('locationAndTimings')
+            const locations =  await this.$API.admin.getSetting('locationAndTimings')
             console.log(locations)
             if (locations.previousEntries[0]) this.loadInPreviousEntries(locations.previousEntries)
             else this.loadInEmpty(locations.emptySchema)

@@ -18,15 +18,14 @@
                     ></textarea><br>
                 </div>
                 <span v-if="
-                    feedbackExists(name) && 
                     inputIsText(name) &&
                     fieldIsNotValid(name)
                 "
                 >
                     <u>
                         {{ 
-                            textFieldInvalidMsg[name] === 'default' ? 
-                            defaultInvalidFeedback(name) : textFieldInvalidMsg[name]
+                            textFieldInvalidMsg && textFieldInvalidMsg[name] ? 
+                            textFieldInvalidMsg[name] : defaultInvalidFeedback(name)
                         }}
                     </u>
                 </span>
@@ -50,12 +49,18 @@ export default {
         },
         textFieldInvalidMsg: {
             type: Object,
-            required: false
+            required: false,
+            default: () => {}
         },
         doNotRender: {
             type: Array,
             required: false,
             default: () => []
+        },
+        groupInvalidation: {
+            type: Object,
+            required: false,
+            default: () => {}
         }
     },
     data() {
@@ -81,32 +86,48 @@ export default {
             return x
         },
         isTextArea(fieldName) {
-            return fieldName === this.bigText.find(elem => elem === fieldName)
-        },
-        feedbackExists(fieldName) {
-            return this.textFieldInvalidMsg[fieldName]
+            return this.fieldIsInArray(fieldName, 'bigText')
         },
         inputIsText(fieldName) {
             return this.typeLoader(fieldName) === 'text'
         },
         defaultInvalidFeedback(fieldName) {
-            return `${this._.stringFormat(fieldName)} Cannot be Empty`
+            return `This is an invalid ${this._.stringFormat(fieldName, 'camel', 'lower')}`
         },
         addToDefaultDoNotRender() {
             this.doNotRenderDefaults = [...this.doNotRenderDefaults, ...this.doNotRender]
         },
         fieldIsNotValid(fieldName) {
-            if (this.$parent) {
-                return this.$parent[fieldName + 'NotValid']
-            } else return true
+            if (!this.$parent) {
+                return true 
+            }
+            const customInvalidation = this.$parent[fieldName + 'NotValid']
+            if (customInvalidation) {
+                return customInvalidation
+            } else {
+                const groupInvalidation = this.checkgroupInvalidation(fieldName)
+                return this.$parent[groupInvalidation] ? this.$parent[groupInvalidation][fieldName] : null
+            }
+        },
+        checkgroupInvalidation(fieldName) {
+            if (!this.groupInvalidation) {
+                return null
+            } 
+            for (let [validationName, fieldsToBeValidated] of Object.entries(this.groupInvalidation)){
+                const isInThisValidationGroup = fieldsToBeValidated.find(elem => elem === fieldName)
+                if (isInThisValidationGroup) return validationName
+            }
         },
         isRenderable(fieldName) {
-            return fieldName !== this.doNotRenderDefaults.find(elem => elem === fieldName)
+            return !this.fieldIsInArray(fieldName, 'doNotRenderDefaults')
+        },
+        fieldIsInArray(fieldName, arrayName) {
+            return fieldName === this[arrayName].find(elem => elem === fieldName)
         }
+
     },
     created() {
         this.addToDefaultDoNotRender()
-        console.log(this.doNotRenderDefaults)
     }
 }
 </script>

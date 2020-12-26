@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="gradient1">
         <h3>Update your password:</h3>
         <form>
             Confirm Old Password:<br><br>
@@ -31,7 +31,7 @@ export default {
     },
     methods: {
         async submit() {
-            const res = await this.$API.updateSetting(this.inputData)
+            const res = await this.$API.admin.updateSetting(this.inputData)
         }
     },
     computed: {
@@ -42,6 +42,7 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+@import '~@/scss/miscStyles/gradientBackgrounds.scss';
+@include gradient1("blue", "green");
 </style>

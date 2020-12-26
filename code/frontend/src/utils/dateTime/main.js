@@ -1,13 +1,14 @@
 import helpers from './helpers.js'
 
 export default {
-    upcomingFriday() {
+    upcomingFriday(raw=false) {
         const upcomingFriday = helpers.findUpcomingFriday()
-        return {
+        if (!raw) return {
             month: upcomingFriday.toLocaleString('default', { month: 'long' }),
             date: upcomingFriday.getDate(),
             year: upcomingFriday.getFullYear()
         }
+        return upcomingFriday
     },
     allUpcomingFridays(input) {
         const firstFriday = helpers.findFirstFridayOfMonth(input)

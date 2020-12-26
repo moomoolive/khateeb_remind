@@ -54,7 +54,7 @@ export default {
     },
     methods: {
         async getSchedule() {
-            const monthlySchedule = await this.$API.monthlySchedule()
+            const monthlySchedule = await this.$API.users.monthlySchedule()
             if (
                 monthlySchedule === `This month's schedule hasn't been created yet` ||
                 !monthlySchedule

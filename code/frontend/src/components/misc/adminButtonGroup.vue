@@ -40,6 +40,7 @@ export default {
         click(extension) {
             this.$router.push(`/admin/${this.instituteName}/${extension}`)
             this.selected = extension
+            this.$store.dispatch('adminSavedChangesScreen', false)
         },
         isCurrentRoute(routeName) {
             return routeName === this.selected

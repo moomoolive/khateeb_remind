@@ -27,14 +27,17 @@ export default {
         async remove() {
             if (window.confirm(`Are you sure you want to delete this ${this.formName}?`)) {
                 console.log(this.inputData)
-                await this.$API['delete' + this.formName]({ _id: this.inputData._id })
+                await this.$API.admin['delete' + this.formName]({ _id: this.inputData._id })
                 this.resetForm()
             }
         },
         async submit() {
             if (window.confirm(`Are you sure you want to send this ${this.formName}?`)) {
-                await this.$API['update' + this.formName](this.inputData)
-                this.resetForm()
+                const response = await this.$API.admin['update' + this.formName](this.inputData)
+                console.log(response)
+                if (response === 'Changes successfully made!') {
+                    this.$store.dispatch('adminSavedChangesScreen', true)
+                }
             }
         }
     },

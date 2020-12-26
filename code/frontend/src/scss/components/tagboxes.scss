@@ -32,13 +32,11 @@ div {
     display: inline;
     font-size: 1.4vh !important;
     pointer-events: none;
-    background-color: #242424 !important;
+    background-color: getColor("grey") !important;
     padding: 0.8vh;
     color: getColor("offWhite");
     margin: 0 1vh 0 0;
     @include tag('background');
-    /* not sure why it's not working */
-    &.wiggle { @include wiggleAnimation(0.5s); }
 }
 
 .words {
@@ -51,7 +49,7 @@ div {
     padding: $padding;
     padding-left: 0.8vh;
     color: getColor("offWhite");
-    background-color: #111;
+    background-color: darken(getColor("grey"), 20%);
     border-radius: 2px;
     @include tag('icon')
 }

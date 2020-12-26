@@ -2,7 +2,23 @@
     <div>
         <admin-button-group />
         <div class="separator"></div>
-        <router-view class="pages"></router-view>
+        <router-view
+            v-if="!savedChanges" 
+            class="pages"
+        ></router-view>
+        <div v-if="savedChanges">
+            <msg-with-pic
+                title="Alhamdillah! Hooray!"
+                gif="flyingPlanesAllOver"
+                msg="Changes successfully made!"
+            />
+            <button 
+                class="green"
+                @click="$store.dispatch('adminSavedChangesScreen', false)"
+            >
+                Make More Changes
+            </button>
+        </div>
     </div>
 </template>
 
@@ -13,6 +29,11 @@ export default {
     name: 'adminParentRoute',
     components: {
         AdminButtonGroup
+    },
+    computed: {
+        savedChanges() {
+            return this.$store.state.admin.savedChanges
+        }
     }
 }
 </script>

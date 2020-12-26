@@ -9,5 +9,6 @@ export default {
     },
     updateToken(state, token) { state.JWT_TOKEN = token },
     removeToken(state) { state.JWT_TOKEN = null },
-    lastVisit(state, date) { state.lastVisit = date }
+    lastVisit(state, date) { state.lastVisit = date },
+    adminSavedChangesScreen(state, onOrOff) { state.admin.savedChanges = onOrOff }
 }

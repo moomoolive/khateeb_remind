@@ -65,7 +65,6 @@ const funcs = {
         const urlComponents = request.originalUrl.split('/')
         const schemaName = urlComponents[2]
         const validationList = $dbModels.schemaParams(schemaName)
-        console.log(validationList)
         return validationList
     },
 }

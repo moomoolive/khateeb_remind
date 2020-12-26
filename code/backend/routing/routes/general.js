@@ -5,11 +5,12 @@ import $dbModels from '../../database/models.js'
 import $httpCodes from '../../utils/httpCodes.js'
 import env from '../../app.js'
 import $db from '../../database/funcs.js'
+import $funcs from '../../utils/funcs.js'
 
 const router = express.Router()
 
 router.get('/', (req, res) => {
-    const x = new Date()
+    const x = $funcs.findUpcomingFriday()
     const month = x.toLocaleString('default', { month: 'long' })
     const year = x.getFullYear()
     const scheduleFor = `${month}${year}`

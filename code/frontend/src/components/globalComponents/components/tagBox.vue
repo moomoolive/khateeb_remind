@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p :class="`tag ${contentLoader('color')} ${isWiggling ? `wiggle` : ``}` ">
+        <p :class="`tag ${contentLoader('color')}` ">
             <span :class='"icon " + contentLoader("color")'>
                 {{ contentLoader('symbol') }}
             </span>

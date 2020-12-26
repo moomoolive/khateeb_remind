@@ -10,12 +10,10 @@
         <form-renderer
             :inputData="inputData"
             :textFieldInvalidMsg="{
-                firstName: `default`,
-                lastName: `default`,
-                phoneNumber: `Invalid Canadian Phone Number`,
-                email: `default`
+                phoneNumber: `Invalid canadian phone number`
             }"
             :doNotRender="['dropouts']"
+            :groupInvalidation="groupInvalidation"
         />
         <div>
             Dropouts: {{ inputData.dropouts }}
@@ -33,15 +31,21 @@
 
 <script>
 import adminForms from '@/mixins/adminForms.js'
-import validation from '@/utils/validationChecks/main.js'
+import invalidations from '@/mixins/invalidations/index.js'
 
 export default {
     name: 'editKhateebs',
-    mixins: [adminForms],
+    mixins: [
+        adminForms,
+        invalidations.phoneNumber,
+        invalidations.emptyField
+    ],
     data() {
         return {
             formName: 'Khateeb',
-            phoneNumberNotValid: true
+            groupInvalidation: {
+                emptyField: ['firstName', 'lastName', 'email']
+            }
         }
     },
     methods: {
@@ -53,32 +57,18 @@ export default {
         notReadyToSubmit() {
             if (this.inputData.firstName) {
                 return (
-                    this.firstNameNotValid || 
-                    this.lastNameNotValid || 
+                    this.emptyField.firstName ||
+                    this.emptyField.lastName ||
+                    this.emptyField.email ||
                     this.phoneNumberNotValid
                 )
             } else return true
-        },
-        firstNameNotValid() {
-            return this.inputData.firstName.length  < 1
-        },
-        lastNameNotValid() {
-            return this.inputData.lastName.length < 1
-        },
-        phone() {
-            if (this.inputData.phoneNumber) return this.inputData.phoneNumber
-            else return '403'
         }
     },
     async created() {
-        const data = await this.$API.getKhateebs('yes')
+        const data = await this.$API.admin.getKhateebs('yes')
         data.emptySchema.active = true
         this.assignAPIData(data)
-    },
-    watch: {
-        async phone() {
-            this.phoneNumberNotValid = await validation.phoneNumber(this.phone)
-        }
     }
 }
 </script>

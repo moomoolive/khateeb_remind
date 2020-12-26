@@ -21,7 +21,7 @@ export default {
     methods: {
         async sendText() {
             this.pushed = true
-            await this.$API.checkTextService()  
+            await this.$API.misc.checkTextService()  
         }
     }
 }

@@ -1,4 +1,4 @@
-@mixin gradient1($color, $opacity: 0.5) {
+@mixin gradient1($colorLeft, $colorRight: "offWhite", $opacity: 0.5) {
     .gradient1 {
         $padding: 3vh;
         width: 90%;
@@ -8,8 +8,8 @@
         margin-right: auto;
         background: linear-gradient(
           to right,
-          themeRGBA($color, $opacity),
-          getColor("offWhite")
+          themeRGBA($colorLeft, $opacity),
+          getColor($colorRight)
         );
     }
 };

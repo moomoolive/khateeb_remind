@@ -32,7 +32,7 @@ export default {
     },
     methods: {
         submit() {
-            this.$API.initializePassword(this.$data)
+            this.$API.initialize.initializePassword(this.$data)
         }
     }
 }

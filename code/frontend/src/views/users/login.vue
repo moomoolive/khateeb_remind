@@ -4,40 +4,26 @@
             msg="No services will work until the issue is resolved insha'Allah"
             gif="planeFail"
             title="Your Khateeb Remind API is not responding"
-            v-if="selected === 'no API response'"
+            v-if="!showForm"
         />
-        <div v-if="selected !== 'no API response'">
-            <login-form
-                v-if="selected === 'form'"
-                @alt="selected = $event"
-            />
-            <first-time
-                v-if="selected === 'first'"
-                @back="selected = 'form'"
-            />
-            <reset-password
-                v-if="selected === 'text'"
-                @back="selected = 'form'"
-            />
-        </div>
+        <login-main
+            @no-API="showForm = false"
+            v-if="showForm"
+        />
     </div>
 </template>
 
 <script>
-import loginForm from '@/components/login/loginForm.vue'
-import firstTime from '@/components/login/firstTime.vue'
-import resetPassword from '@/components/login/resetPassword.vue'
+import loginMain from '@/components/login/main.vue'
 
 export default {
     name: 'login',
     components: {
-        loginForm,
-        firstTime,
-        resetPassword
+        loginMain
     },
     data() {
         return {
-            selected: 'form'
+            showForm: true
         }
     },
     async created() {

@@ -7,6 +7,10 @@ const funcs = {
     failedUpdate(error) {
         console.log(error)
         window.alert('There was a problem saving your changes')
+    },
+    successfulUpdate(response) {
+        console.log(response)
+        return response.data
     }
 }
 
@@ -17,8 +21,8 @@ export default {
             .catch(err => { console.log(err) })
     },
     updatedSchedule(payload) {
-        axios.post(baseUrl + '/monthlySchedules', payload)
-            .then(res => { console.log(res) })
+        return axios.post(baseUrl + '/monthlySchedules', payload)
+            .then(funcs.successfulUpdate)
             .catch(funcs.failedUpdate)
     },
     getAnnouncements() {
@@ -27,8 +31,8 @@ export default {
             .catch(err => { console.log(err) })
     },
     updateAnnouncement(payload) {
-        axios.post(baseUrl + '/announcements', payload)
-            .then(res => { console.log(res) })
+        return axios.post(baseUrl + '/announcements', payload)
+            .then(funcs.successfulUpdate)
             .catch(funcs.failedUpdate)
     },
     deleteAnnouncement(payload) {
@@ -42,8 +46,8 @@ export default {
             .catch(err => { console.log(err) })
     },
     updateKhateeb(payload) {
-        axios.post(baseUrl + '/khateebs', payload)
-            .then(res => { console.log(res) })
+        return axios.post(baseUrl + '/khateebs', payload)
+            .then(funcs.successfulUpdate)
             .catch(funcs.failedUpdate)
     },
     deleteKhateeb(ID) {
@@ -57,8 +61,8 @@ export default {
             .catch(err => { console.log(err) })
     },
     updateSetting(payload) {
-        axios.post(baseUrl + '/settings', payload)
-            .then(res => { console.log(res) })
+        return axios.post(baseUrl + '/settings', payload)
+            .then(funcs.successfulUpdate)
             .catch(funcs.failedUpdate)
     }
 }

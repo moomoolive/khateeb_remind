@@ -43,7 +43,7 @@ export default{
         },
         methods: {
             async submit() {
-                const token = await this.$API.login(this.secretKey)
+                const token = await this.$API.users.login(this.secretKey)
                 if (!token) this.$emit("alt", "no API response")
                 if (token) {
                     localStorage.setItem('token', token.token)
@@ -55,7 +55,7 @@ export default{
                 } else this.error = true
             },
             async password() {
-                const response = await this.$API.passwordExists()
+                const response = await this.$API.initialize.passwordExists()
                 if ( response === 'exists') this.passwordExists = true
             }
         },

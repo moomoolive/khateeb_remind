@@ -1,16 +1,16 @@
 <template>
-    <div style="padding-top: 20px; padding-bottom: 20px;">
-        <div v-for="(field, name) in fields" :key="name">
-            {{ _.stringFormat(name, 'title') }}:<br><br>
-            <input type="text" v-model="inputData.options[name]"><br><br>
-        </div>
-        <div>
-            Phone Number:<br><br>
-            <input type="text" v-model="inputData.options.phoneNumber">
-        </div>
+    <div class="gradient1">
+        <form-renderer
+            :inputData="inputData.options"
+            :textFieldInvalidMsg="{
+                phoneNumber: `Invalid Canadian Phone Number`
+            }"
+            :groupInvalidation="groupInvalidation"
+        />
         <button
             class="grey"
             @click="submit()"
+            :disabled="notReadyToSubmit"
         >
             Submit
         </button>
@@ -18,41 +18,55 @@
 </template>
 
 <script>
+import formRenderer from '@/components/forms/formRenderer.vue'
+import invalidations from '@/mixins/invalidations/index.js'
+
 export default {
     name: 'adminDetails',
+    mixins: [invalidations.emptyField, invalidations.phoneNumber],
+    components: {
+        formRenderer
+    },
     data() {
         return {
             inputData: {
                 __t: 'adminProfile',
                 options: {}
+            },
+            groupInvalidation: {
+                emptyField: ['firstName', 'lastName', 'email']
             }
         }
     },
     methods: {
         async submit() {
-            console.log(this.inputData)
-            const res = await this.$API.updateSetting(this.inputData)
+            const res = await this.$API.admin.updateSetting(this.inputData)
         }
     },
     computed: {
-        fields() {
-            if (this.inputData.options) {
-                const x = this._.deepCopy(this.inputData.options)
-                delete x.phoneNumber
-                return x
-            }
+        notReadyToSubmit() {
+            if (this.inputData.firstName) {
+                return (
+                    this.emptyField.firstName ||
+                    this.emptyField.lastName ||
+                    this.emptyField.email ||
+                    this.phoneNumberNotValid
+                )
+            } else return true
         }
     },
     async created() {
-        const response = await this.$API.getSetting(this.inputData.__t)
-        console.log(response)
+        const response = await this.$API.admin.getSetting(this.inputData.__t)
         if (response.previousEntries[0]) {
             this.inputData = response.previousEntries[0]
         } else this.inputData = response.emptySchema
+    },
+    updated() {
     }
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+@import '~@/scss/miscStyles/gradientBackgrounds.scss';
+@include gradient1("yellow", "green");
 </style>

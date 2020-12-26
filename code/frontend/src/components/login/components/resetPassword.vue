@@ -65,7 +65,7 @@ export default {
     },
     methods: {
         async sendText() {
-            const response = await this.$API.requestVerificationCode()
+            const response = await this.$API.misc.requestVerificationCode()
             if (response !== 'texted') {
                 this.msg.headline = `We weren't able to send a verification text.`
                 this.msg.rest = `Try again later`
@@ -73,7 +73,7 @@ export default {
             this.responseRecieved = true
         },
         async verifyCode() {
-            const response = await this.$API.sendVerificationCode(this.code)
+            const response = await this.$API.misc.sendVerificationCode(this.code)
             if (response.msg === `verified`) {
                 this.token = response.token
                 this.responseRecieved = false
@@ -88,7 +88,7 @@ export default {
                     options: this.password.new
                 }
             }
-            const response = await this.$API.savePassword(requestData)
+            const response = await this.$API.misc.savePassword(requestData)
             if (response === 'success') {
                 this.resetPassword = false
                 this.responseRecieved = true

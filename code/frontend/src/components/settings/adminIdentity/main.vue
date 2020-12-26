@@ -29,7 +29,7 @@ export default {
     methods: {
         parsedName(relativePath) {
             const x = relativePath.slice(1)
-            return this._.stringFormat(x, 'title')
+            return this._.stringFormat(x)
         }
     }
 }

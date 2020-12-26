@@ -10,8 +10,11 @@ export default {
         let canadianAreaCode;
         if (areaCodeExists) {
             const areaCode = phoneNumber.substring(0,3)
-            canadianAreaCode = await API.checkValidCanadianAreaCode(areaCode)
+            canadianAreaCode = await API.misc.checkValidCanadianAreaCode(areaCode)
         }
         return areaCodeExists ? incompleteNumber && canadianAreaCode : incompleteNumber
+    },
+    fieldIsEmpty(field) {
+        return field.length < 1
     }
 }

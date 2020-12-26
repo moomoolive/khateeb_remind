@@ -45,7 +45,7 @@
 <script>
 import equal from 'fast-deep-equal'
 import monthIncrementer from './admin/monthIncrementer.vue'
-import schedule from '../../mixins/schedule.js'
+import schedule from '@/mixins/schedule.js'
 
 export default {
     name: 'scheduleSetter',
@@ -75,20 +75,22 @@ export default {
             this.currentSchedule = schedule
             this.cacheOriginalSchedule()
         },
-        saveData() {
-            const toBeDecidedIndicator = 'TBD'
+        async saveData() {
             if (window.confirm("Are you sure you want to save these changes?")) {
                 this.currentSchedule.month = this.originalSchedule.month = this.currentScheduleKey
                 const payload = this._.deepCopy(this.currentSchedule)
                 payload.original = this._.deepCopy(this.originalSchedule)
-                this.$API.updatedSchedule(payload)
-                this.cacheOriginalSchedule()
+                const response = await this.$API.admin.updatedSchedule(payload)
+                if (response === 'Changes successfully made!') {
+                    this.$store.dispatch('adminSavedChangesScreen', true)
+                    this.cacheOriginalSchedule()
+                }
             }
         },
         async fetchMonthlySchedule() {
             const scheduleFor = `${this.currentScheduleKey}`
             const fridayDates = this.fridayDates
-            const data = await this.$API.getMonthlySchedule(scheduleFor, fridayDates)
+            const data = await this.$API.admin.getMonthlySchedule(scheduleFor, fridayDates)
             if (data === 'No locations or timings were found!') this.errorMsg = data
             else {
                 this.updateSchedule(data)

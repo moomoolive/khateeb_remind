@@ -2,8 +2,11 @@ const subHelpers = {
     toXCase(arrayOfWords, format) {
         return arrayOfWords.map((word) =>
             format === 'title' ? 
-                word.charAt(0).toUpperCase() + word.slice(1) : word[format + 'Case']()
+                word.charAt(0).toUpperCase() + word.slice(1) : this.otherCases(word, format)
         )
+    },
+    otherCases(word, format) {
+        return format === 'lower' ? word.toLowerCase() : word.toUpperCase()
     },
     arrayToString(arrayOfWords) {
         return arrayOfWords.reduce((total, word) => total += ` ${word}`)

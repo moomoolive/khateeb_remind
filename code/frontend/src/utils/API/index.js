@@ -4,8 +4,8 @@ import users from './routes/users.js'
 import admin from './routes/admin.js'
 
 export default {
-    ...initialize,
-    ...misc,
-    ...users,
-    ...admin
+    initialize,
+    misc,
+    users,
+    admin
 }

@@ -14,5 +14,8 @@ export default {
     },
     setLastVisit({ commit }, date) {
         commit('lastVisit', date)
+    },
+    adminSavedChangesScreen({ commit }, state) {
+        commit('adminSavedChangesScreen', state)
     }
 }
