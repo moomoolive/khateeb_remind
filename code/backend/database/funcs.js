@@ -22,11 +22,11 @@ const helpers = {
                     {
                         options: toBeSaved.options,
                         savedOn: new Date()
-                    }, (err) => { this.databaseCallback(response, err) }
+                    }, (err) => { funcs.databaseCallback(response, err) }
                     )
             } else {
                 const x = new $dbModels[discriminatorName](toBeSaved)
-                x.save((err) => { this.databaseCallback(response, err) })
+                x.save((err) => { funcs.databaseCallback(response, err) })
             }
         })
     },
@@ -35,7 +35,7 @@ const helpers = {
     }
 }
 
-export default {
+const funcs = {
     databaseError(response, error) {
         console.log(error)
         response.json('There was a problem accessing the database!')
@@ -89,3 +89,5 @@ export default {
         return adminProfile
     }
 }
+
+export default funcs

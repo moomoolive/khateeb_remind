@@ -1,72 +1,51 @@
 <template>
-    <div class="gradient1">
-        <form-renderer
-            :inputData="inputData.options"
-            :textFieldInvalidMsg="{
-                phoneNumber: `Invalid Canadian Phone Number`
-            }"
-            :groupInvalidation="groupInvalidation"
+    <div>
+        <Form
+            :name="`admin profile`"
+            :emptySchema="emptySchema.options"
+            :invalidations="invalidations"
+            :backgroundColor="`yellow-green`"
+            @submitted="submit($event)"
         />
-        <button
-            class="grey"
-            @click="submit()"
-            :disabled="notReadyToSubmit"
-        >
-            Submit
-        </button>
     </div>
 </template>
 
 <script>
-import formRenderer from '@/components/forms/formRenderer.vue'
-import invalidations from '@/mixins/invalidations/index.js'
+import Form from '@/components/appBuildingBlocks/forms/formRenderer.vue'
 
 export default {
     name: 'adminDetails',
-    mixins: [invalidations.emptyField, invalidations.phoneNumber],
     components: {
-        formRenderer
+        Form
     },
     data() {
         return {
-            inputData: {
-                __t: 'adminProfile',
-                options: {}
+            emptySchema: {
+                options: null
             },
-            groupInvalidation: {
+            invalidations: {
                 emptyField: ['firstName', 'lastName', 'email']
             }
         }
     },
     methods: {
-        async submit() {
-            const res = await this.$API.admin.updateSetting(this.inputData)
-        }
-    },
-    computed: {
-        notReadyToSubmit() {
-            if (this.inputData.firstName) {
-                return (
-                    this.emptyField.firstName ||
-                    this.emptyField.lastName ||
-                    this.emptyField.email ||
-                    this.phoneNumberNotValid
-                )
-            } else return true
+        async submit($event) {
+            this.emptySchema.options = $event
+            const response = await this.$API.admin.updateSetting(this.emptySchema)
+            if (response === 'Changes successfully made!') {
+                    this.$store.dispatch('adminSavedChangesScreen', true)
+            }
         }
     },
     async created() {
-        const response = await this.$API.admin.getSetting(this.inputData.__t)
+        const response = await this.$API.admin.getSetting('adminProfile')
         if (response.previousEntries[0]) {
-            this.inputData = response.previousEntries[0]
-        } else this.inputData = response.emptySchema
-    },
-    updated() {
+            this.emptySchema = response.previousEntries[0]
+        } else this.emptySchema = response.emptySchema
     }
 }
 </script>
 
 <style lang="scss" scoped>
-@import '~@/scss/miscStyles/gradientBackgrounds.scss';
-@include gradient1("yellow", "green");
+
 </style>

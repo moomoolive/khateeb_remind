@@ -24,8 +24,8 @@
                 >
                     <u>
                         {{ 
-                            textFieldInvalidMsg && textFieldInvalidMsg[name] ? 
-                            textFieldInvalidMsg[name] : defaultInvalidFeedback(name)
+                            customInvalidMsg && customInvalidMsg[name] ? 
+                            customInvalidMsg[name] : defaultInvalidFeedback(name)
                         }}
                     </u>
                 </span>
@@ -36,7 +36,7 @@
 
 <script>
 export default {
-    name: 'formRenderer',
+    name: 'formInputRenderer',
     props: {
         inputData: {
             type: Object,
@@ -47,7 +47,7 @@ export default {
             required: false,
             default: () => []
         },
-        textFieldInvalidMsg: {
+        customInvalidMsg: {
             type: Object,
             required: false,
             default: () => {}
@@ -57,10 +57,9 @@ export default {
             required: false,
             default: () => []
         },
-        invalidationList: {
+        activeInvalidations: {
             type: Object,
-            required: false,
-            default: () => {}
+            required: false
         }
     },
     data() {
@@ -100,19 +99,7 @@ export default {
         fieldIsNotValid(fieldName) {
             if (!this.$parent) {
                 return false
-            }
-            const invalidationName = this.checkIfInvalidationExists(fieldName)
-            if (invalidationName) return this.$parent[invalidationName][fieldName]
-        },
-        checkIfInvalidationExists(fieldName) {
-            if (!this.invalidationList) {
-                return null
-            }
-            for (let [invalidationName, fields] of Object.entries(this.invalidationList)) {
-                console.log(invalidationName, fields)
-                const fieldIsInThisInvalidation = fields.find(elem => elem === fieldName)
-                if (fieldIsInThisInvalidation) return invalidationName
-            }
+            } else return this.activeInvalidations[fieldName]
         },
         isRenderable(fieldName) {
             return !this.fieldIsInArray(fieldName, 'doNotRenderDefaults')

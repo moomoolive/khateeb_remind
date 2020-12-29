@@ -3,7 +3,7 @@
       <div class="logo">
         <logo-display />
       </div>
-      <schedule-renderer
+      <Schedule
         :type="`user`"
         :currentSchedule="currentSchedule"
         v-if="scheduleExists"
@@ -19,12 +19,12 @@
 
 <script>
 import logoDisplay from '@/components/misc/logoDisplay.vue'
-import scheduleRenderer from '@/components/appBuildingBlocks/schedules/scheduleRenderer.vue'
+import Schedule from '@/components/appBuildingBlocks/schedules/scheduleRenderer.vue'
 
 export default {
   name: 'Home',
   components: {
-    scheduleRenderer,
+    Schedule,
     logoDisplay
   },
   data() {

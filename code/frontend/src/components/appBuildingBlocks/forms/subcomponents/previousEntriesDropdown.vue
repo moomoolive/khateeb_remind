@@ -6,14 +6,12 @@
             v-for="(entry, ID) in previousEntries" :key="ID"
             :value="ID"
             >
-                <span v-for="field in displayName" :key="field">
-                    {{ entry[field] }}
-                </span>
+                {{ namingConvention ? namingConvention(entry) : defaultNamingConvention(entry) }}
             </option>
         </select><br>
         <button
-            @click="$parent.remove()"
-            v-if="selected !== 'New'"
+            @click="$emit('remove')"
+            v-if="inputData._id"
             class="red"
         >
             Delete this {{ name }}
@@ -33,18 +31,27 @@ export default {
             type: Object,
             required: true
         },
-        selected: {
-            type: [String, Number],
-            required: true
+        namingConvention: {
+            type: Function,
+            required: false
         },
-        displayName: {
-            type: Array,
+        formName: {
+            type: String,
             required: true
-        },
+        }
     },
-    data() {
-        return {
-            name: this.$parent.formName
+    methods: {
+        remove() {
+            this.emit('delete', this.inputData._id)
+        },
+        defaultNamingConvention(data) {
+            const keys = Object.keys(data)
+            return data[keys[0]]
+        }
+    },
+    computed: {
+        name() {
+            return this._.stringFormat(this.formName).slice(0, -1)
         }
     }
 }

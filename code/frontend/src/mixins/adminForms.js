@@ -1,6 +1,3 @@
-import formRenderer from '@/components/forms/formRenderer.vue'
-import previousEntriesDropdown from '@/components/forms/previousEntriesDropdown.vue'
-
 export default {
     data() {
         return {
@@ -9,10 +6,6 @@ export default {
             inputData: {},
             emptySchema: {}
         }
-    },
-    components: {
-        formRenderer,
-        previousEntriesDropdown
     },
     methods: {
         assignAPIData(APIData) {
@@ -34,7 +27,6 @@ export default {
         async submit() {
             if (window.confirm(`Are you sure you want to send this ${this.formName}?`)) {
                 const response = await this.$API.admin['update' + this.formName](this.inputData)
-                console.log(response)
                 if (response === 'Changes successfully made!') {
                     this.$store.dispatch('adminSavedChangesScreen', true)
                 }

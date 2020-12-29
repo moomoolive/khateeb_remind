@@ -10,18 +10,13 @@ export default {
             .catch(err => { console.log(err) })
     },
     sendVerificationCode(code) {
-        return axios.post(baseUrl + '/verify-admin-text', { code })
-            .then(res => res.data)
-            .catch(err => { console.log(err) })
-    },
-    savePassword(payload) {
-        return axios.post(baseUrl + '/save-pass', payload)
+        return axios.post(baseUrl + '/verify-admin-text', code)
             .then(res => res.data)
             .catch(err => { console.log(err) })
     },
     checkTextService() {
-        axios.get(baseUrl + '/check-text-service')
-            .then(res => { console.log(res) })
+        return axios.get(baseUrl + '/check-text-service')
+            .then(res => res.data)
             .catch(err => { console.log(err) })
     },
     checkValidCanadianAreaCode(code) {

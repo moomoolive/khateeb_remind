@@ -1,6 +1,6 @@
 <template>
     <div>
-        <schedule-renderer 
+        <Schedule 
             type="admin"
             :currentSchedule="currentSchedule"
             :originalSchedule="originalSchedule"
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import scheduleRenderer from '@/components/appBuildingBlocks/schedules/scheduleRenderer.vue'
+import Schedule from '@/components/appBuildingBlocks/schedules/scheduleRenderer.vue'
 import datetime from '@/utils/dateTime/main.js'
 
 import equal from 'fast-deep-equal'
@@ -26,7 +26,7 @@ import equal from 'fast-deep-equal'
 export default {
     name: 'adminSchedule',
     components: {
-        scheduleRenderer
+        Schedule
     },
     data() {
         return {

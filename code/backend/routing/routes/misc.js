@@ -42,35 +42,16 @@ router.get('/reset-pass', async (req, res) => {
     }
 })
 
-router.post('/verify-admin-text', middleware.validationCheck(['code']), (req, res) => {
-    const code = parseInt(req.body.code)
+router.post('/verify-admin-text', middleware.validationCheck(['verificationCode']), (req, res) => {
+    console.log(req.body)
+    const code = parseInt(req.body.verificationCode)
     console.log(code, verificationCode)
     console.log(code === verificationCode)
     if (code === verificationCode && verificationCode) {
-        const secsPerMin = 60
-        const thirtyMinutes = 30 * secsPerMin
-        const response = {
-            token: jwt.sign({ user: 'admin' }, env.jwt, { expiresIn: thirtyMinutes }),
-            msg: `verified`
-        }
-        res.json(response)
-        verificationCode = null
-    } else {
-        res.status(401)
-        res.json('Unauthorized')
-    }
-})
-
-router.post('/save-pass', middleware.validationCheck(['token', 'passwordInfo']), (req, res) => {
-    const token = req.body.token
-    jwt.verify(token, env.jwt, (err, decoded) => {
-        if(err || decoded.user !== 'admin') {
-            res.status(401)
-            res.json('Unauthorized')
-        } else {
-            $dbModels.password.findOneAndUpdate( {},
+        if (req.body.createNewPassword) {
+            $dbModels.password.findOneAndUpdate({},
                 { 
-                    options: req.body.passwordInfo.options,
+                    options: req.body.createNewPassword,
                     savedOn: new Date()
                 }, (err) => {
                     if (err) console.log(err)
@@ -78,7 +59,10 @@ router.post('/save-pass', middleware.validationCheck(['token', 'passwordInfo']),
                 }
             )
         }
-    })
+    } else {
+        res.status(401)
+        res.json('Unauthorized')
+    }
 })
 
 router.post('/area-code', [middleware.validationCheck(['code']), middleware.authAdmin],

@@ -107,7 +107,6 @@ const models = {
         console.log(schemaName)
         const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
         if (!full) {
-            console.log(fullSchemaParams)
             const notFull = fullSchemaParams.filter((param) => {
                 return param !== '__v' && param !== '_id' && param !== 'savedOn'
             })

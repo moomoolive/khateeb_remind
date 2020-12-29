@@ -7,11 +7,6 @@ export default [
         component: Home
     },
     {
-        path: '/about',
-        name: 'about',
-        component: () => import ('@/views/users/about.vue')
-    },
-    {
         path: '/announcements',
         name: 'announcements',
         component: () => import (/* webpackPrefetch: true */ '@/views/users/announcements.vue')

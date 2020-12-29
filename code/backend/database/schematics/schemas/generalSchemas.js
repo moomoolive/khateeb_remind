@@ -10,7 +10,7 @@ export default {
         firstName: String,
         lastName: String,
         phoneNumber: String,
-        active: String,
+        active: Boolean,
         email: String,
         dropouts: String,
         savedOn: Date

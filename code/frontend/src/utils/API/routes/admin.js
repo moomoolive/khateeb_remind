@@ -36,8 +36,8 @@ export default {
             .catch(funcs.failedUpdate)
     },
     deleteAnnouncement(payload) {
-        axios.delete(baseUrl + '/announcements', { data: payload })
-            .then(res => { console.log(res) })
+        return axios.delete(baseUrl + '/announcements', { data: payload })
+            .then(funcs.successfulUpdate)
             .catch(funcs.failedUpdate)
     },
     getKhateebs(fullOrNot) {
@@ -51,8 +51,8 @@ export default {
             .catch(funcs.failedUpdate)
     },
     deleteKhateeb(ID) {
-        axios.delete(baseUrl + '/khateebs', { data: ID })
-            .then(res => { console.log(res) })
+        return axios.delete(baseUrl + '/khateebs', { data: ID })
+            .then(funcs.successfulUpdate)
             .catch(funcs.failedUpdate)
     },
     getSetting(setting) {

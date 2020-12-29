@@ -1,42 +1,59 @@
 <template>
-    <div class="gradient1">
-        <h3>Update your password:</h3>
-        <form>
-            Confirm Old Password:<br><br>
-            <input type="text" v-model="inputData.confirm"><br><br>
-            Create Your New Password:<br><br>
-            <input type='text' v-model="inputData.options"><br>
-            <button
-                class="grey"
-                @click="submit()"
-                :disabled="passwordRequirememts"
-            >
-                Submit
-            </button>
-        </form>
+    <div>
+        <Form
+            :name="`updated password`"
+            :emptySchema="emptySchema"
+            :invalidations="invalidations"
+            :customInvalidMsg="customInvalidMsg"
+            :backgroundColor="`blue-green`"
+            @submitted="submit($event)"
+        />
     </div>
 </template>
 
 <script>
+import Form from '@/components/appBuildingBlocks/forms/formRenderer.vue'
+
 export default {
     name: 'updatePassword',
+    components: {
+        Form
+    },
     data() {
         return {
             inputData: {
                 __t: 'password',
                 options: '',
                 confirm: ''
+            },
+            emptySchema: {
+                confirmOldPassword: '',
+                createNewPassword: '',
+                confirmNewPassword: ''
+            },
+            invalidations: {
+                passwordRequirements: ['createNewPassword'],
+                notEqual: [
+                    ['createNewPassword', 'confirmNewPassword']
+                ]
+            },
+            customInvalidMsg: {
+                createNewPassword: 'Your password must be longer than 6 characters',
+                confirmNewPassword: `This doesn't equal your password above`
             }
         }
     },
     methods: {
-        async submit() {
-            const res = await this.$API.admin.updateSetting(this.inputData)
-        }
-    },
-    computed: {
-        passwordRequirememts() {
-            return this.inputData.options.length < 6
+        prepSaveData(info) {
+            this.inputData.options = info.createNewPassword
+            this.inputData.confirm = info.confirmOldPassword
+        },
+        async submit($event) {
+            this.prepSaveData($event)
+            const response = await this.$API.admin.updateSetting(this.inputData)
+            if (response === 'Changes successfully made!') {
+                this.$store.dispatch('adminSavedChangesScreen', true)
+            }
         }
     }
 }
