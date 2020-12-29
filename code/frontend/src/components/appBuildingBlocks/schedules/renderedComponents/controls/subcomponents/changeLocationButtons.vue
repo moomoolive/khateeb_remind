@@ -33,7 +33,7 @@ export default {
     },
     methods: {
         click(value) {
-            this.$emit('change', value)
+            this.$emit('change', { location: value })
         }
     }
 }

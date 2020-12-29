@@ -26,7 +26,7 @@
                 </th>
                 <th class="khateebs">
                     <component
-                    :is="table"
+                    :is="componentX"
                     :displayedWeek="displayedWeek"
                     :schedule="schedule.data.rows[locationID]"
                     :prayerTiming="prayerTiming"
@@ -51,11 +51,7 @@
 
 <script>
 export default {
-    name: 'tableRender',
-    components: {
-        'admin': () => import('@/components/scheduleDisplay/khateebCell/admin.vue'),
-        'user': () => import('@/components/scheduleDisplay/khateebCell/user.vue')
-    },
+    name: 'tableRenderer',
     props: {
         table: {
             type: String,
@@ -78,11 +74,10 @@ export default {
             required: false
         }
     },
-    data() {
-        return {
+    computed: {
+        componentX() {
+            return () => import(`@/components/appBuildingBlocks/schedules/renderedComponents/tableCells/${this.table}.vue`)
         }
-    },
-    methods: {
     }
 }
 </script>

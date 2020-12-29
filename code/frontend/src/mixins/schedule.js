@@ -41,7 +41,8 @@ export default {
             }
         },
         fridays() {
-            return datetime.allUpcomingFridays(this.month)
+            const copy = new Date(this.month.getTime())
+            return datetime.allUpcomingFridays(copy)
         },
         fridayDates() {
             return this.fridays.map(friday => friday.getDate())

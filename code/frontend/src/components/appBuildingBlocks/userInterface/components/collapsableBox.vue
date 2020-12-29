@@ -1,8 +1,8 @@
 <template>
     <div>
         <button
-        :class="`collapsible ${isActive ? `active` : ``}`"
-        @click="clicked()"
+            :class="`collapsible ${isActive ? `active` : ``}`"
+            @click="clicked()"
         >
             {{ headline }}
             <span style="float: right;" class="icon">
@@ -10,21 +10,21 @@
             </span>
             <div class="tag">
                 <tag-box 
-                v-for="(tag, index) in tagDetails" :key="index"
-                :info="tag"
-                style="display: inline;"
+                    v-for="(tag, index) in tagDetails" :key="index"
+                    :info="tag"
+                    style="display: inline;"
                 />
             </div>
         </button>
         <transition name="dropdown">
             <div
-            class="content"
-            :style="`width: ${contentWidth}%;`"
-            v-if="isActive"
+                class="content"
+                :style="`width: ${contentWidth}%;`"
+                v-if="isActive"
             >
                 <component
-                :is="componentX"
-                v-bind="options"
+                    :is="componentX"
+                    v-bind="options"
                 />
             </div>
         </transition>

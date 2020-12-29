@@ -3,9 +3,11 @@
       <div class="logo">
         <logo-display />
       </div>
-      <div class="gradient1" v-show="scheduleExists">
-        <homepage-schedule @schedule="scheduleExists = $event"/>
-      </div>
+      <schedule-renderer
+        :type="`user`"
+        :currentSchedule="currentSchedule"
+        v-if="scheduleExists"
+      />
       <msg-with-pic
         msg="It should be up soon insha'Allah"
         gif="flyingPlanes"
@@ -17,18 +19,32 @@
 
 <script>
 import logoDisplay from '@/components/misc/logoDisplay.vue'
-import homepageSchedule from '@/components/scheduleDisplay/homepageSchedule.vue'
+import scheduleRenderer from '@/components/appBuildingBlocks/schedules/scheduleRenderer.vue'
 
 export default {
   name: 'Home',
   components: {
-    homepageSchedule,
+    scheduleRenderer,
     logoDisplay
   },
   data() {
     return {
-      scheduleExists: true
+      scheduleExists: true,
+      currentSchedule: null
     }
+  },
+  methods: {
+    async getSchedule() {
+      const monthlySchedule = await this.$API.users.monthlySchedule()
+      if (!monthlySchedule || monthlySchedule === `This month's schedule hasn't been created yet`) {
+          this.scheduleExists = false
+      } else {
+          this.currentSchedule = monthlySchedule
+      }
+    }
+  },
+  created() {
+    this.getSchedule()
   }
 }
 </script>
@@ -37,6 +53,4 @@ export default {
 .logo {
   margin-bottom: 15vh;
 }
-@import '~@/scss/miscStyles/gradientBackgrounds.scss';
-@include gradient1("blue");
 </style>

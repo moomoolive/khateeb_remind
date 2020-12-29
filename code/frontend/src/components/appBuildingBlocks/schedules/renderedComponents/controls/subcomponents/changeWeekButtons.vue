@@ -4,9 +4,9 @@
             v-for="fridayDate of fridayDates"
             :key="fridayDate"
             @click="click(fridayDate)"
-            :aria-label="`view schedule for ${displayedMonthInfo.month} ${fridayDate}`"
+            :aria-label="`view schedule for ${display.month} ${fridayDate}`"
         >
-            {{ `${displayedMonthInfo.abbreviatedMonthName} ${fridayDate}` }}
+            {{ `${display.abbreviatedMonthName} ${fridayDate}` }}
         </button>
     </div>
 </template>
@@ -19,14 +19,14 @@ export default {
             type: Array,
             required: true
         },
-        displayedMonthInfo: {
+        display: {
             type: Object,
             required: true
         }
     },
     methods: {
         click(value) {
-            this.$emit('change', value)
+            this.$emit('change', { weekOf: value })
         }
     }
 }

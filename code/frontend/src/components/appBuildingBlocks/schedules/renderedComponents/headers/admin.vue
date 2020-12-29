@@ -5,13 +5,13 @@
         </h2>
         <button
             class="yellow"
-            @click="$emit('hit', 'up')"
+            @click="$emit('change', { month: 'up' })"
         >
             Next Month
         </button>
         <button
             class="yellow"
-            @click="$emit('hit', 'down')"
+            @click="$emit('change', { month: 'down' })"
         >
             Previous Month
         </button>
@@ -20,7 +20,7 @@
 
 <script>
 export default {
-    name: 'monthIncrementer',
+    name: 'adminScheduleHeader',
     props: {
         display: {
             type: Object,

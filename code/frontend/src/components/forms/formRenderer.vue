@@ -57,7 +57,7 @@ export default {
             required: false,
             default: () => []
         },
-        groupInvalidation: {
+        invalidationList: {
             type: Object,
             required: false,
             default: () => {}
@@ -99,23 +99,19 @@ export default {
         },
         fieldIsNotValid(fieldName) {
             if (!this.$parent) {
-                return true 
+                return false
             }
-            const customInvalidation = this.$parent[fieldName + 'NotValid']
-            if (customInvalidation) {
-                return customInvalidation
-            } else {
-                const groupInvalidation = this.checkgroupInvalidation(fieldName)
-                return this.$parent[groupInvalidation] ? this.$parent[groupInvalidation][fieldName] : null
-            }
+            const invalidationName = this.checkIfInvalidationExists(fieldName)
+            if (invalidationName) return this.$parent[invalidationName][fieldName]
         },
-        checkgroupInvalidation(fieldName) {
-            if (!this.groupInvalidation) {
+        checkIfInvalidationExists(fieldName) {
+            if (!this.invalidationList) {
                 return null
-            } 
-            for (let [validationName, fieldsToBeValidated] of Object.entries(this.groupInvalidation)){
-                const isInThisValidationGroup = fieldsToBeValidated.find(elem => elem === fieldName)
-                if (isInThisValidationGroup) return validationName
+            }
+            for (let [invalidationName, fields] of Object.entries(this.invalidationList)) {
+                console.log(invalidationName, fields)
+                const fieldIsInThisInvalidation = fields.find(elem => elem === fieldName)
+                if (fieldIsInThisInvalidation) return invalidationName
             }
         },
         isRenderable(fieldName) {

@@ -18,8 +18,8 @@ export default {
     announcement: new mongoose.Schema({
         headline: String,
         content: String,
-        important: String,
-        urgent: String,
+        important: Boolean,
+        urgent: Boolean,
         savedOn: Date
     }),
     location: new mongoose.Schema({

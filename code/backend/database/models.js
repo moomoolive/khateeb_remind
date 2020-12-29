@@ -18,6 +18,8 @@ const helpers = {
             case 'Array':
                 x = []
                 break;
+            case 'Boolean':
+                x = true
         }
         return x
     },

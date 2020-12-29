@@ -1,5 +1,10 @@
-@mixin gradient1($colorLeft, $colorRight: "offWhite", $opacity: 0.5) {
-    .gradient1 {
+@mixin gradient1(
+    $colorLeft, 
+    $colorRight: "offWhite", 
+    $opacity: 0.5, 
+    $name: '1'
+  ) {
+    .gradient#{$name} {
         $padding: 3vh;
         width: 90%;
         padding-top: $padding;
