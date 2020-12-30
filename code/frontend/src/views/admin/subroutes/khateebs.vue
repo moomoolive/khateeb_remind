@@ -1,6 +1,7 @@
 <template>
     <div>
         <Form
+            v-if="emptySchema"
             :name="`khateebs`"
             :emptySchema="emptySchema"
             :previousEntries="previousEntries"
@@ -8,7 +9,7 @@
             :doNotRender="['dropouts']"
             :invalidations="invalidations"
             :customInvalidMsg="{
-                phoneNumber: 'This is not a valid canadian phone number'
+                phoneNumber: 'This is an invalid canadian phone number'
             }"
             :backgroundColor="`green-offWhite`"
             @submitted="submit($event)"
@@ -18,7 +19,7 @@
 </template>
 
 <script>
-import Form from '@/components/appBuildingBlocks/forms/formRenderer.vue'
+import Form from '@/components/forms/formRenderer.vue'
 
 export default {
     name: 'khateebs',
@@ -31,7 +32,7 @@ export default {
             emptySchema: null,
             invalidations: {
                 emptyField: ['firstName', 'lastName', 'email'],
-                phoneNumberNotValid: ['phoneNumber']
+                nonCanadianPhone: ['phoneNumber']
             }
         }
     },

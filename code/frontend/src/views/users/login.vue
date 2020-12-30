@@ -46,7 +46,7 @@
 <script>
 import axios from 'axios'
 
-import Form from '@/components/appBuildingBlocks/forms/formRenderer.vue'
+import Form from '@/components/forms/formRenderer.vue'
 
 export default {
     name: 'login',
@@ -69,7 +69,7 @@ export default {
                 confirmNewPassword: ''
             },
             invalidations: {
-                passwordRequirements: ['createNewPassword'],
+                invalidPassword: ['createNewPassword'],
                 notEqual: [
                     ['createNewPassword', 'confirmNewPassword']
                 ],

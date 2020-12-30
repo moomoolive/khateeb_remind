@@ -22,7 +22,7 @@ const adminRoutes = [
               },
               {
                 path: 'settings',
-                component: () => import('@/views/admin/subroutes/settings.vue')
+                component: () => import('@/views/admin/subroutes/settings/main.vue')
               }
         ],
         meta: {

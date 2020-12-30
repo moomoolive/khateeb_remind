@@ -1,6 +1,8 @@
 <template>
     <div>
+        <loading-screen v-if="!currentSchedule" />
         <Schedule 
+            v-if="currentSchedule"
             type="admin"
             :currentSchedule="currentSchedule"
             :originalSchedule="originalSchedule"
@@ -18,15 +20,18 @@
 </template>
 
 <script>
-import Schedule from '@/components/appBuildingBlocks/schedules/scheduleRenderer.vue'
-import datetime from '@/utils/dateTime/main.js'
-
 import equal from 'fast-deep-equal'
+
+import Schedule from '@/components/schedules/scheduleRenderer.vue'
+import loadingScreen from '@/components/misc/loadingScreen.vue'
+
+import datetime from '@/utils/dateTime/main.js'
 
 export default {
     name: 'adminSchedule',
     components: {
-        Schedule
+        Schedule,
+        loadingScreen
     },
     data() {
         return {

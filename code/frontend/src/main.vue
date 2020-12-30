@@ -7,10 +7,10 @@
 </template>
 
 <script>
-import Header from './components/Header.vue'
-import Footer from './components/Footer.vue'
+import Header from '@/components/misc/Header.vue'
+import Footer from '@/components/misc/Footer.vue'
 
-import datetime from './utils/dateTime/main.js'
+import datetime from '@/utils/dateTime/main.js'
 
 import axios from 'axios'
 

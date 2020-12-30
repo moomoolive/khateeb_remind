@@ -1,31 +1,36 @@
 <template>
   <div>
-      <div class="logo">
-        <logo-display />
-      </div>
+      <logo-display
+        class="logo"
+        :logoLeft="`uofcLogo`"
+        :logoRight="`msaUofCLogo`"
+      />
       <Schedule
+        v-if="scheduleExists && currentSchedule"
         :type="`user`"
         :currentSchedule="currentSchedule"
-        v-if="scheduleExists"
       />
       <msg-with-pic
+        v-if="!scheduleExists"
         msg="It should be up soon insha'Allah"
         gif="flyingPlanes"
         title="This month's schedule hasn't been created yet"
-        v-if="!scheduleExists"
       />
+      <loading-screen v-if="!currentSchedule && scheduleExists" />
   </div>
 </template>
 
 <script>
 import logoDisplay from '@/components/misc/logoDisplay.vue'
-import Schedule from '@/components/appBuildingBlocks/schedules/scheduleRenderer.vue'
+import Schedule from '@/components/schedules/scheduleRenderer.vue'
+import loadingScreen from '@/components/misc/loadingScreen.vue'
 
 export default {
   name: 'Home',
   components: {
     Schedule,
-    logoDisplay
+    logoDisplay,
+    loadingScreen
   },
   data() {
     return {
@@ -50,7 +55,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.logo {
-  margin-bottom: 15vh;
-}
 </style>

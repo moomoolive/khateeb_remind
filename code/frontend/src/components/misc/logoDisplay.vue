@@ -1,20 +1,33 @@
 <template>
     <div class="logoContainer">
-        <img :src="institutionLogo" alt="Overarching Institution Logo" class="left">
-        <p style="font-size: 4.5vh; font-weight: bold; margin-top: 2vh;">+</p>
-        <img :src="prayerProviderLogo" alt="Friday Prayer Provider Logo" class="right">
+        <img
+          class="left"
+          :src="require(`@/assets/logos/${logoLeft}.jpg`)" 
+          alt="Overarching Institution Logo"
+        >
+        <p v-if="logoRight">+</p>
+        <img
+          v-if="logoRight"
+          class="right"
+          :src="require(`@/assets/logos/${logoRight}.jpg`)" 
+          alt="Friday Prayer Provider Logo"
+        >
       </div>
 </template>
 
 <script>
 export default {
     name: 'logoDisplay',
-    data() {
-        return {
-            institutionLogo: require('@/assets/uofcLogo.jpg'),
-            prayerProviderLogo: require('@/assets/msaUofCLogo.png')
-        }
-    },
+    props: {
+      logoLeft: {
+        type: String,
+        required: true
+      },
+      logoRight: {
+        type: String,
+        required: false
+      }
+    }
 }
 </script>
 
@@ -24,6 +37,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 15vh;
 }
 
 @media screen and (max-width: 550px) {
@@ -44,5 +58,11 @@ img {
   &.right {
     @include boxShadow("blue", false)
   }
+}
+
+p {
+  font-size: 4.5vh;
+  font-weight: bold;
+  margin-top: 2vh;
 }
 </style>

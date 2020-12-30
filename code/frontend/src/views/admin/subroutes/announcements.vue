@@ -1,6 +1,7 @@
 <template>
     <div>
         <Form
+            v-if="emptySchema"
             :name="`announcements`"
             :emptySchema="emptySchema"
             :previousEntries="previousEntries"
@@ -17,7 +18,7 @@
 </template>
 
 <script>
-import Form from '@/components/appBuildingBlocks/forms/formRenderer.vue'
+import Form from '@/components/forms/formRenderer.vue'
 
 export default {
     name: 'announcements',

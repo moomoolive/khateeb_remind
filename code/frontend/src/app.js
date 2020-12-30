@@ -7,7 +7,7 @@ import store from './store'
 import API from '@/utils/API/index.js'
 import funcs from '@/utils/general/main.js'
 
-import globalComponents from '@/components/appBuildingBlocks/userInterface/index.js'
+import globalComponents from '@/components/userInterface/index.js'
 Vue.prototype.$API = API
 Vue.prototype._ = funcs
 
