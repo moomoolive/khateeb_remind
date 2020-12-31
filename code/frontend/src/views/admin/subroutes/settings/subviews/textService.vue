@@ -20,7 +20,7 @@
         </button>
         <collapsable-box
             :headline="`Text Phone`"
-
+            :tagDetails="textPhoneTag"
         >
             <template v-slot:content>
                 <settings-form
@@ -57,9 +57,19 @@ export default {
             required: true
         }
     },
-    methods: {
-        x($event) {
-            console.log($event)
+    data() {
+        return {
+            generalTag: {
+                words: 'Needs Attention',
+                symbol: '⚠️',
+                color: 'important'
+            }
+        }
+    },
+    computed: {
+        textPhoneTag() {
+            if (!this.textPhoneData.previousEntries[0]) return [this.generalTag]
+            else return null
         }
     }
 }

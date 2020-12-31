@@ -6,6 +6,7 @@
         </h2>
         <collapsable-box
             :headline="`Admin Identity`"
+            :tagDetails="adminIdentityTag"
         >
             <template v-slot:content>
                 <settings-form
@@ -72,6 +73,11 @@ export default {
                         confirmNewPassword: ''
                     }
                 }
+            },
+            generalTag: {
+                words: 'Needs Attention',
+                symbol: '⚠️',
+                color: 'important'
             }
         }
     },
@@ -84,6 +90,12 @@ export default {
         },
         toAPI(data) {
             this.$emit('submitted', data)
+        }
+    },
+    computed: {
+        adminIdentityTag() {
+            if (!this.adminIdentityData.previousEntries[0]) return [this.generalTag]
+            else return null
         }
     }
 }

@@ -36,9 +36,14 @@ p {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #F3C620;
   -webkit-transition: .4s;
   transition: .4s;
+  &.yellow {
+    background-color: getColor("yellow");
+  }
+  &.grey {
+    background-color: #ccc;
+  }
 }
 
 .slider:before {

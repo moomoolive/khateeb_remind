@@ -2,8 +2,11 @@
     <div class="top">
         <p>{{ leftMessage }}</p>
         <label class="switch" :aria-label="altText">
-            <input type="checkbox">
-            <span class="slider round" @click="$emit('slider-toggled')"></span>
+            <input type="checkbox" v-model="isToggled">
+            <span 
+                :class="`slider round ${untoggledColor}`" 
+                @click="$emit('toggled', !isToggled)"
+            ></span>
         </label>
         <p>{{ rightMessage }}</p>
     </div>
@@ -24,7 +27,24 @@ export default {
         altText: {
           type: String,
           required: false
+        },
+        basedOn: {
+            type: Boolean,
+            required: true
+        },
+        untoggledColor: {
+            type: String,
+            required: false,
+            default: 'grey'
         }
+    },
+    data() {
+        return {
+            isToggled: null
+        }
+    },
+    created() {
+        this.isToggled = this.basedOn
     }
 }
 </script>

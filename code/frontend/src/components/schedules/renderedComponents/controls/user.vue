@@ -2,18 +2,22 @@
     <div>
         <slider-button
             class="controlSplit display"
-            leftMessage="This Week"
-            rightMessage="This Month"
-            altText="Toggle between weekly and monthly view"
-            @slider-toggled="toWeeklyView()"
+            :basedOn="isWeeklyView"
+            :leftMessage="`This Month`"
+            :rightMessage="`This Week`"
+            :altText="`Toggle between weekly and monthly view`"
+            :untoggledColor="`yellow`"
+            @toggled="toWeeklyView($event)"
         />
-        <change-week-buttons
-            class="controlSplit"
-            :fridayDates="fridayDates"
-            :display="display"
-            v-if="!isWeeklyView"
-            @change="$emit('change', $event)"
-        />
+        <transition name="dropdown">
+            <change-week-buttons
+                class="controlSplit"
+                :fridayDates="fridayDates"
+                :display="display"
+                v-if="!isWeeklyView"
+                @change="$emit('change', $event)"
+            />
+        </transition>
         <change-location-buttons
             :currentSchedule="currentSchedule"
             v-if="currentSchedule.data.rows.length > 1"
@@ -52,9 +56,9 @@ export default {
         }
     },
     methods: {
-        toWeeklyView() {
-            this.$emit('change', { weekOf: this.$store.state.date.upcomingFriday.date })
-            this.isWeeklyView = !this.isWeeklyView
+        toWeeklyView($event) {
+            this.isWeeklyView = $event
+            this.$emit('change', { weekOf: this.$store.state.date.upcomingFriday.date }) 
         }
     }
 }
