@@ -87,6 +87,20 @@ const funcs = {
             else if (profile) adminProfile = profile 
         }).select(['options'])
         return adminProfile
+    },
+    getTwillioPhone() {
+        return new Promise((resolve, reject) => {
+            $dbModels.textPhone.findOne({}, { _id: false }, (err, phone) => {
+                if (err) {
+                    console.log(err)
+                    reject(err)
+                }
+                if (phone) {
+                    const phoneDetails = phone.options
+                    resolve(phoneDetails)
+                } else reject('Unknown error occured')
+            }).select(['options'])
+        })
     }
 }
 

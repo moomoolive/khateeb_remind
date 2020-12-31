@@ -36,10 +36,6 @@ export default {
             type: String,
             required: true
         },
-        options: {
-            type: Object,
-            required: false
-        },
         tagDetails: {
             type: [Array, String],
             required: false

@@ -20,9 +20,9 @@ router.get('/check-text-service', async (req, res) => {
                 Asalam alikoum ${adminProfile.options.firstName}! It looks like khateeb remind's text service is well and alive!
             `,
             res
-    )
+        )
     } catch {
-        res.json('text service offline')
+        res.json('no admin profile exists')
     }
 })
 

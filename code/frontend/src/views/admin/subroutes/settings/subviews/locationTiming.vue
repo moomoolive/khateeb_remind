@@ -5,7 +5,7 @@
             start setting your schedules
         </h3>
         <button
-            @click="save()"
+            @click="$emit('submitted', inputData)"
             :disabled="isDisabled"
             class="grey"
         >
@@ -75,6 +75,16 @@ export default {
     components: {
         timingIncrementer
     },
+    props: {
+        previousEntries: {
+            type: Array,
+            required: true
+        },
+        emptySchema: {
+            type: Object,
+            required: true
+        }
+    },
     data() {
         return {
             hasInitializedLocations: true,
@@ -91,26 +101,18 @@ export default {
             const newLocation = this._.deepCopy(this.emptyLocation)
             this.inputData.options.push(newLocation)
         },
-        async save() {
-            const response = await this.$API.admin.updateSetting(this.inputData)
-            if (response === 'Changes successfully made!') {
-                    this.$store.dispatch('adminSavedChangesScreen', true)
-            }
-        },
         loadInPreviousEntries(previousEntries) {
-            this.inputData = previousEntries[0]
+            this.inputData = this._.deepCopy(previousEntries)
             this.cachedLocations = this._.deepCopy(this.inputData.options)
         },
         loadInEmpty(emptySchema) {
             this.hasInitializedLocations = false
-            this.inputData = emptySchema
+            this.inputData = this._.deepCopy(emptySchema)
         },
         async loadAPIData() {
-            const locations =  await this.$API.admin.getSetting('locationAndTimings')
-            console.log(locations)
-            if (locations.previousEntries[0]) this.loadInPreviousEntries(locations.previousEntries)
-            else this.loadInEmpty(locations.emptySchema)
-            this.emptyLocation = this._.deepCopy(locations.emptySchema.options[0])
+            if (this.previousEntries[0]) this.loadInPreviousEntries(this.previousEntries[0])
+            else this.loadInEmpty(this.emptySchema)
+            this.emptyLocation = this._.deepCopy(this.emptySchema.options[0])
         },
         deleteLocation(locationIndex) {
             this.inputData.options.splice(locationIndex, 1)

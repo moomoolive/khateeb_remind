@@ -28,5 +28,10 @@ export default {
     }),
     password: new mongoose.Schema({
         options: String
+    }),
+    textPhone: new mongoose.Schema({
+        options: {
+            phoneNumber: String
+        }
     })
 }

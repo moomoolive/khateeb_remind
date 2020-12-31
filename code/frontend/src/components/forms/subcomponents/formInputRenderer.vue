@@ -85,7 +85,7 @@ export default {
             return x
         },
         isTextArea(fieldName) {
-            return this.fieldIsInArray(fieldName, 'bigText')
+            return this.bigText.find(elem => elem === fieldName)
         },
         inputIsText(fieldName) {
             return this.typeLoader(fieldName) === 'text'
@@ -102,10 +102,7 @@ export default {
             } else return this.activeInvalidations[fieldName]
         },
         isRenderable(fieldName) {
-            return !this.fieldIsInArray(fieldName, 'doNotRenderDefaults')
-        },
-        fieldIsInArray(fieldName, arrayName) {
-            return fieldName === this[arrayName].find(elem => elem === fieldName)
+            return !this.doNotRenderDefaults.find(elem => elem === fieldName)
         }
 
     },

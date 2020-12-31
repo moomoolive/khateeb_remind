@@ -12,7 +12,6 @@ const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemin
 const JWT_SECRET = process.env.JWT_SECRET || 'secret'
 const EMERGENCY_KEY = process.env.EMERGENCY_KEY || '1234'
 const TEXT = twilio(process.env.TWILIO_USER, process.env.TWILIO_KEY)
-const PHONE = process.env.TWILIO_NUMBER
 
 const app = express()
 mongoose.connect(DATABASE, { ...dbSettings })
@@ -38,6 +37,5 @@ app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })
 export default { 
     jwt: JWT_SECRET,
     emergency_key: EMERGENCY_KEY,
-    text: TEXT,
-    phone: PHONE
+    text: TEXT
 }

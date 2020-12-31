@@ -29,22 +29,22 @@ export default {
         return {
             important: {
                 words: 'Imporant',
-                symbol: '*',
+                symbol: '⭐',
                 color: 'important'
             },
             urgent: {
                 words: 'Urgent',
-                symbol: '!',
+                symbol: '⚠️',
                 color: 'urgent'
             },
             good: {
                 words: 'All Good',
-                symbol: ':)',
+                symbol: '😄',
                 color: 'goodNews'
             },
             new: {
                 words: 'New',
-                symbol: '^',
+                symbol: '⏲️',
                 color: "default"
             }
         }

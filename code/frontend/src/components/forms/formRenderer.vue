@@ -14,7 +14,7 @@
         />
         <form-input-renderer
             :inputData="data"
-            :bigText="['content']"
+            :bigText="bigText"
             :customInvalidMsg="customInvalidMsg"
             :activeInvalidations="allActiveInvalidations"
             :doNotRender="doNotRender"
@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import equal from 'fast-deep-equal'
+
 import previousEntriesDropdown from './subcomponents/previousEntriesDropdown.vue'
 import formInputRenderer from './subcomponents/formInputRenderer.vue'
 
@@ -69,8 +71,9 @@ export default {
             default: () => []
         },
         invalidations: {
-            type: Object,
-            required: false
+            type: [Object, Array],
+            required: false,
+            default: () => []
         },
         customInvalidMsg: {
             type: Object,
@@ -101,13 +104,18 @@ export default {
         return {
             selected: 'New',
             data: null,
+            originalData: null,
             nonCanadianPhone: null
         }
     },
     methods: {
         resetForm() {
-            this.data = this._.deepCopy(this.emptySchema)
+            this.setDataAndCache(this.emptySchema)
             this.selected = 'New'
+        },
+        setDataAndCache(value) {
+            this.data = this._.deepCopy(value)
+            this.originalData = this._.deepCopy(this.data)
         },
         fieldIsEmpty(field) {
             const x = this.data.options ?  this.data.options : this.data
@@ -152,7 +160,7 @@ export default {
             return validations
         },
         phoneNumberWatcher() {
-           if (!this.data || !this.data.phoneNumber) {
+           if (!this.data) {
                return null
            }
            return this.data.phoneNumber
@@ -187,6 +195,9 @@ export default {
             })
             return activeInvalidations
         },
+        sameAsOriginal() {
+            return equal(this.data, this.originalData)
+        },
         notReadytoSubmit() {
             if (!this.allActiveInvalidations) {
                 return null
@@ -196,7 +207,7 @@ export default {
             invalidations.forEach(field => { 
                 if (this.allActiveInvalidations[field])  x = true
             })
-            return x
+            return x || this.sameAsOriginal
         }
     },
     watch: {
@@ -204,14 +215,13 @@ export default {
             if (newValue === 'New') {
                 this.resetForm()
             } else {
-                this.data = this._.deepCopy(this.previousEntries[newValue])
+                this.setDataAndCache(this.previousEntries[newValue])
             }
         },
         emptySchema(newVal) {
             this.data = newVal
         },
         async phoneNumberWatcher() {
-            console.log('hi')
             if (this.phoneNumberWatcher) {
                 const isNotValid = await invalidation.phoneNumber(this.phoneNumberWatcher)
                 this.nonCanadianPhone = { phoneNumber: isNotValid }
@@ -219,7 +229,7 @@ export default {
         }
     },
     created() {
-        this.data = this._.deepCopy(this.emptySchema)
+        this.setDataAndCache(this.emptySchema)
     }
 }
 </script>
@@ -229,7 +239,7 @@ export default {
 
 $rightColors: (
     "offWhite": 1,
-    "green": 0.5
+    "green": 0.2
 );
 
 @each $rightColor, $opacityValue in $rightColors {

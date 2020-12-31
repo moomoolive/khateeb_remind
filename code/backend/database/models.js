@@ -94,6 +94,10 @@ const models = {
         'password',
         schema.password
     ),
+    textPhone: schema.settings.discriminator(
+        'textPhone',
+        schema.textPhone
+    ),
     adminProfile: schema.settings.discriminator(
         'adminProfile',
         schema.admin
