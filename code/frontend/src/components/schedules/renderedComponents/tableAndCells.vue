@@ -13,7 +13,7 @@
             </tr>
             <tr>
                 <th
-                    v-for="columnNames in schedule.data.columnData"
+                    v-for="columnNames in columnData"
                     :key="columnNames"
                     class="columnIdentifiers"
                 >
@@ -76,6 +76,11 @@ export default {
         originalSchedule: {
             type: [Object],
             required: false
+        }
+    },
+    data() {
+        return {
+            columnData: ['Timing', 'Khateeb']
         }
     }
 }

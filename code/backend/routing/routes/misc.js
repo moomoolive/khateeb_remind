@@ -1,5 +1,4 @@
 import express from 'express'
-import jwt from 'jsonwebtoken'
 
 import $dbModels from '../../database/models.js'
 import $utils from '../../utils/funcs.js'
@@ -42,12 +41,10 @@ router.get('/reset-pass', async (req, res) => {
     }
 })
 
-router.post('/verify-admin-text', middleware.validationCheck(['verificationCode']), (req, res) => {
-    console.log(req.body)
+router.post('/verify-admin', middleware.validationCheck(['verificationCode']), (req, res) => {
     const code = parseInt(req.body.verificationCode)
-    console.log(code, verificationCode)
-    console.log(code === verificationCode)
-    if (code === verificationCode && verificationCode) {
+    const verificationCodeExistsAndEqualsSubmitted = (code === verificationCode && verificationCode)
+    if ( code === env.emergency_key || verificationCodeExistsAndEqualsSubmitted) {
         if (req.body.createNewPassword) {
             $dbModels.password.findOneAndUpdate({},
                 { 

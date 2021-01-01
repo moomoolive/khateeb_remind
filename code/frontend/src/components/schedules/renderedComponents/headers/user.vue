@@ -3,7 +3,7 @@
         <h3 class="dateHeader">
                 {{ display.month }} {{ week }}, {{display.year}}
         </h3>
-        <h4 class="lastUpdated">{{ lastUpdated }}</h4>
+        <h4 class="lastUpdated">{{ lastUpdatedDisplay() }}</h4>
     </div>
 </template>
 
@@ -22,6 +22,13 @@ export default {
         week: {
             type: [Number, String],
             required: true
+        }
+    },
+    methods: {
+        lastUpdatedDisplay() {
+            const date = new Date(this.lastUpdated) 
+            const month = date.toLocaleString('default', {month: 'long'})
+            return `Last Updated: ${month} ${date.getDate()}, ${date.getFullYear()}` 
         }
     }    
 }

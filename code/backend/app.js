@@ -10,7 +10,7 @@ import { dbSettings } from './database/settings.js'
 const PORT = process.env.PORT || 5_000
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
 const JWT_SECRET = process.env.JWT_SECRET || 'secret'
-const EMERGENCY_KEY = process.env.EMERGENCY_KEY || '1234'
+const EMERGENCY_KEY = process.env.EMERGENCY_KEY || 1234
 const TEXT = twilio(process.env.TWILIO_USER, process.env.TWILIO_KEY)
 
 const app = express()

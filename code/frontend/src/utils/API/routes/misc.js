@@ -10,7 +10,7 @@ export default {
             .catch(err => { console.log(err) })
     },
     sendVerificationCode(code) {
-        return axios.post(baseUrl + '/verify-admin-text', code)
+        return axios.post(baseUrl + '/verify-admin', code)
             .then(res => res.data)
             .catch(err => { console.log(err) })
     },

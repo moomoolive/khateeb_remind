@@ -5,7 +5,7 @@
             :key="name"
         >
             <div v-if="isRenderable(name)">
-                <p>{{ _.stringFormat(name) }}:</p>
+                <p>{{ inputLabel(name) }}:</p>
                 <div v-if="!isTextArea(name)">
                     <input 
                         :type="typeLoader(name)" 
@@ -47,6 +47,10 @@ export default {
             required: false,
             default: () => []
         },
+        inputAlias: {
+            type: Object,
+            required: false
+        },
         customInvalidMsg: {
             type: Object,
             required: false,
@@ -83,6 +87,10 @@ export default {
                     break
             }
             return x
+        },
+        inputLabel(fieldName) {
+            if (this.inputAlias && this.inputAlias[fieldName]) return this.inputAlias[fieldName]
+            else return this._.stringFormat(fieldName)
         },
         isTextArea(fieldName) {
             return this.bigText.find(elem => elem === fieldName)

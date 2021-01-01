@@ -5,9 +5,8 @@
         :logoLeft="`uofcLogo`"
         :logoRight="`msaUofCLogo`"
       />
-      <Schedule
-        v-if="scheduleExists && currentSchedule"
-        :type="`user`"
+      <user-schedule
+        v-if="scheduleExists"
         :currentSchedule="currentSchedule"
       />
       <msg-with-pic
@@ -16,21 +15,19 @@
         gif="flyingPlanes"
         title="This month's schedule hasn't been created yet"
       />
-      <loading-screen v-if="!currentSchedule && scheduleExists" />
   </div>
 </template>
 
 <script>
+import userSchedule from '@/components/schedules/templates/user.vue'
 import logoDisplay from '@/components/misc/logoDisplay.vue'
 import Schedule from '@/components/schedules/scheduleRenderer.vue'
-import loadingScreen from '@/components/misc/loadingScreen.vue'
 
 export default {
   name: 'Home',
   components: {
-    Schedule,
+    userSchedule,
     logoDisplay,
-    loadingScreen
   },
   data() {
     return {

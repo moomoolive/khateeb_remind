@@ -3,24 +3,23 @@
         v-if="currentSchedule"
         :class="`gradient${background}`"
     >
-        
-        <component
-            :is="`headers-${type}`"
-            :table="type"
+        <slot 
+            name="header" 
             :display="displayedMonthInfo"
             :week="displayData.weekOf"
-            :lastUpdated="lastUpdated(currentSchedule)"
-            @change="displayControls($event)"
-        />
-        <component
-            class="controls display"
-            :is="`controls-${type}`"
-            :fridayDates="fridayDates"
-            :display="displayedMonthInfo"
-            :currentSchedule="currentSchedule"
-            @change="displayControls($event)"
-        />
-        <Table
+            :lastUpdated="currentSchedule.savedOn"
+            :change="displayControls"
+        ></slot>
+        <div class="controls display">
+            <slot
+                name="controls"
+                :fridayDates="fridayDates"
+                :display="displayedMonthInfo"
+                :currentSchedule="currentSchedule"
+                :change="displayControls"
+            ></slot>
+        </div>
+        <table-and-cells
             class="genSpace"
             :shownLocations="shownLocations"
             :table="type"
@@ -35,16 +34,12 @@
 <script>
 import datetime from '@/utils/dateTime/main.js'
 
-import Table from './renderedComponents/tableAndCells.vue'
+import tableAndCells from './renderedComponents/tableAndCells.vue'
 
 export default {
     name: 'scheduleRenderer',
     components: {
-        Table,
-        'controls-user': () => import('@/components/schedules/renderedComponents/controls/user.vue'),
-        'controls-admin': () => import('@/components/schedules/renderedComponents/controls/admin.vue'),
-        'headers-user': () => import('@/components/schedules/renderedComponents/headers/user.vue'),
-        'headers-admin': () => import('@/components/schedules/renderedComponents/headers/admin.vue'),
+        tableAndCells
     },
     props: {
         type: {
@@ -106,13 +101,6 @@ export default {
             }
             this.$emit('schedule-change', info)
         },
-        lastUpdated(schedule) {
-            if (schedule.savedOn) {
-                const date = new Date(schedule.savedOn) 
-                const month = date.toLocaleString('default', {month: 'long'})
-                return `Last Updated: ${month} ${date.getDate()}, ${date.getFullYear()}`
-            } else return ''
-        }
     },
     computed: {
         currentScheduleKey() {

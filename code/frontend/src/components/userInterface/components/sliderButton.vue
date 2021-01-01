@@ -1,6 +1,6 @@
 <template>
     <div class="top">
-        <p>{{ leftMessage }}</p>
+        <p>{{ offMsg }}</p>
         <label class="switch" :aria-label="altText">
             <input type="checkbox" v-model="isToggled">
             <span 
@@ -8,7 +8,7 @@
                 @click="$emit('toggled', !isToggled)"
             ></span>
         </label>
-        <p>{{ rightMessage }}</p>
+        <p>{{ onMsg }}</p>
     </div>
 </template>
 
@@ -16,11 +16,11 @@
 export default {
     name: 'sliderButton',
     props: {
-        leftMessage: {
+        offMsg: {
             type: String,
             required: false
         },
-        rightMessage: {
+        onMsg: {
             type: String,
             required: false
         },

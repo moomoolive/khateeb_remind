@@ -4,9 +4,6 @@
           <router-link :to="{ name: 'login' }" v-if="!isLoggedIn">
             Admin Login
           </router-link>
-          <router-link to="/about" exact v-if="!isLoggedIn">
-            About
-          </router-link>
           <router-link :to="`/admin/${this.$store.state.institution}/dashboard`" v-if="isLoggedIn">
             Admin Dashboard
           </router-link>

@@ -16,15 +16,23 @@
                 @submitted="attemptAuthorization($event)"
             />
             <h2 v-if="error">Incorrect Password</h2>
-            <button
-                class='blue'
-                @click="switchForms()"
-                v-if="!forgotPassword"
-            >
-                Forgot Password ?
-            </button>
+            <div class="resetPassword">
+                <button
+                    class='blue'
+                    @click="switchForms('regular')"
+                >
+                    Forgot Password ?
+                </button>
+                <br>
+                <button
+                    class='red'
+                    @click="switchForms('API')"
+                >
+                    First Time ? No Admin Phone ?
+                </button>
+            </div>
         </div>
-        <div v-if="forgotPassword">
+        <div v-if="resetPassword">
             <h2 v-if="textSent">
                 A text with a verification code was sent to the<br>
                 adminstrator's phone.It should arrive shortly.
@@ -34,6 +42,7 @@
                 :emptySchema="forgotPasswordSchema"
                 :invalidations="invalidations"
                 :customInvalidMsg="customInvalidMsg"
+                :inputAlias="altFormAliases"
                 :backgroundColor="`none`"
                 :buttonText="`Reset Password`"
                 :buttonColor="`yellow`"
@@ -56,7 +65,8 @@ export default {
     data() {
         return {
             showForm: true,
-            forgotPassword: false,
+            resetPassword: false,
+            altForm: 'API',
             textSent: false,
             error: false,
             APIError: false,
@@ -70,9 +80,9 @@ export default {
             },
             invalidations: {
                 invalidPassword: ['createNewPassword'],
-                notEqual: [
-                    ['createNewPassword', 'confirmNewPassword']
-                ],
+                notEqual: {
+                   confirmNewPassword: 'createNewPassword'
+                },
                 emptyField: ['createNewPassword']
             },
             customInvalidMsg: {
@@ -100,10 +110,11 @@ export default {
                 this.$router.push(`/admin/${this.instituteName}/dashboard`)
             })
         },
-        switchForms() {
+        switchForms(altForm) {
             this.showForm = false
-            this.forgotPassword = true
-            this.sendVerificationText()
+            this.altForm = altForm
+            this.resetPassword = true
+            if (this.altForm === 'regular') this.sendVerificationText()
         },
         async sendVerificationText() {
             const res = await this.$API.misc.requestVerificationCode()
@@ -116,12 +127,26 @@ export default {
             console.log(res)
             if (res === 'success') {
                 alert('You have successfully changed your password!')
-                this.forgotPassword = false
+                this.resetPassword = false
                 this.showForm = true
             }
             else if (res === 'unauthorized') alert(res)
             else alert('A problem occurred. Please try again later.')
         }
+    },
+    computed: {
+        altFormAliases() {
+            if (this.altForm === 'API') return {
+                verificationCode: 'API Secret Key' 
+            }
+            else return null
+        }
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.resetPassword {
+    margin-top: 4vh;
+}
+</style>

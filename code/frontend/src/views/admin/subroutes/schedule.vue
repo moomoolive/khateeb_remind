@@ -1,18 +1,15 @@
 <template>
     <div>
-        <loading-screen v-if="!currentSchedule" />
-        <Schedule 
-            v-if="currentSchedule"
-            type="admin"
+        <admin-schedule
             :currentSchedule="currentSchedule"
             :originalSchedule="originalSchedule"
-            background="yellow"
             @schedule-change="setAPIRequestParams($event)"
         />
         <button
-            @click="save()"
+            v-if="currentSchedule && originalSchedule"
             class='grey'
             :disabled="notReadyToSubmit"
+            @click="save()"
         >
             Save Changes
         </button>
@@ -22,16 +19,14 @@
 <script>
 import equal from 'fast-deep-equal'
 
-import Schedule from '@/components/schedules/scheduleRenderer.vue'
-import loadingScreen from '@/components/misc/loadingScreen.vue'
+import adminSchedule from '@/components/schedules/templates/admin.vue'
 
 import datetime from '@/utils/dateTime/main.js'
 
 export default {
-    name: 'adminSchedule',
+    name: 'scheduleSetter',
     components: {
-        Schedule,
-        loadingScreen
+        adminSchedule
     },
     data() {
         return {

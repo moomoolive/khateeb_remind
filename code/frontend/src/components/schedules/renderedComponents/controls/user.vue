@@ -3,8 +3,8 @@
         <slider-button
             class="controlSplit display"
             :basedOn="isWeeklyView"
-            :leftMessage="`This Month`"
-            :rightMessage="`This Week`"
+            :offMsg="`This Month`"
+            :onMsg="`This Week`"
             :altText="`Toggle between weekly and monthly view`"
             :untoggledColor="`yellow`"
             @toggled="toWeeklyView($event)"

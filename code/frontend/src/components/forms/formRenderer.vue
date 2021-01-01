@@ -18,6 +18,7 @@
             :customInvalidMsg="customInvalidMsg"
             :activeInvalidations="allActiveInvalidations"
             :doNotRender="doNotRender"
+            :inputAlias="inputAlias"
         />
         <button
             :class="buttonColor"
@@ -58,6 +59,10 @@ export default {
         },
         previousEntriesNaming: {
             type: Function,
+            required: false
+        },
+        inputAlias: {
+            type: Object,
             required: false
         },
         bigText: {
