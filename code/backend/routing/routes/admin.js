@@ -1,10 +1,9 @@
 import express from 'express'
 
-import $dbModels from '../../database/models.js'
-import { middleware } from '../../utils/middleware.js'
-import $schedule from '../../utils/schedule.js'
-import $db from '../../database/funcs.js'
+import { middleware } from '../../middleware/main.js'
+import $db from '../../database/index.js'
 import $responses from '../../utils/responses.js'
+import $utils from '../../utils/index.js'
 
 const router = express.Router()
 
@@ -14,8 +13,8 @@ router.post('*', middleware.validationCheck('schema'))
 const routerGroup1 = 'announcements'
 const routerGroup1URL = `/${routerGroup1}`
 router.get(routerGroup1URL, (req, res) => {
-    $dbModels.announcements.find({}, (err, announcements) => {
-        if (err) $db.databaseErrorCallback(err, res)
+    $db.models.announcements.find({}, (err, announcements) => {
+        if (err) $db.funcs.databaseErrorCallback(err, res)
         else {
             const responseData = $responses.previousEntriesAndEmptySchema(announcements, routerGroup1)
             res.json(responseData)
@@ -24,11 +23,11 @@ router.get(routerGroup1URL, (req, res) => {
 })
 
 router.delete(routerGroup1URL, (req, res) => {
-    $db.delete(routerGroup1, req.body._id, res)
+    $db.funcs.delete(routerGroup1, req.body._id, res)
 })
 
 router.post(routerGroup1URL, (req, res) => {
-    $db.save(routerGroup1, req.body, res)
+    $db.funcs.save(routerGroup1, req.body, res)
 })
 
 const routerGroup2 = 'khateebs'
@@ -36,7 +35,7 @@ const routerGroup2URL = `/${routerGroup2}`
 router.get(routerGroup2URL + '/:fullOrNot', (req, res) => {
     let x
     req.params.fullOrNot === 'no' ? x = ['_id', 'firstName', 'lastName'] : x = null;
-    $dbModels.khateebs.find({}, (err, khateebs) => {
+    $db.models.khateebs.find({}, (err, khateebs) => {
         if (err) console.log(err)
         else {
             let responseData
@@ -51,11 +50,11 @@ router.get(routerGroup2URL + '/:fullOrNot', (req, res) => {
 })
 
 router.delete(routerGroup2URL, (req, res) => {
-    $db.delete(routerGroup2, req.body._id, res)
+    $db.funcs.delete(routerGroup2, req.body._id, res)
 })
 
 router.post(routerGroup2URL, (req, res) => {
-    $db.save(routerGroup2, req.body, res)
+    $db.funcs.save(routerGroup2, req.body, res)
 })
 
 const routerGroup3 = 'settings'
@@ -63,7 +62,7 @@ const routerGroup3URL = `/${routerGroup3}`
 
 router.get(routerGroup3URL + '/:settingName', (req, res) => {
     const settingName = req.params.settingName
-    $dbModels[settingName].find({}, (err, setting) => {
+    $db.models[settingName].find({}, (err, setting) => {
         if (err) console.log(err)
         else {
             let responseData = $responses.previousEntriesAndEmptySchema(setting, settingName)
@@ -73,28 +72,28 @@ router.get(routerGroup3URL + '/:settingName', (req, res) => {
 })
 
 router.post(routerGroup3URL, middleware.isPassword, (req, res) => {
-    $db.save(routerGroup3, req.body, res)
+    $db.funcs.save(routerGroup3, req.body, res)
 })
 
 const routerGroup4 = 'monthlySchedules'
 const routerGroup4URL = `/${routerGroup4}`
 
 router.get(routerGroup4URL + '/:monthToQuery/:fridayDates', (req, res) => {
-    $dbModels.monthlySchedules.findOne({month : req.params.monthToQuery}, (err, schedule) => {
+    $db.models.monthlySchedules.findOne({month : req.params.monthToQuery}, (err, schedule) => {
         if (err) console.log(err)
         else {
-            $dbModels.locationAndTimings.findOne({}, (err, locationAndTiming) => {
+            $db.models.locationAndTimings.findOne({}, (err, locationAndTiming) => {
                 const fridayDates = req.params.fridayDates.split(',')
                 if (err) console.log(err)
                 else if (!schedule) {
                     if (!locationAndTiming) res.json('No locations or timings were found!')
                     else {
-                        const newSchedule = $schedule.new(fridayDates, locationAndTiming)
+                        const newSchedule =$utils.schedule.new(fridayDates, locationAndTiming)
                         res.json({ data: newSchedule })
                     }
                 } else {
                     if (locationAndTiming.savedOn > schedule.savedOn) {
-                        const updatedSchedule = $schedule.update(fridayDates, locationAndTiming, schedule)
+                        const updatedSchedule =$utils.schedule.update(fridayDates, locationAndTiming, schedule)
                         res.json(updatedSchedule)
                     } else res.json(schedule)
                 }
@@ -104,15 +103,10 @@ router.get(routerGroup4URL + '/:monthToQuery/:fridayDates', (req, res) => {
 })
 
 router.post(routerGroup4URL, (req, res) => {
-    const updatedSchedule = $schedule.updatePrayerSlotDates(req.body, req.body.original)
+    const updatedSchedule =$utils.schedule.updatePrayerSlotDates(req.body, req.body.original)
     delete req.body.original
     console.log(updatedSchedule)
-    $db.save(routerGroup4, req.body, res)
-})
-
-router.get('/blah', (req, res) => {
-    const z = $dbModels.schemasPlus('locationAndTimings')
-    res.json(z)
+    $db.funcs.save(routerGroup4, req.body, res)
 })
 
 export { router as admin }

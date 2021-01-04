@@ -6,8 +6,8 @@ export default {
         const twillioPhone = await $db.funcs.getTwillioPhone()
         return env.text.messages.create({
                 body: msg,
-                from: twillioPhone.phoneNumber,
-                to: to
+                from: `+1${twillioPhone.phoneNumber}`,
+                to: `+1${to}`
         })
     }
 }

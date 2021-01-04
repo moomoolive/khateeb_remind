@@ -2,7 +2,7 @@ import express from 'express'
 
 import $utils from '../../utils/index.js'
 import $db from '../../database/index.js'
-import { middleware } from '../../utils/middleware.js'
+import { middleware } from '../../middleware/main.js'
 
 const router = express.Router()
 

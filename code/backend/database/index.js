@@ -1,5 +1,5 @@
-import funcs from './funcs.js'
-import models from './models.js'
+import funcs from './funcs/main.js'
+import models from './models/main.js'
 
 export default {
     funcs,

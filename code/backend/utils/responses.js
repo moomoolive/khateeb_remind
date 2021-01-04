@@ -1,9 +1,9 @@
-import $dbModels from '../database/models.js'
-import $schedule from '../utils/schedule.js'
+import $db from '../database/index.js'
+import $utils from '../utils/index.js'
 
 export default {
     previousEntriesAndEmptySchema(previousEntries, schemaName) {
-        const emptySchema = $dbModels.schemasPlus(schemaName)
+        const emptySchema = $db.models.schemasPlus(schemaName)
         const responseData = {
             emptySchema,
             previousEntries
@@ -11,7 +11,7 @@ export default {
         return responseData
     },
     prayerSlotKhateebsAndSchema(previousEntries) {
-        const emptySchema = $schedule.toBeDecidedIndicator()
+        const emptySchema = $utils.schedule.toBeDecidedIndicator()
         const responseData = {
             emptySchema,
             previousEntries

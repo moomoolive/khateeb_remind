@@ -1,7 +1,7 @@
 import express from 'express'
 
 import $utils from '../../utils/index.js'
-import { middleware } from '../../utils/middleware.js'
+import { middleware } from '../../middleware/main.js'
 import env from '../../app.js'
 import $db from '../../database/index.js'
 

@@ -3,7 +3,7 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 import twilio from 'twilio'
 
-import { middleware } from './utils/middleware.js'
+import { middleware } from './middleware/main.js'
 import { routes } from './routing/index.js'
 import { dbSettings } from './database/settings.js'
 
