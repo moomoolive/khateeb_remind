@@ -16,45 +16,43 @@
             :key="locationIndex"
             :headline="location.info.name || `Location ${locationIndex + 1}`"
         >
-            <template v-slot:content>
-                <div class="location">
-                    <button
-                        class="red"
-                        @click="deleteLocation(locationIndex)"
-                    >
-                        Delete This Location
-                    </button>
-                    <div>
-                        Name: <input v-model="location.info.name"><br><br>
-                        Address: <input v-model="location.info.address">
-                    </div>
-                    <div
-                        class="timing"
-                        v-for="(timing, timingIndex) in location.timings"
-                        :key="timingIndex"
-                        style="display: inline;"
-                    >
-                        <h3>Prayer Timing {{ timingIndex + 1 }}</h3><br>
-                        <timing-incrementer
-                            :timingIndex="timingIndex"
-                            :location="location"
-                            :locationIndex="locationIndex"
-                            :inputData="inputData"
-                        />
-                        <button
-                            @click="deleteTiming(locationIndex, timingIndex)"
-                            class="yellow"
-                        >
-                            Delete This Timing
-                        </button>
-                        <button
-                            @click="addNewTiming(locationIndex, timingIndex)"
-                        >
-                            Add Timing Here
-                        </button>
-                    </div>
+            <div class="location">
+                <button
+                    class="red"
+                    @click="deleteLocation(locationIndex)"
+                >
+                    Delete This Location
+                </button>
+                <div>
+                    Name: <input v-model="location.info.name"><br><br>
+                    Address: <input v-model="location.info.address">
                 </div>
-            </template>
+                <div
+                    class="timing"
+                    v-for="(timing, timingIndex) in location.timings"
+                    :key="timingIndex"
+                    style="display: inline;"
+                >
+                    <h3>Prayer Timing {{ timingIndex + 1 }}</h3><br>
+                    <timing-incrementer
+                        :timingIndex="timingIndex"
+                        :location="location"
+                        :locationIndex="locationIndex"
+                        :inputData="inputData"
+                    />
+                    <button
+                        @click="deleteTiming(locationIndex, timingIndex)"
+                        class="yellow"
+                    >
+                        Delete This Timing
+                    </button>
+                    <button
+                        @click="addNewTiming(locationIndex, timingIndex)"
+                    >
+                        Add Timing Here
+                    </button>
+                </div>
+            </div>
         </collapsable-box>
         <button
             class="new"

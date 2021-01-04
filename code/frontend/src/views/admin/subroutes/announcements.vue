@@ -11,6 +11,7 @@
             :customInvalidMsg="{
                 content: 'Content cannot be empty'
             }"
+            :backgroundColor="`red-offWhite`"
             @submitted="submit($event)"
             @remove="remove($event)"
         />

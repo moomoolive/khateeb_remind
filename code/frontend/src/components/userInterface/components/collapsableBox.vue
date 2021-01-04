@@ -22,7 +22,7 @@
                 :style="`width: ${contentWidth}%;`"
                 v-if="isActive"
             >
-                <slot name="content"></slot>
+                <slot></slot>
             </div>
         </transition>
     </div>
@@ -37,7 +37,7 @@ export default {
             required: true
         },
         tagDetails: {
-            type: [Array, String],
+            type: Array,
             required: false
         },
         contentWidth: {

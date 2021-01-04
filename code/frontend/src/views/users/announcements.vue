@@ -15,12 +15,9 @@
                 "
                 :tagDetails="tagLoader(announcement)"
             >
-                    <template
-                        class="content" 
-                        v-slot:content
-                    >
-                        {{ announcement.content }}
-                    </template>
+                <div class="content" >
+                    {{ announcement.content }}
+                </div>
             </collapsable-box>
         </div>
     </div>

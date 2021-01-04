@@ -1,4 +1,5 @@
 import scrapy
+import json
 
 class canadianAreaCodes(scrapy.Spider):
     name = "scraper"
@@ -8,6 +9,10 @@ class canadianAreaCodes(scrapy.Spider):
         table_data = response.css('tr')
         area_codes = table_data.css('a::text').getall()
 
+        codes = []
         for area_code in area_codes:
             if (area_code.isnumeric()):
-                yield { 'code': area_code }
+                codes.append(int(area_code))
+        
+        with open('../organize_codes/codes.json', 'w') as f:
+            json.dump(codes, f)

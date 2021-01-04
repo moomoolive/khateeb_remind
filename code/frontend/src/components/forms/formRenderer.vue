@@ -251,7 +251,7 @@ $rightColors: (
     @each $colorName, $color in $themeColors {
         @include gradient1(
             $colorLeft: $colorName,
-            $opacityLeft: 0.5,
+            $opacityLeft: 0.3,
             $name: '#{$colorName}-#{$rightColor}' ,
             $colorRight: $rightColor,
             $opacityRight: $opacityValue

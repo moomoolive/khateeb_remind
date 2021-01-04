@@ -4,41 +4,35 @@
             :headline="`Prayer Locations & Timings`"
             :tagDetails="locationTimingTag"
         >
-            <template v-slot:content>
-                <location-timing
-                    v-if="locationAndTimingData"
-                    :emptySchema="locationAndTimingData.emptySchema"
-                    :previousEntries="locationAndTimingData.previousEntries"
-                    @submitted="saveSetting($event)"
-                />
-            </template>
+            <location-timing
+                v-if="locationAndTimingData"
+                :emptySchema="locationAndTimingData.emptySchema"
+                :previousEntries="locationAndTimingData.previousEntries"
+                @submitted="saveSetting($event)"
+            />
         </collapsable-box>
         <collapsable-box
             :headline="`Admin Details`"
             :tagDetails="adminDetailsTag"
         >
-            <template v-slot:content>
-                <admin-details
-                    v-if="adminIdentityData"
-                    :adminIdentityData="adminIdentityData"
-                    @submitted="saveSetting($event)"
-                />
-            </template>
+            <admin-details
+                v-if="adminIdentityData"
+                :adminIdentityData="adminIdentityData"
+                @submitted="saveSetting($event)"
+            />
         </collapsable-box>
         <collapsable-box
             :headline="`Text Service`"
             :tagDetails="textServiceTag"
         >
-            <template v-slot:content>
-                <text-service
-                    v-if="textPhoneData"
-                    :textInfoUnavailable="textInfoUnavailable"
-                    :verificationTextSent="verificationTextSent"
-                    :textPhoneData="textPhoneData"
-                    @submitted="saveSetting($event)"
-                    @verification-text="sendVerificationText()"
-                />
-            </template>
+            <text-service
+                v-if="textPhoneData"
+                :textInfoUnavailable="textInfoUnavailable"
+                :verificationTextSent="verificationTextSent"
+                :textPhoneData="textPhoneData"
+                @submitted="saveSetting($event)"
+                @verification-text="sendVerificationText()"
+            />
         </collapsable-box>
     </div>
 </template>

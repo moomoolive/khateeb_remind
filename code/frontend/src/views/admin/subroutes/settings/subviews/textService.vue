@@ -22,15 +22,13 @@
             :headline="`Text Phone`"
             :tagDetails="textPhoneTag"
         >
-            <template v-slot:content>
-                <settings-form
-                    :name="`text phone number`"
-                    :previousEntries="textPhoneData.previousEntries"
-                    :emptySchema="textPhoneData.emptySchema"
-                    :backgroundColor="`red-green`"
-                    @submitted="$emit('submitted', $event)"
-                />
-            </template>
+            <settings-form
+                :name="`text phone number`"
+                :previousEntries="textPhoneData.previousEntries"
+                :emptySchema="textPhoneData.emptySchema"
+                :backgroundColor="`red-green`"
+                @submitted="$emit('submitted', $event)"
+            />
         </collapsable-box>
     </div>
 </template>

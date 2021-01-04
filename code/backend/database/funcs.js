@@ -72,13 +72,19 @@ const funcs = {
             this.databaseCallback(response, err)
         })
     },
-    async getPassword() {
-        let pass
-        await $dbModels.password.findOne({}, { _id: false }, (err, password) => {
-            if (err) console.log(err)
-            else if (password) pass = password.options
-        }).select(['options'])
-        return pass
+    getPassword() {
+        return new Promise((resolve, reject) => {
+            $dbModels.password.findOne({}, { _id: false }, (err, password) => {
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                else if (password) {
+                    resolve(password.options)
+                }
+            }).select(['options'])
+        })
+        
     },
     async getAdminProfile() {
         let adminProfile

@@ -8,30 +8,25 @@
             :headline="`Admin Identity`"
             :tagDetails="adminIdentityTag"
         >
-            <template v-slot:content>
-                <settings-form
-                    :name="`admin profile`"
-                    :invalidations="adminIdentity.invalidations"
-                    :backgroundColor="`yellow-green`"
-                    :emptySchema="adminIdentityData.emptySchema"
-                    :previousEntries="adminIdentityData.previousEntries"
-                    @submitted="$emit('submitted', $event)"
-                />
-            </template>
+            <settings-form
+                :name="`admin profile`"
+                :invalidations="adminIdentity.invalidations"
+                :backgroundColor="`yellow-green`"
+                :emptySchema="adminIdentityData.emptySchema"
+                :previousEntries="adminIdentityData.previousEntries"
+                @submitted="$emit('submitted', $event)"
+            />
         </collapsable-box>
-        <!-- -->
         <collapsable-box
             :headline="`Update Password`"
         >
-            <template v-slot:content>
-                <settings-form
-                    :name="`updated password`"
-                    :invalidations="updatePassword.invalidations"
-                    :backgroundColor="`blue-green`"
-                    :emptySchema="updatePassword.emptySchema"
-                    @submitted="preprocessPassword($event)"
-                />
-            </template>
+            <settings-form
+                :name="`updated password`"
+                :invalidations="updatePassword.invalidations"
+                :backgroundColor="`blue-green`"
+                :emptySchema="updatePassword.emptySchema"
+                @submitted="preprocessPassword($event)"
+            />
         </collapsable-box>
     </div>
 </template>

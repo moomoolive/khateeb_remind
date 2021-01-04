@@ -26,7 +26,6 @@ app.delete('*', [middleware.noEmptyBody, middleware.validationCheck(['_id'])])
 
 app.use('/general', routes.general)
 app.use('/admin', routes.admin)
-app.use('/initialize', routes.initialize)
 app.use('/misc', routes.misc)
 app.use('/text', routes.text)
 
