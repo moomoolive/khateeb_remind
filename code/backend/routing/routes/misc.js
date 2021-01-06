@@ -44,7 +44,7 @@ router.get('/reset-pass', async (req, res) => {
 router.post('/verify-admin', middleware.validationCheck(['verificationCode', 'createNewPassword']), (req, res) => {
     const code = parseInt(req.body.verificationCode)
     const verificationCodeExistsAndEqualsSubmitted = (code === verificationCode && verificationCode)
-    if (code === env.emergency_key || verificationCodeExistsAndEqualsSubmitted) {
+    if (code.toString() === env.emergency_key || verificationCodeExistsAndEqualsSubmitted) {
         const password = {
             __t: 'password',
             options: req.body.createNewPassword

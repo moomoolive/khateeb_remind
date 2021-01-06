@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon app.js",
-    "build": "node app.js"
+    "app": "node app.js"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",
