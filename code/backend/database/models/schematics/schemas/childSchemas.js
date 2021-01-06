@@ -16,13 +16,7 @@ export default {
                     name: String,
                     address: String
                 },
-                timings:[
-                    {
-                        hour: String,
-                        minutes: String,
-                        AMorPM: String
-                    }
-                ]
+                timings:[Date]
             }
         ]
     }),

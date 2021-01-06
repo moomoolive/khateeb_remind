@@ -1,7 +1,7 @@
 import $dbModels from '../models/main.js'
 import helpers from './helpers.js'
 
-export default {
+const funcs = {
     databaseError(response, error) {
         console.log(error)
         response.json('There was a problem accessing the database!')
@@ -10,8 +10,24 @@ export default {
         if (response) response.json('Changes successfully made!')
     },
     databaseCallback(response, error=false) {
-        if (error) this.databaseCallback(response, error)
+        if (error) this.databaseError(response, error)
         else this.databaseSuccess(response)
+    },
+    saveSetting(discriminatorName, toBeSaved, response=false) {
+        $dbModels[discriminatorName].findOne({}, (err, setting) => {
+            if (err) console.log(err)
+            else if (setting) {
+                $dbModels[discriminatorName].findOneAndUpdate({}, 
+                    {
+                        options: toBeSaved.options,
+                        savedOn: new Date()
+                    }, (err) => { this.databaseCallback(response, err) }
+                ).select(['options'])
+            } else {
+                const x = new $dbModels[discriminatorName](toBeSaved)
+                x.save((err) => { this.databaseCallback(response, err) })
+            }
+        })
     },
     save(schemaName, toBeSaved, response=false) {
         helpers.saveDateOfEntry(toBeSaved)
@@ -23,7 +39,7 @@ export default {
                 this.databaseCallback(response, err)
             })
         } 
-        else if (isMongooseDiscriminator)  helpers.saveSetting(toBeSaved.__t, toBeSaved, response)
+        else if (isMongooseDiscriminator)  this.saveSetting(toBeSaved.__t, toBeSaved, response)
         else {
             const x = new $dbModels[schemaName](toBeSaved)
             x.save((err) => { this.databaseCallback(response, err) })
@@ -72,5 +88,23 @@ export default {
                 } else reject('Unknown error occured')
             }).select(['options'])
         })
+    },
+    getSetting(name) {
+        return new Promise((resolve, reject) => {
+            $dbModels[name].findOne({}, (err, setting) => {
+                if (err) {
+                    console.log(err)
+                    reject()
+                }
+                if (setting) {
+                    resolve(setting)
+                } else {
+                    console.log('unknown error')
+                    reject()
+                }
+            }).select(['options', 'savedOn'])
+        })
     }
 }
+
+export default funcs

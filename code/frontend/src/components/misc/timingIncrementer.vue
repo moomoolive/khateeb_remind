@@ -2,36 +2,32 @@
     <div>
         <table>
             <tr>
-                <th 
-                    v-for="(value, property) in location.timings[timingIndex]"
-                    :key="property"
-                >
-                    <div 
-                        v-if="property !== '_id'"
+                <th>
+                    <button @click="incrementHours(1)">
+                        +
+                    </button>
+                    <p>{{ hour }}</p>
+                    <button 
+                        class="red"
+                        @click="incrementHours(-1)"
                     >
-                        <button
-                            @click="incrementTime(
-                                {
-                                    property, locationIndex, timingIndex
-                                },
-                                1
-                            )"
-                        >
-                            +
-                        </button>
-                        <p>{{ value }}</p>
-                        <button
-                            class="red"
-                            @click="incrementTime(
-                                {
-                                    property, locationIndex, timingIndex
-                                },
-                                -1
-                            )"
-                        >
-                            -
-                        </button>
-                    </div>
+                        -
+                    </button>
+                </th>
+                <th>
+                    <button @click="incrementMinutes(1)">
+                        +
+                    </button>
+                    <p>{{ minutes }}</p>
+                    <button
+                        class="red"
+                        @click="incrementMinutes(-1)"
+                    >
+                        -
+                    </button>
+                </th>
+                <th>
+                    <p>{{ amOrPM }}</p>
                 </th>
             </tr>
         </table>
@@ -42,65 +38,49 @@
 export default {
     name: 'timingIncrementer',
     props: {
-        timingIndex: {
-            type: [String, Number],
-            required: true
-        },
-        location: {
-            type: Object,
-            required: true
-        },
-        locationIndex: {
-            type: [String, Number],
-            required: true
-        },
-        inputData: {
-            type: Object,
+        dateString: {
+            type: String,
             required: true
         }
     },
-    methods: {
-        incrementTime(info, value=null) {
-            if (info.property === 'hour') this.incrementHour(info, value)
-            else if (info.property === 'minutes') this.incrementMinutes(info, value)
-            else this.changeAMPM(info)
-        },
-        incrementHour(info, value) {
-            const previousHour = this.inputData.options[info.locationIndex].timings[info.timingIndex].hour
-            this.inputData.options[info.locationIndex].timings[info.timingIndex].hour = previousHour + value
-            const currentHour = this.inputData.options[info.locationIndex].timings[info.timingIndex].hour
-            if (currentHour >= 13) {
-                this.inputData.options[info.locationIndex].timings[info.timingIndex].hour = 1
-            }
-            else if (currentHour <= 0) {
-                this.inputData.options[info.locationIndex].timings[info.timingIndex].hour = 12
-            }
-            else if (currentHour === 12 || previousHour === 12) this.changeAMPM(info)
-        },
-        incrementMinutes(info, value) {
-            const previousMinute = parseInt(this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes)
-            this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes = this.nonStringMinutes(previousMinute, value)
-            const currentMinute = this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes
-            const currentHour = this.inputData.options[info.locationIndex].timings[info.timingIndex].hour
-            if (currentMinute >= '60') {
-                this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes = '00'
-                this.incrementHour(info, value)
-            }
-            else if (currentMinute <= '-1') {
-                this.inputData.options[info.locationIndex].timings[info.timingIndex].minutes = '59'
-                this.incrementHour(info, value)
-            }
-        },
-        changeAMPM(info) {
-            const value = this.inputData.options[info.locationIndex].timings[info.timingIndex].AMorPM
-                if (value === 'AM') {
-                    this.inputData.options[info.locationIndex].timings[info.timingIndex].AMorPM = 'PM'
-                } else this.inputData.options[info.locationIndex].timings[info.timingIndex].AMorPM = 'AM'
-        },
-        nonStringMinutes(parsedValue, increment) {
-            const x = parsedValue + increment
-            return x <= 9 && x >= 0 ? `0${x}` : `${x}`
+    data() {
+        return {
+            inputData: null
         }
+    },
+    methods: {
+        incrementHours(hours) {
+            this.inputData.setHours(this.inputData.getHours() + hours)
+            this.toDateObject(this.inputData)
+        },
+        incrementMinutes(minutes) {
+            this.inputData.setMinutes(this.inputData.getMinutes() + minutes)
+            this.toDateObject(this.inputData)
+        },
+        toDateObject(date) {
+            this.inputData = new Date(this._.deepCopy(date))
+        }
+    },
+    computed: {
+        hour() {
+            const hours = this.inputData.getHours()
+            return hours > 12 ? hours - 12 : hours
+        },
+        minutes() {
+            const mins = this.inputData.getMinutes()
+            return mins < 10 ? `0${mins}` : mins
+        },
+        amOrPM() {
+            return this.inputData.getHours() > 11 ? 'PM' : 'AM'
+        }
+    },
+    watch: {
+        inputData(newVal) {
+            this.$emit('changed', newVal.toUTCString())
+        }
+    },
+    created() {
+        this.toDateObject(this.dateString)
     }
 }
 </script>

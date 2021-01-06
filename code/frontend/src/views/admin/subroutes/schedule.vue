@@ -31,7 +31,6 @@ export default {
     data() {
         return {
             scheduleFor: null,
-            fridayDates: null,
             currentSchedule: null,
             originalSchedule: null,
             monthsFromCurrent: 0
@@ -40,8 +39,7 @@ export default {
     methods: {
         async fetchMonthlySchedule(scheduleFor, fridayDates) {
             const data = await this.$API.admin.getMonthlySchedule(
-                scheduleFor,
-                fridayDates
+                scheduleFor
             )
             if (!data) {
                 console.log('hi')
@@ -56,17 +54,13 @@ export default {
         },
         setAPIRequestParams($event) {
             this.scheduleFor = $event.month
-            this.fridayDates = $event.fridays
             this.monthsFromCurrent = $event.monthsFromCurrent
         },
         initialAPIRequestParams() {
             const upcomingFriday = datetime.upcomingFriday(true)
             const month = upcomingFriday.toLocaleString('default', { month: 'long' })
             const allFridays = datetime.allUpcomingFridays(upcomingFriday)
-            return {
-                string: `${month}${upcomingFriday.getFullYear()}`,
-                array: allFridays.map(friday => friday.getDate())
-            }
+            return `${month}-${upcomingFriday.getFullYear()}`
         },
         prepSaveData() {
             this.currentSchedule.month = this.originalSchedule.month = this.scheduleFor
@@ -87,12 +81,12 @@ export default {
     },
     watch: {
         scheduleFor(newVal) {
-            this.fetchMonthlySchedule(this.scheduleFor, this.fridayDates)    
+            this.fetchMonthlySchedule(this.scheduleFor)    
         }
     },
     computed: {
         isSame() {
-            if (this.currentSchedule) return equal(this.currentSchedule.data.rows, this.originalSchedule.data.rows)
+            if (this.currentSchedule) return equal(this.currentSchedule.data, this.originalSchedule.data)
             else return true
         },
         isPreviousMonth() {
@@ -103,9 +97,8 @@ export default {
         }
     },
     async created() {
-        const data = this.initialAPIRequestParams()
-        this.scheduleFor = data.string
-        this.fetchMonthlySchedule(data.string, data.array)
+        const scheduleFor = this.initialAPIRequestParams()
+        this.fetchMonthlySchedule(scheduleFor)
     }
 }
 </script>

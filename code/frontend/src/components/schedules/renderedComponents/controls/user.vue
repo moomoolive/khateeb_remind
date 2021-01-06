@@ -20,7 +20,7 @@
         </transition>
         <change-location-buttons
             :currentSchedule="currentSchedule"
-            v-if="currentSchedule.data.rows.length > 1"
+            v-if="currentSchedule.data.length > 1"
             @change="$emit('change', $event)"
         />
     </div>
@@ -29,6 +29,7 @@
 <script>
 import changeWeekButtons from './subcomponents/changeWeekButtons.vue'
 import changeLocationButtons from './subcomponents/changeLocationButtons.vue'
+import datetime from '@/utils/dateTime/main.js'
 
 export default {
     name: 'userScheduleControl',
@@ -58,7 +59,7 @@ export default {
     methods: {
         toWeeklyView($event) {
             this.isWeeklyView = $event
-            this.$emit('change', { weekOf: this.$store.state.date.upcomingFriday.date }) 
+            this.$emit('change', { weekOf: datetime.upcomingFriday(true).toUTCString() }) 
         }
     }
 }

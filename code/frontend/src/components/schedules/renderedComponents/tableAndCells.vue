@@ -17,21 +17,22 @@
                     :key="columnNames"
                     class="columnIdentifiers"
                 >
-                    {{columnNames}}
+                    {{ columnNames }}
                 </th>
             </tr>
-            <tr v-for="(khateeb, prayerTiming) in prayerLocation.monthlySchedule[displayedWeek]" :key="prayerTiming">
+            <tr v-for="(prayer, prayerTiming) in prayerLocation.monthlySchedule[displayedWeek].timings" :key="prayerTiming">
+                
                 <th class="timings">
-                    {{ `${prayerLocation.timings[prayerTiming].hour}:${prayerLocation.timings[prayerTiming].minutes}${prayerLocation.timings[prayerTiming].AMorPM}` }}
+                    {{ dateDisplay(prayer) }}
                 </th>
                 <th class="khateebs">
                     <component
                         :is="table"
                         :displayedWeek="displayedWeek"
-                        :schedule="schedule.data.rows[locationID]"
+                        :schedule="schedule.data[locationID]"
                         :prayerTiming="prayerTiming"
                         :originalSchedule="
-                            !originalSchedule ? null : originalSchedule.data.rows[locationID]
+                            !originalSchedule ? null : originalSchedule.data[locationID]
                         "
                         @no-khateebs="$emit('no-khateebs')"
                     />
@@ -81,6 +82,15 @@ export default {
     data() {
         return {
             columnData: ['Timing', 'Khateeb']
+        }
+    },
+    methods: {
+        dateDisplay(dateString) {
+            const date = new Date(dateString)
+            const hour = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
+            const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
+            const amOrPm = date.getHours > 11 ? 'PM' : 'AM'
+            return `${hour}:${minutes} ${amOrPm}`
         }
     }
 }

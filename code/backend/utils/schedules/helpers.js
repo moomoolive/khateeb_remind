@@ -5,7 +5,7 @@ export default {
     createScheduleKey() {
         const upcomingFriday = general.findUpcomingFriday()
         const month = upcomingFriday.toLocaleString('default', { month: 'long' })
-        return `${month}${upcomingFriday.getFullYear()}`
+        return `${month}-${upcomingFriday.getFullYear()}`
     },
     emptyLocationTemplate() {
         return $db.models.emptySchema('locationTemplate')

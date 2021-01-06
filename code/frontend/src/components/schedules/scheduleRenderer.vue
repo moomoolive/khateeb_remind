@@ -65,7 +65,7 @@ export default {
             originalMonth: 0,
             displayData: {
                 location: 'All',
-                weekOf: this.$store.state.date.upcomingFriday.date,
+                weekOf: datetime.upcomingFriday(true).toUTCString(),
             },
             month: datetime.upcomingFriday(true)
         }
@@ -96,23 +96,29 @@ export default {
         requestUpdatedSchedule() {
             const info = {
                 month: this.currentScheduleKey,
-                    fridays: this.fridayDates,
-                    monthsFromCurrent: this.originalMonth
+                monthsFromCurrent: this.originalMonth
             }
             this.$emit('schedule-change', info)
         },
+        getScheduleWeeklyKeys(currentSchedule) {
+            const keys = []
+            for (const [key, value] of Object.entries(currentSchedule.data[0].monthlySchedule)) {
+                keys.push(new Date(key))
+            }
+            return keys
+        }
     },
     computed: {
         currentScheduleKey() {
-            return `${this.displayedMonthInfo.month}${this.displayedMonthInfo.year}`
+            return `${this.month.toLocaleString('default', { month: 'long' })}-${this.month.getFullYear()}`
         },
         shownLocations() {
             const location = this.displayData.location
             if (location !== 'All') {
                 let returnLocation = {}
-                returnLocation[location] = this.currentSchedule.data.rows[location] 
+                returnLocation[location] = this.currentSchedule.data[location] 
                 return  returnLocation
-            } else return this.currentSchedule.data.rows
+            } else return this.currentSchedule.data
         },
         displayedMonthInfo() {
             const firstFridayOfMonth = this.fridays[0]
@@ -123,11 +129,15 @@ export default {
             }
         },
         fridays() {
-            const copy = new Date(this.month.getTime())
-            return datetime.allUpcomingFridays(copy)
+            return this.getScheduleWeeklyKeys(this.currentSchedule)
         },
         fridayDates() {
-            return this.fridays.map(friday => friday.getDate())
+            return Object.keys(this.currentSchedule.data[0].monthlySchedule)
+        }
+    },
+    watch: {
+        fridayDates(newVal) {
+            this.displayData.weekOf = newVal[0]
         }
     }
 }

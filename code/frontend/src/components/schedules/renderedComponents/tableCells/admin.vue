@@ -1,7 +1,7 @@
 <template>
     <div>
         <select 
-            v-model="schedule.monthlySchedule[displayedWeek][prayerTiming]" 
+            v-model="schedule.monthlySchedule[displayedWeek].khateebs[prayerTiming]" 
         >
             <option
                 v-for="(khateeb, khateebNumber) in khateebList" :key="khateebNumber"
@@ -35,7 +35,7 @@ export default {
             required: true
         },
         prayerTiming: {
-            type: Number,
+            type: [String, Number],
             required: true
         },
         originalSchedule: {
@@ -67,11 +67,11 @@ export default {
             return randomKhateeb
         },
         revertToOriginal(index) {
-            const originalData = this._.deepCopy(this.originalSchedule.monthlySchedule[this.displayedWeek][index])
-            this.schedule.monthlySchedule[this.displayedWeek].splice(index, 1, originalData)
+            const originalData = this._.deepCopy(this.originalSchedule.monthlySchedule[this.displayedWeek].khateebs[index])
+            this.schedule.monthlySchedule[this.displayedWeek].khateebs.splice(index, 1, originalData)
         },
         deleteExcessValues() {
-            const x = this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
+            const x = this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming]
             if (x.savedOn) delete x.savedOn
         }
     },

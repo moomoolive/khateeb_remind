@@ -35,23 +35,19 @@
                 >
                     <h3>Prayer Timing {{ timingIndex + 1 }}</h3><br>
                     <timing-incrementer
-                        :timingIndex="timingIndex"
-                        :location="location"
-                        :locationIndex="locationIndex"
-                        :inputData="inputData"
+                        :dateString="location.timings[timingIndex]"
+                        @changed="$set(location.timings, timingIndex, $event)"
                     />
-                    <button
-                        @click="deleteTiming(locationIndex, timingIndex)"
-                        class="yellow"
-                    >
-                        Delete This Timing
-                    </button>
-                    <button
-                        @click="addNewTiming(locationIndex, timingIndex)"
-                    >
-                        Add Timing Here
-                    </button>
                 </div>
+                <button @click="addNewTiming(location)">
+                    Add a Prayer Timing
+                </button>
+                <button
+                    class="red"
+                    @click="deleteTiming(location)"
+                >
+                    Delete a Prayer Timing
+                </button>
             </div>
         </collapsable-box>
         <button
@@ -95,6 +91,9 @@ export default {
         }
     },
     methods: {
+        changeTiming(timing, changedTiming) {
+            timing = new Date(this._.deepCopy(changedTiming))
+        },
         addNewLocation() {
             const newLocation = this._.deepCopy(this.emptyLocation)
             this.inputData.options.push(newLocation)
@@ -107,7 +106,7 @@ export default {
             this.hasInitializedLocations = false
             this.inputData = this._.deepCopy(emptySchema)
         },
-        async loadAPIData() {
+        loadAPIData() {
             if (this.previousEntries[0]) this.loadInPreviousEntries(this.previousEntries[0])
             else this.loadInEmpty(this.emptySchema)
             this.emptyLocation = this._.deepCopy(this.emptySchema.options[0])
@@ -119,22 +118,12 @@ export default {
             const x = parsedValue + increment
             return x <= 9 && x >= 0 ? `0${x}` : `${x}`
         },
-        addNewTiming(locationIndex, timingIndex) {
-            const mins = this.nonStringMinutes(parseInt(this.inputData.options[locationIndex].timings[timingIndex].minutes), 1)
-            const newTiming = {
-                hour: this.inputData.options[locationIndex].timings[timingIndex].hour,
-                minutes: mins,
-                AMorPM: this.inputData.options[locationIndex].timings[timingIndex].AMorPM
-            }
-            this.inputData.options[locationIndex].timings.splice(timingIndex + 1, 0, newTiming)
+        addNewTiming(location) {
+            const timing = location.timings[location.timings.length - 1]
+            location.timings.push(timing)
         },
-        deleteTiming(locationIndex, timingIndex) {
-            if (this.inputData.options[locationIndex].timings.length === 1) {
-                const name = this.inputData.options[locationIndex].info.name
-                alert(`You must have at least one timing at ${name}!`)
-            } else {
-                this.inputData.options[locationIndex].timings.splice(timingIndex, 1)
-            }
+        deleteTiming(location) {
+            location.timings.pop()
         }
     },
     computed: {

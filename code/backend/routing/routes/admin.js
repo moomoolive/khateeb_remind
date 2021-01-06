@@ -4,6 +4,7 @@ import { middleware } from '../../middleware/main.js'
 import $db from '../../database/index.js'
 import $responses from '../../utils/responses.js'
 import $utils from '../../utils/index.js'
+import sched from '../../utils/schedule.js'
 
 const router = express.Router()
 
@@ -78,8 +79,24 @@ router.post(routerGroup3URL, middleware.isPassword, (req, res) => {
 const routerGroup4 = 'monthlySchedules'
 const routerGroup4URL = `/${routerGroup4}`
 
-router.get(routerGroup4URL + '/:monthToQuery/:fridayDates', (req, res) => {
-    $db.models.monthlySchedules.findOne({month : req.params.monthToQuery}, (err, schedule) => {
+router.get(routerGroup4URL + '/:monthToQuery', async (req, res) => {
+    try {
+        let schedule = await sched.fetchSchedule(req.params.monthToQuery)
+        const locationAndTimings = await $db.funcs.getSetting('locationAndTimings')
+        const needsUpdate = sched.needsUpdate(locationAndTimings.savedOn, schedule.savedOn)
+        if(!schedule) {
+            schedule = sched.new(req.params.monthToQuery, locationAndTimings)
+        }
+        else if (needsUpdate) {
+            schedule = sched.update(schedule, locationAndTimings)
+        }
+    } catch {
+        res.status($utils.hCodes.serverError)
+        res.json('something went wrong')
+
+    }
+    res.json(schedule)
+    /*$db.models.monthlySchedules.findOne({month : req.params.monthToQuery}, (err, schedule) => {
         if (err) console.log(err)
         else {
             $db.models.locationAndTimings.findOne({}, (err, locationAndTiming) => {
@@ -99,7 +116,7 @@ router.get(routerGroup4URL + '/:monthToQuery/:fridayDates', (req, res) => {
                 }
             })
         }
-    })
+    }) */
 })
 
 router.post(routerGroup4URL, (req, res) => {

@@ -15,8 +15,8 @@ const funcs = {
 }
 
 export default {
-    getMonthlySchedule(monthToQuery, fridayDates) {
-        return axios.get(baseUrl + `/monthlySchedules/${monthToQuery}/${fridayDates}`)
+    getMonthlySchedule(monthToQuery) {
+        return axios.get(baseUrl + `/monthlySchedules/${monthToQuery}`)
             .then(res => res.data)
             .catch(err => { console.log(err) })
     },

@@ -22,7 +22,7 @@ export default {
             required: true
         },
         displayedWeek: {
-            type: Number,
+            type: String,
             required: true
         },
         prayerTiming: {
@@ -45,14 +45,14 @@ export default {
     computed: {
         display() {
             if (this.isMounted) {
-                const x = this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
+                const x = this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming]
                 return `${x.firstName} ${x.lastName}`
             }
             else 'TBD' 
         }
     },
     created() {
-        let x = this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
+        let x = this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming]
         if (x.savedOn) {
             x = new Date(x.savedOn)
             const y = new Date(this.$store.state.lastVisit)

@@ -10,7 +10,7 @@
         </button>
         <br>
         <button
-            v-for="(prayerLocationData, location_ID) in currentSchedule.data.rows"
+            v-for="(prayerLocationData, location_ID) in currentSchedule.data"
             :key="location_ID"
             @click="click(location_ID)"
             :aria-label="`view schedule for ${prayerLocationData.info.name}`"

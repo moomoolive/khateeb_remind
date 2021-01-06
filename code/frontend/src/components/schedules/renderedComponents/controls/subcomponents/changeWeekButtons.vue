@@ -1,12 +1,12 @@
 <template>
     <div>
         <button
-            v-for="fridayDate of fridayDates"
-            :key="fridayDate"
+            v-for="(fridayDate, index) of fridayDates"
+            :key="index"
             @click="click(fridayDate)"
             :aria-label="`view schedule for ${display.month} ${fridayDate}`"
         >
-            {{ `${display.abbreviatedMonthName} ${fridayDate}` }}
+            {{ `${display.abbreviatedMonthName} ${buttonDisplay(fridayDate)}` }}
         </button>
     </div>
 </template>
@@ -27,6 +27,9 @@ export default {
     methods: {
         click(value) {
             this.$emit('change', { weekOf: value })
+        },
+        buttonDisplay(dateString) {
+            return new Date(dateString).getDate()
         }
     }
 }

@@ -1,7 +1,7 @@
 <template>
     <div>
        <h2>
-            {{ display.month }} {{ week }}, {{ display.year }}
+            {{ display.month }} {{ displayedWeek }}, {{ display.year }}
         </h2>
         <button
             class="yellow"
@@ -29,6 +29,11 @@ export default {
         week: {
             type: [Number, String],
             required: true
+        }
+    },
+    computed: {
+        displayedWeek() {
+            return new Date(this.week).getDate()
         }
     }
 }

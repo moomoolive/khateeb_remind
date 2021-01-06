@@ -12,7 +12,7 @@ export default {
         phoneNumber: String,
         active: Boolean,
         email: String,
-        dropouts: String,
+        dropouts: Number,
         savedOn: Date
     }),
     announcement: new mongoose.Schema({
@@ -24,7 +24,6 @@ export default {
     }),
     location: new mongoose.Schema({
         info: Object,
-        timings: Array,
         monthlySchedule: Object
     }),
     prayerSlot: new mongoose.Schema({

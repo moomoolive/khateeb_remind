@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-import schema from '../schematics/index.js'
+import schema from './schematics/index.js'
 import helpers from './helpers.js'
 
 const models = {
@@ -27,7 +27,6 @@ const models = {
     locationTemplate: mongoose.model('template', schema.location),
     prayerSlot: mongoose.model('prayerSlot', schema.prayerSlot),
     schemaParams(schemaName, full=false) {
-        console.log(schemaName)
         const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
         if (!full) {
             const notFull = fullSchemaParams.filter((param) => {
@@ -53,9 +52,26 @@ const models = {
         }
         return schema
     },
+    fetchSchemaModels(schemaName) {
+        return {
+            parent: this.emptySchema(schemaName),
+            child: this[schemaName].schema.childSchemas
+        }
+    },
+    findChildSchemas(topLevelParent) {
+        let CSchemas = []
+        const parentParams = this[topLevelParent].schema.paths
+        for (let field in parentParams) {
+            if (parentParams[field].caster) {
+                CSchemas.push(field)
+            }
+        }
+        return CSchemas
+    },
     schemasPlus(schemaName) {
-        let schemas = helpers.fetchSchemaModels(schemaName)
-        const CSchemas = helpers.findChildSchemas(schemaName)
+        let schemas = this.fetchSchemaModels(schemaName)
+        const CSchemas = this.findChildSchemas(schemaName)
+        //console.log(schemas.child[0].schema.paths.timings.caster.instance)
         if (schemas.child.length > 0) {
             for (let x = 0; x < CSchemas.length; x++) {
                 const parent = schemas.parent[CSchemas[x]]

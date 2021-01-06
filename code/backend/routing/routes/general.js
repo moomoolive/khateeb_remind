@@ -3,11 +3,13 @@ import express from 'express'
 import $utils from '../../utils/index.js'
 import $db from '../../database/index.js'
 import { middleware } from '../../middleware/main.js'
+import sched from '../../utils/schedule.js'
 
 const router = express.Router()
 
 router.get('/', async (req, res) => {
-    const currentSchedule = await $utils.schedule.fetchCurrentSchedule()
+    const currentScheduleKey = sched.currentScheduleKey()
+    const currentSchedule = await sched.fetchSchedule(currentScheduleKey)
     if (!currentSchedule) {
         res.json("This month's schedule hasn't been created yet")
     } else res.json(currentSchedule)
