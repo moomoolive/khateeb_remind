@@ -46,7 +46,8 @@ export default {
     data() {
         return {
             emptyKhateeb: null,
-            khateebList: null
+            khateebList: null,
+            data: null
         }
     },
     methods: {
@@ -57,6 +58,7 @@ export default {
             } else {
                 this.khateebList = khateebs.previousEntries
                 this.emptyKhateeb = khateebs.emptySchema
+                this.modifySavedOnKhateebs()
             }
         },
         toBeDecidedIndicator(khateebArray) {
@@ -70,9 +72,13 @@ export default {
             const originalData = this._.deepCopy(this.originalSchedule.monthlySchedule[this.displayedWeek].khateebs[index])
             this.schedule.monthlySchedule[this.displayedWeek].khateebs.splice(index, 1, originalData)
         },
-        deleteExcessValues() {
-            const x = this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming]
-            if (x.savedOn) delete x.savedOn
+        modifySavedOnKhateebs() {
+            const savedOn = this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming].savedOn
+            if (!savedOn || !this.khateebList)
+                return
+            this.khateebList = this.khateebList.map(khateeb => {
+                return { ...khateeb, savedOn }
+            })
         }
     },
     computed: {
@@ -81,7 +87,6 @@ export default {
         }
     },
     created() {
-        this.deleteExcessValues()
         this.fetchKhateebs()
     }
 }

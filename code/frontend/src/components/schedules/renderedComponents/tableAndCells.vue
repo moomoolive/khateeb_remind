@@ -27,7 +27,7 @@
                 </th>
                 <th class="khateebs">
                     <component
-                        :is="table"
+                        :is="cellType()"
                         :displayedWeek="displayedWeek"
                         :schedule="schedule.data[locationID]"
                         :prayerTiming="prayerTiming"
@@ -91,8 +91,17 @@ export default {
             const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
             const amOrPm = date.getHours > 11 ? 'PM' : 'AM'
             return `${hour}:${minutes} ${amOrPm}`
+        },
+        cellType() {
+            const date = new Date(this.displayedWeek).getTime()
+            if (this.table !==  'admin')
+                return this.table
+            if (date < new Date().getTime())
+                return 'user'
+            else
+                return 'admin'
         }
-    }
+    },
 }
 </script>
 

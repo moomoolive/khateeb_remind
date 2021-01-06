@@ -11,7 +11,7 @@ const funcs = {
     },
     databaseCallback(response, error=false) {
         if (error) this.databaseError(response, error)
-        else this.databaseSuccess(response)
+        else if(response) this.databaseSuccess(response)
     },
     saveSetting(discriminatorName, toBeSaved, response=false) {
         $dbModels[discriminatorName].findOne({}, (err, setting) => {

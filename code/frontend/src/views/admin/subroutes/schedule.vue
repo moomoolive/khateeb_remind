@@ -37,7 +37,7 @@ export default {
         }
     },
     methods: {
-        async fetchMonthlySchedule(scheduleFor, fridayDates) {
+        async fetchMonthlySchedule(scheduleFor) {
             const data = await this.$API.admin.getMonthlySchedule(
                 scheduleFor
             )
@@ -63,7 +63,7 @@ export default {
             return `${month}-${upcomingFriday.getFullYear()}`
         },
         prepSaveData() {
-            this.currentSchedule.month = this.originalSchedule.month = this.scheduleFor
+            //this.currentSchedule.month = this.originalSchedule.month = this.scheduleFor
             const payload = this._.deepCopy(this.currentSchedule)
             payload.original = this._.deepCopy(this.originalSchedule)
             return payload

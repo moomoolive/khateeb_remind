@@ -1,5 +1,6 @@
 import $db from '../database/index.js'
 import general from './funcs.js'
+import equal from 'fast-deep-equal'
 
 const subHelper = {
     monthNames: ["January", "February", "March", "April", "May", "June",
@@ -87,7 +88,6 @@ const helpers = {
         const oldLocations = newLocations.data.length
         const updatedLocations = currentLocationDetails.options.length
         const diff = updatedLocations - oldLocations
-        console.log(oldSchedule.month)
         for (let i = 0; i < Math.abs(diff); i++) {
             if (diff < 0) {
                 newLocations.data.pop()
@@ -95,10 +95,9 @@ const helpers = {
             }
             const emptyLocation = this.createEmptyLocation(
                 this.toBeDecidedIndicator(),
-                Object.keys(oldLocations.data[0].monthlySchedule),
-                currentLocationDetails.options[oldLocations + i + 1]
+                Object.keys(oldSchedule.data[0].monthlySchedule),
+                currentLocationDetails.options[oldLocations + i]
             )
-            console.log(emptyLocation)
             newLocations.data.push(emptyLocation) 
         }
         return newLocations
@@ -107,12 +106,22 @@ const helpers = {
         const updatedTimingsSchedule = subHelper.deepCopy(oldSchedule)
         for (const [key, value] of Object.entries(updatedTimingsSchedule.monthlySchedule)) {
             if (subHelper.weekIsInFuture(key) && value.timings !== currentLocationDetails.timings) {
-                value.timings = currentLocationDetails.timings
-                value.khateebs = subHelper.adjustPrayerSlots(value.timing, value.khateebs)
+                value.timings = subHelper.deepCopy(currentLocationDetails.timings)
+                value.khateebs = subHelper.adjustPrayerSlots(
+                    value.timings, 
+                    value.khateebs,
+                    this.toBeDecidedIndicator()
+                )
             }
         }
-        return updatedTimingsSchedule
+        return updatedTimingsSchedule.monthlySchedule
     },
+    scheduleIsInCurrentMonthOrBeyond(locations, schedule) {
+        const locationsMonth = new Date(locations.savedOn).setDate(1)
+        locationsMonth.setHours(0,0,0,0)
+        const scheduleSavedOn = new Date(schedule.savedOn)
+        return scheduleSavedOn.getTime() > locationsMonth.getTime()
+    }
 }
 
 export default {
@@ -149,7 +158,6 @@ export default {
     },
     update(oldSchedule, currentLocationDetails) {
         const updatedLocations = helpers.adjustNumberOfLocations(oldSchedule, currentLocationDetails)
-        console.log(updatedLocations)
         currentLocationDetails.options.forEach((location, index) => {
             updatedLocations.data[index].info = location.info
             updatedLocations.data[index].monthlySchedule = helpers.checkIfTimingsAreSame(updatedLocations.data[index], location)
@@ -157,9 +165,26 @@ export default {
         
         return updatedLocations
     },
-    needsUpdate(locationsSavedOn, scheduleSavedOn) {
-        const locations = new Date(locationsSavedOn).getTime()
-        const schedule = new Date(scheduleSavedOn).getTime()
-        return locations > schedule
+    needsUpdate(locations, schedule) {
+        if (!schedule)
+            return null
+        const locationsSavedOn = new Date(locations.savedOn).getTime()
+        const scheduleSavedOn= new Date(schedule.savedOn).getTime()
+        return (locationsSavedOn > scheduleSavedOn) && helpers.scheduleIsInCurrentMonthOrBeyond(locations, schedule)
+    },
+    checkForUpdates(updated, original) {
+        const updatedSchedule = JSON.parse(JSON.stringify(updated))
+        updatedSchedule.data.forEach((location, locationIndex) => {
+            for(let [weekOf, weekInfo] of Object.entries(location.monthlySchedule)) {
+                weekInfo.khateebs.forEach((khateeb, khateebIndex) => {
+                    const originalVal = original.data[locationIndex].monthlySchedule[weekOf].khateebs[khateebIndex]
+                    if(!equal(khateeb, originalVal)) {
+                        khateeb.savedOn = new Date()
+                    }
+                })
+            }
+        })
+        delete updatedSchedule.original
+        return updatedSchedule
     }
 }

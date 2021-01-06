@@ -54,9 +54,9 @@ export default {
     created() {
         let x = this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming]
         if (x.savedOn) {
-            x = new Date(x.savedOn)
-            const y = new Date(this.$store.state.lastVisit)
-            this.isUpdated = x < y
+            const cellSaveDate = new Date(x.savedOn).getTime()
+            const lastVisit = new Date(this.$store.state.lastVisit).getTime()
+            this.isUpdated = cellSaveDate > lastVisit
         }
     },
     mounted() {

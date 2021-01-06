@@ -83,47 +83,25 @@ router.get(routerGroup4URL + '/:monthToQuery', async (req, res) => {
     try {
         let schedule = await sched.fetchSchedule(req.params.monthToQuery)
         const locationAndTimings = await $db.funcs.getSetting('locationAndTimings')
-        const needsUpdate = sched.needsUpdate(locationAndTimings.savedOn, schedule.savedOn)
-        if(!schedule) {
+        const needsUpdate = sched.needsUpdate(locationAndTimings, schedule)
+        if(!schedule)
             schedule = sched.new(req.params.monthToQuery, locationAndTimings)
-        }
         else if (needsUpdate) {
             schedule = sched.update(schedule, locationAndTimings)
+            $db.funcs.save('monthlySchedules', schedule)
         }
-    } catch {
+        res.json(schedule)
+    } catch(err) {
+        console.log(err)
         res.status($utils.hCodes.serverError)
         res.json('something went wrong')
 
     }
-    res.json(schedule)
-    /*$db.models.monthlySchedules.findOne({month : req.params.monthToQuery}, (err, schedule) => {
-        if (err) console.log(err)
-        else {
-            $db.models.locationAndTimings.findOne({}, (err, locationAndTiming) => {
-                const fridayDates = req.params.fridayDates.split(',')
-                if (err) console.log(err)
-                else if (!schedule) {
-                    if (!locationAndTiming) res.json('No locations or timings were found!')
-                    else {
-                        const newSchedule =$utils.schedule.new(fridayDates, locationAndTiming)
-                        res.json({ data: newSchedule })
-                    }
-                } else {
-                    if (locationAndTiming.savedOn > schedule.savedOn) {
-                        const updatedSchedule =$utils.schedule.update(fridayDates, locationAndTiming, schedule)
-                        res.json(updatedSchedule)
-                    } else res.json(schedule)
-                }
-            })
-        }
-    }) */
 })
 
 router.post(routerGroup4URL, (req, res) => {
-    const updatedSchedule =$utils.schedule.updatePrayerSlotDates(req.body, req.body.original)
-    delete req.body.original
-    console.log(updatedSchedule)
-    $db.funcs.save(routerGroup4, req.body, res)
+    const updatedSchedule = sched.checkForUpdates(req.body, req.body.original)
+    $db.funcs.save(routerGroup4, updatedSchedule, res)
 })
 
 export { router as admin }
