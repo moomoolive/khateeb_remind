@@ -4,4 +4,4 @@ node_modules/
 
 scraper_env/
 
-.env.prod
+.env

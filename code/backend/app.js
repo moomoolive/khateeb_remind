@@ -2,11 +2,13 @@ import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import twilio from 'twilio'
+import dotenv from 'dotenv'
 
 import { middleware } from './middleware/main.js'
 import { routes } from './routing/index.js'
 import { dbSettings } from './database/settings.js'
 
+dotenv.config()
 const PORT = process.env.PORT || 5_000
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
 const JWT_SECRET = process.env.JWT_SECRET || 'secret'
