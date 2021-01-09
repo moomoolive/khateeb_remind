@@ -2,7 +2,6 @@ const express = require('express')
 
 const $utils = require('../../utils/index.js')
 const middleware = require('../../middleware/main.js')
-const env = require('../../app.js')
 const $db = require('../../database/index.js')
 
 const router = express.Router()
@@ -44,7 +43,8 @@ router.get('/reset-pass', async (req, res) => {
 router.post('/verify-admin', middleware.validationCheck(['verificationCode', 'createNewPassword']), (req, res) => {
     const code = parseInt(req.body.verificationCode)
     const verificationCodeExistsAndEqualsSubmitted = (code === verificationCode && verificationCode)
-    if (code.toString() === env.emergency_key || verificationCodeExistsAndEqualsSubmitted) {
+    const apiKey = process.env.EMERGENCY_KEY || '1234'
+    if (code.toString() === apiKey || verificationCodeExistsAndEqualsSubmitted) {
         const password = {
             __t: 'password',
             options: req.body.createNewPassword

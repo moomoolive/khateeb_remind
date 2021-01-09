@@ -11,7 +11,6 @@ module.exports = {
         lastName: String,
         phoneNumber: String,
         active: Boolean,
-        email: String,
         dropouts: Number,
         savedOn: Date
     }),

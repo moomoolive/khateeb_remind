@@ -9,7 +9,6 @@ const sched = require('../../utils/schedule.js')
 const router = express.Router()
 
 router.use(middleware.authAdmin)
-router.post('*', middleware.validationCheck('schema'))
 
 const routerGroup1 = 'announcements'
 const routerGroup1URL = `/${routerGroup1}`
@@ -27,8 +26,7 @@ router.delete(routerGroup1URL, (req, res) => {
     $db.funcs.delete(routerGroup1, req.body._id, res)
 })
 
-router.post(routerGroup1URL, (req, res) => {
-    console.log(req.body)
+router.post(routerGroup1URL, middleware.validationCheck('schema'), (req, res) => {
     $db.funcs.save(routerGroup1, req.body, res)
 })
 
@@ -55,8 +53,7 @@ router.delete(routerGroup2URL, (req, res) => {
     $db.funcs.delete(routerGroup2, req.body._id, res)
 })
 
-router.post(routerGroup2URL, (req, res) => {
-    console.log(req.body)
+router.post(routerGroup2URL, middleware.validationCheck('schema'), (req, res) => {
     $db.funcs.save(routerGroup2, req.body, res)
 })
 
@@ -74,7 +71,7 @@ router.get(routerGroup3URL + '/:settingName', (req, res) => {
     })
 })
 
-router.post(routerGroup3URL, middleware.isPassword, (req, res) => {
+router.post(routerGroup3URL, [middleware.isPassword, middleware.validationCheck('schema')], (req, res) => {
     $db.funcs.save(routerGroup3, req.body, res)
 })
 
@@ -103,7 +100,7 @@ router.get(routerGroup4URL + '/:monthToQuery', async (req, res) => {
     }
 })
 
-router.post(routerGroup4URL, (req, res) => {
+router.post(routerGroup4URL, middleware.validationCheck('schema'), (req, res) => {
     const updatedSchedule = sched.checkForUpdates(req.body, req.body.original)
     $db.funcs.save(routerGroup4, updatedSchedule, res)
 })

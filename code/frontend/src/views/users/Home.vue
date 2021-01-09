@@ -2,8 +2,8 @@
   <div>
       <logo-display
         class="logo"
-        :logoLeft="`uofcLogo`"
-        :logoRight="`msaUofCLogo`"
+        :logoLeft="`logo1`"
+        :logoRight="`logo2`"
       />
       <user-schedule
         v-if="scheduleExists"

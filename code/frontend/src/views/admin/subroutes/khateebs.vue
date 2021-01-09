@@ -31,7 +31,7 @@ export default {
             previousEntries: null,
             emptySchema: null,
             invalidations: {
-                emptyField: ['firstName', 'lastName', 'email'],
+                emptyField: ['firstName', 'lastName'],
                 nonCanadianPhone: ['phoneNumber']
             }
         }

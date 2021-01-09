@@ -38,7 +38,7 @@ const helpers = {
         const decoded = monthYearString.split('-')
         const month = subHelper.monthNames.indexOf(decoded[0])
         const year = decoded[1]
-        return new Date(year, month, 1)
+        return new Date(year, month, 1, 23)
     },
     findUpcomingFriday(date=new Date()) {
         const friday = 5
@@ -142,8 +142,6 @@ module.exports = {
     },
     new(scheduleKey, locationAndTimings) {
         const allFridays = helpers.findAllFridaysFromKey(scheduleKey)
-        console.log(scheduleKey)
-        console.log(allFridays)
         const newSchedule = {
             month: scheduleKey,
             data : []

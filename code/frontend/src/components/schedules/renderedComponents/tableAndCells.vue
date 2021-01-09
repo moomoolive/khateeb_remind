@@ -21,7 +21,6 @@
                 </th>
             </tr>
             <tr v-for="(prayer, prayerTiming) in prayerLocation.monthlySchedule[displayedWeek].timings" :key="prayerTiming">
-                
                 <th class="timings">
                     {{ dateDisplay(prayer) }}
                 </th>
@@ -101,7 +100,7 @@ export default {
             else
                 return 'admin'
         }
-    },
+    }
 }
 </script>
 

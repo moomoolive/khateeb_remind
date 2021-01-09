@@ -3,10 +3,7 @@ import helpers from './helpers.js'
 export default {
     upcomingFriday(raw=false) {
         const upcomingFriday = helpers.findUpcomingFriday()
-        upcomingFriday.setHours(0)
-        upcomingFriday.setMinutes(0)
-        upcomingFriday.setSeconds(0)
-        upcomingFriday.setMilliseconds(0)
+        upcomingFriday.setUTCHours(23, 0, 0, 0)
         if (!raw) return {
             month: upcomingFriday.toLocaleString('default', { month: 'long' }),
             date: upcomingFriday.getDate(),

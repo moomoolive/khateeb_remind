@@ -26,17 +26,22 @@ router.get('/announcements', (req, res) => {
 
 router.post('/authenicate', middleware.validationCheck(['key']), async (req, res) => {
     const key = req.body.key
-    const password = await $db.funcs.getPassword()
-    if (password && key === password) {
-        const token = $utils.auth.createToken()
-        const repsonse = {
-            token,
-            msg: "You've been successfully logged in!"
+    try {
+        const password = await $db.funcs.getPassword()
+        if (password && key === password) {
+            const token = $utils.auth.createToken()
+            const repsonse = {
+                token,
+                msg: "You've been successfully logged in!"
+            }
+            res.json(repsonse)
+        } else {
+            res.status($utils.hCodes.unauthorized)
+            res.json({token: null, msg: 'Unauthorized'})
         }
-        res.json(repsonse)
-    } else {
-        res.status($utils.hCodes.unauthorized)
-        res.json({token: null, msg: 'Unauthorized'})
+    } catch(err) {
+        console.log(err)
+        res.json('A problem occurred while authenticating')
     }
 })
 

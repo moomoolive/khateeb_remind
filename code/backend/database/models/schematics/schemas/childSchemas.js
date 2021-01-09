@@ -5,8 +5,7 @@ module.exports = {
         options: {
             firstName: String,
             lastName: String,
-            phoneNumber: String,
-            email: String
+            phoneNumber: String
         }
     }),
     locationAndTiming: new mongoose.Schema({

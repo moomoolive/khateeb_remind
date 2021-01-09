@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 
 const $utils = require('../utils/index.js')
-const env = require('../app.js')
 const $db = require('../database/index.js')
 
 const helpers = require('./helpers.js')
@@ -9,7 +8,8 @@ const helpers = require('./helpers.js')
 const funcs = {
     authAdmin(request, response, next) {
         const token = request.headers.authorization
-        jwt.verify(token, env.jwt, (err, decoded) => {
+        const secret = process.env.JWT_SECRET || 'secret'
+        jwt.verify(token, secret, (err, decoded) => {
             if (err || decoded.user !== "admin") {
                 response.status($utils.hCodes.unauthorized)
                 response.json('Unauthorized')
@@ -27,7 +27,6 @@ const funcs = {
         response.json("Are servers aren't responding right now, try later...")
     },
     noEmptyBody(request, response, next) {
-        console.log(request.body)
         if (Object.keys(request.body).length === 0 && request.path !== '/text/hub') {
             response.status($utils.hCodes.notAcceptable)
             response.json(`You cannot send an empty request body to this route!`)
@@ -41,8 +40,7 @@ const funcs = {
             let passed = true
             for (let field of fields ) {
                 if (request.body[field] === undefined) {
-                    console.log(fields)
-                    console.log(field)
+                    console.log(`Failed on field: ${field}`)
                     passed = false
                     response.status($utils.hCodes.notAcceptable)
                     response.json(`You're missing required information`)
@@ -53,11 +51,9 @@ const funcs = {
         }
     },
     schemaVC(request) {
-        console.log(request.body)
         const urlComponents = request.originalUrl.split('/')
         const schemaName = urlComponents[2]
         const validationList = $db.models.schemaParams(schemaName)
-        console.log(validationList)
         return validationList
     },
 }

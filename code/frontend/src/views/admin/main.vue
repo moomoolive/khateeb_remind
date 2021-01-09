@@ -8,7 +8,7 @@
         ></router-view>
         <div v-if="savedChanges">
             <msg-with-pic
-                title="Alhamdillah! Hooray!"
+                title="Alhamdillah!"
                 gif="flyingPlanesAllOver"
                 msg="Changes successfully made!"
             />

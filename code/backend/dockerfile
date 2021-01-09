@@ -1,4 +1,4 @@
-FROM node:12.20
+FROM node:12.20-alpine
 
 ENV NODE_ENV=production
 
@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
-RUN npm install
+RUN npm install --only=prod
 
 EXPOSE 80
 

@@ -50,7 +50,7 @@ export default {
             adminIdentityNotFilled: !this.adminIdentityData.previousEntries[0],
             adminIdentity: {
                 invalidations: {
-                    emptyField: ['firstName', 'lastName', 'email']
+                    emptyField: ['firstName', 'lastName']
                 },
             },
             updatePassword: {
