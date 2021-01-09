@@ -1,10 +1,10 @@
-import express from 'express'
+const express = require('express')
 
-import { middleware } from '../../middleware/main.js'
-import $db from '../../database/index.js'
-import $responses from '../../utils/responses.js'
-import $utils from '../../utils/index.js'
-import sched from '../../utils/schedule.js'
+const middleware = require('../../middleware/main.js')
+const $db = require('../../database/index.js')
+const $responses = require('../../utils/responses.js')
+const $utils = require('../../utils/index.js')
+const sched = require('../../utils/schedule.js')
 
 const router = express.Router()
 
@@ -108,4 +108,4 @@ router.post(routerGroup4URL, (req, res) => {
     $db.funcs.save(routerGroup4, updatedSchedule, res)
 })
 
-export { router as admin }
+module.exports = router

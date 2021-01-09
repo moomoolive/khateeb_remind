@@ -1,10 +1,10 @@
-import jwt from 'jsonwebtoken'
+const jwt = require('jsonwebtoken')
 
-import $utils from '../utils/index.js'
-import env from '../app.js'
-import $db from '../database/index.js'
+const $utils = require('../utils/index.js')
+const env = require('../app.js')
+const $db = require('../database/index.js')
 
-import helpers from './helpers.js'
+const helpers = require('./helpers.js')
 
 const funcs = {
     authAdmin(request, response, next) {
@@ -41,6 +41,8 @@ const funcs = {
             let passed = true
             for (let field of fields ) {
                 if (request.body[field] === undefined) {
+                    console.log(fields)
+                    console.log(field)
                     passed = false
                     response.status($utils.hCodes.notAcceptable)
                     response.json(`You're missing required information`)
@@ -60,4 +62,4 @@ const funcs = {
     },
 }
 
-export { funcs as middleware }
+module.exports = funcs

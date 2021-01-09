@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     expirationDate(expiresAfter) {
         const secsPerMin = 60
         const minPerHour = 60

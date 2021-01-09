@@ -1,9 +1,9 @@
-import express from 'express'
+const express = require('express')
 
-import $utils from '../../utils/index.js'
-import $db from '../../database/index.js'
-import { middleware } from '../../middleware/main.js'
-import sched from '../../utils/schedule.js'
+const $utils = require('../../utils/index.js')
+const $db = require('../../database/index.js')
+const middleware = require('../../middleware/main.js')
+const sched = require('../../utils/schedule.js')
 
 const router = express.Router()
 
@@ -40,4 +40,4 @@ router.post('/authenicate', middleware.validationCheck(['key']), async (req, res
     }
 })
 
-export { router as general }
+module.exports = router

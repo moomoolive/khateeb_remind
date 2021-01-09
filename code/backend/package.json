@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "backend server for khateeb remind",
   "main": "app.js",
-  "type": "module",
   "scripts": {
     "dev": "nodemon app.js",
     "app": "node app.js"

@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken'
-import env from '../../app.js'
-import helpers from './helpers.js'
+const jwt = require('jsonwebtoken')
+const env = require('../../app.js')
+const helpers = require('./helpers.js')
 
-export default {
+module.exports = {
     createToken(expiresAfter='30-days', userType="admin") {
         const expiration = helpers.expirationDate(expiresAfter)
         return jwt.sign({ user:  userType}, env.jwt, { expiresIn: expiration })

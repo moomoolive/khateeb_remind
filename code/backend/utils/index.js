@@ -1,11 +1,11 @@
-import general from './funcs.js'
-import schedule from './schedules/main.js'
-import auth from './auth/main.js'
-import hCodes from './httpCodes.js'
-import text from './textHub/main.js'
-import areaCodes from './areaCodes/main.js'
+const general = require('./funcs.js')
+const schedule = require('./schedules/main.js')
+const auth = require('./auth/main.js')
+const hCodes = require('./httpCodes.js')
+const text = require('./textHub/main.js')
+const areaCodes = require('./areaCodes/main.js')
 
-export default {
+module.exports = {
     general,
     schedule,
     auth,

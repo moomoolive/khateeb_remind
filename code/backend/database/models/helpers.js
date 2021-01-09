@@ -1,6 +1,4 @@
-import mongoose from 'mongoose'
-
-export default {
+module.exports = {
     fillSchemaField(dataType, mixed = {}) {
         let x = null
         switch(dataType) {

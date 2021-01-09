@@ -1,7 +1,7 @@
-import env from '../../app.js'
-import $db from '../../database/index.js'
+const env = require('../../app.js')
+const $db = require('../../database/index.js')
 
-export default {
+module.exports = {
     async send(to, msg) {
         const twillioPhone = await $db.funcs.getTwillioPhone()
         return env.text.messages.create({

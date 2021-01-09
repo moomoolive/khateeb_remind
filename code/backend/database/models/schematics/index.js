@@ -1,8 +1,8 @@
-import general from './schemas/generalSchemas.js'
-import parent from './schemas/parentSchemas.js'
-import child from './schemas/childSchemas.js'
+const general = require('./schemas/generalSchemas.js')
+const parent = require('./schemas/parentSchemas.js')
+const child = require('./schemas/childSchemas.js')
 
-export default {
+module.exports = {
     ...general,
     ...parent,
     ...child

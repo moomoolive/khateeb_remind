@@ -1,6 +1,6 @@
-import $db from '../database/index.js'
-import general from './funcs.js'
-import equal from 'fast-deep-equal'
+const $db = require('../database/index.js')
+const general = require('./funcs.js')
+const equal = require('fast-deep-equal')
 
 const subHelper = {
     monthNames: ["January", "February", "March", "April", "May", "June",
@@ -124,7 +124,7 @@ const helpers = {
     }
 }
 
-export default {
+module.exports = {
     currentScheduleKey() {
         const upcomingFriday = general.findUpcomingFriday()
         const month = upcomingFriday.toLocaleString('default', { month: 'long' })
@@ -142,6 +142,8 @@ export default {
     },
     new(scheduleKey, locationAndTimings) {
         const allFridays = helpers.findAllFridaysFromKey(scheduleKey)
+        console.log(scheduleKey)
+        console.log(allFridays)
         const newSchedule = {
             month: scheduleKey,
             data : []

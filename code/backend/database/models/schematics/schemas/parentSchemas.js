@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const schemas = {
     setting: new mongoose.Schema({
@@ -7,6 +7,6 @@ const schemas = {
     })
 }
 
-export default {
+module.exports = {
     settings: mongoose.model('setting', schemas.setting)
 }

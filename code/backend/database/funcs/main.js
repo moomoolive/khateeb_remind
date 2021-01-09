@@ -1,5 +1,5 @@
-import $dbModels from '../models/main.js'
-import helpers from './helpers.js'
+const $dbModels = require('../models/main.js')
+const helpers = require('./helpers.js')
 
 const funcs = {
     databaseError(response, error) {
@@ -107,4 +107,4 @@ const funcs = {
     }
 }
 
-export default funcs
+module.exports = funcs

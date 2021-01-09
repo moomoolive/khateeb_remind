@@ -4,4 +4,4 @@ const settings = {
     useFindAndModify: false
 }
 
-export { settings as dbSettings }
+module.exports = settings

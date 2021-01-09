@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
-export default {
+module.exports = {
     scheduleEntry: new mongoose.Schema({
         month: String,
         data: Object,

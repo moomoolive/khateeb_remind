@@ -1,7 +1,7 @@
-import $db from '../database/index.js'
-import $utils from '../utils/index.js'
+const $db = require('../database/index.js')
+const $utils = require('../utils/index.js')
 
-export default {
+module.exports = {
     async confirmOldPassword(request, response, next) {
         const oldPassword = await $db.funcs.getPassword()
         if (request.body.confirm === oldPassword) {

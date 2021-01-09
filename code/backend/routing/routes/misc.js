@@ -1,9 +1,9 @@
-import express from 'express'
+const express = require('express')
 
-import $utils from '../../utils/index.js'
-import { middleware } from '../../middleware/main.js'
-import env from '../../app.js'
-import $db from '../../database/index.js'
+const $utils = require('../../utils/index.js')
+const middleware = require('../../middleware/main.js')
+const env = require('../../app.js')
+const $db = require('../../database/index.js')
 
 const router = express.Router()
 
@@ -63,4 +63,4 @@ router.post('/area-code', [middleware.validationCheck(['code']), middleware.auth
         else res.json('none')
 })
 
-export { router as misc }
+module.exports = router

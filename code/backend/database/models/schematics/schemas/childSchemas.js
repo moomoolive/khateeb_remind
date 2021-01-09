@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
-export default {
+module.exports = {
     admin: new mongoose.Schema({
         options: {
             firstName: String,

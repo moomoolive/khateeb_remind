@@ -1,7 +1,7 @@
-import { misc } from './routes/misc.js'
-import { general } from './routes/general.js'
-import { admin } from './routes/admin.js'
-import { text } from './routes/text.js'
+const  misc  = require('./routes/misc.js')
+const  general  = require('./routes/general.js')
+const  admin  = require('./routes/admin.js')
+const  text  = require('./routes/text.js')
 
 const routesList = {
     misc,
@@ -10,4 +10,4 @@ const routesList = {
     text
 }
 
-export { routesList as routes }
+module.exports = routesList

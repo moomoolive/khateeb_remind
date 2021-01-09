@@ -1,7 +1,7 @@
-import $db from '../database/index.js'
-import $utils from '../utils/index.js'
+const $db = require('../database/index.js')
+const $utils = require('../utils/index.js')
 
-export default {
+module.exports = {
     previousEntriesAndEmptySchema(previousEntries, schemaName) {
         const emptySchema = $db.models.schemasPlus(schemaName)
         const responseData = {

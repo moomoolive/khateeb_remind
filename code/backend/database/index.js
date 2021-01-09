@@ -1,7 +1,7 @@
-import funcs from './funcs/main.js'
-import models from './models/main.js'
+const funcs = require('./funcs/main.js')
+const models = require('./models/main.js')
 
-export default {
+module.exports = {
     funcs,
     models
 }

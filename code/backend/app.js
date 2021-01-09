@@ -1,19 +1,20 @@
-import express from 'express'
-import cors from 'cors'
-import mongoose from 'mongoose'
-import twilio from 'twilio'
-import dotenv from 'dotenv'
+const express = require('express')
+const cors = require('cors')
+const mongoose = require('mongoose')
+const twillio = require('twilio')(process.env.TWILIO_USER, process.env.TWILIO_KEY)
+const dotenv = require('dotenv')
 
-import { middleware } from './middleware/main.js'
-import { routes } from './routing/index.js'
-import { dbSettings } from './database/settings.js'
+const middleware = require('./middleware/main.js')
+const routes = require('./routing/index.js')
+const dbSettings =  require('./database/settings.js')
 
-//dotenv.config()
+if (process.env.NODE_ENV === 'production')
+    dotenv.config()
 const PORT = process.env.PORT || 5_000
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
 const JWT_SECRET = process.env.JWT_SECRET || 'secret'
 const EMERGENCY_KEY = process.env.EMERGENCY_KEY || '1234'
-const TEXT = twilio(process.env.TWILIO_USER, process.env.TWILIO_KEY)
+const TEXT = twillio
 
 const app = express()
 mongoose.connect(DATABASE, { ...dbSettings })
@@ -23,7 +24,6 @@ app.use(cors())
 app.use(express.json())
 app.use(middleware.generalError)
 
-//enable pre-flight
 app.options('*', cors())
 
 app.post('*', middleware.noEmptyBody)
@@ -38,7 +38,7 @@ db.once('open', () => { console.log(`Mongo is listening`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
 app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })
 
-export default { 
+module.exports = { 
     jwt: JWT_SECRET,
     emergency_key: EMERGENCY_KEY,
     text: TEXT

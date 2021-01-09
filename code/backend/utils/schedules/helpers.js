@@ -1,7 +1,7 @@
-import general from '../funcs.js'
-import $db from '../../database/index.js'
+const general = require('../funcs.js')
+const $db = require('../../database/index.js')
 
-export default {
+module.exports = {
     createScheduleKey() {
         const upcomingFriday = general.findUpcomingFriday()
         const month = upcomingFriday.toLocaleString('default', { month: 'long' })

@@ -1,5 +1,5 @@
-import helpers from './helpers.js'
-import $db from '../../database/index.js'
+const helpers = require('./helpers.js')
+const $db = require('../../database/index.js')
 
 const main = {
     fetchCurrentSchedule() {
@@ -79,4 +79,4 @@ const main = {
     }
 }
 
-export default main
+module.exports = main

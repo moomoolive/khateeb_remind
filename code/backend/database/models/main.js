@@ -1,7 +1,7 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
-import schema from './schematics/index.js'
-import helpers from './helpers.js'
+const schema = require('./schematics/index.js')
+const helpers = require('./helpers.js')
 
 const models = {
     settings: mongoose.model('setting', schema.setting),
@@ -84,4 +84,4 @@ const models = {
     }
 }
 
-export default models
+module.exports = models
