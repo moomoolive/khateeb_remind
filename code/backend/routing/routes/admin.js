@@ -28,6 +28,7 @@ router.delete(routerGroup1URL, (req, res) => {
 })
 
 router.post(routerGroup1URL, (req, res) => {
+    console.log(req.body)
     $db.funcs.save(routerGroup1, req.body, res)
 })
 
@@ -55,6 +56,7 @@ router.delete(routerGroup2URL, (req, res) => {
 })
 
 router.post(routerGroup2URL, (req, res) => {
+    console.log(req.body)
     $db.funcs.save(routerGroup2, req.body, res)
 })
 
@@ -84,6 +86,8 @@ router.get(routerGroup4URL + '/:monthToQuery', async (req, res) => {
         let schedule = await sched.fetchSchedule(req.params.monthToQuery)
         const locationAndTimings = await $db.funcs.getSetting('locationAndTimings')
         const needsUpdate = sched.needsUpdate(locationAndTimings, schedule)
+        if (!locationAndTimings)
+            res.json("No locations or timings were found!")
         if(!schedule)
             schedule = sched.new(req.params.monthToQuery, locationAndTimings)
         else if (needsUpdate) {

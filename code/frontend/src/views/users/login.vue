@@ -124,8 +124,7 @@ export default {
         },
         async attemptPasswordCreation($event) {
             const res = await this.$API.misc.sendVerificationCode($event)
-            console.log(res)
-            if (res === 'success') {
+            if (res === 'Changes successfully made!') {
                 alert('You have successfully changed your password!')
                 this.resetPassword = false
                 this.showForm = true

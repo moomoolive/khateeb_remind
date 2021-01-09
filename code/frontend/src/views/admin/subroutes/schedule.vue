@@ -5,6 +5,11 @@
             :originalSchedule="originalSchedule"
             @schedule-change="setAPIRequestParams($event)"
         />
+        <msg-with-pic
+            v-if="error"
+            :msg="`You need to setup locations and timing first`"
+            :gif="`personThrowingPlane`"
+        />
         <button
             v-if="currentSchedule && originalSchedule"
             class='grey'
@@ -33,7 +38,8 @@ export default {
             scheduleFor: null,
             currentSchedule: null,
             originalSchedule: null,
-            monthsFromCurrent: 0
+            monthsFromCurrent: 0,
+            error: false
         }
     },
     methods: {
@@ -45,7 +51,7 @@ export default {
                 console.log('hi')
             } 
             else if (data === 'No locations or timings were found!') {
-                console.log('oh no')
+                this.error = true
             } else this.updateSchedule(data)
         },
         updateSchedule(schedule) {

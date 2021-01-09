@@ -27,6 +27,7 @@ const funcs = {
         response.json("Are servers aren't responding right now, try later...")
     },
     noEmptyBody(request, response, next) {
+        console.log(request.body)
         if (Object.keys(request.body).length === 0 && request.path !== '/text/hub') {
             response.status($utils.hCodes.notAcceptable)
             response.json(`You cannot send an empty request body to this route!`)
@@ -50,9 +51,11 @@ const funcs = {
         }
     },
     schemaVC(request) {
+        console.log(request.body)
         const urlComponents = request.originalUrl.split('/')
         const schemaName = urlComponents[2]
         const validationList = $db.models.schemaParams(schemaName)
+        console.log(validationList)
         return validationList
     },
 }

@@ -89,7 +89,7 @@ export default {
             const date = new Date(dateString)
             const hour = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
             const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
-            const amOrPm = date.getHours > 11 ? 'PM' : 'AM'
+            const amOrPm = date.getHours() > 11 ? 'PM' : 'AM'
             return `${hour}:${minutes} ${amOrPm}`
         },
         cellType() {
