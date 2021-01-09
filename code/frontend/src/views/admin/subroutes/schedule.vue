@@ -48,7 +48,7 @@ export default {
                 scheduleFor
             )
             if (!data) {
-                console.log('hi')
+                this.error = true
             } 
             else if (data === 'No locations or timings were found!') {
                 this.error = true

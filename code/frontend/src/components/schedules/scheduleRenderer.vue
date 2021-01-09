@@ -122,7 +122,6 @@ export default {
         },
         displayedMonthInfo() {
             const firstFridayOfMonth = this.fridays[0]
-            console.log(firstFridayOfMonth)
             return {
                 month: firstFridayOfMonth.toLocaleString('default', { month: 'long' }),
                 year: firstFridayOfMonth.getFullYear(),
