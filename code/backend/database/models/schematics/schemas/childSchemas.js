@@ -26,5 +26,11 @@ module.exports = {
         options: {
             phoneNumber: String
         }
+    }),
+    textAPI: new mongoose.Schema({
+        options: {
+            user: String,
+            key: String
+        }
     })
 }

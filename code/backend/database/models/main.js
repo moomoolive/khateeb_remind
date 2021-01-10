@@ -21,6 +21,10 @@ const models = {
         'adminProfile',
         schema.admin
     ),
+    textAPI: schema.settings.discriminator(
+        'textAPI',
+        schema.textAPI
+    ),
     announcements: mongoose.model('announcement', schema.announcement),
     monthlySchedules: mongoose.model('monthlySchedule', schema.scheduleEntry),
     khateebs: mongoose.model('khateeb', schema.khateeb),

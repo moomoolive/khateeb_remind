@@ -30,6 +30,7 @@
                 :textInfoUnavailable="textInfoUnavailable"
                 :verificationTextSent="verificationTextSent"
                 :textPhoneData="textPhoneData"
+                :textAPIData="textAPIData"
                 @submitted="saveSetting($event)"
                 @verification-text="sendVerificationText()"
             />
@@ -54,6 +55,7 @@ export default {
             locationAndTimingData: null,
             adminIdentityData: null,
             textPhoneData: null,
+            textAPIData: null,
             tags: {
                 locationTiming: {
                     words: 'No Locations or Timings on File',
@@ -76,10 +78,15 @@ export default {
                         symbol: '😔',
                         color: 'important'
                     },
-                    noTwillio: {
+                    noTwillioPhone: {
                         words: 'No Twillio Phone',
                         symbol: '⚠️',
                         color: 'urgent'
+                    },
+                    noTwillioAPI: {
+                        words: 'Twillio API Info Missing',
+                        symbol: '🛑',
+                        color: 'important'
                     }
                 }
             },
@@ -120,18 +127,19 @@ export default {
         textInfoUnavailable() {
             return (
                 !this.previousEntriesExist('adminIdentityData') ||
-                !this.previousEntriesExist('textPhoneData')
+                !this.previousEntriesExist('textPhoneData') ||
+                !this.previousEntriesExist('textAPIData')
             )
         },
         textServiceTag() {
             if (this.textInfoUnavailable) {
                 const tags = []
-                if (!this.previousEntriesExist('adminIdentityData')) {
+                if (!this.previousEntriesExist('adminIdentityData'))
                     tags.push(this.tags.textService.missingInfo) 
-                }
-                if (!this.previousEntriesExist('textPhoneData')) {
-                    tags.push(this.tags.textService.noTwillio)
-                }
+                if (!this.previousEntriesExist('textPhoneData')) 
+                    tags.push(this.tags.textService.noTwillioPhone)
+                if (!this.previousEntriesExist('textAPIData'))
+                    tags.push(this.tags.textService.noTwillioAPI)
                 return tags
             } else return [this.tags.textService.online] 
         }
@@ -140,6 +148,7 @@ export default {
         this.locationAndTimingData = await this.getSettingData('locationAndTimings')
         this.adminIdentityData = await this.getSettingData('adminProfile')
         this.textPhoneData = await this.getSettingData('textPhone')
+        this.textAPIData = await this.getSettingData('textAPI')
     }
 
 }

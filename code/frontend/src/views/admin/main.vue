@@ -34,6 +34,9 @@ export default {
         savedChanges() {
             return this.$store.state.admin.savedChanges
         }
+    },
+    destroyed() {
+        this.$store.dispatch('adminSavedChangesScreen', false)
     }
 }
 </script>

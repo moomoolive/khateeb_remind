@@ -1,6 +1,7 @@
 @mixin inputColoring() {
     border: solid 0.1vh;
     border-bottom: solid black 0.5vh;
+    color: getColor("silver");
     background-color: themeRGBA("grey", 0.8);
     animation: border-gradient 8s ease infinite;
     @keyframes border-gradient {

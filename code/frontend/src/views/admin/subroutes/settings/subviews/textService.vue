@@ -30,6 +30,21 @@
                 @submitted="$emit('submitted', $event)"
             />
         </collapsable-box>
+        <collapsable-box
+            :headline="`Text API Info`"
+            :tagDetails="textAPITag"
+        >
+            <settings-form 
+                :name="`text API info`"
+                :previousEntries="textAPIData.previousEntries"
+                :emptySchema="textAPIData.emptySchema"
+                :invalidations="{
+                    emptyField: ['key', 'user']
+                }"
+                :backgroundColor="`blue-green`"
+                @submitted="$emit('submitted', $event)"
+            />
+        </collapsable-box>
     </div>
 </template>
 
@@ -53,6 +68,10 @@ export default {
         textPhoneData: {
             type: Object,
             required: true
+        },
+        textAPIData: {
+            type: Object,
+            required: true
         }
     },
     data() {
@@ -67,6 +86,10 @@ export default {
     computed: {
         textPhoneTag() {
             if (!this.textPhoneData.previousEntries[0]) return [this.generalTag]
+            else return null
+        },
+        textAPITag() {
+            if (!this.textAPIData.previousEntries[0]) return [this.generalTag]
             else return null
         }
     }
