@@ -6,8 +6,7 @@
         <div class="tag">
             <tag-box 
                 info="new" 
-                v-if="isUpdated"
-                :isWiggling="true"
+                v-if="updated"
             />
         </div>
     </div>
@@ -36,31 +35,36 @@ export default {
     },
     data() {
         return {
-            isMounted: false,
-            isUpdated: null
+            updated: false
         }
     },
     methods: {
+        isUpdated(val) {
+            if (!val.savedOn)
+                return false
+            const cellSaveDate = new Date(val.savedOn).getTime()
+            const lastVisit = new Date(this.$store.state.lastVisit).getTime()
+            return cellSaveDate > lastVisit
+        }
     },
     computed: {
+        khateeb() {
+            return this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming]
+        },
         display() {
-            if (this.isMounted) {
-                const x = this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming]
-                return `${x.firstName} ${x.lastName}`
-            }
-            else 'TBD' 
+            if (this.khateeb) 
+                return `${this.khateeb.firstName} ${this.khateeb.lastName}`
+            else 
+                return 'TBD' 
+        }
+    },
+    watch: {
+        khateeb(newVal) {
+            this.updated = this.isUpdated(newVal)
         }
     },
     created() {
-        let x = this.schedule.monthlySchedule[this.displayedWeek].khateebs[this.prayerTiming]
-        if (x.savedOn) {
-            const cellSaveDate = new Date(x.savedOn).getTime()
-            const lastVisit = new Date(this.$store.state.lastVisit).getTime()
-            this.isUpdated = cellSaveDate > lastVisit
-        }
-    },
-    mounted() {
-        this.$nextTick(() => { this.isMounted = true })
+        this.updated = this.isUpdated(this.khateeb)
     }
 }
 </script>

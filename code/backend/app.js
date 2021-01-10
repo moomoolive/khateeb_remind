@@ -10,7 +10,7 @@ const middleware = require('./middleware/main.js')
 const routes = require('./routing/index.js')
 const dbSettings =  require('./database/settings.js')
 
-const PORT = process.env.PORT || 5_000
+const PORT = 80
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
 
 const app = express()

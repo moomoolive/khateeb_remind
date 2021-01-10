@@ -15,6 +15,7 @@
                 name="controls"
                 :fridayDates="fridayDates"
                 :display="displayedMonthInfo"
+                :weekOf="displayData.weekOf"
                 :currentSchedule="currentSchedule"
                 :change="displayControls"
             ></slot>
@@ -65,7 +66,7 @@ export default {
             originalMonth: 0,
             displayData: {
                 location: 'All',
-                weekOf: datetime.upcomingFriday(true).toUTCString(),
+                weekOf: this.findUpcomingFridayKey(),
             },
             month: datetime.upcomingFriday(true)
         }
@@ -78,6 +79,17 @@ export default {
                 if (elem === 'month') this.changeSchedule(val)
                 else this.displayData[elem] = val 
             })
+        },
+        findUpcomingFridayKey() {
+            const date = datetime.upcomingFriday(true)
+            const keys = Object.keys(this.currentSchedule.data[0].monthlySchedule)
+            let returnDate;
+            keys.forEach(week => {
+                const weekDate = new Date(week)
+                if (weekDate.getDate() === date.getDate())
+                    returnDate = week
+            })
+            return returnDate
         },
         changeSchedule(value) {
             this.incrementMonth(value)

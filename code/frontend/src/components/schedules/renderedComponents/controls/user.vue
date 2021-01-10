@@ -53,14 +53,18 @@ export default {
     },
     data() {
         return {
-            isWeeklyView: true
+            isWeeklyView: true,
+            currentWeekKey: null
         }
     },
     methods: {
         toWeeklyView($event) {
             this.isWeeklyView = $event
-            this.$emit('change', { weekOf: datetime.upcomingFriday(true).toUTCString() }) 
+            this.$emit('change', { weekOf: this.currentWeekKey }) 
         }
+    },
+    created() {
+        this.currentWeekKey = this.$attrs.weekOf
     }
 }
 </script>

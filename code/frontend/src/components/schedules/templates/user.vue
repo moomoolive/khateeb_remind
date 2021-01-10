@@ -18,6 +18,7 @@
                         :fridayDates="props.fridayDates"
                         :display="props.display"
                         :currentSchedule="props.currentSchedule"
+                        :weekOf="props.weekOf"
                         @change="props.change($event)"
                     />
                 </template>
