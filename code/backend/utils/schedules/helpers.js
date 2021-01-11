@@ -1,9 +1,7 @@
 const $db = require('../../database/index.js')
+const funcs = require('../funcs.js')
 
 const helpers = {
-    monthNames: ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-    ],
     deepCopy(object) {
         return JSON.parse(JSON.stringify(object))
     },
@@ -48,7 +46,7 @@ const helpers = {
 module.exports = {
     dateObjectFromString(monthYearString) {
         const decoded = monthYearString.split('-')
-        const month = helpers.monthNames.indexOf(decoded[0])
+        const month = funcs.monthStringToNumber(decoded[0])
         const year = decoded[1]
         return new Date(year, month, 1)
     },
