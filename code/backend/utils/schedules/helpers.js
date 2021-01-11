@@ -1,10 +1,6 @@
-const $db = require('../../database/index.js')
-const funcs = require('../funcs.js')
+const funcs = require($DIR + '/utils/funcs.js')
 
 const helpers = {
-    deepCopy(object) {
-        return JSON.parse(JSON.stringify(object))
-    },
     emptyLocationTemplate() {
         return $db.models.emptySchema('locationTemplate')
     },
@@ -16,7 +12,7 @@ const helpers = {
         return arr
     },
     adjustPrayerSlots(newTimings, oldPrayerSlots, toBeDecidedIndicator) {
-        const updatedPrayerSlots = this.deepCopy(oldPrayerSlots)
+        const updatedPrayerSlots = $utils.deepCopy(oldPrayerSlots)
         const diff = newTimings.length - oldPrayerSlots.length
         for (let i = 0; i < Math.abs(diff); i++) {
             diff < 0 ? updatedPrayerSlots.pop() : updatedPrayerSlots.push(toBeDecidedIndicator)
@@ -63,7 +59,7 @@ module.exports = {
         const thisMonth = dateObjectFirstFriday.getMonth()
         const oneWeek = 7
         while (dateObjectFirstFriday.getMonth() === thisMonth) {
-            fridays.push(helpers.deepCopy(dateObjectFirstFriday.toUTCString()))
+            fridays.push($utils.deepCopy(dateObjectFirstFriday.toUTCString()))
             dateObjectFirstFriday.setDate(dateObjectFirstFriday.getDate() + oneWeek)
         }
         return fridays
@@ -74,7 +70,7 @@ module.exports = {
         return prayerSlotTemplate
     },
     createEmptyLocation(emptyPrayerSlotTemplate, weeksInMonth, locationDetails) {
-        const x = helpers.deepCopy(locationDetails)
+        const x = $utils.deepCopy(locationDetails)
         const locationTemplate = helpers.emptyLocationTemplate()
         locationTemplate.info = x.info
         weeksInMonth.forEach(fridayDateObject => {
@@ -96,7 +92,7 @@ module.exports = {
         return this.findAllFridays(firstFriday)
     },
     adjustNumberOfLocations(oldSchedule, currentLocationDetails) {
-        const newLocations = helpers.deepCopy(oldSchedule)
+        const newLocations = $utils.deepCopy(oldSchedule)
         const oldLocations = newLocations.data.length
         const updatedLocations = currentLocationDetails.options.length
         const diff = updatedLocations - oldLocations
@@ -115,10 +111,10 @@ module.exports = {
         return newLocations
     },
     checkIfTimingsAreSame(oldSchedule, currentLocationDetails) {
-        const updatedTimingsSchedule = helpers.deepCopy(oldSchedule)
+        const updatedTimingsSchedule = $utils.deepCopy(oldSchedule)
         for (const [key, value] of Object.entries(updatedTimingsSchedule.monthlySchedule)) {
             if (helpers.weekIsInFuture(key) && value.timings !== currentLocationDetails.timings) {
-                value.timings = helpers.deepCopy(currentLocationDetails.timings)
+                value.timings = $utils.deepCopy(currentLocationDetails.timings)
                 value.khateebs = helpers.adjustPrayerSlots(
                     value.timings, 
                     value.khateebs,

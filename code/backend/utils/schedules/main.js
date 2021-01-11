@@ -1,8 +1,7 @@
-const $db = require('../../database/index.js')
-const general = require('../funcs.js')
-const helpers = require('./helpers.js')
-
 const equal = require('fast-deep-equal')
+
+const general = require($DIR + '/utils/funcs.js')
+const helpers = require('./helpers.js')
 
 module.exports = {
     currentScheduleKey() {

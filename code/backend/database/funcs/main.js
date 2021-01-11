@@ -1,4 +1,4 @@
-const $dbModels = require('../models/main.js')
+const $dbModels = require($DIR + '/database/models/main.js')
 const helpers = require('./helpers.js')
 
 const funcs = {

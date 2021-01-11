@@ -1,9 +1,6 @@
 const express = require('express')
 const cronJob = require('cron').CronJob
 
-const $utils = require('../../utils/index.js')
-const $db = require('../../database/index.js')
-
 const router = express.Router()
 
 router.post('/hub', express.urlencoded({extended: true}),(req, res) => {

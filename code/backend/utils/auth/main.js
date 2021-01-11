@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const env = require('../../app.js')
+
 const helpers = require('./helpers.js')
 
 module.exports = {

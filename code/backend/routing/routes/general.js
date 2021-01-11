@@ -1,8 +1,6 @@
 const express = require('express')
 
-const $utils = require('../../utils/index.js')
-const $db = require('../../database/index.js')
-const middleware = require('../../middleware/main.js')
+const middleware = require($DIR + '/middleware/main.js')
 
 const router = express.Router()
 

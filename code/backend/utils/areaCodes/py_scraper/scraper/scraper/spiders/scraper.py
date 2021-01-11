@@ -14,5 +14,8 @@ class canadianAreaCodes(scrapy.Spider):
             if (area_code.isnumeric()):
                 codes.append(int(area_code))
         
-        with open('../organize_codes/codes.json', 'w') as f:
+        codes.sort()
+        codes = dict.fromkeys(codes, True)
+
+        with open('../../area_codes.json', 'w') as f:
             json.dump(codes, f)

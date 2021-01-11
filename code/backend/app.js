@@ -2,13 +2,18 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
+const path = require('path')
+
+global.$DIR = path.resolve(__dirname)
+global.$utils = require($DIR + '/utils/index.js')
+global.$db = require($DIR + '/database/index.js')
 
 if (process.env.NODE_ENV === 'production')
     dotenv.config()
 
-const middleware = require('./middleware/main.js')
-const routes = require('./routing/index.js')
-const dbSettings =  require('./database/settings.js')
+const middleware = require($DIR + '/middleware/main.js')
+const routes = require($DIR + '/routing/index.js')
+const dbSettings =  require($DIR + '/database/settings.js')
 
 const PORT = 80
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'

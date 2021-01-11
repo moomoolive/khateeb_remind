@@ -1,6 +1,3 @@
-const $db = require('../database/index.js')
-const $utils = require('../utils/index.js')
-
 module.exports = {
     async confirmOldPassword(request, response, next) {
         const oldPassword = await $db.funcs.getPassword()

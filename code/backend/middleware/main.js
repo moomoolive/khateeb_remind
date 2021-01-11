@@ -1,8 +1,5 @@
 const jwt = require('jsonwebtoken')
 
-const $utils = require('../utils/index.js')
-const $db = require('../database/index.js')
-
 const helpers = require('./helpers.js')
 
 const funcs = {

@@ -1,5 +1,3 @@
-const $db = require('../../database/index.js')
-
 const twilio = async () => {
     try {
         const APIInfo = await $db.funcs.getSetting("textAPI")
