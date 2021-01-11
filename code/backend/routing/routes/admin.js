@@ -2,9 +2,7 @@ const express = require('express')
 
 const middleware = require('../../middleware/main.js')
 const $db = require('../../database/index.js')
-const $responses = require('../../utils/responses.js')
 const $utils = require('../../utils/index.js')
-const sched = require('../../utils/schedule.js')
 
 const router = express.Router()
 
@@ -12,14 +10,14 @@ router.use(middleware.authAdmin)
 
 const routerGroup1 = 'announcements'
 const routerGroup1URL = `/${routerGroup1}`
-router.get(routerGroup1URL, (req, res) => {
-    $db.models.announcements.find({}, (err, announcements) => {
-        if (err) $db.funcs.databaseErrorCallback(err, res)
-        else {
-            const responseData = $responses.previousEntriesAndEmptySchema(announcements, routerGroup1)
-            res.json(responseData)
-        }
-    })
+router.get(routerGroup1URL, async (req, res) => {
+    try {
+        const data = await $db.models.previousEntriesAndEmptySchema(routerGroup1)
+        res.json(data)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't retrieve ${routerGroup1}`)
+    }
 })
 
 router.delete(routerGroup1URL, (req, res) => {
@@ -32,21 +30,16 @@ router.post(routerGroup1URL, middleware.validationCheck('schema'), (req, res) =>
 
 const routerGroup2 = 'khateebs'
 const routerGroup2URL = `/${routerGroup2}`
-router.get(routerGroup2URL + '/:fullOrNot', (req, res) => {
-    let x
-    req.params.fullOrNot === 'no' ? x = ['_id', 'firstName', 'lastName'] : x = null;
-    $db.models.khateebs.find({}, (err, khateebs) => {
-        if (err) console.log(err)
-        else {
-            let responseData
-            if (x) {
-                responseData = $responses.prayerSlotKhateebsAndSchema(khateebs)
-            } else {
-                responseData = $responses.previousEntriesAndEmptySchema(khateebs, routerGroup2)
-            }
-            res.json(responseData)
-        }
-    }).select(x)
+router.get(routerGroup2URL + '/:fullOrNot', async (req, res) => {
+    try {
+        const params = req.params.fullOrNot === 'no' ? ['_id', 'firstName', 'lastName'] : 'all'
+        const specialEmptySchema = req.params.fullOrNot === 'no' ? $utils.schedule.TBDIndicator : null
+        const data = await $db.models.previousEntriesAndEmptySchema(routerGroup2, params, specialEmptySchema)
+        res.json(data)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't retrieve ${routerGroup2}`)
+    }
 })
 
 router.delete(routerGroup2URL, (req, res) => {
@@ -60,15 +53,15 @@ router.post(routerGroup2URL, middleware.validationCheck('schema'), (req, res) =>
 const routerGroup3 = 'settings'
 const routerGroup3URL = `/${routerGroup3}`
 
-router.get(routerGroup3URL + '/:settingName', (req, res) => {
+router.get(routerGroup3URL + '/:settingName', async (req, res) => {
     const settingName = req.params.settingName
-    $db.models[settingName].find({}, (err, setting) => {
-        if (err) console.log(err)
-        else {
-            let responseData = $responses.previousEntriesAndEmptySchema(setting, settingName)
-            res.json(responseData)
-        }
-    })
+    try {
+        const data = await $db.models.previousEntriesAndEmptySchema(settingName)
+        res.json(data)
+    } catch(err) {
+        console.log(err)
+        res.json(`Could't retrieve ${settingName}`)
+    }
 })
 
 router.post(routerGroup3URL, [middleware.isPassword, middleware.validationCheck('schema')], (req, res) => {
@@ -80,15 +73,15 @@ const routerGroup4URL = `/${routerGroup4}`
 
 router.get(routerGroup4URL + '/:monthToQuery', async (req, res) => {
     try {
-        let schedule = await sched.fetchSchedule(req.params.monthToQuery)
+        let schedule = await $utils.schedule.fetchSchedule(req.params.monthToQuery)
         const locationAndTimings = await $db.funcs.getSetting('locationAndTimings')
-        const needsUpdate = sched.needsUpdate(locationAndTimings, schedule)
+        const needsUpdate = $utils.schedule.needsUpdate(locationAndTimings, schedule)
         if (!locationAndTimings)
             res.json("No locations or timings were found!")
         if(!schedule)
-            schedule = sched.new(req.params.monthToQuery, locationAndTimings)
+            schedule = $utils.schedule.new(req.params.monthToQuery, locationAndTimings)
         else if (needsUpdate) {
-            schedule = sched.update(schedule, locationAndTimings)
+            schedule = $utils.schedule.update(schedule, locationAndTimings)
             $db.funcs.save('monthlySchedules', schedule)
         }
         res.json(schedule)
@@ -101,7 +94,7 @@ router.get(routerGroup4URL + '/:monthToQuery', async (req, res) => {
 })
 
 router.post(routerGroup4URL, middleware.validationCheck('schema'), (req, res) => {
-    const updatedSchedule = sched.checkForUpdates(req.body, req.body.original)
+    const updatedSchedule = $utils.schedule.checkForUpdates(req.body, req.body.original)
     $db.funcs.save(routerGroup4, updatedSchedule, res)
 })
 

@@ -75,7 +75,6 @@ const models = {
     schemasPlus(schemaName) {
         let schemas = this.fetchSchemaModels(schemaName)
         const CSchemas = this.findChildSchemas(schemaName)
-        //console.log(schemas.child[0].schema.paths.timings.caster.instance)
         if (schemas.child.length > 0) {
             for (let x = 0; x < CSchemas.length; x++) {
                 const parent = schemas.parent[CSchemas[x]]
@@ -85,6 +84,24 @@ const models = {
         }
         if (typeof(schemas.parent.__t) === 'string') schemas.parent.__t = schemaName
         return schemas.parent
+    },
+    previousEntriesAndEmptySchema(schemaName, fields='all', specialEmptySchema=null) {
+        if (fields === 'all')
+            fields = null
+        return new Promise((resolve, reject) => {
+            this[schemaName].find({}, (err, previousEntries) => {
+                if (err) {
+                    console.log(err)
+                    reject()
+                } else {
+                    const emptySchema = specialEmptySchema ? specialEmptySchema() : this.schemasPlus(schemaName)
+                    resolve({
+                        emptySchema,
+                        previousEntries
+                    }) 
+                }
+            }).select(fields)
+        })
     }
 }
 

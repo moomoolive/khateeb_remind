@@ -1,9 +1,16 @@
-const helpers = require('./helpers.js')
 const $db = require('../../database/index.js')
+const general = require('../funcs.js')
+const helpers = require('./helpers.js')
 
-const main = {
-    fetchCurrentSchedule() {
-        const scheduleKey = helpers.createScheduleKey()
+const equal = require('fast-deep-equal')
+
+module.exports = {
+    currentScheduleKey() {
+        const upcomingFriday = general.findUpcomingFriday()
+        const month = upcomingFriday.toLocaleString('default', { month: 'long' })
+        return `${month}-${upcomingFriday.getFullYear()}`
+    },
+    fetchSchedule(scheduleKey) {
         return new Promise((resolve, reject) => {
             $db.models.monthlySchedules.findOne({ month: scheduleKey }, (err, schedule) => {
                 if (err) {
@@ -13,70 +20,55 @@ const main = {
             })
         })
     },
-    new(weeksInMonth, locationAndTiming) {
-        const TBD = this.toBeDecidedIndicator()
-        const tableData = locationAndTiming.options
-        const newSchedule = []
-        for (let location in tableData) {
-            newSchedule[location] = helpers.emptyLocation(
-                tableData[location],
-                weeksInMonth,
-                TBD
+    new(scheduleKey, locationAndTimings) {
+        const allFridays = helpers.findAllFridaysFromKey(scheduleKey)
+        console.log(allFridays)
+        const newSchedule = {
+            month: scheduleKey,
+            data : []
+        }
+        locationAndTimings.options.forEach(location => {
+            const emptyLocation = helpers.createEmptyLocation(
+                helpers.toBeDecidedIndicator(),
+                allFridays,
+                location
             )
-        }
-        return {
-            rows: newSchedule
-        }
+            newSchedule.data.push(emptyLocation)
+        })
+        return newSchedule
     },
-    update(weeksInMonth, locationAndTiming, schedule) {
-        const TBD = this.toBeDecidedIndicator()
-        helpers.removeExcessLocations(schedule.data.rows, locationAndTiming.options)
-        for (let location = 0; location < locationAndTiming.options.length; location++) {
-            if (schedule.data.rows[location]) {
-                const updates = helpers.cloneObject(locationAndTiming.options[location])
-                const old = helpers.cloneObject(schedule.data.rows[location])
-                old.info = updates.info
-                const scheduleUpdates = helpers.updateTimings(old.timings, updates.timings)
-                old.timings = updates.timings
-                old.monthlySchedule = helpers.fillMismatchedWithTBD(
-                    scheduleUpdates.mismatchedTimings,
-                    TBD,
-                    old,
-                    scheduleUpdates.diff
-                )
-                schedule.data.rows[location] = old
-            } else {
-                schedule.data.rows[location] = helpers.emptyLocation(
-                    locationAndTiming.options,
-                    weeksInMonth,
-                    TBD
-                )
-            }
-        }
-        $db.funcs.save('monthlySchedules', schedule)
-        return schedule
+    update(oldSchedule, currentLocationDetails) {
+        const updatedLocations = helpers.adjustNumberOfLocations(oldSchedule, currentLocationDetails)
+        currentLocationDetails.options.forEach((location, index) => {
+            updatedLocations.data[index].info = location.info
+            updatedLocations.data[index].monthlySchedule = helpers.checkIfTimingsAreSame(updatedLocations.data[index], location)
+        })
+        
+        return updatedLocations
     },
-    toBeDecidedIndicator() {
-        const prayerSlotTemplate = $db.models.emptySchema('prayerSlot')
-        prayerSlotTemplate.firstName = 'TBD'
-        return prayerSlotTemplate
+    needsUpdate(locations, schedule) {
+        if (!schedule)
+            return null
+        const locationsSavedOn = new Date(locations.savedOn).getTime()
+        const scheduleSavedOn= new Date(schedule.savedOn).getTime()
+        return (locationsSavedOn > scheduleSavedOn) && helpers.scheduleIsInCurrentMonthOrBeyond(locations, schedule)
     },
-    updatePrayerSlotDates(currentSchedule, originalSchedule) {
-        for (let location in currentSchedule.data.rows) {
-            for (let week in currentSchedule.data.rows[location].monthlySchedule) {
-                for (let prayerSlot in currentSchedule.data.rows[location].monthlySchedule[week]) {
-                    if (
-                        currentSchedule.data.rows[location].monthlySchedule[week][prayerSlot]._id !==
-                        originalSchedule.data.rows[location].monthlySchedule[week][prayerSlot]._id
-                    ) {
-                        currentSchedule.data.rows[location].monthlySchedule[week][prayerSlot].savedOn = new Date().toUTCString()
+    checkForUpdates(updated, original) {
+        const updatedSchedule = JSON.parse(JSON.stringify(updated))
+        updatedSchedule.data.forEach((location, locationIndex) => {
+            for(let [weekOf, weekInfo] of Object.entries(location.monthlySchedule)) {
+                weekInfo.khateebs.forEach((khateeb, khateebIndex) => {
+                    const originalVal = original.data[locationIndex].monthlySchedule[weekOf].khateebs[khateebIndex]
+                    if(!equal(khateeb, originalVal)) {
+                        khateeb.savedOn = new Date()
                     }
-
-                }
+                })
             }
-        }
-        return currentSchedule
+        })
+        delete updatedSchedule.original
+        return updatedSchedule
+    },
+    TBDIndicator() {
+        return helpers.toBeDecidedIndicator()
     }
 }
-
-module.exports = main
