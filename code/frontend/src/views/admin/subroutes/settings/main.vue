@@ -113,9 +113,19 @@ export default {
             } else alert('There is a problem with the text service')
         },
         async assignAPIData(settingName, targetVal='default') {
-            const apiData = await this.getSettingData(settingName)
-            const target = targetVal === 'default' ? settingName + 'Data' : targetVal
-            this[target] = apiData
+            try {
+                const apiData = await this.getSettingData(settingName)
+                const target = targetVal === 'default' ? settingName + 'Data' : targetVal
+                this[target] = apiData
+            } catch(err) {
+                alert(
+                    `Khateeb remind couldn't retrieve ${settingName} from API
+                    
+                    Error Reference:
+                    ${err}`
+                )
+                console.log(err)
+            }
         }
     },
     computed: {
