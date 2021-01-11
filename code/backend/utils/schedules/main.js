@@ -22,7 +22,6 @@ module.exports = {
     },
     new(scheduleKey, locationAndTimings) {
         const allFridays = helpers.findAllFridaysFromKey(scheduleKey)
-        console.log(allFridays)
         const newSchedule = {
             month: scheduleKey,
             data : []

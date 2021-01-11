@@ -28,6 +28,20 @@ const helpers = {
     weekIsInFuture(dateString) {
         const date = new Date(dateString)
         return date > new Date() 
+    },
+    adjustTimingDate(fridayDateObject, timings) {
+        const updatedTimings = []
+        const fridayDate = new Date(fridayDateObject)
+        const month = fridayDate.getMonth()
+        const date = fridayDate.getDate()
+        timings.forEach(timing => {
+            const x = new Date(timing)
+            x.setMonth(month)
+            x.setDate(date)
+            x.setSeconds(0, 0)
+            updatedTimings.push(x)
+        })
+        return updatedTimings
     }
 }
 
@@ -66,11 +80,12 @@ module.exports = {
         const locationTemplate = helpers.emptyLocationTemplate()
         locationTemplate.info = x.info
         weeksInMonth.forEach(fridayDateObject => {
+            const updatedTimings = helpers.adjustTimingDate(fridayDateObject, x.timings)
             locationTemplate.monthlySchedule[fridayDateObject] = {
-                timings: x.timings,
+                timings: updatedTimings,
                 khateebs: helpers.emptyPrayerSlots(
                     emptyPrayerSlotTemplate,
-                    x.timings
+                    updatedTimings
                 )
             }
 
