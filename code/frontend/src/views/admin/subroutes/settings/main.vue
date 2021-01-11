@@ -5,9 +5,9 @@
             :tagDetails="locationTimingTag"
         >
             <location-timing
-                v-if="locationAndTimingData"
-                :emptySchema="locationAndTimingData.emptySchema"
-                :previousEntries="locationAndTimingData.previousEntries"
+                v-if="locationAndTimingsData"
+                :emptySchema="locationAndTimingsData.emptySchema"
+                :previousEntries="locationAndTimingsData.previousEntries"
                 @submitted="saveSetting($event)"
             />
         </collapsable-box>
@@ -26,7 +26,7 @@
             :tagDetails="textServiceTag"
         >
             <text-service
-                v-if="textPhoneData"
+                v-if="textPhoneData && textAPIData"
                 :textInfoUnavailable="textInfoUnavailable"
                 :verificationTextSent="verificationTextSent"
                 :textPhoneData="textPhoneData"
@@ -52,7 +52,7 @@ export default {
     },
     data() {
         return {
-            locationAndTimingData: null,
+            locationAndTimingsData: null,
             adminIdentityData: null,
             textPhoneData: null,
             textAPIData: null,
@@ -111,11 +111,16 @@ export default {
             if (res === 'text was sent') {
                 this.verificationTextSent = true
             } else alert('There is a problem with the text service')
+        },
+        async assignAPIData(settingName, targetVal='default') {
+            const apiData = await this.getSettingData(settingName)
+            const target = targetVal === 'default' ? settingName + 'Data' : targetVal
+            this[target] = apiData
         }
     },
     computed: {
         locationTimingTag() {
-            if (this.previousEntriesExist('locationAndTimingData')) {
+            if (this.previousEntriesExist('locationAndTimingsData')) {
                 return null
             } return [this.tags.locationTiming]
         },
@@ -144,11 +149,11 @@ export default {
             } else return [this.tags.textService.online] 
         }
     },
-    async created() {
-        this.locationAndTimingData = await this.getSettingData('locationAndTimings')
-        this.adminIdentityData = await this.getSettingData('adminProfile')
-        this.textPhoneData = await this.getSettingData('textPhone')
-        this.textAPIData = await this.getSettingData('textAPI')
+    created() {
+        this.assignAPIData('locationAndTimings')
+        this.assignAPIData('adminProfile', 'adminIdentityData')
+        this.assignAPIData('textPhone')
+        this.assignAPIData('textAPI')
     }
 
 }
