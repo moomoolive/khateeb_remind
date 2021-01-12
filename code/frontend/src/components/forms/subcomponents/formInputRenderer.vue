@@ -6,7 +6,7 @@
         >
             <div v-if="isRenderable(name)">
                 <p>{{ inputLabel(name) }}:</p>
-                <div v-if="!isTextArea(name)">
+                <div v-if="!isTextArea(name) && !isDropdown(name)">
                     <input 
                         :type="typeLoader(name)" 
                         v-model="inputData[name]"
@@ -16,6 +16,20 @@
                     <textarea
                         v-model="inputData[name]"
                     ></textarea><br>
+                </div>
+                <div v-if="isDropdown(name)">
+                    <select v-model="inputData[name]">
+                        <option
+                            v-for="option in dropdown[name].data"
+                            :key="option"
+                            :value="option"
+                        >
+                            {{ 
+                                dropdown[name].namingConvention ? 
+                                dropdown[name].namingConvention(option) : option 
+                            }}
+                        </option>
+                    </select>
                 </div>
                 <span v-if="
                     inputIsText(name) &&
@@ -46,6 +60,10 @@ export default {
             type: [Array],
             required: false,
             default: () => []
+        },
+        dropdown: {
+            type: Object,
+            required: false
         },
         inputAlias: {
             type: Object,
@@ -95,6 +113,11 @@ export default {
         isTextArea(fieldName) {
             return this.bigText.find(elem => elem === fieldName)
         },
+        isDropdown(fieldName) {
+            if (!this.dropdown)
+                return null
+            return !!this.dropdown[fieldName]
+        },
         inputIsText(fieldName) {
             return this.typeLoader(fieldName) === 'text'
         },
@@ -111,11 +134,22 @@ export default {
         },
         isRenderable(fieldName) {
             return !this.doNotRenderDefaults.find(elem => elem === fieldName)
+        },
+        defaultDropdownOptions() {
+            if (!this.dropdown)
+                return
+            const keys = Object.keys(this.dropdown)
+            keys.forEach(key => {
+                if (!this.inputData[key]) {
+                    const firstOption = this.dropdown[key].data[0]
+                    this.inputData[key] = firstOption
+                }
+            })
         }
-
     },
     created() {
         this.addToDefaultDoNotRender()
+        this.defaultDropdownOptions()
     }
 }
 </script>

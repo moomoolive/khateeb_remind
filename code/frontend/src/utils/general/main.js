@@ -4,8 +4,8 @@ export default {
     deepCopy(item) {
         return JSON.parse(JSON.stringify(item))
     },
-    stringFormat(string, format='camel', outputCase='title') {
+    stringFormat(string, format='camel', outputCase='title', raw=false) {
         const casedArray = helpers[format + `CaseToArray`](string)
-        return helpers.arrayToString(casedArray, outputCase)
+        return helpers.arrayToString(casedArray, outputCase, raw)
     }
 }

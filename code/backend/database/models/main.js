@@ -25,6 +25,11 @@ const models = {
         'textAPI',
         schema.textAPI
     ),
+    timezone: schema.settings.discriminator(
+        'timezone',
+        schema.timezone
+    ),
+    textHub: mongoose.model('textHub', schema.textHub),
     announcements: mongoose.model('announcement', schema.announcement),
     monthlySchedules: mongoose.model('monthlySchedule', schema.scheduleEntry),
     khateebs: mongoose.model('khateeb', schema.khateeb),

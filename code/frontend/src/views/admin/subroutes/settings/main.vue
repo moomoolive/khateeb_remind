@@ -16,8 +16,10 @@
             :tagDetails="adminDetailsTag"
         >
             <admin-details
-                v-if="adminIdentityData"
+                v-if="adminIdentityData && timezoneData"
                 :adminIdentityData="adminIdentityData"
+                :timezoneData="timezoneData"
+                :supportedTimezones="supportedTimezones"
                 @submitted="saveSetting($event)"
             />
         </collapsable-box>
@@ -41,7 +43,8 @@
 <script>
 import adminDetails from './subviews/adminDetails.vue'
 import locationTiming from './subviews/locationTiming.vue'
-import textService from './subviews/textService.vue' 
+import textService from './subviews/textService.vue'
+import tags from './tags.json' 
 
 export default {
     name: "settings",
@@ -56,40 +59,9 @@ export default {
             adminIdentityData: null,
             textPhoneData: null,
             textAPIData: null,
-            tags: {
-                locationTiming: {
-                    words: 'No Locations or Timings on File',
-                    symbol: '⚠️',
-                    color: 'urgent'
-                },
-                adminDetails: {
-                    words: 'No Administrator on File',
-                    symbol: '⚠️',
-                    color: 'urgent'
-                },
-                textService: {
-                    online: {
-                        words: 'Online',
-                        symbol: '😄',
-                        color: 'goodNews'
-                    },
-                    missingInfo: {
-                        words: 'No Admin Number',
-                        symbol: '😔',
-                        color: 'important'
-                    },
-                    noTwillioPhone: {
-                        words: 'No Twillio Phone',
-                        symbol: '⚠️',
-                        color: 'urgent'
-                    },
-                    noTwillioAPI: {
-                        words: 'Twillio API Info Missing',
-                        symbol: '🛑',
-                        color: 'important'
-                    }
-                }
-            },
+            timezoneData: null,
+            supportedTimezones: null,
+            tags,
             verificationTextSent: false
         }
     },
@@ -118,13 +90,46 @@ export default {
                 const target = targetVal === 'default' ? settingName + 'Data' : targetVal
                 this[target] = apiData
             } catch(err) {
-                alert(
-                    `Khateeb remind couldn't retrieve ${settingName} from API
-                    
-                    Error Reference:
-                    ${err}`
-                )
-                console.log(err)
+                this.apiCallError(settingName, err)
+            }
+        },
+        apiCallError(dataName, error) {
+            alert(
+                `Khateeb remind couldn't retrieve ${dataName} from API
+                
+                Error Reference:
+                ${error}`
+            )
+            console.log(error)
+        },
+        compileTags(tagCategory, missingFields) {
+            const tags = []
+            missingFields.forEach(field => {
+                if (!this.previousEntriesExist(field)) {
+                    tags.push(this.tags[tagCategory][field])
+                }
+            })
+            return tags
+        },
+        errorTagRequired(missingFields=[]) {
+            if (missingFields.length < 1)
+                return null
+            let isRequired = false
+            missingFields.forEach(field => {
+                if (!this.previousEntriesExist(field))
+                    isRequired = true
+            })
+            return isRequired
+        },
+        errorTagKeys(tagCategory) {
+            const keys = Object.keys(this.tags[tagCategory])
+            return keys.filter(elem => elem.slice(-4) === 'Data')
+        },
+        async getSupportedTimezones() {
+            try {
+                this.supportedTimezones = await this.$API.misc.getTimeZones()
+            } catch(err) {
+                this.apiCallError('timezones', err)
             }
         }
     },
@@ -135,28 +140,20 @@ export default {
             } return [this.tags.locationTiming]
         },
         adminDetailsTag() {
-            if (this.previousEntriesExist('adminIdentityData')) {
-                return null
-            } return [this.tags.adminDetails]
+            const tagCategory = 'adminDetails'
+            const errorKeys = this.errorTagKeys(tagCategory)
+            if (this.errorTagRequired(errorKeys))
+                return this.compileTags(tagCategory, errorKeys)
+            else return null
         },
         textInfoUnavailable() {
-            return (
-                !this.previousEntriesExist('adminIdentityData') ||
-                !this.previousEntriesExist('textPhoneData') ||
-                !this.previousEntriesExist('textAPIData')
-            )
+            return this.errorTagRequired(this.errorTagKeys('textService'))
         },
         textServiceTag() {
+            const tagCategory = 'textService'
             if (this.textInfoUnavailable) {
-                const tags = []
-                if (!this.previousEntriesExist('adminIdentityData'))
-                    tags.push(this.tags.textService.missingInfo) 
-                if (!this.previousEntriesExist('textPhoneData')) 
-                    tags.push(this.tags.textService.noTwillioPhone)
-                if (!this.previousEntriesExist('textAPIData'))
-                    tags.push(this.tags.textService.noTwillioAPI)
-                return tags
-            } else return [this.tags.textService.online] 
+                return this.compileTags(tagCategory, this.errorTagKeys(tagCategory))
+            } else return [this.tags[tagCategory].online] 
         }
     },
     created() {
@@ -164,6 +161,8 @@ export default {
         this.assignAPIData('adminProfile', 'adminIdentityData')
         this.assignAPIData('textPhone')
         this.assignAPIData('textAPI')
+        this.assignAPIData('timezone')
+        this.getSupportedTimezones()
     }
 
 }

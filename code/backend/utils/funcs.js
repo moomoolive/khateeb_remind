@@ -11,9 +11,19 @@ const JSdateRef = {
     ]
 }
 
+const supportedTimezones = {
+    calgaryEdmontonMST: 'America/Edmonton', 
+    winnipegReginaCST: 'America/Winnipeg',
+    torontoEST: 'America/Toronto', 
+    vancouverPST: 'America/Vancouver'
+}
+
 module.exports = {
     capitalize(string) {
         return string.charAt(0).toUpperCase() + string.slice(1)
+    },
+    getTimeZones() {
+        return Object.keys(supportedTimezones)
     },
     deepCopy(object) {
         return JSON.parse(JSON.stringify(object))
@@ -27,21 +37,13 @@ module.exports = {
             return `${total} ${elem}`
         })
     },
-    dateStringToAMPM(dateString) {
+    getLocalTime(dateString, timezone) {
         const date = new Date(dateString)
-        const hour = this.intHoursToString(date.getHours())
-        const min = this.intMinsToString(date.getMinutes())
-        const AMorPM = this.intHoursToAMorPM(date.getHours())
-        return `${hour}:${min}${AMorPM}`
-    },
-    intMinsToString(intMins) {
-        return intMins < 10 ? '0' + intMins : `${intMins}`
-    },
-    intHoursToString(intHours) {
-        return intHours < 12 ? `${intHours}` : `${intHours - 12}`
-    },
-    intHoursToAMorPM(intHours) {
-        return intHours < 12 ? 'AM' : `PM`
+        date.setSeconds(0, 0)
+        const localTime = date.toLocaleString('en-CA', {
+            timeZone: supportedTimezones[timezone]
+        })
+        return localTime.split(',')[1]
     },
     monthStringToNumber(monthString) {
         const x = this.capitalize(monthString)

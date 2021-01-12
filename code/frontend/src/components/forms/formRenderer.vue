@@ -15,6 +15,7 @@
         <form-input-renderer
             :inputData="data"
             :bigText="bigText"
+            :dropdown="dropdown"
             :customInvalidMsg="customInvalidMsg"
             :activeInvalidations="allActiveInvalidations"
             :doNotRender="doNotRender"
@@ -66,9 +67,13 @@ export default {
             required: false
         },
         bigText: {
-            type: [Array],
+            type: Array,
             required: false,
             default: () => []
+        },
+        dropdown: {
+            type: Object,
+            required: false
         },
         doNotRender: {
             type: Array,

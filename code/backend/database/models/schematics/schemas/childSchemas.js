@@ -32,5 +32,10 @@ module.exports = {
             user: String,
             key: String
         }
+    }),
+    timezone: new mongoose.Schema({
+        options: {
+            name: String
+        }
     })
 }

@@ -10,6 +10,7 @@ module.exports = {
         firstName: String,
         lastName: String,
         phoneNumber: String,
+        title: String,
         active: Boolean,
         dropouts: Number,
         savedOn: Date
@@ -31,4 +32,19 @@ module.exports = {
         lastName: String,
         savedOn: Date
     }),
+    textHub: new mongoose.Schema({
+        notifed: Boolean,
+        data: [
+            {
+                info: {
+                    address: String,
+                    name: String
+                },
+                prayers: {
+                    timings: [Date],
+                    khateebs: [Object]
+                }
+            }
+        ]
+    })
 }

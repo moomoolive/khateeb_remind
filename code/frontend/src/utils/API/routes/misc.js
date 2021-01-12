@@ -23,5 +23,10 @@ export default {
         return axios.post(baseUrl + '/area-code', { code })
             .then(res => res.data !== 'exists' )
             .catch(err => { console.log(err) })
+    },
+    getTimeZones() {
+        return axios.get(baseUrl + '/timezones')
+            .then(res => res.data)
+            .catch(err => { console.log(err) })
     }
 }

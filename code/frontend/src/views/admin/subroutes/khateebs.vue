@@ -11,6 +11,9 @@
             :customInvalidMsg="{
                 phoneNumber: 'This is an invalid canadian phone number'
             }"
+            :dropdown="{ 
+                title: { data: ['none', 'Shiekh', 'Imam'] } 
+            }"
             :backgroundColor="`green-offWhite`"
             @submitted="submit($event)"
             @remove="remove($event)"

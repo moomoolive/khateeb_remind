@@ -18,6 +18,25 @@
             />
         </collapsable-box>
         <collapsable-box
+            :headline="`Timezone`"
+            :tagDetails="timezoneTag"
+        >
+            <settings-form
+                :name="`updated password`"
+                :backgroundColor="`red-green`"
+                :emptySchema="timezoneData.emptySchema"
+                :previousEntries="timezoneData.previousEntries"
+                :dropdown="{ 
+                    name: {
+                        namingConvention: timezoneDisplay,
+                        data: supportedTimezones
+                    } 
+                }"
+                :inputAlias="{ name: 'choose your timezone' }"
+                @submitted="$emit('submitted', $event)"
+            />
+        </collapsable-box>
+        <collapsable-box
             :headline="`Update Password`"
         >
             <settings-form
@@ -42,6 +61,14 @@ export default {
     props: {
         adminIdentityData: {
             type: Object,
+            required: true
+        },
+        timezoneData: {
+            type: Object,
+            required: true
+        },
+        supportedTimezones: {
+            type: Array,
             required: true
         }
     },
@@ -73,6 +100,11 @@ export default {
                 words: 'Needs Attention',
                 symbol: '⚠️',
                 color: 'important'
+            },
+            defaultTZ: {
+                words: 'Calgary/Edmonton - MST (Default)',
+                symbol: '🌎',
+                color: 'goodNews'
             }
         }
     },
@@ -85,12 +117,29 @@ export default {
         },
         toAPI(data) {
             this.$emit('submitted', data)
+        },
+        timezoneDisplay(timezone) {
+            const parsed = this._.stringFormat(timezone, 'camel', 'title', true)
+            let timezoneAbbreviated = parsed.filter(word => word.length === 1)
+            timezoneAbbreviated = timezoneAbbreviated.reduce((total, letter) => total + letter)
+            const lengthOfTimezoneAbbreviated = 3
+            for (let i = 0; i < lengthOfTimezoneAbbreviated; i++) { parsed.pop() }
+            const TZ = parsed.reduce((total, elem) => `${total}/${elem}`) + ` - ${timezoneAbbreviated}`
+            return TZ
         }
     },
     computed: {
         adminIdentityTag() {
             if (!this.adminIdentityData.previousEntries[0]) return [this.generalTag]
             else return null
+        },
+        timezoneTag() {
+            if (!this.timezoneData.previousEntries[0]) return [this.defaultTZ]
+            else return [{
+                words: this.timezoneDisplay(this.timezoneData.previousEntries[0].options.name),
+                symbol: '🌎',
+                color: 'goodNews'
+            }]
         }
     }
 }

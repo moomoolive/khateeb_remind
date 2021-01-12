@@ -17,8 +17,10 @@ export default {
     camelCaseToArray(camelCase) {
         return camelCase.split(/(?=[A-Z])/)
     },
-    arrayToString(arrayOfWords, format) {
+    arrayToString(arrayOfWords, format, raw) {
         const modifiedArray = subHelpers.toXCase(arrayOfWords, format)
-        return subHelpers.arrayToString(modifiedArray)
+        if (raw)
+            return modifiedArray
+        else return subHelpers.arrayToString(modifiedArray)
     }
 }

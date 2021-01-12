@@ -61,4 +61,8 @@ router.post('/area-code', [middleware.validationCheck(['code']), middleware.auth
         else res.json('none')
 })
 
+router.get('/timezones', middleware.authAdmin, (req, res) => {
+    res.json($utils.general.getTimeZones())
+})
+
 module.exports = router

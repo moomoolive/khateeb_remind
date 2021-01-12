@@ -6,6 +6,8 @@
             :backgroundColor="backgroundColor"
             :invalidations="invalidations"
             :customInvalidMsg="customInvalidMsg"
+            :dropdown="dropdown"
+            :inputAlias="inputAlias"
             @submitted="submit($event)"
         />
     </div>
@@ -36,11 +38,19 @@ export default {
             type: Object,
             required: true
         },
+        dropdown: {
+            type: Object,
+            required: false
+        },
         invalidations: {
             type: Object,
             required: false
         },
         customInvalidMsg: {
+            type: Object,
+            required: false
+        },
+        inputAlias: {
             type: Object,
             required: false
         }
