@@ -43,7 +43,7 @@ module.exports = {
         const localTime = date.toLocaleString('en-CA', {
             timeZone: supportedTimezones[timezone]
         })
-        return localTime.split(',')[1]
+        return localTime.split(',')[1].trim()
     },
     monthStringToNumber(monthString) {
         const x = this.capitalize(monthString)

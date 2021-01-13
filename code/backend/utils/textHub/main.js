@@ -72,7 +72,7 @@ module.exports = {
             const phoneNumber = admin.options.phoneNumber
             const senderName = await this.getSendersName(textBody.From)
             const msg = `From ${senderName}\n---------\n${textBody.Body}`
-            $utils.text.send(phoneNumber, msg) 
+            this.text.send(phoneNumber, msg) 
         } catch(err) {
             console.log('There was a problem forwarding the message to admin')
             console.log(`Error ref:\n-------------\n${err}`)
