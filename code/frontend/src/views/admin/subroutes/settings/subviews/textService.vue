@@ -72,24 +72,23 @@ export default {
         textAPIData: {
             type: Object,
             required: true
+        },
+        sharedTags: {
+            type: Object,
+            required: true
         }
     },
     data() {
         return {
-            generalTag: {
-                words: 'Needs Attention',
-                symbol: '⚠️',
-                color: 'important'
-            }
         }
     },
     computed: {
         textPhoneTag() {
-            if (!this.textPhoneData.previousEntries[0]) return [this.generalTag]
+            if (!this.textPhoneData.previousEntries[0]) return [this.sharedTags.attention]
             else return null
         },
         textAPITag() {
-            if (!this.textAPIData.previousEntries[0]) return [this.generalTag]
+            if (!this.textAPIData.previousEntries[0]) return [this.sharedTags.attention]
             else return null
         }
     }

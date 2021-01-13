@@ -70,6 +70,14 @@ export default {
         supportedTimezones: {
             type: Array,
             required: true
+        },
+        sharedTags: {
+            type: Object,
+            required: true
+        },
+        adminDetailTags: {
+            type: Object,
+            required: true
         }
     },
     data() {
@@ -95,16 +103,6 @@ export default {
                         confirmNewPassword: ''
                     }
                 }
-            },
-            generalTag: {
-                words: 'Needs Attention',
-                symbol: '⚠️',
-                color: 'important'
-            },
-            defaultTZ: {
-                words: 'Calgary/Edmonton - MST (Default)',
-                symbol: '🌎',
-                color: 'goodNews'
             }
         }
     },
@@ -130,11 +128,11 @@ export default {
     },
     computed: {
         adminIdentityTag() {
-            if (!this.adminIdentityData.previousEntries[0]) return [this.generalTag]
+            if (!this.adminIdentityData.previousEntries[0]) return [this.sharedTags.attention]
             else return null
         },
         timezoneTag() {
-            if (!this.timezoneData.previousEntries[0]) return [this.defaultTZ]
+            if (!this.timezoneData.previousEntries[0]) return [this.adminDetailTags.defaultTZ]
             else return [{
                 words: this.timezoneDisplay(this.timezoneData.previousEntries[0].options.name),
                 symbol: '🌎',

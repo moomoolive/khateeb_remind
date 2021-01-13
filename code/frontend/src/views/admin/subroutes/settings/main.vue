@@ -20,6 +20,8 @@
                 :adminIdentityData="adminIdentityData"
                 :timezoneData="timezoneData"
                 :supportedTimezones="supportedTimezones"
+                :adminDetailTags="staticTags.adminDetails"
+                :sharedTags="staticTags.shared"
                 @submitted="saveSetting($event)"
             />
         </collapsable-box>
@@ -33,6 +35,7 @@
                 :verificationTextSent="verificationTextSent"
                 :textPhoneData="textPhoneData"
                 :textAPIData="textAPIData"
+                :sharedTags="staticTags.shared"
                 @submitted="saveSetting($event)"
                 @verification-text="sendVerificationText()"
             />
@@ -44,7 +47,7 @@
 import adminDetails from './subviews/adminDetails.vue'
 import locationTiming from './subviews/locationTiming.vue'
 import textService from './subviews/textService.vue'
-import tags from './tags.json' 
+import staticTags from './tags.json' 
 
 export default {
     name: "settings",
@@ -61,7 +64,8 @@ export default {
             textAPIData: null,
             timezoneData: null,
             supportedTimezones: null,
-            tags,
+            staticTags,
+            tags: staticTags.main,
             verificationTextSent: false
         }
     },

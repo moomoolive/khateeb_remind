@@ -4,4 +4,6 @@ node_modules/
 
 scraper_env/
 
+TZ_env/
+
 .env
