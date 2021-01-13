@@ -29,6 +29,10 @@ const models = {
         'timezone',
         schema.timezone
     ),
+    textFunctionality: schema.settings.discriminator(
+        'textFunctionality',
+        schema.textFunctionality
+    ),
     textHub: mongoose.model('textHub', schema.textHub),
     announcements: mongoose.model('announcement', schema.announcement),
     monthlySchedules: mongoose.model('monthlySchedule', schema.scheduleEntry),

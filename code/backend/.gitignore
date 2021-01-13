@@ -7,3 +7,5 @@ scraper_env/
 TZ_env/
 
 .env
+
+text.json

@@ -33,7 +33,10 @@ module.exports = {
         savedOn: Date
     }),
     textHub: new mongoose.Schema({
-        notifed: Boolean,
+        notified: Boolean,
+        timezone: String,
+        finished: Boolean,
+        weekOf: Date,
         data: [
             {
                 info: {

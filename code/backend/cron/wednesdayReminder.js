@@ -4,6 +4,8 @@ const templates = {
     textHub: {
         notified: false,
         timezone: null,
+        finished: false,
+        weekOf: null,
         data: []
     },
     location: {
@@ -12,7 +14,10 @@ const templates = {
     },
     prayerSlot: {
         data: null,
-        hasResponded: null
+        confirm: {
+            state: null,
+            responded: null
+        }
     }
 }
 
@@ -33,6 +38,7 @@ const funcs = {
     createdInitialTextHub(schedule, timezone, upcomingFriday) {
         const hub = $utils.general.deepCopy(templates.textHub)
         hub.timezone = timezone.options.name
+        hub.weekOf = $utils.general.deepCopy(upcomingFriday)
         schedule.data.forEach(location => {
             const template = $utils.general.deepCopy(templates.location)
             template.info = $utils.general.deepCopy(location.info)
@@ -43,7 +49,7 @@ const funcs = {
     },
     async fetchTimezoneInfo() {
         try {
-            const TZ = await $db.models.timezone.findOne({}).select(['options'])
+            const TZ = await $db.models.timezone.findOne({}).select(['options']).exec()
             return TZ 
         } catch(err) {
             this.dbIOError('timezone', err)
@@ -67,7 +73,7 @@ const funcs = {
             (${locationInfo.address}) insha'Allah!\
             Reply 'Yes' if you can make it or 'No' if you cannot.`.replace(/  +/g, ' ')
             console.log(text)
-            //$utils.text.send(phone, text)
+            $utils.text.send(phone, text)
         } catch(err) {
             console.log(`There was a problem send a text to ${name}`)
             console.log(`Please check if their number (${number}) exists`)
@@ -79,20 +85,33 @@ const funcs = {
         if (khateeb.title.toLowerCase() !== 'none')
             return `${khateeb.title} ${khateeb.firstName}`
         else return khateeb.firstName
+    },
+    async textFunctionalityisOff() {
+        try {
+            const textFunctionality = await $db.funcs.getSetting('textFunctionality')
+            if (!textFunctionality.options.active || textFunctionality.options.active === true)
+                return false
+            else return true
+        } catch(err) {
+            this.dbIOError('text functionality', err)
+        }
     }
 }
 
 const cronTime = $utils.general.cronTime(
-    'every 5',
+    '0',
+    '0',
+    '10',
     'all',
     'all',
-    'all',
-    'all',
-    'all'
+    'wed'
 )
 
 const onTick = async () => {
     try {
+        const notAllowedToText = await funcs.textFunctionalityisOff()
+        if (notAllowedToText)
+            return
         const schedule = await funcs.getCurrentSchedule()
         const upcomingFriday = $utils.general.findUpcomingFriday()
         upcomingFriday.setHours(0, 0, 0, 0)
@@ -114,13 +133,13 @@ const onTick = async () => {
                     location.prayers.timings[prayerTiming],
                     location.info
                 )
-                template.hasResponded = false
+                template.confirm.responded = false
                 return template
             })
             return location
         })
         textHub.notified = true
-        //$db.funcs.save('textHub', textHub)
+        $db.funcs.save('textHub', textHub)
     } catch(err) {
         console.log(`A error occurred when creating textHub`)
         console.log(`Error ref: ${err}`)

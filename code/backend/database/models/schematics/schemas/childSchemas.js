@@ -37,5 +37,10 @@ module.exports = {
         options: {
             name: String
         }
+    }),
+    textFunctionality: new mongoose.Schema({
+        options: {
+            active: Boolean
+        }
     })
 }
