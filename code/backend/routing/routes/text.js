@@ -22,9 +22,9 @@ router.post('/hub', express.urlencoded({ extended: true }), async (req, res) => 
     }
 })
 
-wednesdayReminder.start()
-thursdayReport.start()
-fridayCleanup.start()
+//wednesdayReminder.start()
+//thursdayReport.start()
+//fridayCleanup.start()
 
 
 module.exports = router

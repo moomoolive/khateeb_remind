@@ -1,25 +1,64 @@
 const mongoose = require('mongoose')
 
+const subDocs = require('./subDocs.js')
+
 module.exports = {
     scheduleEntry: new mongoose.Schema({
-        month: String,
-        data: Object,
+        month: {
+            type: String,
+            default: 'January-2021'
+        },
+        notified: {
+            type: Boolean,
+            default: false
+        },
+        data: [subDocs.locationTemplate],
         savedOn: Date
     }),
     khateeb: new mongoose.Schema({
-        firstName: String,
-        lastName: String,
-        phoneNumber: String,
-        title: String,
-        active: Boolean,
-        dropouts: Number,
+        firstName: {
+            type: String,
+            default: 'TBD'
+        },
+        lastName: {
+            type: String,
+            default: ''
+        },
+        phoneNumber: {
+            type: String,
+            default: '0000000000'
+        },
+        title: {
+            type: String,
+            default: 'none'
+        },
+        active: {
+            type: Boolean,
+            default: true
+        },
+        dropouts: {
+            type: Number,
+            default: 0
+        },
         savedOn: Date
     }),
     announcement: new mongoose.Schema({
-        headline: String,
-        content: String,
-        important: Boolean,
-        urgent: Boolean,
+        headline: {
+            type: String,
+            default: 'No headline'
+        },
+        content: {
+            type: String,
+            default: 'no content'
+        },
+        important: {
+            type: Boolean,
+            default: false
+        },
+        urgent: {
+            type: Boolean,
+            default: false
+        },
         savedOn: Date
     }),
     location: new mongoose.Schema({
@@ -27,9 +66,31 @@ module.exports = {
         monthlySchedule: Object
     }),
     prayerSlot: new mongoose.Schema({
-        _id: String,
-        firstName: String,
-        lastName: String,
+        timing: String,
+        data: {
+            firstName: {
+                type: String,
+                default: 'TBD'
+            },
+            lastName: {
+                type: String,
+                default: ' '
+            },
+            title: {
+                type: String,
+                default: 'none'
+            }
+        },
+        confirm: {
+            state: {
+                type: Boolean,
+                default: false
+            },
+            responded: {
+                type: Boolean,
+                default: false
+            }
+        },
         savedOn: Date
     }),
     textHub: new mongoose.Schema({

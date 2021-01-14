@@ -21,18 +21,21 @@ module.exports = {
     },
     new(scheduleKey, locationAndTimings) {
         const allFridays = helpers.findAllFridaysFromKey(scheduleKey)
-        const newSchedule = {
-            month: scheduleKey,
-            data : []
-        }
+        const newSchedule = $db.models.schemasPlus('monthlySchedules')
+        console.log(newSchedule.data[0])
+        newSchedule.month = scheduleKey
         locationAndTimings.options.forEach(location => {
+            const empty = $utils.general.deepCopy(newSchedule.data[0])
+            empty.info = $utils.general.deepCopy(location.info)
             const emptyLocation = helpers.createEmptyLocation(
                 helpers.toBeDecidedIndicator(),
                 allFridays,
                 location
             )
-            newSchedule.data.push(emptyLocation)
+            empty.monthlySchedule = emptyLocation
+            newSchedule.data.push(empty)
         })
+        newSchedule.data.shift()
         return newSchedule
     },
     update(oldSchedule, currentLocationDetails) {
@@ -68,5 +71,10 @@ module.exports = {
     },
     TBDIndicator() {
         return helpers.toBeDecidedIndicator()
+    },
+    processKhateebs(previousEntries) {
+        if (previousEntries.length < 1)
+            return previousEntries
+        else return previousEntries.map(khateeb => helpers.khateebToPrayerSlots(khateeb))
     }
 }

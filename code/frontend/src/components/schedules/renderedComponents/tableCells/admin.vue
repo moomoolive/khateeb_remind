@@ -7,7 +7,7 @@
                 v-for="(khateeb, khateebNumber) in khateebList" :key="khateebNumber"
                 :value="khateeb"
             >
-                {{ khateeb.firstName }} {{ khateeb.lastName }}
+                {{ khateeb.data.firstName }} {{ khateeb.data.lastName }}
             </option>
             <option selected :value="emptyKhateeb">
                 TBD
@@ -79,11 +79,6 @@ export default {
             this.khateebList = this.khateebList.map(khateeb => {
                 return { ...khateeb, savedOn }
             })
-        }
-    },
-    computed: {
-        x() {
-            return this.schedule.monthlySchedule[this.displayedWeek][this.prayerTiming]
         }
     },
     created() {

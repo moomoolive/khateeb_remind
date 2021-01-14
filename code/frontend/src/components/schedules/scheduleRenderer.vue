@@ -82,7 +82,9 @@ export default {
         },
         findUpcomingFridayKey() {
             const date = datetime.upcomingFriday(true)
+            console.log(date)
             const keys = Object.keys(this.currentSchedule.data[0].monthlySchedule)
+            console.log(keys)
             let returnDate;
             keys.forEach(week => {
                 const weekDate = new Date(week)
@@ -151,6 +153,9 @@ export default {
         fridayDates(newVal) {
             this.displayData.weekOf = newVal[0]
         }
+    },
+    created() {
+        console.log(this.findUpcomingFridayKey())
     }
 }
 </script>

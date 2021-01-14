@@ -30,9 +30,16 @@ const routerGroup2 = 'khateebs'
 const routerGroup2URL = `/${routerGroup2}`
 router.get(routerGroup2URL + '/:fullOrNot', async (req, res) => {
     try {
-        const params = req.params.fullOrNot === 'no' ? ['_id', 'firstName', 'lastName'] : 'all'
-        const specialEmptySchema = req.params.fullOrNot === 'no' ? $utils.schedule.TBDIndicator : null
-        const data = await $db.models.previousEntriesAndEmptySchema(routerGroup2, params, specialEmptySchema)
+        const fullParams = req.params.fullOrNot === 'yes'
+        let data
+        if (fullParams) {
+            data = await $db.models.previousEntriesAndEmptySchema(routerGroup2)
+        } else {
+            const params = ['_id', 'firstName', 'lastName']
+            const specialEmptySchema = $utils.schedule.TBDIndicator
+            data = await $db.models.previousEntriesAndEmptySchema(routerGroup2, params, specialEmptySchema)
+            data.previousEntries = $utils.schedule.processKhateebs(data.previousEntries)
+        }
         res.json(data)
     } catch(err) {
         console.log(err)

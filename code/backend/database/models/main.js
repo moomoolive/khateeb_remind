@@ -55,11 +55,15 @@ const models = {
             if (param !== '__v' && param !== '_id' && param !== 'savedOn') {
                 const paramList = param.split('.')
                 const paramObject = fullSchemaParams[param]
+                console.log(paramObject)
                 if (paramList.length > 1) {
                     if (!schema[paramList[0]]) schema[paramList[0]] = {}
                     schema[paramList[0]][paramList[1]] = helpers.fillSchemaField(paramObject.instance)
                 } else {
-                    schema[param] = helpers.fillSchemaField(paramObject.instance)
+                    if (paramObject.defaultValue)
+                        schema[param] = paramObject.defaultValue
+                    else 
+                        schema[param] = helpers.fillSchemaField(paramObject.instance)
                 }
             }
         }

@@ -53,7 +53,7 @@ export default {
         },
         display() {
             if (this.khateeb) 
-                return `${this.khateeb.firstName} ${this.khateeb.lastName}`
+                return `${this.khateeb.data.firstName} ${this.khateeb.data.lastName}`
             else 
                 return 'TBD' 
         }

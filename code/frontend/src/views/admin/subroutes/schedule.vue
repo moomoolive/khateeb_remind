@@ -69,7 +69,6 @@ export default {
             return `${month}-${upcomingFriday.getFullYear()}`
         },
         prepSaveData() {
-            //this.currentSchedule.month = this.originalSchedule.month = this.scheduleFor
             const payload = this._.deepCopy(this.currentSchedule)
             payload.original = this._.deepCopy(this.originalSchedule)
             return payload
