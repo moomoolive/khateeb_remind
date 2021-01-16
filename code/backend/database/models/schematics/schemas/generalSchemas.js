@@ -1,20 +1,135 @@
 const mongoose = require('mongoose')
 
-const subDocs = require('./subDocs.js')
+const subDocs = require('./subDocs')
 
 module.exports = {
-    scheduleEntry: new mongoose.Schema({
-        month: {
+    jummah: new mongoose.Schema({
+        institutionID: {
             type: String,
-            default: 'January-2021'
+            required: true,
+            default: 'TBD'
         },
-        notified: {
+        month: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+        year: {
+            type: Number,
+            required: true,
+            default: 2021
+        },
+        weekOf: {
+            type: Number,
+            required: true,
+            default: 15
+        },
+        confirmed: {
             type: Boolean,
+            required: true,
             default: false
         },
-        data: [subDocs.locationTemplate],
-        savedOn: Date
+        locationID: {
+            type: String,
+            required: true,
+            default: 'TBD'
+        },
+        timingID: {
+            type: String,
+            required: true,
+            default: 'TBD'
+        },
+        khateebPreference: [subDocs.prayerSlot],
+        savedOn: {
+            type: Date,
+            required: false
+        }
     }),
+    institution: new mongoose.Schema({
+        name: {
+            type: String,
+            required: true,
+            default: 'Unknown Institution'
+        },
+        abbreviatedName: {
+            type: String,
+            required: true,
+            default: 'UNK'
+        },
+        timezone: {
+            type: String,
+            required: true,
+            default: 'America/Edmonton'
+        }
+    }),
+    location: new mongoose.Schema({
+        institutionID: {
+            type: String,
+            required: true
+        },
+        name: {
+            type: String,
+            default: 'Unknown Institution',
+        },
+        address: {
+            type: String,
+            default: 'Unknown Address'
+        },
+        active: {
+            type: Boolean,
+            required: true,
+            default: true
+        }
+    }),
+    timing: new mongoose.Schema({
+        institutionID: {
+            type: String,
+            required: true
+        },
+        locationID: {
+            type: String,
+            required: true
+        },
+        hour: {
+            type: Number,
+            required: true,
+            default: 11
+        },
+        minutes: {
+            type: Number,
+            required: true,
+            default: 30
+        },
+        active: {
+            type: Boolean,
+            required: true,
+            default: true
+        }
+    }),
+    profile: new mongoose.Schema({
+        institutionID: {
+            type: String,
+            required: true
+        },
+        handle: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        password: {
+            type: String,
+            required: true
+        },
+        firstName: {
+            type: String,
+            default: "no first name"
+        },
+        lastName: {
+            type: String,
+            default: "no last name"
+        }
+    }),
+    // old schemas
     khateeb: new mongoose.Schema({
         firstName: {
             type: String,
@@ -60,10 +175,6 @@ module.exports = {
             default: false
         },
         savedOn: Date
-    }),
-    location: new mongoose.Schema({
-        info: Object,
-        monthlySchedule: Object
     }),
     prayerSlot: new mongoose.Schema({
         timing: String,

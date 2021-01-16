@@ -38,6 +38,29 @@ const subDocs = {
 }
 
 module.exports = {
+    prayerSlot: new mongoose.Schema({
+        notified: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        confirmed: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        responded: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        khateebID: {
+            type: String,
+            default: 'TBD',
+            required: true
+        }
+    }),
+    //---------------------------------------
     locationTemplate: new mongoose.Schema({
         info: subDocs.locationInfo,
         monthlySchedule: [

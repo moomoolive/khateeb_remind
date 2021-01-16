@@ -4,6 +4,13 @@ const schema = require('./schematics/index.js')
 const helpers = require('./helpers.js')
 
 const models = {
+    jummahs: mongoose.model('jummah', schema.jummah),
+    institutions: mongoose.model('institution', schema.institution),
+    timings: mongoose.model('timing', schema.timing),
+    locations: mongoose.model('location', schema.location),
+    profiles: mongoose.model('profile', schema.profile),
+
+    //old models
     settings: mongoose.model('setting', schema.setting),
     locationAndTimings: schema.settings.discriminator(
         'locationAndTimings',
@@ -35,10 +42,7 @@ const models = {
     ),
     textHub: mongoose.model('textHub', schema.textHub),
     announcements: mongoose.model('announcement', schema.announcement),
-    monthlySchedules: mongoose.model('monthlySchedule', schema.scheduleEntry),
     khateebs: mongoose.model('khateeb', schema.khateeb),
-    locationTemplate: mongoose.model('template', schema.location),
-    prayerSlot: mongoose.model('prayerSlot', schema.prayerSlot),
     schemaParams(schemaName, full=false) {
         const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
         if (!full) {
@@ -118,4 +122,21 @@ const models = {
     }
 }
 
-module.exports = models
+const schemas = {
+    emptyEntry(modelName) {
+        const emptySchema = {}
+        let schemaData
+        try {
+            schemaData = models[modelName].schema.paths
+        } catch {
+            schemaData = schema[modelName].paths
+        }
+        for (let [fieldName, details] of Object.entries(schemaData)) {
+            if (typeof details.defaultValue !== 'undefined' || fieldName !== '_id')
+                emptySchema[fieldName] = details.defaultValue
+        }
+        return emptySchema
+    }
+}
+
+module.exports = { ...models, ...schemas }
