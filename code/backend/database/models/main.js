@@ -8,6 +8,7 @@ const models = {
     institutions: mongoose.model('institution', schema.institution),
     timings: mongoose.model('timing', schema.timing),
     locations: mongoose.model('location', schema.location),
+    users: mongoose.model('user', schema.user),
     profiles: mongoose.model('profile', schema.profile),
 
     //old models
@@ -42,7 +43,6 @@ const models = {
     ),
     textHub: mongoose.model('textHub', schema.textHub),
     announcements: mongoose.model('announcement', schema.announcement),
-    khateebs: mongoose.model('khateeb', schema.khateeb),
     schemaParams(schemaName, full=false) {
         const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
         if (!full) {
@@ -122,6 +122,12 @@ const models = {
     }
 }
 
+const discriminators = {
+    khateebs: models.profiles.discriminator('khateeb', schema.khateeb),
+    sysAdmins: models.profiles.discriminator('sysAdmin', schema.sysAdmin),
+    institutionAdmins: models.profiles.discriminator('institutionAdmin', schema.institutionAdmin)
+}
+
 const schemas = {
     emptyEntry(modelName) {
         const emptySchema = {}
@@ -139,4 +145,4 @@ const schemas = {
     }
 }
 
-module.exports = { ...models, ...schemas }
+module.exports = { ...models, ...schemas, ...discriminators }

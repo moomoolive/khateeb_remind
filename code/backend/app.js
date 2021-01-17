@@ -36,6 +36,7 @@ app.use('/general', routes.general)
 app.use('/admin', routes.admin)
 app.use('/misc', routes.misc)
 app.use('/text', routes.text)
+app.use('/auth', routes.auth)
 
 db.once('open', () => { console.log(`${dbType} Mongo is listening`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })

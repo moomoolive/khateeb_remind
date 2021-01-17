@@ -60,8 +60,24 @@ module.exports = {
             type: String,
             required: true,
             default: 'America/Edmonton'
+        },
+        confirmed: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        country: {
+            type: String,
+            required: false,
+            default: 'canada'
+        },
+        state: {
+            type: String,
+            required: false,
+            default: 'alberta'
         }
-    }),
+    },
+    { timestamps: true }),
     location: new mongoose.Schema({
         institutionID: {
             type: String,
@@ -79,6 +95,11 @@ module.exports = {
             type: Boolean,
             required: true,
             default: true
+        },
+        savedOn: {
+            type: Date,
+            required: true,
+            default: new Date()
         }
     }),
     timing: new mongoose.Schema({
@@ -104,59 +125,69 @@ module.exports = {
             type: Boolean,
             required: true,
             default: true
+        },
+        savedOn: {
+            type: Date,
+            required: true,
+            default: new Date()
         }
     }),
-    profile: new mongoose.Schema({
+    user: new mongoose.Schema({
         institutionID: {
             type: String,
             required: true
         },
-        handle: {
+        username: {
             type: String,
             required: true,
             unique: true
         },
         password: {
             type: String,
-            required: true
+            required: false,
+            default: 'password'
         },
-        firstName: {
-            type: String,
-            default: "no first name"
-        },
-        lastName: {
-            type: String,
-            default: "no last name"
+        confirmed: {
+            type: Boolean,
+            required: true,
+            default: false
         }
-    }),
-    // old schemas
-    khateeb: new mongoose.Schema({
-        firstName: {
+    },
+    { timestamps: true }),
+    profile: new mongoose.Schema({
+        userID: {
             type: String,
+            required: true,
             default: 'TBD'
         },
+        institutionID: {
+            type: String,
+            required: true,
+            default: 'TBD'
+        },
+        handle: {
+            type: String,
+            required: false,
+            default: "__NOHANDLE__"
+        },
+        firstName: {
+            type: String,
+            required: true,
+            default: 'no first name'
+        },
         lastName: {
             type: String,
-            default: ''
+            required: true,
+            default: 'no last name'
         },
         phoneNumber: {
-            type: String,
-            default: '0000000000'
-        },
-        title: {
-            type: String,
-            default: 'none'
-        },
-        active: {
-            type: Boolean,
-            default: true
-        },
-        dropouts: {
             type: Number,
-            default: 0
-        },
-        savedOn: Date
-    }),
+            required: true,
+            default: 0000000000
+        }
+    }, { timestamps: true }),
+
+    // old schemas
     announcement: new mongoose.Schema({
         headline: {
             type: String,
