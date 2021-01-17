@@ -6,54 +6,6 @@ const router = express.Router()
 
 router.use(middleware.authAdmin)
 
-const routerGroup1 = 'announcements'
-const routerGroup1URL = `/${routerGroup1}`
-router.get(routerGroup1URL, async (req, res) => {
-    try {
-        const data = await $db.models.previousEntriesAndEmptySchema(routerGroup1)
-        res.json(data)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't retrieve ${routerGroup1}`)
-    }
-})
-
-router.delete(routerGroup1URL, (req, res) => {
-    $db.funcs.delete(routerGroup1, req.body._id, res)
-})
-
-router.post(routerGroup1URL, middleware.validationCheck('schema'), (req, res) => {
-    $db.funcs.save(routerGroup1, req.body, res)
-})
-
-const routerGroup2 = 'khateebs'
-const routerGroup2URL = `/${routerGroup2}`
-router.get(routerGroup2URL + '/:fullOrNot', async (req, res) => {
-    try {
-        const fullParams = req.params.fullOrNot === 'yes'
-        let data
-        if (fullParams) {
-            data = await $db.models.previousEntriesAndEmptySchema(routerGroup2)
-        } else {
-            const params = ['_id', 'firstName', 'lastName']
-            const specialEmptySchema = $utils.schedule.TBDIndicator
-            data = await $db.models.previousEntriesAndEmptySchema(routerGroup2, params, specialEmptySchema)
-            data.previousEntries = $utils.schedule.processKhateebs(data.previousEntries)
-        }
-        res.json(data)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't retrieve ${routerGroup2}`)
-    }
-})
-
-router.delete(routerGroup2URL, (req, res) => {
-    $db.funcs.delete(routerGroup2, req.body._id, res)
-})
-
-router.post(routerGroup2URL, middleware.validationCheck('schema'), (req, res) => {
-    $db.funcs.save(routerGroup2, req.body, res)
-})
 
 const routerGroup3 = 'settings'
 const routerGroup3URL = `/${routerGroup3}`
@@ -113,9 +65,6 @@ dayjs.extend(timezone)
 dayjs.extend(objectSupport)
 
 const funcs = {
-    allOrSpecificEntry(param) {
-        return param === 'all' ? { } : { _id: param }
-    },
     isNumeric(value) {
         return /^\d+$/.test(value)
     },
@@ -160,6 +109,23 @@ const errors = {
     getReq(dataName, err) {
         console.log(err)
         return `There was an error retrieving ${dataName}`
+    },
+    dbSaveError(dataName, err) {
+        console.log(err)
+        return `There was a problem saving ${dataName}`
+    },
+    db(dataName, actionName, err) {
+        console.log(err)
+        return `There was a problem ${actionName} ${dataName}`
+    }
+}
+
+const dbFuncs = {
+    save(modelName, toBeSaved) {
+        if (toBeSaved._id)
+            return $db.models[modelName].updateOne({ _id: toBeSaved._id }, toBeSaved)
+        else
+            return new $db.models[modelName](toBeSaved).save()
     }
 }
 
@@ -233,8 +199,22 @@ const schedules = {
         return this.createEmptyJummah(templates)
     },
     getEmptyJummahComponents() {
-        const jummah = $db.models.emptyEntry('jummah')
-        const prayerSlot = $db.models.emptyEntry('prayerSlot')
+        const jummah = {
+            month: 0,
+            year: 2021,
+            weekOf: 15,
+            confirmed: false,
+            institutionID: 'TBD',
+            locationID: "TBD",
+            timingID: 'TBD',
+            khateebPreference: []
+        }
+        const prayerSlot = {
+            notified: false,
+            confirmed: false,
+            responded: false,
+            khateebID: 'TBD'
+        }
         return { jummah, prayerSlot }
     },
     createEmptyJummah(templates) {
@@ -279,20 +259,80 @@ const schedules = {
     }
 }
 
-const routerGroup5 = "institutions"
-const routerGroup5URL = `/${routerGroup5}`
-
-router.get(routerGroup5URL, async (req, res) => {
+// ------ do we need to have schema checks??
+const routerGroup1 = 'announcements'
+const routerGroup1URL = `/${routerGroup1}`
+router.get(routerGroup1URL, async (req, res) => {
     try {
-        const data = await funcs.query(req, routerGroup5).exec()
+        const data = await $db.models[routerGroup1].find({ institutionID: req.headers.institutionid }).exec()
         res.json(data)
     } catch(err) {
-        res.json(errors.getReq(routerGroup5, err))
+        errors.db(routerGroup1, 'retrieve', err)
     }
 })
 
-router.post(routerGroup5URL, (req, res) => {
-    $db.funcs.save(routerGroup5, req.body, res)
+router.delete(routerGroup1URL, async (req, res) => {
+    try {
+        const deleted = await $db.models[routerGroup1].deleteOne(req.body)
+        res.json(`successfullly deleted announcement: ${req.body._id}`)
+    } catch(err) {
+        errors.db(routerGroup1.slice(0, -1), 'deleting', err)
+    }
+})
+
+router.post(routerGroup1URL, async (req, res) => {
+    try {
+        req.body.institutionID = req.headers.institutionid
+        const announcementEntry = await dbFuncs.save(routerGroup1, req.body)
+        res.json(`successfully saved announcement: '${req.body.headline}'`)
+    } catch(err) {
+        errors.db(routerGroup1.slice(0, -1), 'saving', err)
+    }
+})
+
+const routerGroup2 = 'khateebs'
+const routerGroup2URL = `/${routerGroup2}`
+
+router.get(routerGroup2URL, async (req, res) => {
+    try {
+        const data = await $db.models[routerGroup2].find({ institutionID: req.headers.institutionid }).exec()
+        res.json(data)
+    } catch(err) {
+        errors.db(routerGroup2, 'retrieve', err)
+    }
+})
+
+router.delete(routerGroup2URL, async (req, res) => {
+    try {
+        const deleted = await $db.models[routerGroup2].deleteOne(req.body)
+        res.json(`successfullly deleted khateeb: ${req.body._id}`)
+    } catch(err) {
+        errors.db(routerGroup2.slice(0, -1), 'deleting', err)
+    }
+})
+
+router.post(routerGroup2URL, async (req, res) => {
+    try {
+        console.log(req.body)
+        const updated = await $db.models[routerGroup2].updateOne({ _id: req.body._id }, req.body)
+        res.json(`successfully updated khateeb: ${req.body._id}`)
+    } catch(err) {
+        errors.db(routerGroup2.slice(0, -1), 'updating', err)
+    }
+})
+
+router.post(routerGroup2URL + "/create", async(req, res) => {
+    try {
+        const institutionID = req.headers.institutionid
+        req.body.user.institutionID = institutionID
+        const userEntry = await new $db.models.users(req.body.user).save()
+        req.body.khateeb.institutionID = institutionID
+        req.body.khateeb.userID = userEntry._id.toString()
+        const khateebEntry = await new $db.models[routerGroup2](req.body.khateeb).save()
+        res.json(`You've successfully made ${khateebEntry.firstName} ${khateebEntry.lastName} a khateeb (username: ${userEntry.username}).`)
+    } catch(err) {
+        errors.db(routerGroup2.slice(0, 1), 'creating', err)
+    }
 })
 
 const routerGroup6 = "locations"
@@ -307,10 +347,14 @@ router.get(routerGroup6URL + "/:location", async (req, res) => {
     }
 })
 
-router.post(routerGroup6URL, (req, res) => {
-    const data = $utils.general.deepCopy(req.body)
-    data["institutionID"] = req.headers.institution
-    $db.funcs.save(routerGroup6, data, res)
+router.post(routerGroup6URL, async (req, res) => {
+    try {
+        req.body["institutionID"] = req.headers.institutionid
+        const saved = await dbFuncs.save(routerGroup6, req.body)
+        res.json(`successfully saved ${req.body.name}`)
+    } catch(err) {
+        errors.db(routerGroup6.slice(0, -1), 'saving', err)
+    }
 })
 
 const routerGroup7 = "timings"
@@ -326,12 +370,15 @@ router.get(routerGroup7URL + '/:timing' + "/:locationID", async (req, res) => {
 })
 
 router.post(routerGroup7URL, async (req, res) => {
-    req.body.times.forEach(time => {
-        const copy = $utils.general.deepCopy(time)
-        copy["institutionID"] = req.headers.institution
-        $db.funcs.save(routerGroup7, copy)
-    })
-    res.json('successfully saved')
+    try {
+        for (let i = 0; i < req.body.times.length; i++) {
+            req.body.times[i]["institutionID"] = req.headers.institutionid
+            const saved = await dbFuncs.save(routerGroup7, req.body.times[i])
+        }
+        res.json('timings successfully saved')
+    } catch(err) {
+        errors.db(routerGroup7, "saving", err)
+    }
 })
 
 const routerGroup8 = "jummahs"
@@ -347,13 +394,15 @@ router.get(routerGroup8URL + "/:jummah/:year/:month/:weekOf/:locationID/:timingI
 })
 
 router.post(routerGroup8URL, async (req, res) => {
-    req.body.jummahs.forEach(jummah => {
-        const copy = $utils.general.deepCopy(jummah)
-        copy["institutionID"] = req.headers.institution
-        console.log(copy)
-        $db.funcs.save(routerGroup8, copy)
-    })
-    res.json("successfully updated")
+    try {
+        for (let i = 0; i < req.body.jummahs.length; i++) {
+            req.body.jummahs[i]["institutionID"] = req.headers.institutionid
+            const saved = await dbFuncs.save(routerGroup8, req.body.jummahs[i])
+        }
+        res.json("successfully updated")
+    } catch(err) {
+        errors.db(routerGroup8, "saving", err)
+    }
 })
 
 router.get(routerGroup8URL + "/:jummah/:year/:month/:weekOf/:locationID/:timingID", async (req, res) => {
@@ -369,22 +418,11 @@ router.get("/schedules" + "/:month/:year", async (req, res) => {
     try {
         let data = await funcs.query(req, 'jummahs').exec()
         if (data.length < 1)
-            data = await schedules.build(req.params.month, req.params.year, req.headers.institution)
+            data = await schedules.build(req.params.month, req.params.year, req.headers.institutionid)
         res.json(data)
     } catch(err) {
         res.json(errors.getReq('schedules', err))
     }
 })
-
-/*
-router.get('/prayerSlots/:prayerSlot', async (req, res) => {
-    try {
-        const data = await funcs.query(req, 'jummahs').exec()
-        const x = data[0].khateebPreference.find(pref => pref._id == "60031d60fb653405ecdd4620")
-        res.json(x)
-    } catch(err) {
-        res.json(errors.getReq('prayer slots', err))
-    }
-}) */
 
 module.exports = router

@@ -10,6 +10,7 @@ const models = {
     locations: mongoose.model('location', schema.location),
     users: mongoose.model('user', schema.user),
     profiles: mongoose.model('profile', schema.profile),
+    announcements: mongoose.model('announcement', schema.announcement),
 
     //old models
     settings: mongoose.model('setting', schema.setting),
@@ -41,8 +42,8 @@ const models = {
         'textFunctionality',
         schema.textFunctionality
     ),
-    textHub: mongoose.model('textHub', schema.textHub),
-    announcements: mongoose.model('announcement', schema.announcement),
+    // -------------------------- old models -------------------------- //
+    // delete all underneath here
     schemaParams(schemaName, full=false) {
         const fullSchemaParams = Object.keys(this[schemaName].schema.paths)
         if (!full) {
@@ -128,21 +129,4 @@ const discriminators = {
     institutionAdmins: models.profiles.discriminator('institutionAdmin', schema.institutionAdmin)
 }
 
-const schemas = {
-    emptyEntry(modelName) {
-        const emptySchema = {}
-        let schemaData
-        try {
-            schemaData = models[modelName].schema.paths
-        } catch {
-            schemaData = schema[modelName].paths
-        }
-        for (let [fieldName, details] of Object.entries(schemaData)) {
-            if (typeof details.defaultValue !== 'undefined' || fieldName !== '_id')
-                emptySchema[fieldName] = details.defaultValue
-        }
-        return emptySchema
-    }
-}
-
-module.exports = { ...models, ...schemas, ...discriminators }
+module.exports = { ...models, ...discriminators }

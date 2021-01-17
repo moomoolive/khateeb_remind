@@ -6,75 +6,60 @@ module.exports = {
     jummah: new mongoose.Schema({
         institutionID: {
             type: String,
-            required: true,
-            default: 'TBD'
+            required: true
         },
         month: {
             type: Number,
-            required: true,
-            default: 0
+            required: true
         },
         year: {
             type: Number,
-            required: true,
-            default: 2021
+            required: true
         },
         weekOf: {
             type: Number,
             required: true,
-            default: 15
         },
         confirmed: {
             type: Boolean,
-            required: true,
-            default: false
+            required: true
         },
         locationID: {
             type: String,
-            required: true,
-            default: 'TBD'
+            required: true
         },
         timingID: {
             type: String,
-            required: true,
-            default: 'TBD'
+            required: true
         },
-        khateebPreference: [subDocs.prayerSlot],
-        savedOn: {
-            type: Date,
-            required: false
-        }
-    }),
+        khateebPreference: [subDocs.prayerSlot]
+    }, { timestamps: true }),
     institution: new mongoose.Schema({
         name: {
             type: String,
-            required: true,
-            default: 'Unknown Institution'
+            required: true
         },
         abbreviatedName: {
             type: String,
-            required: true,
-            default: 'UNK'
+            required: false,
+            default: '__NOABBREVIATEDNAME__'
         },
         timezone: {
             type: String,
-            required: true,
-            default: 'America/Edmonton'
+            required: true
         },
         confirmed: {
             type: Boolean,
-            required: true,
+            required: false,
             default: false
         },
         country: {
             type: String,
-            required: false,
-            default: 'canada'
+            required: true
         },
         state: {
             type: String,
-            required: false,
-            default: 'alberta'
+            required: false
         }
     },
     { timestamps: true }),
@@ -85,23 +70,19 @@ module.exports = {
         },
         name: {
             type: String,
-            default: 'Unknown Institution',
+            required: true
         },
         address: {
             type: String,
+            required: false,
             default: 'Unknown Address'
         },
         active: {
             type: Boolean,
-            required: true,
+            required: false,
             default: true
-        },
-        savedOn: {
-            type: Date,
-            required: true,
-            default: new Date()
         }
-    }),
+    }, { timestamps: true }),
     timing: new mongoose.Schema({
         institutionID: {
             type: String,
@@ -113,25 +94,18 @@ module.exports = {
         },
         hour: {
             type: Number,
-            required: true,
-            default: 11
+            required: true
         },
-        minutes: {
+        minute: {
             type: Number,
-            required: true,
-            default: 30
+            required: true
         },
         active: {
             type: Boolean,
-            required: true,
+            required: false,
             default: true
-        },
-        savedOn: {
-            type: Date,
-            required: true,
-            default: new Date()
         }
-    }),
+    }, { timestamps: true }),
     user: new mongoose.Schema({
         institutionID: {
             type: String,
@@ -144,12 +118,10 @@ module.exports = {
         },
         password: {
             type: String,
-            required: false,
             default: 'password'
         },
         confirmed: {
             type: Boolean,
-            required: true,
             default: false
         }
     },
@@ -157,13 +129,11 @@ module.exports = {
     profile: new mongoose.Schema({
         userID: {
             type: String,
-            required: true,
-            default: 'TBD'
+            required: true
         },
         institutionID: {
             type: String,
             required: true,
-            default: 'TBD'
         },
         handle: {
             type: String,
@@ -172,26 +142,27 @@ module.exports = {
         },
         firstName: {
             type: String,
-            required: true,
+            required: false,
             default: 'no first name'
         },
         lastName: {
             type: String,
-            required: true,
+            required: false,
             default: 'no last name'
         },
         phoneNumber: {
             type: Number,
-            required: true,
-            default: 0000000000
+            required: true
         }
     }, { timestamps: true }),
-
-    // old schemas
     announcement: new mongoose.Schema({
+        institutionID: {
+            type: String,
+            required: true,
+        },
         headline: {
             type: String,
-            default: 'No headline'
+            required: true
         },
         content: {
             type: String,
@@ -205,52 +176,5 @@ module.exports = {
             type: Boolean,
             default: false
         },
-        savedOn: Date
-    }),
-    prayerSlot: new mongoose.Schema({
-        timing: String,
-        data: {
-            firstName: {
-                type: String,
-                default: 'TBD'
-            },
-            lastName: {
-                type: String,
-                default: ' '
-            },
-            title: {
-                type: String,
-                default: 'none'
-            }
-        },
-        confirm: {
-            state: {
-                type: Boolean,
-                default: false
-            },
-            responded: {
-                type: Boolean,
-                default: false
-            }
-        },
-        savedOn: Date
-    }),
-    textHub: new mongoose.Schema({
-        notified: Boolean,
-        timezone: String,
-        finished: Boolean,
-        weekOf: Date,
-        data: [
-            {
-                info: {
-                    address: String,
-                    name: String
-                },
-                prayers: {
-                    timings: [Date],
-                    khateebs: [Object]
-                }
-            }
-        ]
-    })
+    }, { timestamps: true }),
 }
