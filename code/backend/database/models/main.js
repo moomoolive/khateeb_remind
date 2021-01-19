@@ -125,8 +125,9 @@ const models = {
 
 const discriminators = {
     khateebs: models.profiles.discriminator('khateeb', schema.khateeb),
-    sysAdmins: models.profiles.discriminator('sysAdmin', schema.sysAdmin),
-    institutionAdmins: models.profiles.discriminator('institutionAdmin', schema.institutionAdmin)
+    root: models.profiles.discriminator('root', schema.root),
+    institutionAdmins: models.profiles.discriminator('institutionAdmin', schema.institutionAdmin),
+    sysAdmins: models.profiles.discriminator('sysAdmin', schema.sysAdmin)
 }
 
 module.exports = { ...models, ...discriminators }

@@ -4,7 +4,8 @@ module.exports = {
     khateeb: new mongoose.Schema({
         title: {
             type: String,
-            default: 'none'
+            default: 'none',
+            minlength: 1
         },
         active: {
             type: Boolean,
@@ -12,14 +13,18 @@ module.exports = {
         },
         dropouts: {
             type: Number,
-            default: 0
+            default: 0,
+            min: 0
         },
         preferredTimings: [String]
     }),
     institutionAdmin: new mongoose.Schema({
 
     }),
-    sysAdmin: new mongoose.Schema({
+    root: new mongoose.Schema({
 
+    }),
+    sysAdmin: new mongoose.Schema({
+        
     })
 }

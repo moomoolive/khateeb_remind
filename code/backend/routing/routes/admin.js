@@ -120,15 +120,6 @@ const errors = {
     }
 }
 
-const dbFuncs = {
-    save(modelName, toBeSaved) {
-        if (toBeSaved._id)
-            return $db.models[modelName].updateOne({ _id: toBeSaved._id }, toBeSaved)
-        else
-            return new $db.models[modelName](toBeSaved).save()
-    }
-}
-
 const schedules = {
     async build(month, year, institutionID) {
         try {
@@ -150,9 +141,8 @@ const schedules = {
         const jummahEntries = []
         for (let i = 0; i < emptyJummahArray.length; i++) {
             try {
-                const jummah = new $db.models.jummahs(emptyJummahArray[i])
-                const x = await jummah.save()
-                jummahEntries.push(x)
+                const jummah = await new $db.models.jummahs(emptyJummahArray[i]).save()
+                jummahEntries.push(jummah)
             } catch(err) {
                 console.log(err)
             }
@@ -283,7 +273,7 @@ router.delete(routerGroup1URL, async (req, res) => {
 router.post(routerGroup1URL, async (req, res) => {
     try {
         req.body.institutionID = req.headers.institutionid
-        const announcementEntry = await dbFuncs.save(routerGroup1, req.body)
+        const announcementEntry = await $db.funcs.save(routerGroup1, req.body)
         res.json(`successfully saved announcement: '${req.body.headline}'`)
     } catch(err) {
         errors.db(routerGroup1.slice(0, -1), 'saving', err)
@@ -325,10 +315,11 @@ router.post(routerGroup2URL + "/create", async(req, res) => {
     try {
         const institutionID = req.headers.institutionid
         req.body.user.institutionID = institutionID
-        const userEntry = await new $db.models.users(req.body.user).save()
+        req.body.user.isDefault = true
+        const userEntry = await $db.funcs.save('users', req.body.user)
         req.body.khateeb.institutionID = institutionID
         req.body.khateeb.userID = userEntry._id.toString()
-        const khateebEntry = await new $db.models[routerGroup2](req.body.khateeb).save()
+        const khateebEntry = await $db.funcs.save(routerGroup2, req.body.khateeb)
         res.json(`You've successfully made ${khateebEntry.firstName} ${khateebEntry.lastName} a khateeb (username: ${userEntry.username}).`)
     } catch(err) {
         errors.db(routerGroup2.slice(0, 1), 'creating', err)
@@ -350,7 +341,7 @@ router.get(routerGroup6URL + "/:location", async (req, res) => {
 router.post(routerGroup6URL, async (req, res) => {
     try {
         req.body["institutionID"] = req.headers.institutionid
-        const saved = await dbFuncs.save(routerGroup6, req.body)
+        const saved = await $db.funcs.save(routerGroup6, req.body)
         res.json(`successfully saved ${req.body.name}`)
     } catch(err) {
         errors.db(routerGroup6.slice(0, -1), 'saving', err)
@@ -373,7 +364,7 @@ router.post(routerGroup7URL, async (req, res) => {
     try {
         for (let i = 0; i < req.body.times.length; i++) {
             req.body.times[i]["institutionID"] = req.headers.institutionid
-            const saved = await dbFuncs.save(routerGroup7, req.body.times[i])
+            const saved = await $db.funcs.save(routerGroup7, req.body.times[i])
         }
         res.json('timings successfully saved')
     } catch(err) {
@@ -397,7 +388,7 @@ router.post(routerGroup8URL, async (req, res) => {
     try {
         for (let i = 0; i < req.body.jummahs.length; i++) {
             req.body.jummahs[i]["institutionID"] = req.headers.institutionid
-            const saved = await dbFuncs.save(routerGroup8, req.body.jummahs[i])
+            const saved = await $db.funcs.save(routerGroup8, req.body.jummahs[i])
         }
         res.json("successfully updated")
     } catch(err) {

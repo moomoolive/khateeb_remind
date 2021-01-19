@@ -47,7 +47,7 @@ router.post('/verify-admin', middleware.validationCheck(['verificationCode', 'cr
             __t: 'password',
             options: req.body.createNewPassword
         }
-        $db.funcs.save('password', password, res)
+        //$db.funcs.save('password', password, res)
     } else {
         res.status($utils.hCodes.unauthorized)
         res.json('Unauthorized')

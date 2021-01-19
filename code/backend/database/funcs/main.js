@@ -1,54 +1,13 @@
 const $dbModels = require($DIR + '/database/models/main.js')
 const helpers = require('./helpers.js')
 
+
 const funcs = {
-    databaseError(response, error) {
-        console.log(error)
-        response.json('There was a problem accessing the database!')
-    },
-    databaseSuccess(response) {
-        if (response) response.json('Changes successfully made!')
-    },
-    databaseCallback(response, error=false) {
-        if (error) this.databaseError(response, error)
-        else if(response) this.databaseSuccess(response)
-    },
-    saveSetting(discriminatorName, toBeSaved, response=false) {
-        $dbModels[discriminatorName].findOne({}, (err, setting) => {
-            if (err) console.log(err)
-            else if (setting) {
-                $dbModels[discriminatorName].findOneAndUpdate({}, 
-                    {
-                        options: toBeSaved.options,
-                        savedOn: new Date()
-                    }, (err) => { this.databaseCallback(response, err) }
-                ).select(['options'])
-            } else {
-                const x = new $dbModels[discriminatorName](toBeSaved)
-                x.save((err) => { this.databaseCallback(response, err) })
-            }
-        })
-    },
-    save(schemaName, toBeSaved, response=false) {
-        helpers.saveDateOfEntry(toBeSaved)
-        const previousEntry = toBeSaved._id
-        const isMongooseDiscriminator = toBeSaved.__t
-        if (previousEntry) {
-            toBeSaved.__v++
-            $dbModels[schemaName].findByIdAndUpdate(toBeSaved._id, toBeSaved, (err) => {
-                this.databaseCallback(response, err)
-            })
-        } 
-        else if (isMongooseDiscriminator)  this.saveSetting(toBeSaved.__t, toBeSaved, response)
-        else {
-            const x = new $dbModels[schemaName](toBeSaved)
-            x.save((err) => { this.databaseCallback(response, err) })
-        }
-    },
-    delete(schemaName, ID, response) {
-        $dbModels[schemaName].deleteOne({ _id: ID }, (err) => {
-            this.databaseCallback(response, err)
-        })
+    async save(modelName, toBeSaved) {
+        if (toBeSaved._id)
+            return $db.models[modelName].updateOne({ _id: toBeSaved._id }, toBeSaved)
+        else
+            return new $db.models[modelName](toBeSaved).save()
     },
     getPassword() {
         return new Promise((resolve, reject) => {
