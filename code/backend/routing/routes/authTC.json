@@ -22,7 +22,7 @@
                 "required": false
             }
         },
-        "user": {
+        "institutionAdmin": {
             "username": {
                 "__type__": "str",
                 "required": true
@@ -30,29 +30,28 @@
             "password": {
                 "__type__": "str",
                 "required": true
-            }
-        },
-        "institutionAdmin": {
-            "handle": {
-                "__type__": "str",
-                "required": false
             },
-            "firstName": {
-                "__type__": "str",
-                "required": true
-            },
-            "lastName": {
-                "__type__": "str",
-                "required": true
-            },
-            "phoneNumber": {
-                "__type__": "num",
-                "required": true
+            "profile": {
+                "handle": {
+                    "__type__": "str",
+                    "required": false
+                },
+                "firstName": {
+                    "__type__": "str",
+                    "required": true
+                },
+                "lastName": {
+                    "__type__": "str",
+                    "required": true
+                },
+                "phoneNumber": {
+                    "__type__": "num",
+                    "required": true
+                }
             }
         }
     },
     "createKhateeb": {
-        "user": {
             "institutionID": {
                 "__type__": "str",
                 "required": true
@@ -64,34 +63,29 @@
             "password": {
                 "__type__": "str",
                 "required": true
+            },
+            "profile": {
+                "handle": {
+                    "__type__": "str",
+                    "required": false
+                },
+                "firstName": {
+                    "__type__": "str",
+                    "required": true
+                },
+                "lastName": {
+                    "__type__": "str",
+                    "required": true
+                },
+                "phoneNumber": {
+                    "__type__": "num",
+                    "required": true
+                },
+                "title": {
+                    "__type__": "str",
+                    "required": false
+                }
             }
-        },
-        "khateeb": {
-            "institutionID": {
-                "__type__": "str",
-                "required": true
-            },
-            "handle": {
-                "__type__": "str",
-                "required": false
-            },
-            "firstName": {
-                "__type__": "str",
-                "required": true
-            },
-            "lastName": {
-                "__type__": "str",
-                "required": true
-            },
-            "phoneNumber": {
-                "__type__": "num",
-                "required": true
-            },
-            "title": {
-                "__type__": "str",
-                "required": false
-            }
-        }
     },
     "login": {
         "username": {
@@ -112,24 +106,24 @@
             "password": {
                 "__type__": "str",
                 "required": true
-            }
-        },
-        "profile": {
-            "handle": {
-                "__type__": "str",
-                "required": false
             },
-            "firstName": {
-                "__type__": "str",
-                "required": true
-            },
-            "lastName": {
-                "__type__": "str",
-                "required": true
-            },
-            "phoneNumber": {
-                "__type__": "num",
-                "required": true
+            "profile": {
+                "handle": {
+                    "__type__": "str",
+                    "required": false
+                },
+                "firstName": {
+                    "__type__": "str",
+                    "required": true
+                },
+                "lastName": {
+                    "__type__": "str",
+                    "required": true
+                },
+                "phoneNumber": {
+                    "__type__": "num",
+                    "required": true
+                }
             }
         },
         "apiKey": {

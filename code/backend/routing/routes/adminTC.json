@@ -1,0 +1,100 @@
+{
+    "announcements": {
+        "headline": {
+            "__type__": "str",
+            "required": true
+        },
+        "content": {
+            "__type__": "str",
+            "required": false
+        },
+        "important": {
+            "__type__": "bool",
+            "required": false
+        },
+        "urgent": {
+            "__type__": "bool",
+            "required": false
+        }
+    },
+    "existingKhateeb": {
+        "_id": {
+            "__type__": "str",
+            "required": true
+        },
+        "profile": {
+            "phoneNumber": {
+                "__type__": "num",
+                "required": false
+            },
+            "active": {
+                "__type__": "bool",
+                "required": false
+            },
+            "availableTimings": {
+                "__type__": "arr",
+                "required": false
+            }
+        }
+    },
+    "newKhateeb": {
+        "username": {
+            "__type__": "str",
+            "required": true
+        },
+        "profile": {
+            "firstName": {
+                "__type__": "str",
+                "required": true
+            },
+            "lastName": {
+                "__type__": "str",
+                "required": true
+            },
+            "availableTimings": {
+                "__type__": "arr",
+                "required": false
+            },
+            "phoneNumber": {
+                "__type__": "num",
+                "required": false
+            },
+            "title": {
+                "__type__": "str",
+                "required": false
+            }
+        }
+    },
+    "confirmKhateebs": {
+        "all": {
+            "__type__": "bool",
+            "required": false
+        },
+        "_id": {
+            "__type__": "str",
+            "required": false
+        }
+    },
+    "locations": {
+        "name": {
+            "__type__": "str",
+            "required": true
+        },
+        "address": {
+            "__type__": "str",
+            "required": false
+        }
+    },
+    "timings": {
+        "times": {
+            "__type__": "arr",
+            "required": true
+        }
+    },
+    "jummahs": {
+        "jummahs": {
+            "__type__": "arr",
+            "required": true
+        }
+    }
+}

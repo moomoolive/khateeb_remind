@@ -1,15 +1,19 @@
 const  misc  = require('./routes/misc.js')
-const  general  = require('./routes/general.js')
+const  khateeb  = require('./routes/khateebs.js')
 const  admin  = require('./routes/admin.js')
 const  text  = require('./routes/text.js')
 const auth = require('./routes/auth.js')
+const sysAdmin = require('./routes/sysAdmin.js')
+const root = require('./routes/root.js')
 
 const routesList = {
     misc,
-    general,
+    khateeb,
     admin,
     text,
-    auth
+    auth,
+    sysAdmin,
+    root
 }
 
 module.exports = routesList

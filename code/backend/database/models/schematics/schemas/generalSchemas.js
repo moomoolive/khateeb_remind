@@ -50,7 +50,7 @@ const institution = new mongoose.Schema({
     abbreviatedName: {
         type: String,
         required: false,
-        default: '__NOABBREVIATEDNAME__'
+        default: '__NO-ABBREVIATED-NAME__'
     },
     timezone: {
         type: String,
@@ -149,6 +149,32 @@ const user = new mongoose.Schema({
     isDefault: {
         type: Boolean,
         default: false
+    },
+    handle: {
+        type: String,
+        required: false,
+        default: "__NO-HANDLE__",
+        minlength: 1,
+        validate: {
+            validator: (val) => val[0] !== "@",
+            message: "Illegal 'at' symbol in position 0"
+        }
+    },
+    firstName: {
+        type: String,
+        required: true,
+        minlength: 1
+    },
+    lastName: {
+        type: String,
+        required: true,
+        minlength: 1
+    },
+    phoneNumber: {
+        type: Number,
+        required: true,
+        min: 100_000_0000,
+        max: 999_999_9999
     }
 },
 { timestamps: true })
@@ -171,7 +197,27 @@ user.pre('save', function (next) {
     })
 })
 
+user.pre('updateOne', function (next) {
+    try {
+        const data = this.getUpdate()
+        if (!data.password) {
+            this.update({}, data).exec()
+            return next()
+        }
+        const saltFactor = 9
+        const salt = bcyrpt.genSaltSync(saltFactor)
+        const hash = bcyrpt.hashSync(data.password, salt)
+        data.password = hash
+        this.update({}, data).exec()
+        next()
+    } catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
 user.methods.comparePassword = async function (submittedPassword) {
+    console.log(submittedPassword)
     try {
         const isMatched = await bcyrpt.compare(submittedPassword, this.password)
         return isMatched
@@ -181,39 +227,6 @@ user.methods.comparePassword = async function (submittedPassword) {
         return null
     }
 }
-
-const profile = new mongoose.Schema({
-    userID: {
-        type: String,
-        required: true
-    },
-    institutionID: {
-        type: String,
-        required: true,
-    },
-    handle: {
-        type: String,
-        required: false,
-        default: "__NOHANDLE__",
-        minlength: 1
-    },
-    firstName: {
-        type: String,
-        required: true,
-        minlength: 1
-    },
-    lastName: {
-        type: String,
-        required: true,
-        minlength: 1
-    },
-    phoneNumber: {
-        type: Number,
-        required: true,
-        min: 100_000_0000,
-        max: 999_999_9999
-    }
-}, { timestamps: true })
 
 const announcement = new mongoose.Schema({
     institutionID: {
@@ -240,6 +253,31 @@ const announcement = new mongoose.Schema({
     },
 }, { timestamps: true })
 
+const setting = new mongoose.Schema({
+    institutionID: {
+        type: String,
+        required: true,
+        minlength: 1
+    },
+    twilioUser: {
+        type: String,
+        required: false,
+        default: 'TBD',
+        minlength: 1
+    },
+    twilioKey: {
+        type: String,
+        required: false,
+        default: 'TBD',
+        minlength: 1
+    },
+    textAllowed: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
+})
+
 
 module.exports = {
     jummah,
@@ -248,5 +286,5 @@ module.exports = {
     location,
     institution,
     user,
-    profile
+    setting
 }

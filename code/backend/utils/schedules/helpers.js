@@ -1,134 +1,171 @@
-const funcs = require($DIR + '/utils/funcs.js')
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+const objectSupport = require('dayjs/plugin/objectSupport')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(objectSupport)
 
-const helpers = {
-    emptyPrayerSlots(filledWith, timingsArray) {
-        const arr = []
-        timingsArray.forEach(timing => {
-            const fill = $utils.general.deepCopy(filledWith)
-            fill.timing = timing
-            arr.push(fill)
-        })
-        return arr
-    },
-    adjustPrayerSlots(newTimings, oldPrayerSlots, toBeDecidedIndicator) {
-        const updatedPrayerSlots = $utils.general.deepCopy(oldPrayerSlots)
-        const diff = newTimings.length - oldPrayerSlots.length
-        for (let i = 0; i < Math.abs(diff); i++) {
-            diff < 0 ? updatedPrayerSlots.pop() : updatedPrayerSlots.push(toBeDecidedIndicator)
+const createJummahsAndReturnEntries = async (emptyJummahArray) => {
+    const jummahEntries = []
+    for (let i = 0; i < emptyJummahArray.length; i++) {
+        try {
+            const jummah = await new $db.models.jummahs(emptyJummahArray[i]).save()
+            jummahEntries.push(jummah)
+        } catch(err) {
+            console.log(err)
         }
-        return updatedPrayerSlots
-    },
-    weekIsInFuture(dateString) {
-        const date = new Date(dateString)
-        return date > new Date() 
-    },
-    adjustTimingDate(fridayDateObject, timings) {
-        const updatedTimings = []
-        const fridayDate = new Date(fridayDateObject)
-        const month = fridayDate.getMonth()
-        const date = fridayDate.getDate()
-        timings.forEach(timing => {
-            const x = new Date(timing)
-            x.setMonth(month)
-            x.setDate(date)
-            x.setSeconds(0, 0)
-            updatedTimings.push(x)
+    }
+    return jummahEntries
+}
+
+const createEmptyJummahsEntries = async (emptyJummah, prayerInfo, fridays, month, year, institutionID) => {
+    const linkedTimesAndLocations = linkTimesAndLocations(prayerInfo)
+    const emptyJummahs = loopOverLinkedStructAndFillJummahs(
+        linkedTimesAndLocations, emptyJummah, fridays, month, year, institutionID
+    )
+    return emptyJummahs
+}
+
+const loopOverLinkedStructAndFillJummahs = async (linkedStruct, emptyJummah, fridays, month, year, institutionID) => {
+    const jummahArray = []
+    for (let [locationID, timingIDs] of Object.entries(linkedStruct)) {
+        fridays.forEach(friday => {
+            timingIDs.forEach(timingID => {
+                const jummah = $utils.general.deepCopy(emptyJummah)
+                jummah.institutionID = institutionID
+                jummah.month = month
+                jummah.year = year
+                jummah.weekOf = friday
+                jummah.locationID = locationID
+                jummah.timingID = timingID.toString()
+                jummahArray.push(jummah)
+            })
         })
-        return updatedTimings
+    }
+    return jummahArray
+}
+
+const linkTimesAndLocations = async (prayerInfo) => {
+    const linkedStruct = {  }
+    prayerInfo.locations.forEach(location => {
+        linkedStruct[location._id] = []
+    })
+    prayerInfo.timings.forEach(timing => {
+        linkedStruct[timing.locationID].push(timing._id)
+    })
+    return linkedStruct
+}
+
+const getEmptyJummah = async () => {
+    const templates = getEmptyJummahComponents()
+    return createEmptyJummah(templates)
+}
+
+const getEmptyJummahComponents = async () => {
+    const jummah = {
+        month: 0,
+        year: 2021,
+        weekOf: 15,
+        confirmed: false,
+        institutionID: 'TBD',
+        locationID: "TBD",
+        timingID: 'TBD',
+        khateebPreference: []
+    }
+    const prayerSlot = {
+        notified: false,
+        confirmed: false,
+        responded: false,
+        khateebID: 'TBD'
+    }
+    return { jummah, prayerSlot }
+}
+
+const createEmptyJummah = (templates) => {
+    const maxKhateebPreference = 3
+    const preferences = []
+    for (let i =0; i < maxKhateebPreference; i++)
+        preferences.push(templates.prayerSlot)
+    templates.jummah.khateebPreference = preferences
+    return templates.jummah
+}
+
+const getActiveLocationsAndTimings = async (institutionID) => {
+    try {
+        const query = { institutionID, active: true }
+        const locations = await $db.models.locations.find(query).exec()
+        const timings = await $db.models.timings.find(query).exec()
+        return { locations, timings }
+    } catch(err) {
+        console.log(`Could not get locations and timings`)
+        console.log(err)
     }
 }
 
-module.exports = {
-    dateObjectFromString(monthYearString) {
-        const decoded = monthYearString.split('-')
-        const month = funcs.monthStringToNumber(decoded[0])
-        const year = decoded[1]
-        return new Date(year, month, 1)
-    },
-    findUpcomingFriday(date=new Date()) {
-        console.log(date)
-        const friday = 5
-        while (date.getDay() !== friday) {
-            date.setDate(date.getDate() + 1)
-        }
-        return date
-    },
-    findAllFridays(dateObjectFirstFriday) {
-        const fridays = []
-        const thisMonth = dateObjectFirstFriday.getMonth()
-        const oneWeek = 7
-        while (dateObjectFirstFriday.getMonth() === thisMonth) {
-            fridays.push($utils.general.deepCopy(dateObjectFirstFriday.toUTCString()))
-            dateObjectFirstFriday.setDate(dateObjectFirstFriday.getDate() + oneWeek)
-        }
-        return fridays
-    },
-    toBeDecidedIndicator() {
-        const prayerSlotTemplate = $db.models.emptySchema('prayerSlot')
-        prayerSlotTemplate.data.firstName = 'TBD'
-        prayerSlotTemplate.confirm.state = null
-        prayerSlotTemplate.confirm.responded = null
-        return prayerSlotTemplate
-    },
-    createEmptyLocation(emptyPrayerSlotTemplate, weeksInMonth, locationDetails) {
-        const details = $utils.general.deepCopy(locationDetails)
-        let monthlySchedule = {}
-        weeksInMonth.forEach(fridayDateObject => {
-            const updatedTimings = helpers.adjustTimingDate(fridayDateObject, details.timings)
-            const data = $utils.general.deepCopy(emptyPrayerSlotTemplate)
-            const emptyPrayerSlots = helpers.emptyPrayerSlots(data, updatedTimings, fridayDateObject)
-            monthlySchedule[fridayDateObject] = emptyPrayerSlots
-        })
-        return monthlySchedule
-    },
-    findAllFridaysFromKey(scheduleKey) {
-        const dateObjectFirstDayOfMonth = this.dateObjectFromString(scheduleKey)
-        const firstFriday = this.findUpcomingFriday(dateObjectFirstDayOfMonth)
-        return this.findAllFridays(firstFriday)
-    },
-    adjustNumberOfLocations(oldSchedule, currentLocationDetails) {
-        const newLocations = $utils.general.deepCopy(oldSchedule)
-        const oldLocations = newLocations.data.length
-        const updatedLocations = currentLocationDetails.options.length
-        const diff = updatedLocations - oldLocations
-        for (let i = 0; i < Math.abs(diff); i++) {
-            if (diff < 0) {
-                newLocations.data.pop()
-                continue
-            }
-            const emptyLocation = this.createEmptyLocation(
-                this.toBeDecidedIndicator(),
-                Object.keys(oldSchedule.data[0].monthlySchedule),
-                currentLocationDetails.options[oldLocations + i]
-            )
-            newLocations.data.push(emptyLocation) 
-        }
-        return newLocations
-    },
-    checkIfTimingsAreSame(oldSchedule, currentLocationDetails) {
-        const updatedTimingsSchedule = $utils.general.deepCopy(oldSchedule)
-        for (const [key, value] of Object.entries(updatedTimingsSchedule.monthlySchedule)) {
-            if (helpers.weekIsInFuture(key) && value.timings !== currentLocationDetails.timings) {
-                value.timings = $utils.general.deepCopy(currentLocationDetails.timings)
-                value.khateebs = helpers.adjustPrayerSlots(
-                    value.timings, 
-                    value.khateebs,
-                    this.toBeDecidedIndicator()
-                )
-            }
-        }
-        return updatedTimingsSchedule.monthlySchedule
-    },
-    scheduleIsInCurrentMonthOrBeyond(locations, schedule) {
-        const locationsMonth = new Date(locations.savedOn)
-        locationsMonth.setDate(1)
-        locationsMonth.setHours(0,0,0,0)
-        const scheduleSavedOn = new Date(schedule.savedOn)
-        return scheduleSavedOn.getTime() > locationsMonth.getTime()
-    },
-    khateebToPrayerSlots(khateeb) {
-        const template = this.toBeDecidedIndicator()
-        template.data = $utils.general.deepCopy(khateeb)
-        return template
+const findFirstFriday = (month, year) => {
+    let date = dayjs().month(month).year(year).date(1)
+    return findUpcomingFriday(date)
+}
+
+const findNextMonth = () => {
+    let date = dayjs()
+    return dayjs(date).month(date.month() + 1)
+}
+
+const fridaysOfMonth = (month, year, onlyDate=true) => {
+    const firstFriday = findFirstFriday(month, year)
+    return findAllFridays(firstFriday, onlyDate)
+}
+
+const fridaysNextMonth = (onlyDate=true) => {
+    const date = findNextMonth()
+    return fridaysOfMonth(date.month(), date.year(), onlyDate)
+}
+
+const findUpcomingFriday = (date=dayjs()) => {
+    const friday = 5
+    while (date.day() !== friday)
+        date = dayjs(date).date(date.date() + 1)
+    return date
+}
+
+const findAllFridays = (startFridayDayJs, onlyDate=true) => {
+    const fridays = []
+    let fri = startFridayDayJs.clone()
+    const oneWeek = 7
+    while (fri.month() === startFridayDayJs.month()) {
+        if (onlyDate)
+            fridays.push(fri.date())
+        else
+            fridays.push(fri)
+        fri = dayjs(fri).date(fri.date() + oneWeek)
     }
+    return fridays
+}
+
+const createAssociatedJummahKeys = (remainingJummahsDayJs, nextMonthJummahsDayJs, associatedKey) => {
+    const allJummahs = [...remainingJummahsDayJs, ...nextMonthJummahsDayJs]
+    const keys = []
+    allJummahs.forEach(jummah => {
+        const ID = $utils.general.deepCopy(associatedKey)
+        const jummahKey = { ...ID }
+        jummahKey.month = jummah.month()
+        jummahKey.weekOf = jummah.date()
+        jummahKey.year = jummah.year()
+        keys.push(jummahKey)
+    })
+    return keys
+}
+
+module.exports = {
+    fridaysOfMonth,
+    getActiveLocationsAndTimings,
+    getEmptyJummah,
+    createEmptyJummahsEntries,
+    createJummahsAndReturnEntries,
+    findUpcomingFriday,
+    findAllFridays,
+    fridaysNextMonth,
+    createAssociatedJummahKeys
 }

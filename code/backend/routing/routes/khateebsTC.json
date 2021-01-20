@@ -1,0 +1,12 @@
+{
+    "userInfo": {
+        "username": {
+            "__type__": "str",
+            "required": true
+        },
+        "password": {
+            "__type__": "str",
+            "required": false
+        }
+    }
+}

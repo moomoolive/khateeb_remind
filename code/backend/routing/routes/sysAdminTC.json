@@ -1,0 +1,16 @@
+{
+    "institutionStatus": {
+        "_id": {
+            "__type__": "str",
+            "required": true
+        },
+        "confirmed": {
+            "__type__": "bool",
+            "required": true
+        },
+        "users": {
+            "__type__": "bool",
+            "required": false
+        }
+    }
+}

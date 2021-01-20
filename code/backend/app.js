@@ -30,13 +30,21 @@ app.use(middleware.generalError)
 app.options('*', cors())
 
 app.post('*', middleware.noEmptyBody)
-app.delete('*', [middleware.noEmptyBody, middleware.validationCheck(['_id'])])
+const deleteRequestParams = {
+    _id: {
+        __type__: "str",
+        required: true
+    }
+}
+app.delete('*', [middleware.noEmptyBody, middleware.allowedFields(deleteRequestParams)])
 
-app.use('/general', routes.general)
+app.use('/khateeb', routes.khateeb)
 app.use('/admin', routes.admin)
 app.use('/misc', routes.misc)
 app.use('/text', routes.text)
 app.use('/auth', routes.auth)
+app.use('/sysAdmin', routes.sysAdmin)
+app.use('/root', routes.root)
 
 db.once('open', () => { console.log(`${dbType} Mongo is listening`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })

@@ -16,7 +16,7 @@ module.exports = {
             default: 0,
             min: 0
         },
-        preferredTimings: [String]
+        availableTimings: [String]
     }),
     institutionAdmin: new mongoose.Schema({
 
