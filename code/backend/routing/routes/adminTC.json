@@ -10,11 +10,11 @@
         },
         "important": {
             "__type__": "bool",
-            "required": false
+            "required": true
         },
         "urgent": {
             "__type__": "bool",
-            "required": false
+            "required": true
         }
     },
     "existingKhateeb": {
@@ -22,19 +22,17 @@
             "__type__": "str",
             "required": true
         },
-        "profile": {
-            "phoneNumber": {
-                "__type__": "num",
-                "required": false
-            },
-            "active": {
-                "__type__": "bool",
-                "required": false
-            },
-            "availableTimings": {
-                "__type__": "arr",
-                "required": false
-            }
+        "phoneNumber": {
+            "__type__": "num",
+            "required": true
+        },
+        "active": {
+            "__type__": "bool",
+            "required": true
+        },
+        "availableTimings": {
+            "__type__": "arr",
+            "required": true
         }
     },
     "newKhateeb": {
@@ -42,27 +40,25 @@
             "__type__": "str",
             "required": true
         },
-        "profile": {
-            "firstName": {
-                "__type__": "str",
-                "required": true
-            },
-            "lastName": {
-                "__type__": "str",
-                "required": true
-            },
-            "availableTimings": {
-                "__type__": "arr",
-                "required": false
-            },
-            "phoneNumber": {
-                "__type__": "num",
-                "required": false
-            },
-            "title": {
-                "__type__": "str",
-                "required": false
-            }
+        "firstName": {
+            "__type__": "str",
+            "required": true
+        },
+        "lastName": {
+            "__type__": "str",
+            "required": true
+        },
+        "availableTimings": {
+            "__type__": "arr",
+            "required": true
+        },
+        "phoneNumber": {
+            "__type__": "num",
+            "required": true
+        },
+        "title": {
+            "__type__": "str",
+            "required": true
         }
     },
     "confirmKhateebs": {
@@ -94,6 +90,36 @@
     "jummahs": {
         "jummahs": {
             "__type__": "arr",
+            "required": true
+        }
+    },
+    "userUsername": {
+        "username": {
+            "__type__": "str",
+            "required": true
+        }
+    },
+    "userPassword": {
+        "password": {
+            "__type__": "str",
+            "required": true
+        }
+    },
+    "userProfile": {
+        "firstName": {
+            "__type__": "str",
+            "required": true
+        },
+        "lastName": {
+            "__type__": "str",
+            "required": true
+        },
+        "phoneNumber": {
+            "__type__": "num",
+            "required": true
+        },
+        "handle": {
+            "__type__": "str",
             "required": true
         }
     }

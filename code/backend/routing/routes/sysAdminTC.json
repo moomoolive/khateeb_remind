@@ -12,5 +12,35 @@
             "__type__": "bool",
             "required": false
         }
+    },
+    "userUsername": {
+        "username": {
+            "__type__": "str",
+            "required": true
+        }
+    },
+    "userPassword": {
+        "password": {
+            "__type__": "str",
+            "required": true
+        }
+    },
+    "userProfile": {
+        "firstName": {
+            "__type__": "str",
+            "required": true
+        },
+        "lastName": {
+            "__type__": "str",
+            "required": true
+        },
+        "phoneNumber": {
+            "__type__": "num",
+            "required": true
+        },
+        "handle": {
+            "__type__": "str",
+            "required": true
+        }
     }
 }

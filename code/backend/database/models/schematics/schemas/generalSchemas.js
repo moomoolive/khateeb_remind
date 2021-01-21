@@ -217,7 +217,6 @@ user.pre('updateOne', function (next) {
 })
 
 user.methods.comparePassword = async function (submittedPassword) {
-    console.log(submittedPassword)
     try {
         const isMatched = await bcyrpt.compare(submittedPassword, this.password)
         return isMatched

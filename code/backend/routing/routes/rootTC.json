@@ -1,42 +1,50 @@
 {
     "createSysAdmin": {
-        "_id": {
-            "__type__": "str",
-            "required": false
-        },
         "username": {
             "__type__": "str",
             "required": true
         },
+        "firstName": {
+            "__type__": "str",
+            "required": true
+        },
+        "lastName": {
+            "__type__": "str",
+            "required": true
+        },
+        "phoneNumber": {
+            "__type__": "num",
+            "required": true
+        }
+    },
+    "userUsername": {
+        "username": {
+            "__type__": "str",
+            "required": true
+        }
+    },
+    "userPassword": {
         "password": {
             "__type__": "str",
-            "required": false
+            "required": true
+        }
+    },
+    "userProfile": {
+        "firstName": {
+            "__type__": "str",
+            "required": true
         },
-        "confirmed": {
-            "__type__": "bool",
-            "required": false
+        "lastName": {
+            "__type__": "str",
+            "required": true
         },
-        "isDefault": {
-            "__type__": "bool",
-            "required": false
+        "phoneNumber": {
+            "__type__": "num",
+            "required": true
         },
-        "profile": {
-            "handle": {
-                "__type__": "str",
-                "required": false
-            },
-            "firstName": {
-                "__type__": "str",
-                "required": true
-            },
-            "lastName": {
-                "__type__": "str",
-                "required": true
-            },
-            "phoneNumber": {
-                "__type__": "num",
-                "required": true
-            }
+        "handle": {
+            "__type__": "str",
+            "required": true
         }
     }
 }

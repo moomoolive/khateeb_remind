@@ -31,61 +31,57 @@
                 "__type__": "str",
                 "required": true
             },
-            "profile": {
-                "handle": {
-                    "__type__": "str",
-                    "required": false
-                },
-                "firstName": {
-                    "__type__": "str",
-                    "required": true
-                },
-                "lastName": {
-                    "__type__": "str",
-                    "required": true
-                },
-                "phoneNumber": {
-                    "__type__": "num",
-                    "required": true
-                }
+            "handle": {
+                "__type__": "str",
+                "required": false
+            },
+            "firstName": {
+                "__type__": "str",
+                "required": true
+            },
+            "lastName": {
+                "__type__": "str",
+                "required": true
+            },
+            "phoneNumber": {
+                "__type__": "num",
+                "required": true
             }
         }
     },
     "createKhateeb": {
-            "institutionID": {
-                "__type__": "str",
-                "required": true
-            },
-            "username": {
-                "__type__": "str",
-                "required": true
-            },
-            "password": {
-                "__type__": "str",
-                "required": true
-            },
-            "profile": {
-                "handle": {
-                    "__type__": "str",
-                    "required": false
-                },
-                "firstName": {
-                    "__type__": "str",
-                    "required": true
-                },
-                "lastName": {
-                    "__type__": "str",
-                    "required": true
-                },
-                "phoneNumber": {
-                    "__type__": "num",
-                    "required": true
-                },
-                "title": {
-                    "__type__": "str",
-                    "required": false
-                }
-            }
+        "institutionID": {
+            "__type__": "str",
+            "required": true
+        },
+        "username": {
+            "__type__": "str",
+            "required": true
+        },
+        "password": {
+            "__type__": "str",
+            "required": true
+        },
+        "handle": {
+            "__type__": "str",
+            "required": false
+        },
+        "firstName": {
+            "__type__": "str",
+            "required": true
+        },
+        "lastName": {
+            "__type__": "str",
+            "required": true
+        },
+        "phoneNumber": {
+            "__type__": "num",
+            "required": true
+        },
+        "title": {
+            "__type__": "str",
+            "required": true
+        }
     },
     "login": {
         "username": {
@@ -107,23 +103,21 @@
                 "__type__": "str",
                 "required": true
             },
-            "profile": {
-                "handle": {
-                    "__type__": "str",
-                    "required": false
-                },
-                "firstName": {
-                    "__type__": "str",
-                    "required": true
-                },
-                "lastName": {
-                    "__type__": "str",
-                    "required": true
-                },
-                "phoneNumber": {
-                    "__type__": "num",
-                    "required": true
-                }
+            "handle": {
+                "__type__": "str",
+                "required": false
+            },
+            "firstName": {
+                "__type__": "str",
+                "required": true
+            },
+            "lastName": {
+                "__type__": "str",
+                "required": true
+            },
+            "phoneNumber": {
+                "__type__": "num",
+                "required": true
             }
         },
         "apiKey": {

@@ -12,7 +12,7 @@ router.post('/create/institution',
         const institutionEntry = await $db.funcs.save('institutions', req.body.institution)
         req.body.institutionAdmin.institutionID = institutionEntry._id.toString()
         const institutionAdminEntry = await $db.funcs.save('institutionAdmins', req.body.institutionAdmin)
-        res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${institutionAdminEntry.profile.firstName} ${institutionAdminEntry.profile.lastName} as it's administrator (username: ${institutionAdminEntry.username}). Please wait a day or two for 'khateeb.com' to confirm your institution before logging in.`)
+        res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${institutionAdminEntry.firstName} ${institutionAdminEntry.lastName} as it's administrator (username: ${institutionAdminEntry.username}). Please wait a day or two for 'khateeb.com' to confirm your institution before logging in.`)
     } catch(err) {
         console.log(err)
         res.status($utils.hCodes.serverError)
@@ -26,7 +26,7 @@ router.post('/create/khateeb',
     async (req, res) => {
     try {
         const khateebEntry = await $db.funcs.save('khateebs', req.body)
-        res.json(`Asalam alaikoum ${khateebEntry.profile.firstName} ${khateebEntry.profile.lastName}, your account has been created (username: ${khateebEntry.username}). Please wait a day or two for the institution administrator to confirm your account.`)
+        res.json(`Asalam alaikoum ${khateebEntry.firstName} ${khateebEntry.lastName}, your account has been created (username: ${khateebEntry.username}). Please wait a day or two for the institution administrator to confirm your account.`)
     } catch(err) {
         console.log(err)
         res.status($utils.hCodes.serverError)
@@ -34,7 +34,7 @@ router.post('/create/khateeb',
     }
 })
 
-// root --> user: "moomoo123" password: "password"
+// root --> user: "moomoo123" password: "password123"
 // institutionAdmin ---> user: "moomoolive" password: "123456" institution: "Al-Salam Centre"
 // khateeb ---> user: "gandgand" password: "123456" institution: "Al-Salam Centre"
 // sysAdmin ---> user: "sysAdmin1" password: "123456"
@@ -46,28 +46,27 @@ router.post('/',
     ],
     async (req, res) => {
     try {
-        let token
+        let response
         const user = req.__USER__
         validPassword = await user.comparePassword(req.body.password)
-        console.log(validPassword)
-        if (!validPassword)
-            token = null
+        if (!validPassword) {
+            res.status($utils.hCodes.unauthorized)
+            response = {  msg: 'unauthorized', token: null }
+        }
         else if (user.isDefault)
-            token = 'default'
+            response = 'default'
         else {
             if (!user.confirmed && user.__t !== 'root') {
-                token = `un-confirmed-${user.__t}`
+                response = { msg: `un-confirmed-${user.__t}`, token: null }
             } else {
-                const tokenInfo = {
-                    ...user.profile,
-                    _id: user._id.toString(),
-                    username: user.username,
-                    institutionID: user.institutionID 
-                }
-                token = $utils.auth.createToken('60-days', user.__t, tokenInfo)
+                const tokenInfo = $utils.general.deepCopy(user)
+                delete tokenInfo.password
+                delete tokenInfo.isDefault 
+                delete tokenInfo.confirmed
+                response = { msg: 'success', token: $utils.auth.createToken('60-days', tokenInfo) }
             }
         }
-        res.json(token)
+        res.json(response)
     } catch(err) {
         console.log(err)
         res.status($utils.hCodes.serverError)

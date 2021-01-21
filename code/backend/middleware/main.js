@@ -66,7 +66,8 @@ const auth = (authLevel) => {
                 response.json('There was an error authorizing account, check if user credentials are correct and if authorization is present in request. If present then this is probably a server issue. Please try again later.')
             } 
             else {
-                request.headers.userid = decoded._id 
+                request.headers.userid = decoded._id
+                request.headers.institutionid = decoded.institutionID 
                 next()
             }  
         })
@@ -74,10 +75,11 @@ const auth = (authLevel) => {
 }
 
 const userExists = async (request, response, next) => {
-    const user = await $db.models.users.findOne({ username: request.body.username }).exec()
-    if (!user)
-        response.json({ token: null })
-    else {
+    const user = await $db.models.users.findOne({ username: request.body.username }).select(["-createdAt", "-updatedAt", "-__v"]).exec()
+    if (!user){
+        response.status($utils.hCodes.unauthorized)
+        response.json({  msg: 'unauthorized', token: null })
+    } else {
         request.__USER__ = user
         next()
     }

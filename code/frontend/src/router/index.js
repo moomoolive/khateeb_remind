@@ -4,6 +4,7 @@ import store from '../store/index.js'
 
 import admin from './routes/admin.js'
 import users from './routes/users.js'
+import auth from './routes/auth.js'
 
 Vue.use(VueRouter)
 
@@ -12,9 +13,8 @@ const routes = [
     path: '*',
     name: 'Not Found',
     component: () => import ('@/views/404.vue')
-  }, 
-  ...admin,
-  ...users
+  },
+  ...auth
 ]
 
 const router = new VueRouter({

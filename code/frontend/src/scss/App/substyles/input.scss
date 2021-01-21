@@ -28,7 +28,7 @@
 }
 
 
-input[type=text] {
+input[type=text], input[type=password], input[type=number] {
     height: 3vh;
     width: 35vh;
     @include inputColoring();

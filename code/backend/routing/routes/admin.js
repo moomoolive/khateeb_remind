@@ -1,65 +1,11 @@
 const express = require('express')
 
 const middleware = require($DIR + '/middleware/main.js')
+const requestTypeChecks = require('./adminTC.json')
 
 const router = express.Router()
 
 router.use(middleware.auth(2))
-
-/*
-const routerGroup3 = 'settings'
-const routerGroup3URL = `/${routerGroup3}`
-
-router.get(routerGroup3URL + '/:settingName', async (req, res) => {
-    const settingName = req.params.settingName
-    try {
-        const data = await $db.models.previousEntriesAndEmptySchema(settingName)
-        res.json(data)
-    } catch(err) {
-        console.log(err)
-        res.json(`Could't retrieve ${settingName}`)
-    }
-})
-
-router.post(routerGroup3URL, [middleware.isPassword, middleware.validationCheck('schema')], (req, res) => {
-    $db.funcs.save(routerGroup3, req.body, res)
-})
-
-const routerGroup4 = 'monthlySchedules'
-const routerGroup4URL = `/${routerGroup4}`
-
-router.get(routerGroup4URL + '/:monthToQuery', async (req, res) => {
-    try {
-        let schedule = await $utils.schedule.fetchSchedule(req.params.monthToQuery)
-        const locationAndTimings = await $db.funcs.getSetting('locationAndTimings')
-        const needsUpdate = $utils.schedule.needsUpdate(locationAndTimings, schedule)
-        if (!locationAndTimings)
-            res.json("No locations or timings were found!")
-        if(!schedule)
-            schedule = $utils.schedule.new(req.params.monthToQuery, locationAndTimings)
-        else if (needsUpdate) {
-            schedule = $utils.schedule.update(schedule, locationAndTimings)
-            $db.funcs.save('monthlySchedules', schedule)
-        }
-        res.json(schedule)
-    } catch(err) {
-        console.log(err)
-        res.status($utils.hCodes.serverError)
-        res.json('something went wrong')
-
-    }
-})
-
-
-router.post(routerGroup4URL, middleware.validationCheck('schema'), (req, res) => {
-    const updatedSchedule = $utils.schedule.checkForUpdates(req.body, req.body.original)
-    $db.funcs.save(routerGroup4, updatedSchedule, res)
-})
-
-*/
-// ------------------------------------------------------------ old routes
-const requestTypeChecks = require('./adminTC.json')
-
 
 const funcs = {
     isNumeric(value) {
@@ -164,11 +110,7 @@ router.post(routerGroup2URL,
     middleware.allowedFields(requestTypeChecks.existingKhateeb),
     async (req, res) => {
     try {
-        const updateObj = {}
-        for (let [profileField, value] of Object.entries(req.body.profile)) {
-            updateObj["profile." + profileField] = value
-        }
-        const updated = await $db.models[routerGroup2].updateOne({ _id: req.body._id }, updateObj)
+        const updated = await $db.models[routerGroup2].updateOne({ _id: req.body._id }, req.body)
         res.json(`successfully updated khateeb: ${req.body._id}`)
     } catch(err) {
         res.json(errors.db(routerGroup2.slice(0, -1), 'updating', err))
@@ -183,7 +125,7 @@ router.post(routerGroup2URL + "/create",
         req.body.isDefault = true
         req.body.confirmed = true
         const khateebEntry = await $db.funcs.save(routerGroup2, req.body)
-        res.json(`You've successfully made ${khateebEntry.profile.firstName} ${khateebEntry.profile.lastName} a khateeb (username: ${khateebEntry.username}).`)
+        res.json(`You've successfully made ${khateebEntry.firstName} ${khateebEntry.lastName} a khateeb (username: ${khateebEntry.username}).`)
     } catch(err) {
         res.json(errors.db(routerGroup2.slice(0, 1), 'creating', err))
     }
@@ -331,6 +273,41 @@ router.get("/schedules" + "/:month/:year", async (req, res) => {
         res.json(data)
     } catch(err) {
         res.json(errors.getReq('schedules', err))
+    }
+})
+
+
+router.post('/user/username', 
+    middleware.allowedFields(requestTypeChecks.userUsername),
+    async (req, res) => {
+    try {
+        const userEntry = await $db.models.institutionAdmins.updateOne({ _id: req.headers.userid }, req.body)
+        res.json(`Successfully username information!`)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't update user info`)
+    }
+})
+
+router.post('/user/password', 
+    middleware.allowedFields(requestTypeChecks.userPassword),
+    async (req, res) => {
+    try {
+        const userEntry = await $db.models.institutionAdmins.updateOne({ _id: req.headers.userid }, req.body)
+        res.json(`Successfully username information!`)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't update user info`)
+    }
+})
+
+router.post('/user/profile', async (req, res) => {
+    try {
+        const updated = await $db.models.institutionAdmins.updateOne({ _id: req.headers.userid }, req.body)
+        res.json(`Successfully updated user profile!`)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't update user profile`)
     }
 })
 

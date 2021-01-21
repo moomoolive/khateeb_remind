@@ -39,26 +39,33 @@ router.get('/announcements', async (req, res) => {
     }
 })
 
-router.post('/user-info', 
-    middleware.allowedFields(requestTypeChecks.userInfo),
+router.post('/user/username', 
+    middleware.allowedFields(requestTypeChecks.userUsername),
     async (req, res) => {
     try {
-        const userEntry = await $db.models.users.updateOne({ _id: req.headers.userid }, req.body).exec()
-        console.log(userEntry)
-        res.json(`Successfully updated user information!`)
+        const userEntry = await $db.models.khateebs.updateOne({ _id: req.headers.userid }, req.body)
+        res.json(`Successfully username information!`)
     } catch(err) {
         console.log(err)
         res.json(`Couldn't update user info`)
     }
 })
 
-router.post('/user-profile', async (req, res) => {
+router.post('/user/password', 
+    middleware.allowedFields(requestTypeChecks.userPassword),
+    async (req, res) => {
     try {
-        const updateObj = {}
-        for (let [profileField, value] of Object.entries(req.body)) {
-            updateObj["profile." + profileField] = value
-        }
-        const updated = await $db.models.users.updateOne({ _id: req.headers.userid }, updateObj)
+        const userEntry = await $db.models.khateebs.updateOne({ _id: req.headers.userid }, req.body)
+        res.json(`Successfully username information!`)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't update user info`)
+    }
+})
+
+router.post('/user/profile', async (req, res) => {
+    try {
+        const updated = await $db.models.khateebs.updateOne({ _id: req.headers.userid }, req.body)
         res.json(`Successfully updated user profile!`)
     } catch(err) {
         console.log(err)
