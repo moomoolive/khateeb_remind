@@ -1,12 +1,32 @@
 <template>
     <div>
+        <div class="welcomeContainer">
+            <div class="titleContainer">
+                <img style="display: inline;" :src="require('@/assets/logos/khateebRemindLogo.svg')">
+                <p class="title" style="display: inline;">Khateeb Remind</p>
+            </div>
+            <div class="subTitleContainer">
+                <p class="subTitle">Khateeb Scheduling.</p>
+                <p class="subTitle">Without the Mess.</p>
+            </div>
+        </div>
         <formMain
             :structure="formStructure"
             :errorMsg="errorMsg"
+            :showInvalidationMsgs="false"
             @submitted="login($event)"
         />
-        <button class="blue" @click="$router.push('/institutions')">Institution Sign-up</button>
-        <button>Khateeb Sign-up</button>
+        <div class="signUp">
+            <p class="signUpTitle">Sign Up</p>
+            <div class="signUpBtn">
+                 <button class="blue" @click="$router.push('/institutions')">
+                    Institutions
+                 </button>
+            </div>
+            <div class="signUpBtn">
+                <button>Khateebs</button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -24,15 +44,11 @@ export default {
         return {
             formStructure: {
                 username: {
-                    required: true,
-                    default: '',
-                    minLength: 1
+                    required: true
                 },
                 password: {
-                    type: "password",
-                    required: true,
-                    default: '',
-                    minLength: 1
+                    type: "protected",
+                    required: true
                 }
             },
             errorMsg: ''
@@ -71,6 +87,53 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+
+.welcomeContainer {
+    margin-top: 3vh;
+    margin-bottom: 3vh;
+}
+
+.titleContainer {
+    border-bottom: black 0.5vh dotted;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.subTitleContainer {
+    margin-top: 3vh;
+    margin-bottom: 5vh;
+}
+
+.title {
+    font-size: 4vh;
+    font-weight: bold;
+    margin-left: 2vh;
+}
+
+.subTitle {
+    font-size: 2vh;
+    font-weight: bold;
+    line-height: 0.5vh;
+}
+
+img {
+    width: 5vh;
+    height: 5vh;
+}
+
+.signUp {
+    margin-top: 4vh;
+}
+
+.signUpBtn {
+    display: inline;
+}
+
+.signUpTitle {
+    font-weight: bold;
+    font-size: 2.5vh;
+}
 
 </style>

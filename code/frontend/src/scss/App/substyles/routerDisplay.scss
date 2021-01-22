@@ -1,4 +1,6 @@
 .displayedPage {
+    position: relative;
+    z-index: 0;
     $padding: 9%;
     background-color: getColor("offWhite");
     padding-bottom: 5%;

@@ -7,5 +7,8 @@ export default {
     stringFormat(string, format='camel', outputCase='title', raw=false) {
         const casedArray = helpers[format + `CaseToArray`](string)
         return helpers.arrayToString(casedArray, outputCase, raw)
+    },
+    isNumeric(value) {
+        return /^\d+$/.test(value)
     }
 }

@@ -2,19 +2,19 @@
     <div>
         <button @click="$router.push('/')">Back to Login</button>
         <formMain
-            v-if="!request.institution"
+            v-if="showInstitutions"
             :structure="formStructure.institution"
-            :extensions="['states']"
+            :bindedExts="['states']"
             @submitted="deposit('institution', $event)"
             :formTitle="`Institution Details`"
         />
-        <!---
         <formMain
+            v-if="showInstitutionAdmin"
             :structure="formStructure.institutionAdmin"
+            :bindedExts="['confirms']"
             @submitted="deposit('institutionAdmin', $event)"
-            :backgroundColor="`red-offWhite`"
             :formTitle="`Institution Admin`"
-        /> -->
+        />
     </div>
 </template>
 
@@ -28,15 +28,15 @@ export default {
     },
     data() {
         return {
+            showInstitutions: true,
+            showInstitutionAdmin: false,
             formStructure: {
                 institution: {
                     name: {
-                        required: true,
-                        minLength: 1
+                        required: true
                     },
                     abbreviatedName: {
-                        required: true,
-                        minLength: 1
+                        required: true
                     },
                     timezone: {
                         type: "dropdown",
@@ -47,34 +47,31 @@ export default {
                         type: "dropdown",
                         required: true,
                         selectOptions: ["Canada", "United States", "Mexico"]
-                    }   
+                    }  
                 },
                 institutionAdmin: {
                     username: {
                         required: true,
-                        minLength: 1
+                        minLength: 6
                     },
                     password: {
-                        type: 'password',
+                        type: 'protected',
                         required: true,
-                        minLength: 1
+                        minLength: 6
                     },
                     handle: {
+                        type: 'handle',
                         required: true,
-                        validation: 'handle'
                     },
                     firstName: {
-                        required: true,
-                        minLength: 1
+                        required: true
                     },
                     lastName: {
-                        required: true,
-                        minLength: 1
+                        required: true
                     },
                     phoneNumber: {
-                        type: 'number',
-                        required: true,
-                        min: 100_000_0000
+                        type: 'phoneNumber',
+                        required: true
                     }
                 }
             },

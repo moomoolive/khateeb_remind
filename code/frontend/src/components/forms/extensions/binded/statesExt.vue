@@ -1,9 +1,7 @@
 <template>
-    <div v-if="country && statesOfCountry">
-        <div class="formLabel">
-                State
-        </div>
-        <select v-model="selectedState" @change="$emit('changed', $event.target.value)">
+    <div v-if="bindedTo && statesOfCountry">
+        <slot></slot>
+        <select v-model="selectedState" @change="toMain()">
             <option
                 v-for="option in statesOfCountry"
                 :key="option"
@@ -21,7 +19,7 @@ import states from './states.json'
 export default {
     name: "formStateExt",
     props: {
-        country: {
+        bindedTo: {
             type: String,
             required: true
         }
@@ -32,23 +30,34 @@ export default {
             selectedState: null
         }
     },
+    methods: {
+        toMain(options) {
+            this.$emit("changed", { val: this.selectedState, ...options})
+        }
+    },
     computed: {
         statesOfCountry() {
-            if (!this.states[this.country])
+            if (!this.states[this.bindedTo])
                 return null
             else
-                return this.states[this.country]
+                return this.states[this.bindedTo]
         }
     },
     watch: {
-        country(newVal) {
+        bindedTo(newVal) {
             if (this.statesOfCountry)
                 this.selectedState = this.statesOfCountry[0]
+        },
+        statesOfCountry(newVal, oldVal) {
+            if (!newVal && oldVal)
+                this.toMain({ deleted: true })
+            if (newVal && !oldVal)
+                this.toMain({ created: true })
         }
     },
     created() {
         this.selectedState = this.statesOfCountry[0]
-        this.$emit("changed", this.selectedState)
+        this.toMain({ created: true })
     }
 }
 </script>

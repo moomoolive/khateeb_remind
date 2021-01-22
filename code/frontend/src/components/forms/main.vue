@@ -1,5 +1,5 @@
 <template>
-    <div :class="`gradient${backgroundColor} formContainer`" v-if="data && formIsSetup">
+    <div :class="`gradient${backgroundColor} formContainer`" v-if="data">
         <div v-if="formTitle" class="formTitle">
             {{ formTitle }}
         </div>
@@ -7,45 +7,55 @@
             <div class="formLabel" :for="fieldName">
                 {{ _.stringFormat(fieldName) }}
             </div>
-            <div v-if="fieldData.type === 'textArea'">
-                <textarea v-model="data[fieldName]"></textarea>
-            </div>
-            <div v-else-if="fieldData.type === 'dropdown'">
-                <select v-model="data[fieldName]">
-                    <option
-                        v-for="option in fieldData.selectOptions"
-                        :key="option"
-                        :value="option"
-                    >
-                        {{ option }}
-                    </option>
-                </select>
-                <states-ext 
-                    v-if="extensionIncluded('states') && fieldName === 'country'"
-                    :country="data.country"
-                    @changed="extensionSupport('state', $event)"
+            <div v-if="extensibleType(fieldData.type)">
+                <component 
+                    :is="fieldData.type + `Ext`"
+                    :name="fieldName"
+                    :options="fieldData"
+                    :defaultValidators="{
+                        minLength
+                    }"
+                    @changed="extensionInterface(fieldName, $event)"
                 />
             </div>
-            <div v-else-if="fieldData.type">
-                <input
-                    style="display: inline-block" 
-                    :type="fieldData.type" 
-                    :id="fieldName" 
-                    v-model="data[fieldName]"
-                >
-            </div>
-            <div v-else>
-                <input 
-                    type="text"
-                    v-model="data[fieldName]" 
-                    :id="fieldName"
-                >
+            <div v-else-if="!fieldData.type">
+                <default-extension
+                    @changed="extensionInterface(fieldName, $event)"
+                    :name="fieldName"
+                    :options="fieldData"
+                    :defaultValidators="{
+                        minLength
+                    }"
+                />
             </div>
             <div 
-                v-if="fieldNeedsValidationAndIsInvalid(fieldName)"
+                v-if="fieldNeedsValidationAndIsInvalid(fieldName) && showInvalidationMsgs"
                 class="invalidFeedback"
             >
-                {{ invalidFeedback(fieldName) }}
+                ❌ {{ invalidFeedback(fieldName) }}
+            </div>
+            <div v-if="bindedExtSupported(fieldName)">
+                <transition name="dropdown">
+                    <component 
+                        :is="`${bindedExtName(fieldName)}Ext`"
+                        :bindedTo="data[bindedExtBindedTo(fieldName)]"
+                        @changed="extensionInterface(bindedExtName(fieldName).slice(0, -1), $event)"
+                    >
+                        <template #default>
+                            <div class="formLabel">
+                                {{ _.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
+                            </div>
+                        </template>
+                        <template #invalidMsgs>
+                            <div 
+                                v-if="fieldNeedsValidationAndIsInvalid(bindedExtName(fieldName).slice(0, -1)) && showInvalidationMsgs"
+                                class="invalidFeedback"
+                            >
+                                ❌ {{ invalidFeedback(bindedExtName(fieldName).slice(0, -1)) }}
+                            </div>
+                        </template>
+                    </component>
+                </transition>
             </div>
         </div>
         <button 
@@ -63,6 +73,9 @@
 
 <script>
 import equal from 'fast-deep-equal'
+
+import defaultExtension from './extensions/free/defaultExt.vue'
+import extsList from './extsList.json'
 
 export default {
     name: "formMain",
@@ -100,34 +113,66 @@ export default {
             required: false,
             default: ''
         },
-        extensions: {
+        bindedExts: {
             type: Array,
             required: false,
             default: () => []
+        },
+        showInvalidationMsgs: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     },
     components: {
-        'statesExt': () => import('./statesExt.vue')
+        'statesExt': () => import('./extensions/binded/statesExt.vue'),
+        "confirmsExt": () => import('./extensions/binded/confirmExt.vue'),
+        "phoneNumberExt": () => import('./extensions/free/phoneNumberExt.vue'),
+        "dropdownExt": () => import('./extensions/free/dropdownExt.vue'),
+        "protectedExt": () => import('./extensions/free/protectedExt.vue'),
+        "handleExt": () => import('./extensions/free/handleExt.vue'),
+        defaultExtension
     },
     data() {
         return {
             data: null,
             originalData: null,
-            validations: {},
-            protectedFields: {},
-            formIsSetup: false,
+            extsList,
+            validations: {}
         }
     },
     methods: {
         fieldNeedsValidationAndIsInvalid(fieldName) {
-            return typeof this.validateFields[fieldName] !== 'undefined' && !this.validateFields[fieldName]
+            if (typeof this.validations[fieldName] !== 'undefined') {
+                return !this.validations[fieldName].state
+            }
         },
-        extensionIncluded(name) {
-            return !!this.extensions.find(ext => ext === name)
+        extensibleType(type) {
+            return !!this.extsList.freeExts.find(extType => extType === type)
+        },
+        findBindedExt(bindedTo) {
+            return this.extsList.bindedExts.find(bindedExts => bindedExts.bindedTo === bindedTo)
+        },
+        bindedExtName(fieldName) {
+            const found = this.findBindedExt(fieldName)
+            return found.name
+        },
+        bindedExtSupported(fieldName) {
+            const found = this.findBindedExt(fieldName)
+            if (found)
+                return !!this.bindedExts.find(ext => ext === found.name)
+            else
+                return false
+        },
+        bindedExtBindedTo(fieldName) {
+            const found = this.findBindedExt(fieldName)
+            return found.bindedTo
         },
         invalidFeedback(fieldName) {
-            if (this.structure[fieldName].invalidMsg)
+            if (this.structure[fieldName] && this.structure[fieldName].invalidMsg)
                 return this.structure[fieldName].invalidMsg
+            else if (this.validations[fieldName])
+                return this.validations[fieldName].msgs.reduce((total, msg) => `${total}\n❌ ${msg}`)
             else
                 return `Invalid ${this._.stringFormat(fieldName)}`
         },
@@ -138,36 +183,36 @@ export default {
         createDataBasedOnStructure() {
             let data = {}
             for (let [fieldName, options] of Object.entries(this.structure)) {
-                if (options.default)
-                    data[fieldName] = options.default
-                else if (options.type === 'dropdown')
-                    data[fieldName] = options.selectOptions[0]
-                else
-                    data[fieldName] = ''
+                data[fieldName] = ''
             }
             return data
         },
         submit() {
             this.$emit('submitted', this.data)
         },
-        makeProtectedFields(fieldName, options) {
-            if (options.type === 'password')
-                this.protectedFields[fieldName] = true
-        },
-        setupFormOptions() {
-            for (let [fieldName, options] of Object.entries(this.structure)) {
-                this.makeProtectedFields(fieldName, options)
+        extensionInterface(extension, $event) {
+            if ($event.val)
+                this.$set(this.data, extension, $event.val)
+            if ($event.created)
+                this.setData(this.data)
+            if ($event.deleted) {
+                delete this.data[extension]
+                this.setData(this.data)
             }
-            this.formIsSetup = true
-        },
-        extensionSupport(extension, $event) {
-            this.data[extension] = $event
+            const fieldNeedsValidation = typeof $event.state !== 'undefined'
+            if (fieldNeedsValidation) {
+                if (!this.validations[extension])
+                        this.$set(this.validations, extension, {})
+                for (let [exetensionInfoField, info] of Object.entries($event)) {
+                    this.$set(this.validations[extension], exetensionInfoField, info)
+                }
+            }
         },
         needsValidation(type) {
             const typesNeedValidation = ["number", "password"]
             return !!typesNeedValidation.find(needValidation => needValidation === type)
         },
-        minLength(data, min) {
+        minLength(data, min=0) {
             return data.length >= min
         },
         max(data, max) {
@@ -175,66 +220,23 @@ export default {
         },
         min(data, min) {
             return data >= min
-        },
-        specialValidation(data, validationName) {
-            return true
-            //return this[validationName](data)
         }
     },
     computed: {
-        needToBeValidatedFields() {
-            const needsValidation = {}
-            for (let [fieldName, options] of Object.entries(this.structure)) {
-                if (!options.type || this.needsValidation(options.type))
-                    needsValidation[fieldName] = options
-            }
-            return needsValidation
-        },
-        compiledValidations() {
-            const compiled = {}
-            for (let [fieldName, options] of Object.entries(this.needToBeValidatedFields)) {
-                compiled[fieldName] = {}
-                if (options.validation) {
-                    compiled[fieldName].specialValidation = options.validation
-                    continue
-                }
-                if (!options.type && !options.minLength) {
-                    compiled[fieldName].minLength = 1
-                    continue
-                }
-                else if (options.minLength)
-                    compiled[fieldName].minLength = options.minLength
-                if (options.type === 'number' && options.min) 
-                    compiled[fieldName].min = options.min
-                if (options.type === "number" && options.max)
-                    compiled[fieldName].max = options.max
-            }
-            return compiled
-        },
-        validateFields() {
-            const valid = {}
-            for (let [fieldName, validations] of Object.entries(this.compiledValidations)) {
-                let passed = true
-                for (let [validationName, validationVal] of Object.entries(validations)) {
-                    const target = this.data[fieldName]
-                    if (!this[validationName](target, validationVal)) {
-                        passed = false
-                        break
-                    }
-                }
-                valid[fieldName] = passed
-            }
-            return valid
-        },
         allFieldsValid() {
-            for (let [fieldName, isValid] of Object.entries(this.validateFields)) {
-                if (!isValid)
+            if (!this.validations)
+                return false
+            for (let [fieldName, validationInfo] of Object.entries(this.validations)) {
+                if (!validationInfo.state)
                     return false
             }
             return true
         },
+        sameAsOriginal() {
+            return equal(this.data, this.originalData)
+        },
         validSubmission() {
-            return !equal(this.data, this.originalData) && this.allFieldsValid
+            return !this.sameAsOriginal && this.allFieldsValid
         }
     },
     created() {
@@ -242,7 +244,6 @@ export default {
             this.setData(this.basedOn)
         else
             this.setData(this.createDataBasedOnStructure())
-        this.setupFormOptions()       
     }
 }
 </script>

@@ -1,0 +1,19 @@
+{
+    "freeExts": [
+        "phoneNumber",
+        "dropdown", 
+        "default", 
+        "protected",
+        "handle"
+    ],
+    "bindedExts": [
+        {
+            "name": "states",
+            "bindedTo": "country"
+        },
+        {
+            "name": "confirms",
+            "bindedTo": "password"
+        }
+    ]
+}
