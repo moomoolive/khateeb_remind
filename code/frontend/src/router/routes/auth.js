@@ -1,5 +1,4 @@
 import login from '@/views/auth/main.vue'
-import institutionSignUp from '@/views/auth/institutions.vue'
 
 export default [
     {
@@ -10,6 +9,11 @@ export default [
     {
         path: "/institutions",
         name: "institutionSignUp",
-        component: institutionSignUp
+        component: () => import('@/views/auth/institutions.vue')
+    },
+    {
+        path: "/root",
+        name: "createRoot",
+        component: () => import('@/views/auth/root.vue')
     }
 ]

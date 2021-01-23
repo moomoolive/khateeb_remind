@@ -1,0 +1,20 @@
+{
+    "templates" : {
+        "unauthorized": {
+            "color": "red",
+            "icon": "exclamation",
+            "msg": "Unauthorized"
+        },
+        "serverError": {
+            "color": "yellow",
+            "icon": "unknown",
+            "msg": "Our servers aren't responding right now. Try again later!",
+            "textSize": "small"
+        }
+    },
+    "icons": {
+        "exclamation": "⚠️",
+        "locked": "🔒",
+        "unknown": "❓"
+    }
+}

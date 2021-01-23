@@ -10,5 +10,11 @@ export default {
     updateToken(state, token) { state.JWT_TOKEN = token },
     removeToken(state) { state.JWT_TOKEN = null },
     lastVisit(state, date) { state.lastVisit = date },
-    adminSavedChangesScreen(state, onOrOff) { state.admin.savedChanges = onOrOff }
+    adminSavedChangesScreen(state, onOrOff) { state.admin.savedChanges = onOrOff },
+    closeNotification(state) { state.notifications.show = false },
+    createNotification(state, notificationsInfo) { 
+        state.notifications.show = true
+        state.notifications.type = notificationsInfo.type
+        state.notifications.options = notificationsInfo.options
+    }
 }

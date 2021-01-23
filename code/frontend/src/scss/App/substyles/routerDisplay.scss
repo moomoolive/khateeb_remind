@@ -8,3 +8,14 @@
     max-width: 1200px;
     margin: auto;
 }
+
+.header {
+    overflow: hidden;
+    position: fixed;
+    z-index: 10;
+}
+
+.notifications {
+    position: fixed;
+    z-index: 9;
+}

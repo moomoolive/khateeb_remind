@@ -32,13 +32,10 @@ export default {
 <style lang="scss" scoped>
 .topnav {
   background-color: lighten(getColor("grey"), 5%);
-  overflow: hidden;
-  position: fixed;
   top: 0;
   height: 4.5vh;
   width: 100vw;
   left: 0;
-  z-index: 2;
 }
 
 .currentDate {

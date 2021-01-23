@@ -9,6 +9,7 @@ router.post('/create/institution',
     middleware.allowedFields(requestTypeChecks.createInstitution), 
     async (req, res) => {
     try {
+        console.log(req.body)
         const institutionEntry = await $db.funcs.save('institutions', req.body.institution)
         req.body.institutionAdmin.institutionID = institutionEntry._id.toString()
         const institutionAdminEntry = await $db.funcs.save('institutionAdmins', req.body.institutionAdmin)
@@ -78,6 +79,7 @@ router.post('/create/root',
     middleware.allowedFields(requestTypeChecks.createRoot), 
     async (req, res) => {
     try {
+        console.log(req.body)
         const rootExists = await $db.models.root.findOne({}).exec()
         if (!!rootExists)
             res.json('already exists')

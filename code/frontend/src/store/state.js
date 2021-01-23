@@ -13,5 +13,10 @@ export default {
     lastVisit: null,
     admin: {
         savedChanges: false
+    },
+    notifications: {
+        show: false,
+        type: 'none',
+        options: { } 
     }
 }

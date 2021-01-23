@@ -14,7 +14,5 @@ const funcs = {
 export default {
     authenticate(credentials) {
         return axios.post(baseUrl + '/', credentials)
-            .then(res => res.data)
-            //.catch(funcs.err)
     }
 }

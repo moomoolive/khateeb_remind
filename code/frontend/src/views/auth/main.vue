@@ -19,7 +19,7 @@
         <div class="signUp">
             <p class="signUpTitle">Sign Up</p>
             <div class="signUpBtn">
-                 <button class="blue" @click="$router.push('/institutions')">
+                 <button class="blue" @click="institutionSignUp()">
                     Institutions
                  </button>
             </div>
@@ -58,16 +58,21 @@ export default {
         async login($event) {
             try {
                 const authRes = await this.$API.auth.getToken($event)
-                if (!authRes.token && authRes.msg === 'un-confirmed-khateeb')
-                    this.errorMsg = `Your administrator hasn't confirmed your account yet! Try again in a few days.`
-                else if (!authRes.token && authRes.msg === 'un-confirmed-institutionAdmin')
-                    this.errorMsg = `'khateebs.com' hasn't confirmed your institution yet! Try again in a few days`
+                if (!authRes.token && authRes.msg === 'un-confirmed-khateeb') {
+                    const notification = { color: 'yellow', icon: "locked", msg: `Your administrator hasn't confirmed your account yet. Try again later!`, textSize: 'small' }
+                    this.$store.dispatch('createNotification', { type: 'alert', options: notification })
+                }
+                else if (!authRes.token && authRes.msg === 'un-confirmed-institutionAdmin') {
+                    const notification = { color: 'yellow', icon: "locked", msg: `Khateeb Remind hasn't confirmed your institution yet. Try again later!`, textSize: 'small' }
+                    this.$store.dispatch('createNotification', { type: 'alert', options: notification })
+                }
                 else if (authRes.token && authRes.msg === 'default')
                     console.log('default')
                 else if (authRes.token && authRes.msg === 'success')
                     this.storeToken(authRes.token)
             } catch(err) {
-                console.log(err)
+                if (err.status === 401)
+                    this.errorMsg = 'Incorrect Username or Password'
             }
         },
         storeToken(token) {
@@ -75,13 +80,12 @@ export default {
             axios.defaults.headers.common['authorization'] = token
             this.$store.dispatch('JWT_TOKEN', token)
             this.$nextTick(() => {
-                //this.$router.push(`/admin/${this.instituteName}/dashboard`)
-                // push to whereever is relevant
+                //temp
+                this.$router.push(`/sysAdmin/`)
             })
         },
         institutionSignUp() {
-            console.log('institution sign up')
-            //this.$router.push('/institutions')
+            this.$router.push('/institutions')
         }
     }
 }

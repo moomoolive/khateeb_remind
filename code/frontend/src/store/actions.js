@@ -17,5 +17,11 @@ export default {
     },
     adminSavedChangesScreen({ commit }, state) {
         commit('adminSavedChangesScreen', state)
+    },
+    closeNotification({ commit }) {
+        commit('closeNotification')
+    },
+    createNotification({ commit }, notificationsInfo) {
+        commit('createNotification', notificationsInfo)
     }
 }

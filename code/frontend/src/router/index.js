@@ -5,6 +5,7 @@ import store from '../store/index.js'
 import admin from './routes/admin.js'
 import users from './routes/users.js'
 import auth from './routes/auth.js'
+import sysAdmin from './routes/sysAdmin.js'
 
 Vue.use(VueRouter)
 
@@ -14,7 +15,8 @@ const routes = [
     name: 'Not Found',
     component: () => import ('@/views/404.vue')
   },
-  ...auth
+  ...auth,
+  ...sysAdmin
 ]
 
 const router = new VueRouter({
