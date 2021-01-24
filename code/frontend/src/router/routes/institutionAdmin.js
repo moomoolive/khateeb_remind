@@ -1,9 +1,9 @@
 const adminRoutes = [
     {
-        path: '/admin/:institute',
-        name: 'admin',
-        component: () => import('@/views/admin/main.vue'),
-        children: [
+        path: '/institutionAdmin',
+        name: 'institutionAdminMain',
+        component: () => import('@/views/institutionAdmin/main.vue'),
+        /*children: [
               {
                 path: 'dashboard',
                 component: () => import('@/views/admin/subroutes/dashboard.vue')
@@ -24,9 +24,10 @@ const adminRoutes = [
                 path: 'settings',
                 component: () => import('@/views/admin/subroutes/settings/main.vue')
               }
-        ],
+        ],*/
         meta: {
-            requireAuthorization: true
+            requireAuthorization: true,
+            authLevel: 2
         }
     }
 ]

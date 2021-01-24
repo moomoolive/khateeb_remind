@@ -20,12 +20,12 @@ const typeCheckRequest = (structure, data, depth='') => {
             msgs = [...msgs, ...deeperMsgs]
             continue
         }
-        if (info.__type__ !== shortTypeOf(value) && !Array.isArray(value)) {
-            msgs.push(`Illegal type in ${depth ? `${depth}.${allowedField}` : allowedField} field. Expected: ${info.__type__}, got: ${value === null ? null : shortTypeOf(value)}`)
-            continue
-        }
         if (info.__type__ === 'arr' && !Array.isArray(value)) {
             msgs.push(`Illegal type in ${depth ? `${depth}.${allowedField}` : allowedField} field. Expected: array, got: ${shortTypeOf(value)}`)
+            continue
+        }
+        if (info.__type__ !== shortTypeOf(value) && !Array.isArray(value)) {
+            msgs.push(`Illegal type in ${depth ? `${depth}.${allowedField}` : allowedField} field. Expected: ${info.__type__}, got: ${value === null ? null : shortTypeOf(value)}`)
             continue
         }
     }
@@ -56,13 +56,7 @@ const authLevelToUser = (authLevel) => {
 
 const permissionGranted = (authLevel, userType) => {
     const allowedUsers = authLevelToUser(authLevel)
-    return !!allowedUsers.find(allowedUserType => allowedUserType === userType) && correctInstitution
-}
-
-const correctInstitution = (authLevel, requestInstitutionID, tokenInstitutionID) => {
-    if (authLevel > 2)
-        return true
-    return requestInstitutionID === tokenInstitutionID
+    return !!allowedUsers.find(allowedUserType => allowedUserType === userType)
 }
 
 module.exports = {
@@ -77,6 +71,5 @@ module.exports = {
         }
     },
     typeCheckRequest,
-    permissionGranted,
-    correctInstitution
+    permissionGranted
 }

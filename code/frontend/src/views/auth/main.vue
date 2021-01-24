@@ -19,12 +19,14 @@
         <div class="signUp">
             <p class="signUpTitle">Sign Up</p>
             <div class="signUpBtn">
-                 <button class="blue" @click="institutionSignUp()">
+                 <button class="blue" @click="institutionSignup()">
                     Institutions
                  </button>
             </div>
             <div class="signUpBtn">
-                <button>Khateebs</button>
+                <button @click="khateebSignup()">
+                    Khateebs
+                </button>
             </div>
         </div>
     </div>
@@ -80,12 +82,14 @@ export default {
             axios.defaults.headers.common['authorization'] = token
             this.$store.dispatch('JWT_TOKEN', token)
             this.$nextTick(() => {
-                //temp
-                this.$router.push(`/sysAdmin/`)
+                this.$router.push(`/${this.$store.getters.decodedJWT.__t}/`)
             })
         },
-        institutionSignUp() {
-            this.$router.push('/institutions')
+        institutionSignup() {
+            this.$router.push('/create/institutions')
+        },
+        khateebSignup() {
+            this.$router.push('/create/khateebs')
         }
     }
 }

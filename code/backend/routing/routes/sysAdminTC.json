@@ -1,4 +1,10 @@
 {
+    "cli": {
+        "command": {
+            "__type__": "arr",
+            "required": true
+        }
+    },
     "institutionStatus": {
         "_id": {
             "__type__": "str",

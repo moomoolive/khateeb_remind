@@ -5,11 +5,11 @@
             @change="$emit('changed', { val: currentlySelected })"
         >
             <option
-                v-for="option in options.selectOptions"
-                :key="option"
-                :value="option"
+                v-for="(option, index) in options.selectOptions"
+                :key="index"
+                :value="value(option)"
             >
-                {{ option }}
+                {{ display(option) }}
             </option>
         </select>
     </div>
@@ -26,7 +26,27 @@ export default {
     },
     data() {
         return {
-            currentlySelected: this.options.selectOptions[0]
+            currentlySelected: this.startValue()
+        }
+    },
+    methods: {
+        display(option) {
+            if (typeof this.options.display !== "undefined")
+                return option[this.options.display]
+            else
+                return option
+        },
+        value(option) {
+            if (typeof this.options.value !== 'undefined')
+                return option[this.options.value]
+            else
+                return option
+        },
+        startValue() {
+            if (typeof this.options.value !== 'undefined')
+                return this.options.selectOptions[0][this.options.value]
+            else
+                return this.options.selectOptions[0]
         }
     },
     created() {

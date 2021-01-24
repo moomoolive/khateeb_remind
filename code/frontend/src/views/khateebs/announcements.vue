@@ -53,7 +53,8 @@ export default {
         }
     },
     async created() {
-        this.announcements = await this.$API.users.announcements()
+        this.announcements = await this.$API.khateeb.getAnnouncements()
+        console.log(this.announcements)
         if (this.announcements.length < 1 || !this.announcements) this.announcementsExists = false
     }
 }

@@ -64,7 +64,7 @@
         },
         "handle": {
             "__type__": "str",
-            "required": false
+            "required": true
         },
         "firstName": {
             "__type__": "str",

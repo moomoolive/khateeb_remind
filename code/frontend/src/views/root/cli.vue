@@ -49,7 +49,7 @@ export default {
         addToOutput(msg, status="okay", from="s") {
             this.outputQueue.push({ from, status, msg })
         },
-        handleEnter($event) {
+        keyBindings($event) {
             const enter = 13
             if ($event.keyCode === enter)
                 this.execute()
@@ -67,7 +67,7 @@ export default {
         },
         exit() {
             window.setTimeout(() => {
-                this.$router.push('/sysAdmin/')
+                this.$router.push('/root/')
             }, 2_300)
         },
         cloudCommands(command) {
@@ -96,11 +96,19 @@ export default {
             const cloudCommands = ["clear", "--help", "bye"]
             return !! cloudCommands.find(cmd => cmd === command)
         },
-        cli(command) {
-            let cmd = this.preprocessCommand(command)
-            if (this.cloudCommand(cmd[0]))
-                return this.cloudCommands(cmd)
-            return { msg: 'valid command', status: 'success' }
+        async cli(command) {
+            try {
+                let cmd = this.preprocessCommand(command)
+                if (this.cloudCommand(cmd[0]))
+                    return this.cloudCommands(cmd)
+                else {
+                    const res = await this.$API.root.executeCommand({ command: cmd })
+                    res.forEach(msg => { this.addToOutput(msg.msg, msg.status, msg.from) })
+                }
+            } catch(err) {
+                console.log(err)
+                return { msg: `A problem was encounter when executing command. Err: ${err}`, status: 'fail' }
+            }
         },
         preprocessCommand(command) {
             let cmd = command.trim()
@@ -119,7 +127,7 @@ export default {
     },
     created() {
         this.outputMutator
-        window.addEventListener('keyup', this.handleEnter)
+        window.addEventListener('keyup', this.keyBindings)
         this.addToOutput(`Asalam Alaikoum ${this._.stringFormat(this.name)} 😀`)
         this.addToOutput(`System is ready for commands 👍`, 'success')
     },

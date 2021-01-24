@@ -38,6 +38,26 @@ const auth = {
     },
     createRoot(rootInfo) {
         return axios.post(authExt + '/create/root', rootInfo)
+    },
+    getAvailableInstitutions() {
+        return axios.get(authExt + '/institution-selection')
+    },
+    createKhateeb(khateebInfo) {
+        return axios.post(authExt + "/create/khateeb", khateebInfo)
+    }
+}
+
+const khateebExt = API_URL + '/khateeb'
+const khateeb = {
+    getAnnouncements() {
+        return axios.get(khateebExt + '/announcements')
+    }
+} 
+
+const rootExt = API_URL + '/root'
+const root = {
+    executeCommand(commandArray) {
+        return axios.post(rootExt + '/cli', commandArray)
     }
 }
 
@@ -45,5 +65,7 @@ export default {
     misc,
     users,
     admin,
-    auth
+    auth,
+    root,
+    khateeb
 }

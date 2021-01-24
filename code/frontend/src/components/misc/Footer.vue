@@ -1,12 +1,12 @@
 <template>
     <div>
         <div class="topnav">
-          <router-link :to="{ name: 'login' }" v-if="!isLoggedIn">
+          <!-- <router-link :to="{ name: 'login' }" v-if="!isLoggedIn">
             Admin Login
           </router-link>
           <router-link :to="`/admin/${this.$store.state.institution}/dashboard`" v-if="isLoggedIn">
             Admin Dashboard
-          </router-link>
+          </router-link> -->
           <a
           @click="logout()" 
           v-if="isLoggedIn">
@@ -26,7 +26,8 @@ export default {
     methods: {
       logout() {
         this.$store.dispatch('logout')
-        this.$router.push('/')
+        if (this.$router.currentRoute.fullPath !== '/')
+          this.$router.push('/') 
       }
     },
     computed: {

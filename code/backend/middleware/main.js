@@ -50,6 +50,7 @@ const allowedFields = (fields={}) => {
         if (failed.length < 1)
             next()
         else {
+            console.log(failed)
             response.status($utils.hCodes.notAcceptable)
             response.json(failed)
         }
@@ -61,7 +62,7 @@ const auth = (authLevel) => {
         const token = request.headers.authorization
         const secret = process.env.JWT_SECRET || 'secret'
         jwt.verify(token, secret, (err, decoded) => {
-            if (err || !helpers.permissionGranted(authLevel, decoded.__t) || !helpers.correctInstitution(authLevel, request.headers.institutionid, decoded.institutionID)) {
+            if (err || !helpers.permissionGranted(authLevel, decoded.__t)) {
                 response.status($utils.hCodes.unauthorized)
                 response.json('There was an error authorizing account, check if user credentials are correct and if authorization is present in request. If present then this is probably a server issue. Please try again later.')
             } 

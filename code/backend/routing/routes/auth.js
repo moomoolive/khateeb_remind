@@ -22,10 +22,22 @@ router.post('/create/institution',
     }
 )
 
+router.get('/institution-selection', async (req, res) => {
+    try {
+        const data = await $db.models.institutions.find({ confirmed: true }).select(["-createdAt", "-updatedAt"]).exec()
+        res.json(data)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't get institutions!`)
+    }
+})
+
 router.post('/create/khateeb',
     middleware.allowedFields(requestTypeChecks.createKhateeb),
     async (req, res) => {
     try {
+        console.log(req.body)
+        req.body.confirmed = true // temporary
         const khateebEntry = await $db.funcs.save('khateebs', req.body)
         res.json(`Asalam alaikoum ${khateebEntry.firstName} ${khateebEntry.lastName}, your account has been created (username: ${khateebEntry.username}). Please wait a day or two for the institution administrator to confirm your account.`)
     } catch(err) {

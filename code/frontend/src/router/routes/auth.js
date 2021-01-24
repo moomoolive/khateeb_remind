@@ -7,13 +7,18 @@ export default [
         component: login
     },
     {
-        path: "/institutions",
-        name: "institutionSignUp",
+        path: "/create/institutions",
+        name: "institutionSignup",
         component: () => import('@/views/auth/institutions.vue')
     },
     {
-        path: "/root",
+        path: "/create/root",
         name: "createRoot",
         component: () => import('@/views/auth/root.vue')
+    },
+    {
+        path: "/create/khateebs",
+        name: "khateebsSignup",
+        component: () => import('@/views/auth/khateebs.vue')
     }
 ]
