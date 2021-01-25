@@ -39,7 +39,7 @@ const deleteRequestParams = {
 app.delete('*', [middleware.noEmptyBody, middleware.allowedFields(deleteRequestParams)])
 
 app.use('/khateeb', routes.khateeb)
-app.use('/admin', routes.admin)
+app.use('/institutionAdmin', routes.admin)
 app.use('/misc', routes.misc)
 app.use('/text', routes.text)
 app.use('/auth', routes.auth)

@@ -61,11 +61,37 @@ const root = {
     }
 }
 
+const institutionAdminExt = API_URL + '/institutionAdmin'
+const institutionAdmin = {
+    updateAnnouncements(announcement) {
+        return axios.post(institutionAdminExt + '/announcements', announcement)
+    },
+    getLocations(location) {
+        return axios.get(institutionAdminExt + `/locations/${location}`)
+    },
+    saveLocations(locationsArray) {
+        return axios.post(institutionAdminExt + '/locations', locationsArray)
+    },
+    deleteLocation(id) {
+        return axios.delete(institutionAdminExt + '/locations', { data: id })
+    },
+    getTimings(timing, associatedLocation) {
+        return axios.get(institutionAdminExt + `/timings/${timing}/${associatedLocation}`)
+    },
+    saveTimings(timingsArray) {
+        return axios.post(institutionAdminExt + '/timings', timingsArray)
+    },
+    deleteTiming(id) {
+        return axios.delete(institutionAdminExt + '/timings', { data: id })
+    }
+}
+
 export default {
     misc,
     users,
     admin,
     auth,
     root,
-    khateeb
+    khateeb,
+    institutionAdmin
 }

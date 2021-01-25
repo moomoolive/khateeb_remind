@@ -43,7 +43,6 @@ const correctAuthLevel = (routeAuthLevel, decodedJWT) => {
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requireAuthorization)) {
-    console.log('hi')
     if (!store.getters.tokenExists) {
       next('/')
       alert('Please login to view this page')

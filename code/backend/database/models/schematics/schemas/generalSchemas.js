@@ -87,8 +87,7 @@ const location = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: false,
-        default: 'Unknown Address',
+        required: true,
         minlength: 1
     },
     active: {

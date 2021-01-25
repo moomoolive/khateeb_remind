@@ -28,7 +28,6 @@ export default {
     name: 'adminButtonGroup',
     data() {
         return {
-            instituteName: this.$store.state.institution,
             buttonLinks: [
                 ['schedule', 'announcements', 'khateebs'],
                 ['settings']
@@ -38,7 +37,7 @@ export default {
     },
     methods: {
         click(extension) {
-            this.$router.push(`/admin/${this.instituteName}/${extension}`)
+            this.$router.push(`/institutionAdmin/${extension}`)
             this.selected = extension
             if (this.isSavedChangesScreenDisplayed) {
                 this.$store.dispatch('adminSavedChangesScreen', false)

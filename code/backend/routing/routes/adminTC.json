@@ -1,12 +1,16 @@
 {
     "announcements": {
+        "institutionID": {
+            "__type__": "str",
+            "required": false
+        },
         "headline": {
             "__type__": "str",
             "required": true
         },
         "content": {
             "__type__": "str",
-            "required": false
+            "required": true
         },
         "important": {
             "__type__": "bool",
@@ -72,13 +76,9 @@
         }
     },
     "locations": {
-        "name": {
-            "__type__": "str",
+        "locations": {
+            "__type__": "arr",
             "required": true
-        },
-        "address": {
-            "__type__": "str",
-            "required": false
         }
     },
     "timings": {

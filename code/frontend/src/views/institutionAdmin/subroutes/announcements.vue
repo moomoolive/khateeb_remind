@@ -1,41 +1,53 @@
 <template>
     <div>
-        <Form
-            v-if="emptySchema"
-            :name="`announcements`"
-            :emptySchema="emptySchema"
-            :previousEntries="previousEntries"
-            :previousEntriesNaming="previousEntriesNaming"
-            :bigText="['content']"
-            :invalidations="invalidations"
-            :customInvalidMsg="{
-                content: 'Content cannot be empty'
-            }"
-            :backgroundColor="`red-offWhite`"
+        <form-main
+            :structure="structure"
             @submitted="submit($event)"
-            @remove="remove($event)"
+            :formTitle="`Announcements`"
         />
     </div>
 </template>
 
 <script>
-import Form from '@/components/forms/formRenderer.vue'
+import formMain from '@/components/forms/main.vue'
 
 export default {
     name: 'announcements',
     components: {
-        Form
+        formMain
     },
     data() {
         return {
-            previousEntries: null,
-            emptySchema: null,
-            invalidations: {
-                emptyField: ['headline', 'content']
+            structure: {
+                headline: {
+                    required: true
+                },
+                content: {
+                    type: 'textArea',
+                    required: true
+                },
+                important: {
+                    type: 'checkbox',
+                    required: true,
+                    default: false
+                },
+                urgent: {
+                    type: 'checkbox',
+                    required: true,
+                    default: false
+                }
             }
         }
     },
     methods: {
+        async submit($event) {
+            try {
+                const msg = await this.$API.institutionAdmin.updateAnnouncements($event)
+                this.$store.dispatch('adminSavedChangesScreen', true)
+            } catch(err) {
+                console.log(err)
+            }
+        },
         async getAnnouncements() {
             const data = await this.$API.admin.getAnnouncements()
             data.emptySchema.urgent = data.emptySchema.important = false
@@ -44,12 +56,6 @@ export default {
         assignAPIData(data) {
             this.emptySchema = data.emptySchema
             this.previousEntries = data.previousEntries
-        },
-        async submit($event) {
-            const response = await this.$API.admin.updateAnnouncement($event)
-            if (response === 'Changes successfully made!') {
-                    this.$store.dispatch('adminSavedChangesScreen', true)
-            }
         },
         async remove($event) {
             const response = await this.$API.admin.deleteAnnouncement({ _id: $event })
@@ -65,7 +71,7 @@ export default {
         }
     },
     created() {
-        this.getAnnouncements()
+        //this.getAnnouncements()
     }
 }
 </script>

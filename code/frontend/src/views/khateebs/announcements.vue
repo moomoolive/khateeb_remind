@@ -11,7 +11,7 @@
                 v-for="(announcement, ID) in announcements" 
                 :key="ID"
                 :headline="
-                    `${dateLoader(announcement.savedOn)} || ${announcement.headline}`
+                    `${dateLoader(announcement.updatedAt)} || ${announcement.headline}`
                 "
                 :tagDetails="tagLoader(announcement)"
             >

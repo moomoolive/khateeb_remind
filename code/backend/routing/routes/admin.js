@@ -26,15 +26,10 @@ const funcs = {
         }
         return query
     },
-    queryBuilder(request) {
-        request.params.institutionID = request.headers.institutionid
-        const modelID = this.modelID(request)
-        if (modelID)
-            return funcs.buildQueryFromParams(request.params, modelID)
-        else return funcs.buildQueryFromParams(request.params)
-    },
-    query(request, dataName) {
-        const query = this.queryBuilder(request)
+    query(request, dataName, options={}) {
+        let query = funcs.buildQueryFromParams(request.params)
+        query.institutionID = request.headers.institutionid
+        query = { ...query, ...options }
         return $db.models[dataName].find(query)
     }
 }
@@ -76,6 +71,7 @@ router.delete(routerGroup1URL, async (req, res) => {
 router.post(routerGroup1URL,
     middleware.allowedFields(requestTypeChecks.announcements),
     async (req, res) => {
+    console.log(req.body)
     try {
         req.body.institutionID = req.headers.institutionid
         const announcementEntry = await $db.funcs.save(routerGroup1, req.body)
@@ -147,9 +143,38 @@ router.post(routerGroup2URL + "/confirm", async (req, res) => {
 const routerGroup6 = "locations"
 const routerGroup6URL = `/${routerGroup6}`
 
+const locations = {
+    async build(institutionID) {
+        const location = await this.firstLocation(institutionID)
+        const timing = await this.firstTiming(institutionID, location._id.toString())
+        return [location]
+    },
+    async firstLocation(institutionID) {
+        const location = {
+            institutionID,
+            name: 'Unknown Location 1',
+            address: "Unknown Address 1"
+        }
+        const saved = await new $db.models.locations(location).save()
+        return saved
+    },
+    async firstTiming(institutionID, locationID) {
+        const timing = {
+            institutionID,
+            locationID,
+            hour: 12,
+            minute: 30
+        }
+        const saved = await new $db.models.timings(timing).save()
+        return saved
+    }
+}
+
 router.get(routerGroup6URL + "/:_id", async (req, res) => {
     try {
-        const data = await funcs.query(req, routerGroup6).exec()
+        let data = await funcs.query(req, routerGroup6, { active: true }).exec()
+        if (data.length < 1 && req.params._id === 'all')
+            data = await locations.build(req.headers.institutionid)
         res.json(data)
     } catch(err) {
         res.json(errors.getReq(routerGroup6, err))
@@ -160,9 +185,12 @@ router.post(routerGroup6URL,
     middleware.allowedFields(requestTypeChecks.locations),
     async (req, res) => {
     try {
-        req.body["institutionID"] = req.headers.institutionid
-        const saved = await $db.funcs.save(routerGroup6, req.body)
-        res.json(`successfully saved ${req.body.name}`)
+        console.log(req.body)
+        for (let i = 0; i < req.body.locations.length; i++) {
+            req.body["institutionID"] = req.headers.institutionid
+            const saved = await $db.funcs.save(routerGroup6, req.body.locations[i])
+        }
+        res.json(`successfully saved locations!`)
     } catch(err) {
         res.json(errors.db(routerGroup6.slice(0, -1), 'saving', err))
     }
@@ -182,12 +210,13 @@ router.delete(routerGroup6URL, async (req, res) => {
             timingsObject[updatedTiming._id] = $utils.general.deepCopy(updatedTiming)
             const updated = await $db.models.timings.updateOne({ _id: updatedTiming._id }, { active: false })
         }
+        /*
         const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).exec()
         for (let i = 0; i < khateebs.length; i++) {
             const newKhateeb = $utils.general.deepCopy(khateebs[i])
             newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => !timingsObject[timing])
             const updated = await $db.models.khateebs.updateOne({ _id: newKhateeb._id }, newKhateeb)
-        }
+        }*/
         res.json(`Successfully deleted location: ${req.body._id} and it's associated jummahs and timings`)
     } catch(err) {
         res.json(errors.db(`${routerGroup6.slice(0, -1)} and associated jummahs and timings.`, 'deleting', err))
@@ -199,7 +228,7 @@ const routerGroup7URL = `/${routerGroup7}`
 
 router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
     try {
-        const data = await funcs.query(req, routerGroup7).exec()
+        const data = await funcs.query(req, routerGroup7, { active: true }).exec()
         res.json(data)
     } catch(err) {
         res.json(errors.getReq(routerGroup7, err))
@@ -209,6 +238,7 @@ router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
 router.post(routerGroup7URL, 
     middleware.allowedFields(requestTypeChecks.timings),
     async (req, res) => {
+    console.log(req.body)
     try {
         for (let i = 0; i < req.body.times.length; i++) {
             req.body.times[i]["institutionID"] = req.headers.institutionid

@@ -131,6 +131,8 @@ export default {
         "dropdownExt": () => import('./extensions/free/dropdownExt.vue'),
         "protectedExt": () => import('./extensions/free/protectedExt.vue'),
         "handleExt": () => import('./extensions/free/handleExt.vue'),
+        "textAreaExt": () => import('./extensions/free/textAreaExt.vue'),
+        "checkboxExt": () => import('./extensions/free/checkbox.vue'),
         defaultExtension
     },
     data() {
@@ -191,7 +193,7 @@ export default {
             this.$emit('submitted', this.data)
         },
         extensionInterface(extension, $event) {
-            if ($event.val)
+            if (typeof $event.val !== "undefined")
                 this.$set(this.data, extension, $event.val)
             if ($event.created)
                 this.setData(this.data)

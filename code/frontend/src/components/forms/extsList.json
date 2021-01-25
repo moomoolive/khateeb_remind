@@ -4,7 +4,9 @@
         "dropdown", 
         "default", 
         "protected",
-        "handle"
+        "handle",
+        "textArea",
+        "checkbox"
     ],
     "bindedExts": [
         {

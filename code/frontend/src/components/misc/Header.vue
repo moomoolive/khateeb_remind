@@ -1,7 +1,8 @@
 <template>
       <div class="topnav">
-        <router-link to="/" exact>Home</router-link>
-        <router-link :to="{ name: 'announcements' }">Announcements</router-link>
+        <a>Welcome to Khateeb Remind</a>
+        <!-- <router-link to="/" exact>Home</router-link>
+        <router-link :to="{ name: 'announcements' }">Announcements</router-link> -->
         <a class="currentDate" style="float: right; ">
           {{ abbreviatedDayOfWeek }} {{ abbreviatedMonthName }} {{ currentDate }}, {{ abbreviatedYear }}
         </a>
