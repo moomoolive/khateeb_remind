@@ -12,17 +12,26 @@
                 @submitted="saveLocationsAndTimings($event)" 
             />
         </collapsable-box>
+        <collapsable-box
+            :headline="`Text Settings`"
+        >
+            <text-settings 
+                @submitted="saveSettings($event)"
+            />
+        </collapsable-box>
     </div>
 </template>
 
 <script>
 import staticTags from './tags.json'
 import locationsAndTimings from './subviews/locationsAndTimings.vue' 
+import textSettings from './subviews/textSettings.vue'
 
 export default {
     name: "settings",
     components: {
-        locationsAndTimings
+        locationsAndTimings,
+        textSettings
     },
     data() {
         return {
@@ -66,6 +75,14 @@ export default {
                 else {
                     const deleted = await this.$API.institutionAdmin.deleteTiming({ _id: $event.id })
                 }
+                this.$store.dispatch('adminSavedChangesScreen', true)
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        async saveSettings($event) {
+            try {
+                const saved = await this.$API.institutionAdmin.updateSettings($event)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)

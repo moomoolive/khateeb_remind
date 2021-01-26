@@ -83,6 +83,9 @@ const institutionAdmin = {
     },
     deleteTiming(id) {
         return axios.delete(institutionAdminExt + '/timings', { data: id })
+    },
+    updateSettings(settings) {
+        return axios.post(institutionAdminExt + '/settings', settings)
     }
 }
 

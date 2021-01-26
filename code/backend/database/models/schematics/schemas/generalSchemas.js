@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
 const bcyrpt = require('bcrypt')
+const Cryptr = require('cryptr')
 
 const subDocs = require('./subDocs')
-
 
 const jummah = new mongoose.Schema({
     institutionID: {
@@ -276,6 +276,40 @@ const setting = new mongoose.Schema({
     }
 })
 
+const cryptr = new Cryptr(process.env.ENCRYPTION_KEY || '1234')
+setting.pre('save', function(next) {
+    try {
+        const setting = this
+        const encryptedUser = cryptr.encrypt(setting.twilioUser)
+        const encryptedKey = cryptr.encrypt(setting.twilioKey)
+        setting.twilioKey = encryptedKey
+        setting.twilioUser = encryptedUser
+        next()
+    } catch(err) {
+        console.log('There was a problem encrypting settings')
+        console.log(err)
+        next(err)
+    }
+})
+
+setting.pre('updateOne', function(next) {
+    try {
+        const data = this.getUpdate()
+        if (!data.twilioUser || !data.twilioKey) {
+            this.update({}, data).exec()
+            next()
+        }
+        const encryptedUser = cryptr.encrypt(data.twilioUser)
+        const encryptedKey = cryptr.encrypt(data.twilioKey)
+        data.twilioKey = encryptedKey
+        data.twilioUser = encryptedUser
+        this.update({}, data).exec()
+        next()
+    } catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
 
 module.exports = {
     jummah,

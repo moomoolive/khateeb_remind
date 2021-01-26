@@ -341,4 +341,16 @@ router.post('/user/profile', async (req, res) => {
     }
 })
 
+router.post('/settings', async(req, res) => {
+    try {
+        req.body.institutionID = req.headers.institutionid
+        const saved = await $db.funcs.save('settings', req.body)
+        res.json(`Successfully saved settings!`)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't save settings`)
+    }
+    //no type checking yet, don't know exactly what's going into this
+})
+
 module.exports = router
