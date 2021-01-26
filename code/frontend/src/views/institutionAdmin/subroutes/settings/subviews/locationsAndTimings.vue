@@ -7,9 +7,17 @@
                 :headline="location.name"
             >
                 <p>Location Name</p>
-                <input type="text" v-model="location.name"><br>
+                <input 
+                    type="text" 
+                    v-model="location.name" 
+                    @input="changeLocationInfo('name', location)"
+                ><br>
                 <p>Location Address</p>
-                <input type="text" v-model="location.address"><br>
+                <input 
+                    type="text" 
+                    v-model="location.address" 
+                    @input="changeLocationInfo('address', location)"
+                ><br>
                 <div v-for="(timing, index) in location.timings" :key="index">
                     <p>Prayer Time {{ index + 1 }}</p>
                     <timing-mutator
@@ -80,6 +88,10 @@ export default {
         }
     },
     methods: {
+        changeLocationInfo(attribute, location) {
+            const target = this.updatedLocations.find(loc => loc._id === location._id)
+            target[attribute] = location[attribute]
+        },
         addTiming(previousTimings, id) {
             const last = previousTimings[previousTimings.length - 1]
             let newest = this._.deepCopy(last)
@@ -94,18 +106,6 @@ export default {
             array.forEach(elem => { obj[elem[keyNameProperty]] = elem })
             return obj
         },
-        addTimingToLocationsWithNone(struct) {
-            for (let [location, info] of Object.entries(struct)) {
-                if (!info.timings) {
-                    info.timings = []
-                    const copy = this._.deepCopy(this.updatedTimings[0])
-                    delete copy.createdAt; delete copy.updatedAt;
-                    copy.locationID = info._id
-                    info.timings.push(copy)
-                    this.updatedTimings.push(copy)
-                }
-            }
-        },
         buildStruct(timingsArray) {
             this.struct = this.ArrayToObject(this.locations, '_id')
             timingsArray.forEach(timing => {
@@ -113,7 +113,6 @@ export default {
                     this.struct[timing.locationID].timings = []
                 this.struct[timing.locationID].timings.push(timing)
             })
-            this.addTimingToLocationsWithNone(this.struct)
         },
         increment($event) {
             let index
@@ -129,6 +128,7 @@ export default {
             this.$set(this.updatedTimings, index, found)
         },
         save() {
+            console.log(this.updatedLocations)
             this.$emit('submitted', { locations: this.updatedLocations, times: this.updatedTimings })
         },
         addNewLocation() {
@@ -147,6 +147,15 @@ export default {
         deleteTiming(timing, location) {
             if (location.timings.length > 1)
                 this.$emit('delete', { type: 'timing', id: timing._id })
+        },
+        updatedStructDependencies() {
+            this.updatedLocations = this._.deepCopy(this.locations)
+            this.updatedTimings = this._.deepCopy(this.timings)
+        },
+        createDisplay() {
+            this.updatedStructDependencies()
+            this.buildStruct(this.updatedTimings)
+            this.originalStruct = this._.deepCopy(this.struct)
         }
     },
     computed: {
@@ -155,16 +164,12 @@ export default {
         }
     },
     watch: {
-        locations() {
-            this.buildStruct(this.timings)
-            this.originalStruct = this._.deepCopy(this.struct)
+        timings() {
+            this.createDisplay()
         }
     },
     created() {
-        this.updatedLocations = this._.deepCopy(this.locations)
-        this.updatedTimings = this._.deepCopy(this.timings)
-        this.buildStruct(this.updatedTimings)
-        this.originalStruct = this._.deepCopy(this.struct)
+        this.createDisplay()
     }
 }
 </script>

@@ -86,6 +86,9 @@ const institutionAdmin = {
     },
     updateSettings(settings) {
         return axios.post(institutionAdminExt + '/settings', settings)
+    },
+    getSchedule(month, year) {
+        return axios.get(institutionAdminExt + `/schedules/${month}/${year}`)
     }
 }
 

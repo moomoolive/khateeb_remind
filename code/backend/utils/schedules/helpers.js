@@ -19,7 +19,7 @@ const createJummahsAndReturnEntries = async (emptyJummahArray) => {
     return jummahEntries
 }
 
-const createEmptyJummahsEntries = async (emptyJummah, prayerInfo, fridays, month, year, institutionID) => {
+const createEmptyJummahsEntries = (emptyJummah, prayerInfo, fridays, month, year, institutionID) => {
     const linkedTimesAndLocations = linkTimesAndLocations(prayerInfo)
     const emptyJummahs = loopOverLinkedStructAndFillJummahs(
         linkedTimesAndLocations, emptyJummah, fridays, month, year, institutionID
@@ -27,7 +27,7 @@ const createEmptyJummahsEntries = async (emptyJummah, prayerInfo, fridays, month
     return emptyJummahs
 }
 
-const loopOverLinkedStructAndFillJummahs = async (linkedStruct, emptyJummah, fridays, month, year, institutionID) => {
+const loopOverLinkedStructAndFillJummahs = (linkedStruct, emptyJummah, fridays, month, year, institutionID) => {
     const jummahArray = []
     for (let [locationID, timingIDs] of Object.entries(linkedStruct)) {
         fridays.forEach(friday => {
@@ -46,7 +46,7 @@ const loopOverLinkedStructAndFillJummahs = async (linkedStruct, emptyJummah, fri
     return jummahArray
 }
 
-const linkTimesAndLocations = async (prayerInfo) => {
+const linkTimesAndLocations = (prayerInfo) => {
     const linkedStruct = {  }
     prayerInfo.locations.forEach(location => {
         linkedStruct[location._id] = []
@@ -57,12 +57,12 @@ const linkTimesAndLocations = async (prayerInfo) => {
     return linkedStruct
 }
 
-const getEmptyJummah = async () => {
+const getEmptyJummah = () => {
     const templates = getEmptyJummahComponents()
     return createEmptyJummah(templates)
 }
 
-const getEmptyJummahComponents = async () => {
+const getEmptyJummahComponents = () => {
     const jummah = {
         month: 0,
         year: 2021,
@@ -84,10 +84,8 @@ const getEmptyJummahComponents = async () => {
 
 const createEmptyJummah = (templates) => {
     const maxKhateebPreference = 3
-    const preferences = []
     for (let i =0; i < maxKhateebPreference; i++)
-        preferences.push(templates.prayerSlot)
-    templates.jummah.khateebPreference = preferences
+        templates.jummah.khateebPreference.push(templates.prayerSlot)
     return templates.jummah
 }
 

@@ -79,6 +79,10 @@
         "locations": {
             "__type__": "arr",
             "required": true
+        },
+        "new": {
+            "__type__": "bool",
+            "required": false
         }
     },
     "timings": {

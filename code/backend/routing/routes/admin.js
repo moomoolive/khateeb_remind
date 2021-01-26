@@ -189,6 +189,8 @@ router.post(routerGroup6URL,
         for (let i = 0; i < req.body.locations.length; i++) {
             req.body["institutionID"] = req.headers.institutionid
             const saved = await $db.funcs.save(routerGroup6, req.body.locations[i])
+            if (req.body.new && !req.body.locations[i]._id)
+                await locations.firstTiming(req.headers.institutionid, saved._id.toString())
         }
         res.json(`successfully saved locations!`)
     } catch(err) {
@@ -295,12 +297,53 @@ router.post(
     }
 })
 
+const schedules = {
+    createDateObjectFromRequest(month, year) {
+        const requestDate = new Date()
+        requestDate.setMonth(parseInt(month))
+        requestDate.setFullYear(parseInt(year))
+        return requestDate
+    },
+    previousMonth(month, year) {
+        const requestDate = this.createDateObjectFromRequest(month, year)
+        const currentDate = new Date()
+        return currentDate.getTime() > requestDate.getTime()
+    },
+    twoMonthsAhead(month, year) {
+        const requestDate = this.createDateObjectFromRequest(month, year)
+        requestDate.setDate(1)
+        const twoMonthsAhead = new Date()
+        twoMonthsAhead.setDate(1)
+        twoMonthsAhead.setMonth(twoMonthsAhead.getMonth() + 2)
+        return twoMonthsAhead.getTime() <= requestDate.getTime()
+    }
+}
+
 router.get("/schedules" + "/:month/:year", async (req, res) => {
     try {
-        let data = await funcs.query(req, 'jummahs').exec()
-        if (data.length < 1)
-            data = await $utils.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
-        res.json(data)
+        let jummahs = await funcs.query(req, 'jummahs').exec()
+        if (jummahs.length < 1 && schedules.previousMonth(req.params.month, req.params.year))
+            res.json(`nobuild-previous`)
+        else if (jummahs.length < 1 && schedules.twoMonthsAhead(req.params.month, req.params.year))
+            res.json(`nobuild-future`)
+        else {
+            console.log(jummahs)
+            console.log(req.headers.institutionid)
+            if (jummahs.length < 1) {
+                jummahs = await $utils.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
+            }
+            console.log(jummahs)
+            const locations = await $db.models.locations.find({ institutionID: req.headers.institutionid }).exec()
+            const timings = await $db.models.timings.find({ institutionID: req.headers.institutionid }).exec()
+            const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()
+            const data = {
+                jummahs,
+                locations,
+                timings,
+                khateebs
+            }
+            res.json(data)
+        }
     } catch(err) {
         res.json(errors.getReq('schedules', err))
     }

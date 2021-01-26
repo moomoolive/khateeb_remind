@@ -1,4 +1,5 @@
 import helpers from './helpers.js'
+import store from '@/store/index.js'
 
 export default {
     deepCopy(item) {
@@ -10,5 +11,17 @@ export default {
     },
     isNumeric(value) {
         return /^\d+$/.test(value)
+    },
+    alert(msg, color="yellow") {
+        const notificationInfo = {
+            type: 'alert',
+            options: {
+                textSize: "small",
+                icon: "exclamation",
+                color,
+                msg
+            }
+        }
+        store.dispatch('createNotification', notificationInfo)
     }
 }

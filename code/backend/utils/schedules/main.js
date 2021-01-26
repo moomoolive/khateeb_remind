@@ -4,6 +4,7 @@ const build = async (month, year, institutionID) => {
     try {
         const fridays = helpers.fridaysOfMonth(month, year)
         const prayerInfo = await helpers.getActiveLocationsAndTimings(institutionID)
+        console.log(prayerInfo)
         const emptyJummah = helpers.getEmptyJummah()
         const emptyJummahArray = helpers.createEmptyJummahsEntries(
             emptyJummah, prayerInfo, fridays, month,

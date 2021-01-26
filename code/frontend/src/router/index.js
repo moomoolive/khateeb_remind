@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import store from '../store/index.js'
+import store from '@/store/index.js'
 
 import institutionAdmin from './routes/institutionAdmin.js'
 import khateebs from './routes/khateebs.js'

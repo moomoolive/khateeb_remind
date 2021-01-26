@@ -7,11 +7,15 @@ const adminRoutes = [
               /*{
                 path: 'dashboard',
                 component: () => import('@/views/admin/subroutes/dashboard.vue')
-              },
+              },*/
               {
                 path: 'schedule',
-                component: () => import('@/views/admin/subroutes/schedule.vue')
-              }, */
+                component: () => import('@/views/institutionAdmin/subroutes/schedule.vue'),
+                meta: {
+                  requireAuthorization: true,
+                  authLevel: 2
+                }
+              },
               {
                 path: 'announcements',
                 component: () => import('@/views/institutionAdmin/subroutes/announcements.vue'),

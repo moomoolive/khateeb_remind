@@ -37,8 +37,7 @@ export default {
         return {
             staticTags,
             locations: null,
-            timings: null,
-            struct: null
+            timings: null
         }
     },
     methods: {
@@ -52,6 +51,7 @@ export default {
         },
         async saveLocationsAndTimings($event) {
             try {
+                console.log($event)
                 const locations = await this.$API.institutionAdmin.saveLocations({ locations: $event.locations })
                 const timings = await this.$API.institutionAdmin.saveTimings({ times: $event.times })
                 this.$store.dispatch('adminSavedChangesScreen', true)
@@ -61,7 +61,7 @@ export default {
         },
         async newLocation($event) {
             try {
-                const newest = await this.$API.institutionAdmin.saveLocations({ locations: $event })
+                const newest = await this.$API.institutionAdmin.saveLocations({ locations: $event, new: true })
                 this.getLocationsAndTimings()
             } catch(err) {
                 console.log(err)

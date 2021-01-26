@@ -1,113 +1,80 @@
 <template>
     <div>
-        <admin-schedule
-            :currentSchedule="currentSchedule"
-            :originalSchedule="originalSchedule"
-            @schedule-change="setAPIRequestParams($event)"
-        />
-        <msg-with-pic
-            v-if="error"
-            :msg="`You need to setup locations and timing first`"
-            :gif="`personThrowingPlane`"
-        />
-        <button
-            v-if="currentSchedule && originalSchedule"
-            class='grey'
-            :disabled="notReadyToSubmit"
-            @click="save()"
-        >
-            Save Changes
-        </button>
+        <khateeb-schedule
+            @schedule-date="getSchedule($event)"
+            :data="APIData"
+            :revertToPreviousMonth="revertToPreviousMonth"
+        >   
+            <template #default="props">
+                <change-month-buttons
+                    :originalDate="props.originalDate"
+                    :date="props.date"
+                    @changed="props.changeViewingMonth($event)"
+                />
+            </template>
+        </khateeb-schedule>
     </div>
 </template>
 
 <script>
-import equal from 'fast-deep-equal'
-
-import adminSchedule from '@/components/schedules/templates/admin.vue'
-
-import datetime from '@/utils/dateTime/main.js'
+import khateebSchedule from '@/components/schedules/khateebSchedule.vue'
+import changeMonthButtons from '@/components/schedules/extraControls/changeMonth.vue'
 
 export default {
-    name: 'scheduleSetter',
+    name: "scheduleSetter",
     components: {
-        adminSchedule
+        khateebSchedule,
+        changeMonthButtons
     },
     data() {
         return {
-            scheduleFor: null,
-            currentSchedule: null,
-            originalSchedule: null,
-            monthsFromCurrent: 0,
-            error: false
+            date: null,
+            APIData: {
+                isThisADummyValue: true
+            },
+            revertToPreviousMonth: false
         }
     },
     methods: {
-        async fetchMonthlySchedule(scheduleFor) {
-            const data = await this.$API.admin.getMonthlySchedule(
-                scheduleFor
-            )
-            if (!data) {
-                this.error = true
-            } 
-            else if (data === 'No locations or timings were found!') {
-                this.error = true
-            } else this.updateSchedule(data)
-        },
-        updateSchedule(schedule) {
-            this.currentSchedule = schedule
-            this.originalSchedule = this._.deepCopy(this.currentSchedule)
-        },
-        setAPIRequestParams($event) {
-            this.scheduleFor = $event.month
-            this.monthsFromCurrent = $event.monthsFromCurrent
-        },
-        initialAPIRequestParams() {
-            const upcomingFriday = datetime.upcomingFriday(true)
-            const month = upcomingFriday.toLocaleString('default', { month: 'long' })
-            const allFridays = datetime.allUpcomingFridays(upcomingFriday)
-            return `${month}-${upcomingFriday.getFullYear()}`
-        },
-        prepSaveData() {
-            const payload = this._.deepCopy(this.currentSchedule)
-            payload.original = this._.deepCopy(this.originalSchedule)
-            return payload
-        },
-        async save() {
-            const msg = "Are you sure you want to save these changes?"
-            if (window.confirm(msg)) {
-                const payload = this.prepSaveData()
-                const response = await this.$API.admin.updatedSchedule(payload)
-                if (response === 'Changes successfully made!') {
-                    this.$store.dispatch('adminSavedChangesScreen', true)
+        async getSchedule(date) {
+            try {
+                const month = date.getMonth()
+                const year = date.getFullYear()
+                const res = await this.$API.institutionAdmin.getSchedule(month, year)
+                if (typeof res !== 'string' && res)
+                    this.APIData = res
+                else if (res === 'nobuild-previous') {
+                    this.revertToPreviousMonth = true
+                    this._.alert(`Previous Month schedule doesn't exist!`)
+                    this.$nextTick(() => { this.revertToPreviousMonth = false })
                 }
+                else if (res === 'nobuild-future')
+                    this._.alert(`You can't schedule more than one month ahead!`)
+            } catch(err) {
+                console.log(err)
             }
         }
-    },
-    watch: {
-        scheduleFor(newVal) {
-            this.fetchMonthlySchedule(this.scheduleFor)    
-        }
-    },
-    computed: {
-        isSame() {
-            if (this.currentSchedule) return equal(this.currentSchedule.data, this.originalSchedule.data)
-            else return true
-        },
-        isPreviousMonth() {
-            return this.monthsFromCurrent < 0
-        },
-        notReadyToSubmit() {
-            return this.isPreviousMonth || this.isSame
-        }
-    },
-    async created() {
-        const scheduleFor = this.initialAPIRequestParams()
-        this.fetchMonthlySchedule(scheduleFor)
     }
+    
 }
 </script>
 
 <style lang="scss" scoped>
+.jummahContainer {
+    display: flex;
+    width: 70%;
+    height: 10%;
+    margin-left: auto;
+    margin-right: auto;
+    flex-direction: column;
+}
+
+.timingLabel {
+    background: red;
+}
+
+.jummahPreferences {
+    background: blue;
+}
 
 </style>
