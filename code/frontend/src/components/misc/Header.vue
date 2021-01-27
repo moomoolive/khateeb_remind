@@ -3,9 +3,11 @@
         <img 
             class="logo" 
             :src="require('@/assets/logos/khateebRemindLogo.svg')"
+            @click="toHome()"
         >
-        <div>
-          <button class="blue">Sign Up <u>(It's FREE)</u></button>
+        <div v-if="!loggedIn">
+          <button class="blue" @click="toLogin()">Log In</button>
+          <button class="green" @click="signUp()">Sign Up</button>
         </div>
         <!-- <a class="currentDate" style="float: right; ">
           {{ abbreviatedDayOfWeek }} {{ abbreviatedMonthName }} {{ currentDate }}, {{ abbreviatedYear }}
@@ -22,6 +24,36 @@ export default {
         abbreviatedMonthName: '',
         abbreviatedDayOfWeek: '',
         abbreviatedYear: '',
+        loggedIn: this.$store.getters.tokenExists
+      }
+    },
+    methods: {
+      signUp() {
+        const info = {
+          type: 'redirect',
+          options: {
+              redirections: [
+                  {
+                      text: 'Khateebs',
+                      to: '/create/khateebs'
+                  },
+                  {
+                      text: 'Institutions',
+                      to: '/create/institutions'
+                  }
+              ]
+          }
+        }
+        this.$store.dispatch('createNotification', info)
+      },
+      toHome() {
+        const to = this.$store.getters.decodedJWT ? `/${this.$store.getters.decodedJWT.__t}/` : `/`
+        if (this.$router.currentRoute.fullPath !== to)
+          this.$router.push(to)
+      },
+      toLogin() {
+        if (this.$router.currentRoute.fullPath !== '/')
+          this.$router.push('/')
       }
     },
     created() {
@@ -36,7 +68,7 @@ export default {
 
 <style lang="scss" scoped>
 img {
-  width: 3.3vh;
+  height: 70%;
   float: left;
   padding: 1vh;
 }
@@ -47,13 +79,17 @@ button {
   font-weight: bold;
   border-radius: 0;
   color: black;
+  height: 60%;
+  width: 10vh;
+  margin-left: 0;
 }
 
 .topnav {
-  background-color: themeRGBA("grey", 0.4);
+  background-color: themeRGBA("grey", 0.5);
   top: 0;
-  height: 4.5vh;
-  width: 100vw;
+  height: 5vh;
+  max-height: 50px;
+  width: 100%;
   left: 0;
 }
 

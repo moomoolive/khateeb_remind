@@ -36,7 +36,6 @@ export default {
 
 <style lang="scss" scoped>
 .topnav {
-    background-color: lighten(getColor("grey"), 5%);
     margin-top: 30px;
     overflow: hidden;
     left: 0;

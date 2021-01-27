@@ -1,29 +1,19 @@
 <template>
-    <div class="page">
-        <div class="loginContainer">
-            <img style="display: inline;" :src="require('@/assets/logos/khateebRemindLogo.svg')">
-            <div class="formContainer">
-                <formMain
-                    :structure="formStructure"
-                    :errorMsg="errorMsg"
-                    :showInvalidationMsgs="false"
-                    :backgroundColor="`none`"
-                    @submitted="login($event)"
-                />
-                <!-- <div class="signUp">
-                    <p class="signUpTitle">Sign Up</p>
-                    <div class="signUpBtn">
-                        <button class="blue" @click="institutionSignup()">
-                            Institutions
-                        </button>
-                    </div>
-                    <div class="signUpBtn">
-                        <button @click="khateebSignup()">
-                            Khateebs
-                        </button>
-                    </div>
-                </div> -->
-            </div>
+    <div>
+        <img :src="require('@/assets/logos/khateebRemindLogo.svg')">
+        <div class="formContainer">
+            <formMain
+                :structure="formStructure"
+                :errorMsg="errorMsg"
+                :showInvalidationMsgs="false"
+                :backgroundColor="`darkBlue`"
+                :buttonText="`Log In`"
+                @submitted="login($event)"
+            />
+        </div>
+        <div class="remember-me">
+            <slider-button @toggled="saveToken($event)" :basedOn="rememberMe"/>
+            <p>Remember Me?</p>
         </div>
     </div>
 </template>
@@ -32,11 +22,13 @@
 import axios from 'axios'
 
 import formMain from '@/components/forms/main.vue'
+import sliderButton from '@/components/userInterface/components/sliderButton.vue'
 
 export default {
     name: "login",
     components: {
-        formMain
+        formMain,
+        sliderButton
     },
     data() {
         return {
@@ -49,7 +41,8 @@ export default {
                     required: true
                 }
             },
-            errorMsg: ''
+            errorMsg: '',
+            rememberMe: !!localStorage.getItem('rememberMe')
         }
     },
     methods: {
@@ -67,14 +60,21 @@ export default {
                 else if (authRes.token && authRes.msg === 'default')
                     console.log('default')
                 else if (authRes.token && authRes.msg === 'success')
-                    this.storeToken(authRes.token)
+                    this.toApp(authRes.token)
             } catch(err) {
                 if (err.status === 401)
                     this.errorMsg = 'Incorrect Username or Password'
             }
         },
-        storeToken(token) {
-            localStorage.setItem('token', token)
+        saveToken($event) {
+            if ($event) 
+                localStorage.setItem('rememberMe', 'yes')
+            else
+                localStorage.removeItem('rememberMe')
+        },
+        toApp(token) {
+            if (localStorage.getItem('rememberMe'))
+                localStorage.setItem('token', token)
             axios.defaults.headers.common['authorization'] = token
             this.$store.dispatch('JWT_TOKEN', token)
             this.$nextTick(() => {
@@ -92,27 +92,29 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.formContainer {
-    margin-top: 2vh;
-    background: themeRGBA("darkBlue", 0.2);
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    border-radius: 7px;
-}
-
-.loginContainer {
-    width: 40vh;
-}
-
-.page {
-    display: flex;
-    align-content: center;
-    justify-content: center;
-}
 
 img {
     width: 5vh;
     height: 5vh;
 }
 
+
+
+.remember-me {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 50px;
+}
+
+p {
+    margin-top: 0;
+}
+
+@media screen and (max-width: $phoneWidth) {
+      .remember-me {
+        font-size: 1.4vh;
+        margin-top: 5vh;
+      }
+}
 
 </style>

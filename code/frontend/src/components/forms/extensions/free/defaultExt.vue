@@ -1,12 +1,21 @@
 <template>
     <div>
-        <input type="text" v-model="data" @input="toMain()">
+        <input-primitive
+            :inputType="`text`"
+            :default="options.default ? options.default : ''"
+            @changed="process($event)"
+        />
     </div>
 </template>
 
 <script>
+import inputPrimitive from '@/components/forms/extensions/primitives/input.vue'
+
 export default {
     name: "formDefaultExt",
+    components: {
+        inputPrimitive
+    },
     props: {
         defaultValidators: {
             type: Object,
@@ -21,42 +30,30 @@ export default {
             required: true
         }
     },
-    data() {
-        return {
-            data: ''
-        }
-    },
     methods: {
-        toMain(options) {
-            this.$emit('changed', { val: this.data, state: this.valid, msgs: this.invalidMsgs, ...options })
-        }
-    },
-    computed: {
-        valid() {
-            if (this.options.minLength)
-                return this.defaultValidators.minLength(this.data, this.options.minLength)
-            else
-                return this.defaultValidators.minLength(this.data, 1)
+        process($event) {
+            const state = this.valid($event.val)
+            const msgs = this.invalidMsgs(state)
+            const info = {
+                ...$event,
+                state,
+                msgs
+            }
+            this.$emit('changed', info)
         },
-        invalidMsgs() {
-            if (!this.valid) {
+        valid(data) {
+            if (this.options.minLength)
+                return this.defaultValidators.minLength(data, this.options.minLength)
+            else
+                return this.defaultValidators.minLength(data, 1)
+        },
+        invalidMsgs(state) {
+            if (!state) {
                 const msg = this.options.minLength ? `${this._.stringFormat(this.name)} cannot be less than ${this.options.minLength} characters` : `${this._.stringFormat(this.name)} cannot be empty`
                 return [msg]
             } else
                 return []
         }
-    },
-    created() {
-        this.toMain({ created: true })
     }
 }
 </script>
-
-<style lang="scss" scoped>
-input {
-    border: none;
-    outline: none;
-    border-radius: 4px;
-}
-
-</style>

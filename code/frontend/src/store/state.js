@@ -9,7 +9,6 @@ export default {
         }
     },
     JWT_TOKEN: localStorage.getItem('token') || null,
-    institution: 'uofc', //hardcoded
     lastVisit: null,
     admin: {
         savedChanges: false
@@ -17,6 +16,6 @@ export default {
     notifications: {
         show: false,
         type: 'none',
-        options: { } 
+        options: {} 
     }
 }

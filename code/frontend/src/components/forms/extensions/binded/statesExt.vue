@@ -1,23 +1,24 @@
 <template>
-    <div v-if="bindedTo && statesOfCountry">
+    <div v-if="bindedTo && statesOfCountry && show">
         <slot></slot>
-        <select v-model="selectedState" @change="toMain()">
-            <option
-                v-for="option in statesOfCountry"
-                :key="option"
-                :value="option"
-            >
-                {{ option }}
-            </option>
-        </select>
+        <dropdown-primitive 
+            :options="{
+                selectOptions: statesOfCountry
+            }"
+            @changed="process($event)"
+        />
     </div>
 </template>
 
 <script>
 import states from './states.json'
+import dropdownPrimitive from '@/components/forms/extensions/primitives/dropdown.vue'
 
 export default {
     name: "formStateExt",
+    components: {
+        dropdownPrimitive
+    },
     props: {
         bindedTo: {
             type: String,
@@ -27,12 +28,12 @@ export default {
     data() {
         return {
             states,
-            selectedState: null
+            show: true
         }
     },
     methods: {
-        toMain(options) {
-            this.$emit("changed", { val: this.selectedState, ...options})
+        process($event) {
+            this.$emit("changed", $event)
         }
     },
     computed: {
@@ -44,20 +45,14 @@ export default {
         }
     },
     watch: {
-        bindedTo(newVal) {
-            if (this.statesOfCountry)
-                this.selectedState = this.statesOfCountry[0]
-        },
         statesOfCountry(newVal, oldVal) {
             if (!newVal && oldVal)
-                this.toMain({ deleted: true })
-            if (newVal && !oldVal)
-                this.toMain({ created: true })
+                this.process({ deleted: true })
+            if (newVal && oldVal) {
+                this.show = false
+                this.$nextTick(() => { this.show = true })
+            }
         }
-    },
-    created() {
-        this.selectedState = this.statesOfCountry[0]
-        this.toMain({ created: true })
     }
 }
 </script>

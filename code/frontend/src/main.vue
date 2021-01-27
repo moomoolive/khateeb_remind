@@ -2,9 +2,9 @@
   <div id="app">
     <Header class="header" />
     <transition name="dropdown">
-      <notifications v-if="showNotification" class="notifications" />
+      <notifications v-if="showNotification" class="notifications notifications-size-position" />
     </transition>
-    <router-view class="displayedPage"/>
+    <router-view class="displayed-page page-padding"/>
     <Footer />
   </div>
 </template>
@@ -64,4 +64,54 @@ export default {
 
 <style lang="scss">
 @import '~@/scss/App/index.scss';
+
+.displayed-page {
+    position: relative;
+    z-index: 0;
+    background-color: getColor("offWhite");
+    margin: auto;
+    background-image: url('~@/assets/wallpaper/app.jpg');
+    min-height: 70vh;
+}
+
+.page-padding {
+  padding-bottom: 60px;
+  padding-top: 100px !important;
+}
+
+.header {
+    overflow: hidden;
+    position: fixed;
+    z-index: 10;
+}
+
+.notifications {
+    position: fixed;
+    z-index: 9;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 20%;
+}
+
+.notifications-size-position {
+  height: 300px;
+  width: 300px;
+  font-size: 17px;
+}
+
+@media screen and (max-width: $phoneWidth) {
+      .notifications-size-position {
+        width: 70%;
+        height: 35vh;
+        font-size: 2vh;
+      }
+      .page-padding {
+        padding-bottom: 5%;
+        padding-top: 13% !important;
+      }
+}
 </style>

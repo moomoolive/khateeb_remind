@@ -1,72 +1,79 @@
 <template>
-    <div :class="`gradient${backgroundColor} formContainer`" v-if="data">
-        <div v-if="formTitle" class="formTitle">
-            {{ formTitle }}
-        </div>
-        <div v-for="(fieldData, fieldName) in structure" :key="fieldName">
-            <div class="formLabel" :for="fieldName">
-                {{ _.stringFormat(fieldName) }}
+    <div>
+        <div :class="`${backgroundColor} ${ backgroundColor === 'none' ? '' : 'box-shadow'} formContainer`" v-if="data">
+            <div v-if="formTitle" class="formTitle">
+                {{ formTitle }}
             </div>
-            <div v-if="extensibleType(fieldData.type)">
-                <component 
-                    :is="fieldData.type + `Ext`"
-                    :name="fieldName"
-                    :options="fieldData"
-                    :defaultValidators="{
-                        minLength
-                    }"
-                    @changed="extensionInterface(fieldName, $event)"
-                />
-            </div>
-            <div v-else-if="!fieldData.type">
-                <default-extension
-                    @changed="extensionInterface(fieldName, $event)"
-                    :name="fieldName"
-                    :options="fieldData"
-                    :defaultValidators="{
-                        minLength
-                    }"
-                />
-            </div>
-            <div 
-                v-if="fieldNeedsValidationAndIsInvalid(fieldName) && showInvalidationMsgs"
-                class="invalidFeedback"
-            >
-                ❌ {{ invalidFeedback(fieldName) }}
-            </div>
-            <div v-if="bindedExtSupported(fieldName)">
-                <transition name="dropdown">
+            <div v-for="(fieldData, fieldName) in structure" :key="fieldName">
+                <div class="formLabel" :for="fieldName">
+                    {{  fieldData.alias || _.stringFormat(fieldName) }}
+                </div>
+                <div v-if="extensibleType(fieldData.type)">
                     <component 
-                        :is="`${bindedExtName(fieldName)}Ext`"
-                        :bindedTo="data[bindedExtBindedTo(fieldName)]"
-                        @changed="extensionInterface(bindedExtName(fieldName).slice(0, -1), $event)"
-                    >
-                        <template #default>
-                            <div class="formLabel">
-                                {{ _.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
-                            </div>
-                        </template>
-                        <template #invalidMsgs>
-                            <div 
-                                v-if="fieldNeedsValidationAndIsInvalid(bindedExtName(fieldName).slice(0, -1)) && showInvalidationMsgs"
-                                class="invalidFeedback"
-                            >
-                                ❌ {{ invalidFeedback(bindedExtName(fieldName).slice(0, -1)) }}
-                            </div>
-                        </template>
-                    </component>
-                </transition>
+                        :is="fieldData.type + `Ext`"
+                        :name="fieldName"
+                        :options="fieldData"
+                        :defaultValidators="{
+                            minLength
+                        }"
+                        @changed="extensionInterface(fieldName, $event)"
+                    />
+                </div>
+                <div v-else-if="!fieldData.type">
+                    <default-extension
+                        @changed="extensionInterface(fieldName, $event)"
+                        :name="fieldName"
+                        :options="fieldData"
+                        :defaultValidators="{
+                            minLength
+                        }"
+                    />
+                </div>
+                <div 
+                    v-if="fieldNeedsValidationAndIsInvalid(fieldName) && showInvalidationMsgs"
+                    class="invalidFeedback"
+                >
+                    ❌ {{ invalidFeedback(fieldName) }}
+                </div>
+                <div v-if="bindedExtSupported(fieldName)">
+                    <transition name="dropdown">
+                        <component 
+                            :is="`${bindedExtName(fieldName)}Ext`"
+                            :bindedTo="data[bindedExtBindedTo(fieldName)]"
+                            :defaultValidators="{
+                                minLength
+                            }"
+                            :bindedName="bindedExtBindedTo(fieldName)"
+                            @changed="extensionInterface(bindedExtName(fieldName).slice(0, -1), $event)"
+                        >
+                            <template #default>
+                                <div class="formLabel">
+                                    {{ _.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
+                                </div>
+                            </template>
+                            <template #invalidMsgs>
+                                <div 
+                                    v-if="fieldNeedsValidationAndIsInvalid(bindedExtName(fieldName).slice(0, -1)) && showInvalidationMsgs"
+                                    class="invalidFeedback"
+                                >
+                                    ❌ {{ invalidFeedback(bindedExtName(fieldName).slice(0, -1)) }}
+                                </div>
+                            </template>
+                        </component>
+                    </transition>
+                </div>
             </div>
-        </div>
-        <button 
-            :class="buttonColor" 
-            :disabled="!validSubmission"
-            @click="submit()"
-        >
-            {{ buttonText }}
-        </button>
-        <div v-if="errorMsg" class="errorMsg">
-            {{ errorMsg }}
+            <button
+                :style="`margin-top: ${showInvalidationMsgs ? 7 : 3}%;`" 
+                :class="buttonColor" 
+                :disabled="!validSubmission"
+                @click="submit()"
+            >
+                {{ buttonText }}
+            </button>
+            <div v-if="errorMsg" class="errorMsg">
+                {{ errorMsg }}
+            </div>
         </div>
     </div>
 </template>
@@ -96,12 +103,12 @@ export default {
         buttonColor: {
             type: String,
             required: false,
-            default: 'grey'
+            default: 'silver'
         },
         backgroundColor: {
             type: String,
             required: false,
-            default: 'yellow-offWhite'
+            default: 'darkBlue'
         },
         errorMsg: {
             type: String,
@@ -128,7 +135,7 @@ export default {
         'statesExt': () => import('./extensions/binded/statesExt.vue'),
         "confirmsExt": () => import('./extensions/binded/confirmExt.vue'),
         "phoneNumberExt": () => import('./extensions/free/phoneNumberExt.vue'),
-        "dropdownExt": () => import('./extensions/free/dropdownExt.vue'),
+        "dropdownExt": () => import('./extensions/primitives/dropdown.vue'),
         "protectedExt": () => import('./extensions/free/protectedExt.vue'),
         "handleExt": () => import('./extensions/free/handleExt.vue'),
         "textAreaExt": () => import('./extensions/free/textAreaExt.vue'),
@@ -251,54 +258,59 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/scss/miscStyles/gradientBackgrounds.scss';
-
-$rightColors: (
-    "offWhite": 1,
-    "green": 0.2
-);
-
-@each $rightColor, $opacityValue in $rightColors {
-    @each $colorName, $color in $themeColors {
-        @include gradient1(
-            $colorLeft: $colorName,
-            $opacityLeft: 0.3,
-            $name: '#{$colorName}-#{$rightColor}' ,
-            $colorRight: $rightColor,
-            $opacityRight: $opacityValue
-        );
-    }
-};
-
 button {
-    margin-top: 3%;
-    width: 35.5vh;
-}
-
-.formLabel {
-    margin-left: 2vh;
-    margin-bottom: 0.5vh;
-    text-align: left;
-    margin-top: 2.5vh;
-    font-weight: 500;
-    font-size: 1.9vh;
+    width: 90%;
     opacity: 1;
     color: black;
+    font-size: 1.8vh;
+}
+
+.darkBlue {
+    background: themeRGBA("darkBlue", 0.5);
+}
+
+.red {
+    background: themeRGBA("red", 0.5);
+}
+
+.yellow {
+    background: themeRGBA("yellow", 0.5);
 }
 
 .formContainer {
-    margin-top: 2vh;
-    padding-top: 0.8vh;
-    padding-bottom: 0.8vh;
+    margin-top: 4vh;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    border-radius: 7px;
+    width: 80%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 1;
+    position: relative;
 }
 
-.protected {
-    margin-top: 1vh
+.box-shadow {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.formLabel {
+    text-align: left;
+    margin-top: 2.5vh;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 500;
+    font-size: 1.9vh;
+    color: black;
+    width: 90%;
 }
 
 .errorMsg {
-    color: red;
+    color: getColor("yellow");
     font-size: 2vh;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .formTitle {
@@ -310,6 +322,9 @@ button {
     margin-top: 1.3vh;
     color: red;
     font-size: 1.5vh;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 </style>

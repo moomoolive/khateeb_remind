@@ -1,7 +1,6 @@
 <template>
     <div>
         <loading>
-            <button @click="toLogin()">To Login</button>
             <div v-if="finished && finishedMsg">
                 <h1>
                     {{ finishedMsg }}
@@ -11,6 +10,9 @@
                 v-if="structure.institutionID.selectOptions && !finished && !finishedMsg"
                 :structure="structure"
                 :bindedExts="['confirms']"
+                :backgroundColor="`red`"
+                :buttonColor="`blue`"
+                :buttonText="`Sign Up`"
                 @submitted="signupKhateeb($event)"
                 :formTitle="`Khateeb Sign Up`"
             />
@@ -36,20 +38,25 @@ export default {
                     required: true,
                     selectOptions: null,
                     value: '_id',
-                    display: "name"
+                    display: "name",
+                    alias: 'Institution'
                 },
                 username: {
                     required: true,
                     minLength: 6
                 },
                 password: {
-                    type: 'protected',
                     required: true,
                     minLength: 6
                 },
                 handle: {
                     type: 'handle',
                     required: true,
+                },
+                title: {
+                    type: "dropdown",
+                    required: true,
+                    selectOptions: ['none', 'Shiekh', 'Imam']
                 },
                 firstName: {
                     required: true
@@ -60,11 +67,6 @@ export default {
                 phoneNumber: {
                     type: 'phoneNumber',
                     required: true
-                },
-                title: {
-                    type: "dropdown",
-                    required: true,
-                    selectOptions: ['none', 'Shiekh', 'Imam']
                 }
             },
             finished: false,

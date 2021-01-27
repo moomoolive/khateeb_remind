@@ -1,22 +1,31 @@
 <template>
     <div>
-        <input 
-            :type="protect ? 'password' : 'text'" v-model="protectedData" 
-            @input="toMain()"
-        >
-        <span 
-            v-if="options.toggle"
-            :style="`opacity: ${protect ? '1': '0.3'};`" 
-            @click="protect = !protect"
-        >
-            👁️
-        </span>
+        <input-primitive 
+            :inputType="protect ? 'password' : 'text'"
+            :default="options.default ? options.default : ''"
+            @changed="process($event)"
+        />
+        <!--  -->
+        <div class="toggleContainer">
+            <span
+                :style="`opacity: ${protect ? '1': '0.3'};`" 
+                @click="protect = !protect"
+                v-if="options.toggle"
+            >
+                👁️
+            </span>
+        </div>
     </div>
 </template>
 
 <script>
+import inputPrimitive from '@/components/forms/extensions/primitives/input.vue'
+
 export default {
     name: "formProtectedExt",
+    components: {
+        inputPrimitive
+    },
     props: {
         options: {
             type: Object,
@@ -33,54 +42,54 @@ export default {
     },
     data() {
         return {
-            protect: true,
-            protectedData: ''
+            protect: true
         }
     },
     methods: {
-        toMain(options) {
-            this.$emit('changed', { val: this.protectedData, state: this.valid, msgs: this.invalidMsg })
-        }
-    },
-    computed: {
-        buttonText() {
-            return this.protect ? 'show' : 'hide'
+        process($event) {
+            const state = this.valid($event.val)
+            const msgs = this.invalidMsgs(state)
+            const info = {
+                ...$event,
+                state,
+                msgs
+            }
+            this.$emit('changed', info)
         },
-        valid() {
+        valid(data) {
             if (this.options.minLength)
-                return this.defaultValidators.minLength(this.protectedData, this.options.minLength)
+                return this.defaultValidators.minLength(data, this.options.minLength)
             else
-                return this.defaultValidators.minLength(this.protectedData, 1)
+                return this.defaultValidators.minLength(data, 1)
         },
-        invalidMsg() {
-            if (!this.valid) {
+        invalidMsgs(state) {
+            if (!state) {
                 const msg = this.options.minLength ? `${this._.stringFormat(this.name)} cannot be less than ${this.options.minLength} characters` : `${this._.stringFormat(this.name)} cannot be empty`
                 return [msg]
             } else
                 return []
         }
-    },
-    created() {
-        this.toMain({ created: true })
     }
 }
 </script>
 
 <style lang="scss" scoped>
-input {
-    border: none;
-    outline: none;
-    border-radius: 4px;
+.toggleContainer {
+    height: 1px;
+    width: 90%;
+    text-align: right;
+    padding: 0;
+    margin: 0;
 }
 
 span {
-    position: absolute;
-    right: 10.5vh;
+    margin: 0;
+    padding: 0;
     font-size: 2.5vh;
+    position: relative;
+    bottom: 3.3vh;
+    right: -5%;
     z-index: 1;
-    opacity: 01;
-    margin-top: auto;
-    margin-bottom: auto;
     &:hover {
         cursor: pointer;
     }

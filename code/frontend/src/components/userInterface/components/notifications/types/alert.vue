@@ -2,9 +2,7 @@
     <div v-if="display">
         <div :class="display.color">
             <div class="topAnchor"></div>
-            <div class="icon">
-                {{ icons[display.icon] }}
-            </div>
+            <img :src="require(`@/assets/notifications/${display.icon}.png`)">
             <div :class="`msg ${display.textSize ? display.textSize : 'large'}`">
                 {{ display.msg }}<br>
                 <button
@@ -32,7 +30,6 @@ export default {
     data() {
         return {
             templates: { ...alertExtras.templates },
-            icons: { ...alertExtras.icons },
             display: null
         }
     },
@@ -72,30 +69,19 @@ div {
     padding: 0;
 }
 .green {
-        background: linear-gradient(
-        to right bottom,
-        themeRGBA("green", 0.9),
-        themeRGBA("green", 0.6)
-        );
+        background: themeRGBA("green", 0.75);
 }
 
 .red {
-        background: linear-gradient(
-        to right bottom,
-        themeRGBA("red", 0.9),
-        themeRGBA("red", 0.6)
-        );
+        background: themeRGBA("red", 0.75);
 }
 
 .yellow {
-        background: linear-gradient(
-        to right bottom,
-        themeRGBA("yellow", 0.9),
-        themeRGBA("yellow", 0.6)
-        );
+        background: themeRGBA("yellow", 0.75);
 }
 
 .msg {
+    margin-top: 5%;
     width: 80%;
     margin-left: auto;
     margin-right: auto;
@@ -113,15 +99,14 @@ div {
     height: 1vh;
 }
 
-.icon {
-    $size: 10vh;
-    height: $size;
-    font-size: $size;
-    margin-bottom: 5vh;
+img {
+    height: 40%;
 }
 
 button {
-    margin-top: 2.5vh;
+    margin-top: 7%;
+    width: 30%;
+    height: 15%;
 }
 
 </style>

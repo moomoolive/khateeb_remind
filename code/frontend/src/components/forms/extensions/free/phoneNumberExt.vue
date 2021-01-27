@@ -1,33 +1,43 @@
 <template>
-    <div>
-        <input 
-            type="text" 
-            v-model="areaCode" 
-            placeholder="area" 
-            maxlength="3" 
-            @input="toMain()"
-        > -
-        <input
-            type="text" 
-            v-model="first3" 
-            maxlength="3" 
-            placeholder="123"
-            @input="toMain()"
-        > -
-        <input 
-            class="last" 
-            type="text" 
-            v-model="last4" 
-            maxlength="4" 
-            placeholder="4567"
-            @input="toMain()"
-        >
+    <div class="phone-number-container">
+        <input-primitive 
+            class="phone-section"
+            :inputType="`text`"
+            :maxChars="3"
+            :width="24"
+            :placeholder="`Area Code`"
+            :default="areaCode"
+            @changed="toVal('areaCode', $event)"
+        /> -
+        <input-primitive 
+            class="phone-section"
+            :inputType="`text`"
+            :maxChars="3"
+            :width="25"
+            :placeholder="`123`"
+            :default="first3"
+            @changed="toVal('first3', $event)"
+        /> -
+        <input-primitive 
+            class="phone-section"
+            :inputType="`text`"
+            :maxChars="4"
+            :width="35"
+            :placeholder="`4567`"
+            :default="last4"
+            @changed="toVal('last4', $event)"
+        />
     </div>
 </template>
 
 <script>
+import inputPrimitive from '@/components/forms/extensions/primitives/input.vue'
+
 export default {
     name: "formPhoneNumberExt",
+    components: {
+        inputPrimitive
+    },
     data() {
         return {
             areaCode: '',
@@ -36,18 +46,18 @@ export default {
         }
     },
     methods: {
-        maxNumChars(target, max, $event) {
-            const val = $event.target.value
-            if (val.length <= max)
-                this[target] = val
-            this.$forceUpdate()
+        toVal(target, $event) {
+            this[target] = $event.val
+            delete $event.val
+            this.process($event)
+
         },
-        toMain(options) {
+        process(options) {
             const info = {
+                ...options,
                 val: this.completeNumberInt,
                 state: this.readyToSubmit,
-                msgs: [`Phone Number must be 9 numeric characters`],
-                ...options
+                msgs: this.invalidMsg
             }
             this.$emit('changed', info)
         } 
@@ -61,15 +71,29 @@ export default {
         },
         completeNumberInt() {
             return parseInt(this.completeNumber)
+        },
+        invalidMsg() {
+            if (!this.readyToSubmit)
+                return [`Phone number must be 9 numeric characters`]
+            else
+                return []
         }
-    },
-    created() {
-        this.toMain({ created: true })
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+
+.phone-number-container {
+    width: 89%;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.phone-section {
+    display: inline;
+}
 
 input {
     width: 7vh;

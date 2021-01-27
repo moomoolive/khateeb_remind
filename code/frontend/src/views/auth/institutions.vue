@@ -8,7 +8,6 @@
         <div v-show="finished" class="msgContainer">
             <h1>
                 Success!<br><br>
-                blahjlakfasf lfajl;dfkjf asdfl  afld fslkja fldjf saf asl flkklsad fas
                 {{ apiResponse }}
             </h1>
         </div>
@@ -17,6 +16,8 @@
                 v-show="showInstitutions"
                 :structure="formStructure.institution"
                 :bindedExts="['states']"
+                :backgroundColor="`yellow`"
+                :buttonText="`To Next Step`"
                 @submitted="toStepTwo('institution', $event)"
                 :formTitle="`Institution Details`"
             />
@@ -24,6 +25,8 @@
                 v-show="showInstitutionAdmin"
                 :structure="formStructure.institutionAdmin"
                 :bindedExts="['confirms']"
+                :backgroundColor="`yellow`"
+                :buttonText="`Sign Up`"
                 @submitted="toAPI('institutionAdmin', $event)"
                 :formTitle="`Institution Admin`"
             />
@@ -34,12 +37,6 @@
                 To Previous Step
             </button><br>
         </div>
-        <button 
-            class="red" 
-            @click="toLogin()"
-        >
-            Back to Login
-        </button>
     </div>
 </template>
 
@@ -57,7 +54,7 @@ export default {
         return {
             showInstitutions: true,
             showInstitutionAdmin: false,
-            finished: true,
+            finished: false,
             formStructure: {
                 institution: {
                     name: {
