@@ -43,16 +43,18 @@ export default {
                 const res = await this.$API.institutionAdmin.getSchedule(month, year)
                 if (typeof res !== 'string' && res)
                     this.APIData = res
-                else if (res === 'nobuild-previous') {
-                    this.revertToPreviousMonth = true
-                    this._.alert(`Previous Month schedule doesn't exist!`)
-                    this.$nextTick(() => { this.revertToPreviousMonth = false })
-                }
+                else if (res === 'nobuild-previous')
+                    this.revertToPrevious(`Previous Month schedule doesn't exist!`)
                 else if (res === 'nobuild-future')
-                    this._.alert(`You can't schedule more than one month ahead!`)
+                    this.revertToPrevious(`You can't schedule more than one month ahead!`)
             } catch(err) {
                 console.log(err)
             }
+        },
+        revertToPrevious(msg) {
+            this.revertToPreviousMonth = true
+            this._.alert(msg)
+            this.$nextTick(() => { this.revertToPreviousMonth = false })
         }
     }
     

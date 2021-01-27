@@ -12,10 +12,6 @@
           v-if="isLoggedIn">
             Logout
           </a>
-          <img 
-            class="logo" 
-            :src="require('@/assets/logos/khateebRemindLogo.svg')"
-          >
         </div>
     </div>
 </template>
@@ -39,12 +35,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.logo {
-  width: 3.3vh;
-  float: right; 
-  padding: 1vh;
-}
-
 .topnav {
     background-color: lighten(getColor("grey"), 5%);
     margin-top: 30px;

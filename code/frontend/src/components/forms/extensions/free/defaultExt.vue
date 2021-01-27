@@ -52,6 +52,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+input {
+    border: none;
+    outline: none;
+    border-radius: 4px;
+}
 
 </style>

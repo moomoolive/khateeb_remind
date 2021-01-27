@@ -271,18 +271,25 @@ $rightColors: (
 };
 
 button {
-    margin-top: 4vh;
+    margin-top: 3%;
+    width: 35.5vh;
 }
 
 .formLabel {
+    margin-left: 2vh;
+    margin-bottom: 0.5vh;
+    text-align: left;
     margin-top: 2.5vh;
-    margin-bottom: 1.5vh;
     font-weight: 500;
-    font-size: 2.3vh;
+    font-size: 1.9vh;
+    opacity: 1;
+    color: black;
 }
 
 .formContainer {
     margin-top: 2vh;
+    padding-top: 0.8vh;
+    padding-bottom: 0.8vh;
 }
 
 .protected {

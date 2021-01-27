@@ -5,8 +5,12 @@
     background-color: getColor("offWhite");
     padding-bottom: 5%;
     padding-top: 9% !important;
-    max-width: 1200px;
     margin: auto;
+    /*
+    background: linear-gradient(to top right, getColor("blue"), white);
+    */
+    background-image: url('~@/assets/wallpaper/app.jpg');
+    min-height: 60vh;
 }
 
 .header {

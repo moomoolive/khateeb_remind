@@ -1,7 +1,11 @@
 <template>
     <div>
-        <input :type="protect ? 'password' : 'text'" v-model="protectedData" @input="toMain()">
+        <input 
+            :type="protect ? 'password' : 'text'" v-model="protectedData" 
+            @input="toMain()"
+        >
         <span 
+            v-if="options.toggle"
             :style="`opacity: ${protect ? '1': '0.3'};`" 
             @click="protect = !protect"
         >
@@ -63,6 +67,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+input {
+    border: none;
+    outline: none;
+    border-radius: 4px;
+}
+
 span {
     position: absolute;
     right: 10.5vh;

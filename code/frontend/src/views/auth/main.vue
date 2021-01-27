@@ -1,32 +1,28 @@
 <template>
-    <div>
-        <div class="welcomeContainer">
-            <div class="titleContainer">
-                <img style="display: inline;" :src="require('@/assets/logos/khateebRemindLogo.svg')">
-                <p class="title" style="display: inline;">Khateeb Remind</p>
-            </div>
-            <div class="subTitleContainer">
-                <p class="subTitle">Khateeb Scheduling.</p>
-                <p class="subTitle">Without the Mess.</p>
-            </div>
-        </div>
-        <formMain
-            :structure="formStructure"
-            :errorMsg="errorMsg"
-            :showInvalidationMsgs="false"
-            @submitted="login($event)"
-        />
-        <div class="signUp">
-            <p class="signUpTitle">Sign Up</p>
-            <div class="signUpBtn">
-                 <button class="blue" @click="institutionSignup()">
-                    Institutions
-                 </button>
-            </div>
-            <div class="signUpBtn">
-                <button @click="khateebSignup()">
-                    Khateebs
-                </button>
+    <div class="page">
+        <div class="loginContainer">
+            <img style="display: inline;" :src="require('@/assets/logos/khateebRemindLogo.svg')">
+            <div class="formContainer">
+                <formMain
+                    :structure="formStructure"
+                    :errorMsg="errorMsg"
+                    :showInvalidationMsgs="false"
+                    :backgroundColor="`none`"
+                    @submitted="login($event)"
+                />
+                <!-- <div class="signUp">
+                    <p class="signUpTitle">Sign Up</p>
+                    <div class="signUpBtn">
+                        <button class="blue" @click="institutionSignup()">
+                            Institutions
+                        </button>
+                    </div>
+                    <div class="signUpBtn">
+                        <button @click="khateebSignup()">
+                            Khateebs
+                        </button>
+                    </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -96,34 +92,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.welcomeContainer {
-    margin-top: 3vh;
-    margin-bottom: 3vh;
+.formContainer {
+    margin-top: 2vh;
+    background: themeRGBA("darkBlue", 0.2);
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 7px;
 }
 
-.titleContainer {
-    border-bottom: black 0.5vh dotted;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+.loginContainer {
+    width: 40vh;
 }
 
-.subTitleContainer {
-    margin-top: 3vh;
-    margin-bottom: 5vh;
-}
-
-.title {
-    font-size: 4vh;
-    font-weight: bold;
-    margin-left: 2vh;
-}
-
-.subTitle {
-    font-size: 2vh;
-    font-weight: bold;
-    line-height: 0.5vh;
+.page {
+    display: flex;
+    align-content: center;
+    justify-content: center;
 }
 
 img {
@@ -131,17 +114,5 @@ img {
     height: 5vh;
 }
 
-.signUp {
-    margin-top: 4vh;
-}
-
-.signUpBtn {
-    display: inline;
-}
-
-.signUpTitle {
-    font-weight: bold;
-    font-size: 2.5vh;
-}
 
 </style>

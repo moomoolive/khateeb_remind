@@ -1,11 +1,15 @@
 <template>
       <div class="topnav">
-        <a>Welcome to Khateeb Remind</a>
-        <!-- <router-link to="/" exact>Home</router-link>
-        <router-link :to="{ name: 'announcements' }">Announcements</router-link> -->
-        <a class="currentDate" style="float: right; ">
+        <img 
+            class="logo" 
+            :src="require('@/assets/logos/khateebRemindLogo.svg')"
+        >
+        <div>
+          <button class="blue">Sign Up <u>(It's FREE)</u></button>
+        </div>
+        <!-- <a class="currentDate" style="float: right; ">
           {{ abbreviatedDayOfWeek }} {{ abbreviatedMonthName }} {{ currentDate }}, {{ abbreviatedYear }}
-        </a>
+        </a> -->
       </div>
 </template>
 
@@ -31,8 +35,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+img {
+  width: 3.3vh;
+  float: left;
+  padding: 1vh;
+}
+
+button {
+  float: right;
+  font-size: 1vh;
+  font-weight: bold;
+  border-radius: 0;
+  color: black;
+}
+
 .topnav {
-  background-color: lighten(getColor("grey"), 5%);
+  background-color: themeRGBA("grey", 0.4);
   top: 0;
   height: 4.5vh;
   width: 100vw;
