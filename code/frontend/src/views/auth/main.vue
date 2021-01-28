@@ -2,18 +2,19 @@
     <div>
         <img :src="require('@/assets/logos/khateebRemindLogo.svg')">
         <div class="formContainer">
-            <formMain
+            <form-main
                 :structure="formStructure"
                 :errorMsg="errorMsg"
                 :showInvalidationMsgs="false"
                 :backgroundColor="`darkBlue`"
                 :buttonText="`Log In`"
                 @submitted="login($event)"
-            />
-        </div>
-        <div class="remember-me">
-            <slider-button @toggled="saveToken($event)" :basedOn="rememberMe"/>
-            <p>Remember Me?</p>
+            >
+                <div class="remember-me">
+                    <input type="checkbox" v-model="rememberMe">
+                    <p>Remember Me</p>
+                </div>
+            </form-main>
         </div>
     </div>
 </template>
@@ -22,13 +23,11 @@
 import axios from 'axios'
 
 import formMain from '@/components/forms/main.vue'
-import sliderButton from '@/components/userInterface/components/sliderButton.vue'
 
 export default {
     name: "login",
     components: {
-        formMain,
-        sliderButton
+        formMain
     },
     data() {
         return {
@@ -66,14 +65,8 @@ export default {
                     this.errorMsg = 'Incorrect Username or Password'
             }
         },
-        saveToken($event) {
-            if ($event) 
-                localStorage.setItem('rememberMe', 'yes')
-            else
-                localStorage.removeItem('rememberMe')
-        },
         toApp(token) {
-            if (localStorage.getItem('rememberMe'))
+            if (this.rememberMe)
                 localStorage.setItem('token', token)
             axios.defaults.headers.common['authorization'] = token
             this.$store.dispatch('JWT_TOKEN', token)
@@ -87,6 +80,14 @@ export default {
         khateebSignup() {
             this.$router.push('/create/khateebs')
         }
+    },
+    watch: {
+        rememberMe(newVal) {
+            if (newVal) 
+                localStorage.setItem('rememberMe', 'yes')
+            else
+                localStorage.removeItem('rememberMe')
+        }
     }
 }
 </script>
@@ -98,22 +99,31 @@ img {
     height: 5vh;
 }
 
-
+input {
+    display: inline;
+    width: 12px;
+    height: 12px;
+}
 
 .remember-me {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: bold;
-    margin-top: 50px;
+    margin-top: 0px;
 }
 
 p {
     margin-top: 0;
+    display: inline;
+    color: getColor("offWhite");
 }
 
 @media screen and (max-width: $phoneWidth) {
       .remember-me {
-        font-size: 1.4vh;
-        margin-top: 5vh;
+        font-size: 1.8vh;
+      }
+      input {
+          width: 2vh;
+          height: 2vh;
       }
 }
 

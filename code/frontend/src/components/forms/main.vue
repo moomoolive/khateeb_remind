@@ -71,6 +71,7 @@
             >
                 {{ buttonText }}
             </button>
+            <slot></slot>
             <div v-if="errorMsg" class="errorMsg">
                 {{ errorMsg }}
             </div>

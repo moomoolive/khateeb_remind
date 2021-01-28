@@ -41,44 +41,6 @@ textarea {
     margin: 0;
 }
 
-input[type=checkbox] + label {
-    display: block;
-    margin: 0.2em;
-    cursor: pointer;
-    padding: 0.2em;
-    &:before {
-        content: "\2714";
-        border: 0.1em solid #000;
-        border-radius: 0.2em;
-        display: inline-block;
-        width: 2vh;
-        height: 2vh;
-        vertical-align: bottom;
-        color: transparent;
-        transition: .2s;
-    }
-    &:active:before {
-        transform: scale(0);
-    }
-}
-
-input[type=checkbox] {
-    display: none;
-    &:checked + label:before {
-        background-color: getColor("green");
-        border-color: getColor("green");
-        color: #fff;
-    }
-    &:disabled + label:before {
-        transform: scale(1);
-        border-color: #aaa;
-    }
-    &:checked:disabled + label:before {
-        transform: scale(1);
-        background-color: #bfb;
-        border-color: #bfb;
-    }
-}
 
 select {
     color: themeRGBA("offWhite", 0.6);
