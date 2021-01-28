@@ -35,7 +35,6 @@ const authLevels = {
 }
 
 const correctAuthLevel = (routeAuthLevel, decodedJWT) => {
-  console.log('hi')
   const currentUserType = decodedJWT.__t
   const authLevel = authLevels[currentUserType]
   return authLevel >= routeAuthLevel

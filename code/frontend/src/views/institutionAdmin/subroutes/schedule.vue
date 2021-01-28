@@ -62,21 +62,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.jummahContainer {
-    display: flex;
-    width: 70%;
-    height: 10%;
-    margin-left: auto;
-    margin-right: auto;
-    flex-direction: column;
-}
-
-.timingLabel {
-    background: red;
-}
-
-.jummahPreferences {
-    background: blue;
-}
 
 </style>

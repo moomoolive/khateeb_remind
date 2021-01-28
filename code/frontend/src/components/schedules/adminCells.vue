@@ -5,9 +5,9 @@
                 v-for="(preference, preferenceNo) in data.khateebPreference"
                 :key="preferenceNo"
             >
-                Preference {{ preferenceNo + 1 }}
+                <p>Preference {{ preferenceNo + 1 }}</p>
                 <div v-if="readOnly(preference)">
-                    {{ readOnlyKhateebDisplay(preference.khateebID) }}
+                    <p>{{ readOnlyKhateebDisplay(preference.khateebID) }}</p>
                 </div>
                 <select
                     v-else 
@@ -93,6 +93,39 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+select {
+    width: 80%;
+    text-align: center;
+    border: none;
+    outline: none;
+    height: 4vh;
+    max-height: 40px;
+    font-size: 15px;
+    background-color: themeRGBA("grey", 1);
+    &:focus {
+        background-color: themeRGBA("grey", 0.5);
+    }
+}
 
+p { 
+    text-align: left;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 0;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+@media screen and (max-width: $phoneWidth) {
+    select {
+        font-size: 2vh;
+    }
+    p { 
+        margin-top: 4vh;
+        font-size: 2.5vh;
+    }
+}
 </style>

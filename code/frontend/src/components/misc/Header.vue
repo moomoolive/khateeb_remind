@@ -19,7 +19,9 @@
             <div v-show="activeMenu" class="menu-container">
               <div class="menu-item" @click="redirect('/khateeb/')"><p>Schedule</p></div>
               <div class="menu-item" @click="redirect('/khateeb/announcements')"><p>Announcements</p></div>
-              <div class="menu-item" @click="redirect('/institutionAdmin/')"><p>Admin Central</p></div>
+              <div class="menu-item" @click="redirect('/institutionAdmin/')">
+                <p v-if="userInfo.__t !== 'khateeb'">Admin Central</p>
+              </div>
               <div class="menu-item" @click="redirect('/user/profile')"><p>My Profile</p></div>
               <div class="menu-item" @click="redirect('/user/notifications')">
                 <p>
@@ -41,14 +43,14 @@ export default {
     name: 'Header',
     data() {
       return {
-        loggedIn: this.$store.getters.tokenExists,
-        activeMenu: true,
+        activeMenu: false,
         notifications: ['hey there', 'buddy', 'yeah']
       }
     },
     methods: {
       redirect(path) {
         this.$router.push(path)
+        this.activeMenu = false
       },
       signUp() {
         const info = {
@@ -80,12 +82,19 @@ export default {
       logout() {
         this.$store.dispatch('logout')
         if (this.$router.currentRoute.fullPath !== '/')
-          this.$router.push('/') 
+          this.$router.push('/')
+        this.activeMenu = false 
       }
     },
     computed: {
       notificationNum() {
         return this.notifications.length
+      },
+      loggedIn() {
+        return this.$store.getters.tokenExists
+      },
+      userInfo() {
+        return this.$store.getters.decodedJWT
       }
     }
 }
