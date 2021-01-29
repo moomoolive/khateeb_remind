@@ -16,9 +16,13 @@
               @click="activeMenu = !activeMenu" 
               :class="`menu-icon-container ${activeMenu ? 'active-menu' : ''}`"
             >
+            <button class="get-the-app blue" @click="downloadApp()">
+              <p class="get-the-app-text">Get the App</p>
+            </button>
             <div v-show="activeMenu" class="menu-container">
               <div class="menu-item" @click="redirect('/khateeb/')"><p>Schedule</p></div>
-              <div class="menu-item" @click="redirect('/khateeb/announcements')"><p>Announcements</p></div>
+              <!-- for now until schedule is made for khateebs -->
+              <div class="menu-item" @click="redirect('/khateeb/')"><p>Announcements</p></div>
               <div class="menu-item" @click="redirect('/institutionAdmin/')">
                 <p v-if="userInfo.__t !== 'khateeb'">Admin Central</p>
               </div>
@@ -48,6 +52,9 @@ export default {
       }
     },
     methods: {
+      downloadApp() {
+        this._.alert(`This feature is coming soon insha'Allah!`)
+      },
       redirect(path) {
         this.$router.push(path)
         this.activeMenu = false
@@ -139,7 +146,7 @@ span {
   position: relative;
   border-radius: 50%;
   height: 50%;
-  right: 1%;
+  right: 5px;
   bottom: -6%;
   float: right;
 }
@@ -169,13 +176,6 @@ p {
   color: lighten(getColor("darkBlue"), 50%);
 }
 
-@media screen and (max-width: $phoneWidth) {
-      p {
-        font-size: 3vh;
-        text-align: center;
-      }
-}
-
 button {
   float: right;
   font-size: 1.1vh;
@@ -186,6 +186,36 @@ button {
   width: 15%;
   max-width: 110px;
   margin-left: 0;
+}
+
+.get-the-app {
+  max-width: 120px;
+  padding-top: 6px;
+}
+
+.get-the-app-text {
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+}
+
+@media screen and (max-width: $phoneWidth) {
+      p {
+        font-size: 3vh;
+        text-align: center;
+      }
+      .menu-icon-container {
+        right: 1%;
+      }
+      .get-the-app {
+        width: 25%;
+        font-weight: 500;
+      }
+      .get-the-app-text {
+        font-size: 1.5vh;
+      }
 }
 
 .topnav {

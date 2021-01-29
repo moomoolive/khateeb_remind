@@ -1,5 +1,5 @@
 <template>
-    <div class="phone-number-container">
+    <div class="phone-number-container" v-if="init">
         <input-primitive 
             class="phone-section"
             :inputType="`text`"
@@ -38,11 +38,18 @@ export default {
     components: {
         inputPrimitive
     },
+    props: {
+        options: {
+            type: Object,
+            required: true
+        }
+    },
     data() {
         return {
             areaCode: '',
             first3: '',
-            last4: ''
+            last4: '',
+            init: false
         }
     },
     methods: {
@@ -78,6 +85,15 @@ export default {
             else
                 return []
         }
+    },
+    created() {
+        if (this.options.default) {
+            const startVal = this.options.default.toString()
+            this.areaCode = startVal.slice(0, 4)
+            this.first3 = startVal.slice(4, 7)
+            this.last4 = startVal.slice(7, 10)
+        }
+        this.init = true
     }
 }
 </script>

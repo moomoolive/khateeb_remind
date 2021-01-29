@@ -6,7 +6,7 @@
 
 <script>
 export default {
-    name: 'formTextAreaExt',
+    name: 'formTextAreaPrimitive',
     props: {
         defaultValidators: {
             type: Object,
@@ -23,7 +23,7 @@ export default {
     },
     data() {
         return {
-            data: ''
+            data: this.options.default || ''
         }
     },
     methods: {
@@ -52,6 +52,20 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+textarea {
+    border: none;
+    outline: none;
+    width: 89%;
+    border-radius: 4px;
+    height: 13vh;
+    max-height: 300px;
+    font-size: 1.5vh;
+    background-color: themeRGBA("grey", 1);
+    &:focus {
+        background-color: themeRGBA("grey", 0.5);
+    }
+    position: relative;
+    z-index: 0;
+}
 </style>

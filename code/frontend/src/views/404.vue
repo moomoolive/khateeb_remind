@@ -6,8 +6,8 @@
             gif="personThrowingPlane"
         />
         <div class="button">
-            <button>
-                <router-link to="/">Go to Home</router-link>
+            <button @click="toHome()">
+                Go to Home
             </button>
         </div>
     </div>
@@ -15,15 +15,20 @@
 
 <script>
 export default {
-    name: 'pageNotFound'
+    name: 'pageNotFound',
+    methods: {
+        toHome() {
+            if (this.$store.getters.decodedJWT)
+                this.$router.push(`/${this.$store.getters.decodedJWT.__t}/`)
+            else {
+                this.$router.push('/')
+            }
+        }
+    }
 }
 </script>
 
 <style>
-.space {
-    margin-top: 4vh;
-}
-
 .button {
     margin-top: 2vh;
 }

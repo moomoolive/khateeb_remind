@@ -60,7 +60,34 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@/scss/App/index.scss';
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+}
+
+div {
+    height: 100%;
+    width: 100%;
+}
+  
+img {
+    min-width: 0px;
+    min-height: 0px;
+}
+  
+body {
+    margin: 0 0 0 0;
+    background-color: getColor("grey");
+}
+
+h2 {
+    font-size: 3.2vh;
+    padding-left: 0.4vw;
+    padding-right: 0.4vw;
+}
 
 .displayed-page {
     position: relative;
@@ -110,5 +137,44 @@ export default {
         padding-bottom: 5%;
         padding-top: 13% !important;
       }
+}
+
+@mixin color($color) {
+    background-color: getColor($color);
+    &:hover{ border: 0.1vh solid getColor($color); }
+}
+
+@mixin allColors($list: $themeColors) {
+    @each $colorName, $color in $list {
+        &.#{$colorName} { @include color($colorName); }
+    }
+}
+
+button {
+    background-color: getColor("green");
+    border: none;
+    border-radius: 4px;
+    color: white;
+    padding: 1vh 2vh;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 2vh;
+    transition-duration: 0.4s;
+    outline: none;
+
+    $marginOne: 1vh;
+    margin: $marginOne $marginOne $marginOne $marginOne;
+    &:hover {
+      background-color: white !important;
+      color: black !important;
+      border: 0.1vh solid getColor("green");
+    }
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    &:focus { @include blinkingAnimation(); }
+    @include allColors();
 }
 </style>

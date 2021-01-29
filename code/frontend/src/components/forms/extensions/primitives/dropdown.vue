@@ -26,7 +26,7 @@ export default {
     },
     data() {
         return {
-            currentlySelected: this.startValue()
+            currentlySelected: this.options.default || this.startValue()
         }
     },
     methods: {

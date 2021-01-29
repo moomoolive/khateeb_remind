@@ -5,8 +5,7 @@
             :type="inputType" 
             v-model="data" 
             :maxlength="maxChars"
-            :placeholder="placeholder" 
-            @input="toMain()"
+            :placeholder="placeholder"
         >
     </div>
 </template>
@@ -50,6 +49,11 @@ export default {
         },
         startVal() {
             return typeof this.default !== 'undefined' ? this.default : null
+        }
+    },
+    watch: {
+        data() {
+            this.toMain()
         }
     },
     created() {

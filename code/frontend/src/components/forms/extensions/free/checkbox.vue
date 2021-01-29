@@ -1,47 +1,42 @@
 <template>
     <div>
-        <input type="checkbox" style="display: inline;" v-model="data">
+        <input-primitive
+            class='right' 
+            :inputType="`checkbox`"
+            :width="4"
+            :default="options.default || false"
+            @changed="process($event)" 
+        />
     </div>
 </template>
 
 <script>
+import inputPrimitive from '@/components/forms/extensions/primitives/input.vue'
+
 export default {
     name: 'formCheckbox',
+    components: {
+        inputPrimitive
+    },
     props: {
-        defaultValidators: {
-            type: Object,
-            required: true
-        },
         options: {
             type: Object,
             required: true
         },
-        name: {
-            type: String,
-            required: true
-        }
-    },
-    data() {
-        return {
-            data: this.options.default || false
-        }
     },
     methods: {
-        toMain(options) {
-            this.$emit('changed', { val: this.data, ...options })
+        process($event) {
+            this.$emit('changed', $event)
         }
-    },
-    watch: {
-        data() {
-            this.toMain()
-        }
-    },
-    created() {
-        this.toMain({ created: true })
     }
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+.right {
+    text-align: left;
+    width: 89%;
+    margin-left: auto;
+    margin-right: auto;
+}
 </style>

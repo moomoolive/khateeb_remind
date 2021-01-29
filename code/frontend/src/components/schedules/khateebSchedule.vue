@@ -64,6 +64,15 @@
                         </div>
                     </div>
                 </div>
+                <div v-if="emitCopy">
+                    <button 
+                        class="submit-schedule silver"
+                        :disabled="!readyToSubmit"
+                        @click="emitSchedule()"
+                    >
+                        {{ buttonText }}
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -71,6 +80,8 @@
 
 <script>
 import datetime from '@/utils/dateTime/main.js'
+
+import equal from 'fast-deep-equal'
 
 export default {
     name: "khateebSchedule",
@@ -85,6 +96,15 @@ export default {
         revertToPreviousMonth: {
             type: Boolean,
             required: false
+        },
+        emitCopy: {
+            type: Boolean,
+            required: false
+        },
+        buttonText: {
+            type: String,
+            required: false,
+            default: 'Submit Changes'
         }
     },
     data() {
@@ -104,16 +124,6 @@ export default {
         }
     },
     methods: {
-        async getSchedule(date) {
-            try {
-                const month = date.getMonth()
-                const year = date.getFullYear()
-                const schedule = await this.$API.institutionAdmin.getSchedule(month, year)
-                return schedule
-            } catch(err) {
-                console.log(err)
-            }
-        },
         changeViewingLocation(val) {
             this.selected.location = val
         },
@@ -158,6 +168,9 @@ export default {
             })
             return struct
         },
+        emitSchedule() {
+            this.$emit('copy', this.data.jummahs)
+        },
         async init() {
             this.locationsIndex = this.ArrayToObject('_id', this.data.locations)
             this.timingsIndex = this.ArrayToObject('_id' ,this.data.timings)
@@ -190,6 +203,9 @@ export default {
                 location[this.selected.location] = this.struct[this.selected.location]
                 return location
             }
+        },
+        readyToSubmit() {
+            return !equal(this.struct, this.originalStruct)
         }
     },
     watch: {
@@ -201,7 +217,6 @@ export default {
                 this.selected.week = this.weeklyKeys[0]
         },
         revertToPreviousMonth(newVal) {
-            console.log(newVal)
             if (newVal)
                 this.date = new Date(this.cachedDate)
         }
@@ -313,6 +328,14 @@ export default {
     @include blinkingAnimation()
 }
 
+.submit-schedule {
+    width: 80%;
+    height: 6vh;
+    max-height: 50px;
+    font-size: 18px;
+    color: black;
+}
+
 @media screen and (max-width: $phoneWidth) {
     .schedule-container {
             background: themeRGBA("darkBlue", 0.5);
@@ -361,6 +384,9 @@ export default {
     }
     .external-controls {
         width: 73%;
+    }
+    .submit-schedule {
+        font-size: 2vh;
     }
 }
 

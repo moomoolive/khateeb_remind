@@ -31,6 +31,8 @@ img {
     $size: 40vh;
     width: $size;
     height: $size;
+    max-width: 1000px;
+    max-height: 1000px;
 }
 
 h2 {

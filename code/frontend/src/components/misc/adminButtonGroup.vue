@@ -1,23 +1,13 @@
 <template>
-    <div class="buttonGroup">
-        <div class="dashboard">
-            <button
-                @click="click('dashboard')"
-                :disabled="isCurrentRoute('dashboard')"
-            >
-                Dashboard/Admin Home
-            </button>
-        </div>
+    <div>
         <div 
-            v-for="(buttonGroup, index) in buttonLinks" :key="index"
+            v-for="(link, index) in buttonLinks" :key="index"
         >
             <button
-                v-for="link in buttonGroup" :key="link"
-                :disabled="isCurrentRoute(link)"
-                class="blue buttonLinks"
+                class="admin-nav silver"
                 @click="click(link)"
             >
-                {{ _.stringFormat(link) }}
+              <p>{{ _.stringFormat(link) }} <span class="arrow-icon">></span></p>
             </button>
         </div>
     </div>
@@ -28,10 +18,7 @@ export default {
     name: 'adminButtonGroup',
     data() {
         return {
-            buttonLinks: [
-                ['schedule', 'announcements', 'khateebs'],
-                ['settings']
-            ],
+            buttonLinks: ['schedule', 'announcements', 'khateebs', 'settings'],
             selected: null
         }
     },
@@ -42,9 +29,6 @@ export default {
             if (this.isSavedChangesScreenDisplayed) {
                 this.$store.dispatch('adminSavedChangesScreen', false)
             }
-        },
-        isCurrentRoute(routeName) {
-            return routeName === this.selected
         }
     },
     computed: {
@@ -58,19 +42,37 @@ export default {
 }
 </script>
 
-<style>
-.buttonLinks {
-    display: inline;
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-top: 5px;
+<style lang="scss" scoped>
+.admin-nav {
+    width: 80% !important;
+    height: 7.3vh;
+    max-height: 200px;
+    max-width: 850px;
+    padding: 10px 30px;
+    border-radius: 100px 100px 100px 100px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    color: black;
 }
 
-.dashboard {
-    margin-bottom: 3vh;
+p {
+    margin: 0;
+    text-align: left;
+    font-size: 20px;
 }
 
-.buttonGroup {
-    margin-top: 2.5vh;
+.arrow-icon {
+    float: right;
+    margin-right: 0;
+    right: -5%;
+}
+
+@media screen and (max-width: $phoneWidth) {
+      .admin-nav {
+          width: 90% !important;
+          padding: 1vh 3vh;
+      }
+      p {
+          font-size: 2.4vh;
+      }
 }
 </style>

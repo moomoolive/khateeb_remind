@@ -1,9 +1,11 @@
 <template>
     <div>
         <khateeb-schedule
-            @schedule-date="getSchedule($event)"
             :data="APIData"
+            :emitCopy="true"
             :revertToPreviousMonth="revertToPreviousMonth"
+            @copy="saveSchedule($event)"
+            @schedule-date="getSchedule($event)"
         >   
             <template #default="props">
                 <change-month-buttons
@@ -44,7 +46,7 @@ export default {
                 if (typeof res !== 'string' && res)
                     this.APIData = res
                 else if (res === 'nobuild-previous')
-                    this.revertToPrevious(`Previous Month schedule doesn't exist!`)
+                    this.revertToPrevious(`Previous month schedule doesn't exist!`)
                 else if (res === 'nobuild-future')
                     this.revertToPrevious(`You can't schedule more than one month ahead!`)
             } catch(err) {
@@ -55,6 +57,14 @@ export default {
             this.revertToPreviousMonth = true
             this._.alert(msg)
             this.$nextTick(() => { this.revertToPreviousMonth = false })
+        },
+        async saveSchedule($event) {
+            try {
+                const res = await this.$API.institutionAdmin.saveJummahs({ jummahs: $event })
+                this.$store.dispatch('adminSavedChangesScreen', true)
+            } catch(err) {
+                console.log(err)
+            }
         }
     }
     

@@ -63,8 +63,14 @@ const root = {
 
 const institutionAdminExt = API_URL + '/institutionAdmin'
 const institutionAdmin = {
+    getAnnouncements() {
+        return axios.get(institutionAdminExt + '/announcements')
+    },
     updateAnnouncements(announcement) {
         return axios.post(institutionAdminExt + '/announcements', announcement)
+    },
+    deleteAnnouncement(id) {
+        return axios.delete(institutionAdminExt + '/announcements', { data: id })
     },
     getLocations(location) {
         return axios.get(institutionAdminExt + `/locations/${location}`)
@@ -89,6 +95,9 @@ const institutionAdmin = {
     },
     getSchedule(month, year) {
         return axios.get(institutionAdminExt + `/schedules/${month}/${year}`)
+    },
+    saveJummahs(jummahsArray) {
+        return axios.post(institutionAdminExt + '/jummahs', jummahsArray)
     }
 }
 

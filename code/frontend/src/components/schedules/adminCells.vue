@@ -10,7 +10,8 @@
                     <p>{{ readOnlyKhateebDisplay(preference.khateebID) }}</p>
                 </div>
                 <select
-                    v-else 
+                    v-else
+                    v-model="preference.khateebID" 
                     @change="change($event.target.value, preferenceNo, preference._id)"
                 >
                     <option value="TBD">TBD</option>

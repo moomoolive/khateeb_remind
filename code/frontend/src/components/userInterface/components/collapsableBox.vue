@@ -43,7 +43,7 @@ export default {
         contentWidth: {
             type: Number,
             required: false,
-            default: 95
+            default: 98
         }
     },
     data() {
@@ -63,5 +63,63 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/scss/components/collapsableBox.scss';
+.active { @include blinkingAnimation($speedOfAnimation: 5s, $opacity: 2); }
+
+.collapsible {
+  background-color: getColor("grey");
+  color: white;
+  padding: 20px;
+  height: auto !important;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 17px;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0;
+  width: 98%;
+  &:hover {
+    background-color: getColor("grey") !important;
+    color: getColor("offWhite") !important;
+  }
+}
+
+.icon {
+    color: getColor("blue");
+    position: relative;
+    left: 5px;
+}
+
+.tag {
+  margin-top: 10px;
+}
+
+.content {
+    background: themeRGBA("darkBlue", 0.8);
+    $padding: 15px;
+    padding-top: $padding;
+    padding-bottom: $padding;
+    overflow: hidden;
+    $rad: 4px;
+    border-bottom-left-radius: $rad;
+    border-bottom-right-radius: $rad;
+    margin: auto;
+}
+
+@media screen and (max-width: $phoneWidth) {
+    .collapsible {
+        padding: 2vh;
+        font-size: 2vh;
+    }
+    .tag {
+        margin-top: 1vh;
+    }
+    .content { 
+        $padding: 1.5vh;
+        padding-top: $padding;
+        padding-bottom: $padding;
+    }
+}
+
 </style>

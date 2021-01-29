@@ -7,18 +7,25 @@
             v-if="!announcementsExists"
         />
         <div v-if="announcementsExists">
-            <collapsable-box
-                v-for="(announcement, ID) in announcements" 
-                :key="ID"
-                :headline="
-                    `${dateLoader(announcement.updatedAt)} || ${announcement.headline}`
-                "
-                :tagDetails="tagLoader(announcement)"
+            <div 
+                v-for="(twoAnnouncements, index) in announcementsArraysOfTwo"
+                :key="index"
+                class="two-announcement-container"
             >
-                <div class="content" >
-                    {{ announcement.content }}
-                </div>
-            </collapsable-box>
+                <collapsable-box
+                    v-for="(announcement, ID) in twoAnnouncements" 
+                    class="announcement-container"
+                    :key="ID"
+                    :headline="
+                        `${dateLoader(announcement.updatedAt)} || ${announcement.headline}`
+                    "
+                    :tagDetails="tagLoader(announcement)"
+                >
+                    <div class="content" >
+                        <p>{{ announcement.content }}</p>
+                    </div>
+                </collapsable-box>
+            </div>
         </div>
     </div>
 </template>
@@ -30,6 +37,7 @@ export default {
         return {
             announcementsExists: true,
             announcements: null,
+            announcementsArraysOfTwo: null,
             lastVisit: this.$store.state.lastVisit
         }
     },
@@ -50,20 +58,78 @@ export default {
         isNew(announcementDate) {
             const date = new Date(announcementDate)
             return date > this.lastVisit
+        },
+        announcementsToArraysOfTwo(announcements) {
+            const arraysOfTwo = []
+            let chopped = []
+            for (let i = 0; i < announcements.length; i++) {
+                const copy = this._.deepCopy(announcements[i])
+                chopped.push(copy)
+                const even = i % 2
+                if (even) {
+                    arraysOfTwo.push(chopped)
+                    chopped = []
+                }
+            }
+            arraysOfTwo.push(chopped)
+            return arraysOfTwo
         }
     },
     async created() {
-        this.announcements = await this.$API.khateeb.getAnnouncements()
-        console.log(this.announcements)
-        if (this.announcements.length < 1 || !this.announcements) this.announcementsExists = false
+        try{ 
+            this.announcements = await this.$API.khateeb.getAnnouncements()
+            if (this.announcements.length < 1) 
+                this.announcementsExists = false
+            else
+                this.announcementsArraysOfTwo = this.announcementsToArraysOfTwo(this.announcements)
+        } catch(err) {
+            console.log(err)
+            this.announcementsExists = false
+        }
     }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.two-announcement-container {
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    max-height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1200px;
+    align-items: center;
+    justify-content: center;
+}
+
+.announcement-container {
+    width: 45%;
+}
+
 .content {
-    font-size: 1.7vh;
+    min-height: 50px;
+    color: getColor("offWhite");
     text-align: left;
-    padding-left: 2vw;
+}
+
+p {
+    margin: 0;
+    margin-left: 5px;
+    font-size: 16px;
+}
+
+@media screen and (max-width: $phoneWidth) {
+      .two-announcement-container {
+            flex-direction: column;
+        }
+        .announcement-container {
+            width: 100%;
+        }
+        p {
+            margin: 0;
+            margin-left: 2%;
+            font-size: 2.3vh;
+        }
 }
 </style>

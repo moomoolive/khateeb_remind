@@ -52,7 +52,8 @@ const routerGroup1 = 'announcements'
 const routerGroup1URL = `/${routerGroup1}`
 router.get(routerGroup1URL, async (req, res) => {
     try {
-        const data = await $db.models[routerGroup1].find({ institutionID: req.headers.institutionid }).exec()
+        const mostRecent = -1
+        const data = await $db.models[routerGroup1].find({ institutionID: req.headers.institutionid }).sort('-updatedAt').exec()
         res.json(data)
     } catch(err) {
         res.json(errors.db(routerGroup1, 'retrieve', err))
@@ -327,12 +328,10 @@ router.get("/schedules" + "/:month/:year", async (req, res) => {
         else if (jummahs.length < 1 && schedules.twoMonthsAhead(req.params.month, req.params.year))
             res.json(`nobuild-future`)
         else {
-            console.log(jummahs)
             console.log(req.headers.institutionid)
             if (jummahs.length < 1) {
                 jummahs = await $utils.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
             }
-            console.log(jummahs)
             const locations = await $db.models.locations.find({ institutionID: req.headers.institutionid }).exec()
             const timings = await $db.models.timings.find({ institutionID: req.headers.institutionid }).exec()
             const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()

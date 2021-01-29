@@ -4,7 +4,7 @@
             <div v-if="formTitle" class="formTitle">
                 {{ formTitle }}
             </div>
-            <div v-for="(fieldData, fieldName) in structure" :key="fieldName">
+            <div v-for="(fieldData, fieldName) in structureCopy" :key="fieldName">
                 <div class="formLabel" :for="fieldName">
                     {{  fieldData.alias || _.stringFormat(fieldName) }}
                 </div>
@@ -139,16 +139,17 @@ export default {
         "dropdownExt": () => import('./extensions/primitives/dropdown.vue'),
         "protectedExt": () => import('./extensions/free/protectedExt.vue'),
         "handleExt": () => import('./extensions/free/handleExt.vue'),
-        "textAreaExt": () => import('./extensions/free/textAreaExt.vue'),
+        "textAreaExt": () => import('./extensions/primitives/textArea.vue'),
         "checkboxExt": () => import('./extensions/free/checkbox.vue'),
         defaultExtension
     },
     data() {
         return {
-            data: null,
+            data: {},
             originalData: null,
             extsList,
-            validations: {}
+            validations: {},
+            structureCopy: null
         }
     },
     methods: {
@@ -179,8 +180,8 @@ export default {
             return found.bindedTo
         },
         invalidFeedback(fieldName) {
-            if (this.structure[fieldName] && this.structure[fieldName].invalidMsg)
-                return this.structure[fieldName].invalidMsg
+            if (this.structureCopy[fieldName] && this.structureCopy[fieldName].invalidMsg)
+                return this.structureCopy[fieldName].invalidMsg
             else if (this.validations[fieldName])
                 return this.validations[fieldName].msgs.reduce((total, msg) => `${total}\n❌ ${msg}`)
             else
@@ -189,13 +190,6 @@ export default {
         setData(inputData) {
             this.data = this._.deepCopy(inputData)
             this.originalData = this._.deepCopy(inputData)
-        },
-        createDataBasedOnStructure() {
-            let data = {}
-            for (let [fieldName, options] of Object.entries(this.structure)) {
-                data[fieldName] = ''
-            }
-            return data
         },
         submit() {
             this.$emit('submitted', this.data)
@@ -225,11 +219,11 @@ export default {
         minLength(data, min=0) {
             return data.length >= min
         },
-        max(data, max) {
-            return data <= max
-        },
-        min(data, min) {
-            return data >= min
+        fillDefaultsWithBasedOn(basedOn) {
+            const copy = this._.deepCopy(basedOn)
+            for (let [fieldName, currentVal] of Object.entries(this.structureCopy)) {
+                this.structureCopy[fieldName].default = copy[fieldName]
+            }
         }
     },
     computed: {
@@ -250,10 +244,11 @@ export default {
         }
     },
     created() {
-        if (this.basedOn)
+        this.structureCopy = this._.deepCopy(this.structure)
+        if (this.basedOn) {
+            this.fillDefaultsWithBasedOn(this.basedOn)
             this.setData(this.basedOn)
-        else
-            this.setData(this.createDataBasedOnStructure())
+        }
     }
 }
 </script>
@@ -261,7 +256,6 @@ export default {
 <style lang="scss" scoped>
 button {
     width: 90%;
-    opacity: 1;
     color: black;
     font-size: 1.8vh;
 }
