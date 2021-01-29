@@ -198,8 +198,9 @@ export default {
         extensionInterface(extension, $event) {
             if (typeof $event.val !== "undefined")
                 this.$set(this.data, extension, $event.val)
-            if ($event.created)
+            if ($event.created) {
                 this.setData(this.data)
+            }
             if ($event.deleted) {
                 delete this.data[extension]
                 this.setData(this.data)

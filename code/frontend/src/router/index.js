@@ -5,6 +5,7 @@ import store from '@/store/index.js'
 import institutionAdmin from './routes/institutionAdmin.js'
 import khateebs from './routes/khateebs.js'
 import auth from './routes/auth.js'
+import user from './routes/user.js'
 import root from './routes/root.js'
 
 Vue.use(VueRouter)
@@ -18,7 +19,8 @@ const routes = [
   ...khateebs,
   ...auth,
   ...root,
-  ...institutionAdmin
+  ...institutionAdmin,
+  ...user
 ]
 
 const router = new VueRouter({
@@ -44,12 +46,12 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requireAuthorization)) {
     if (!store.getters.tokenExists) {
       next('/')
-      alert('Please login to view this page')
+      this._.alert('Please login to view this page')
       return
     }
     else if (!store.getters.isJWTValid) {
       next('/')
-      alert('Your login has expired. Please sign-in again')
+      this._.alert('Your login has expired. Please sign-in again')
       store.dispatch('logout')
       return
     }

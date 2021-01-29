@@ -49,38 +49,4 @@ router.get('/announcements', async (req, res) => {
     }
 })
 
-router.post('/user/username', 
-    middleware.allowedFields(requestTypeChecks.userUsername),
-    async (req, res) => {
-    try {
-        const userEntry = await $db.models.khateebs.updateOne({ _id: req.headers.userid }, req.body)
-        res.json(`Successfully username information!`)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't update user info`)
-    }
-})
-
-router.post('/user/password', 
-    middleware.allowedFields(requestTypeChecks.userPassword),
-    async (req, res) => {
-    try {
-        const userEntry = await $db.models.khateebs.updateOne({ _id: req.headers.userid }, req.body)
-        res.json(`Successfully username information!`)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't update user info`)
-    }
-})
-
-router.post('/user/profile', async (req, res) => {
-    try {
-        const updated = await $db.models.khateebs.updateOne({ _id: req.headers.userid }, req.body)
-        res.json(`Successfully updated user profile!`)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't update user profile`)
-    }
-})
-
 module.exports = router

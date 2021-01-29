@@ -9,9 +9,17 @@ const API_URL = process.env.VUE_APP_API_SERVER_URL || 'http://localhost:80'
 
 const nonErrorResponse = res => res.data
 const errorResponse = err => {
-    if (err.response.status === 401) {
-        const errOrigin = err.response.request.responseURL
-        const splitOrigin = errOrigin.split('/')
+    if (!err.response) {
+        store.dispatch('createNotification', { type: 'alert', options: { template: 'serverError' } })
+        return Promise.reject(err)
+    }
+    const errOrigin = err.response.request.responseURL
+    const splitOrigin = errOrigin.split('/')
+    const fromCheckin = splitOrigin[3] === 'user' && splitOrigin[4] === 'check-in'
+    if (fromCheckin) {
+        return Promise.reject(err)
+    }
+    else if (err.response.status === 401) {
         const fromLogin = splitOrigin[3] === 'auth' && splitOrigin[4] === ''
         if (fromLogin)
             return Promise.reject(err.response)
@@ -116,6 +124,22 @@ const institutionAdmin = {
     }
 }
 
+const userExt = API_URL + `/user`
+const user = {
+    changePassword(newPassword) {
+        return axios.post(userExt + '/password', newPassword)
+    },
+    changeUsername(newUsername) {
+        return axios.post(userExt + '/username', newUsername)
+    },
+    changeProfile(updatedProfile) {
+        return axios.post(userExt + '/profile', updatedProfile)
+    },
+    checkIn() {
+        return axios.get(userExt + '/check-in')
+    }
+}
+
 export default {
     misc,
     users,
@@ -123,5 +147,6 @@ export default {
     auth,
     root,
     khateeb,
-    institutionAdmin
+    institutionAdmin,
+    user
 }

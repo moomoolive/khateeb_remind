@@ -25,7 +25,7 @@
               <div class="menu-item" @click="redirect('/institutionAdmin/')">
                 <p v-if="userInfo.__t !== 'khateeb'">Admin Central</p>
               </div>
-              <div class="menu-item" @click="redirect('/user/profile')"><p>My Profile</p></div>
+              <div class="menu-item" @click="redirect('/user/')"><p>My Profile</p></div>
               <div class="menu-item" @click="redirect('/user/notifications')">
                 <p>
                   Notifications 

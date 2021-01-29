@@ -72,10 +72,9 @@ router.post('/',
                 response = { msg: `un-confirmed-${user.__t}`, token: null }
             } else {
                 const tokenInfo = $utils.general.deepCopy(user)
-                delete tokenInfo.password
-                delete tokenInfo.isDefault 
-                delete tokenInfo.confirmed
-                response = { msg: 'success', token: $utils.auth.createToken('60-days', tokenInfo) }
+                delete tokenInfo.password; delete tokenInfo.isDefault; 
+                delete tokenInfo.confirmed; delete tokenInfo.__v;
+                response = { msg: 'success', token: $utils.auth.createToken(tokenInfo) }
             }
         }
         res.json(response)

@@ -101,6 +101,7 @@ export default {
     max-width: 1200px;
     align-items: center;
     justify-content: center;
+    max-height: 1500px;
 }
 
 .announcement-container {

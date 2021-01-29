@@ -68,7 +68,8 @@ const auth = (authLevel) => {
             } 
             else {
                 request.headers.userid = decoded._id
-                request.headers.institutionid = decoded.institutionID 
+                request.headers.institutionid = decoded.institutionID
+                request.headers.usertype = decoded.__t 
                 next()
             }  
         })

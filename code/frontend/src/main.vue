@@ -28,15 +28,25 @@ export default {
       }
       this.$store.dispatch('dateInfo', info)
     },
-    setJWT() {
-      const token = localStorage.getItem('token')
-      if (token) {
+    async setJWT() {
+      let token = localStorage.getItem('token')
+      axios.defaults.headers.common['authorization'] = token
+      if (!token)
+        return
+      try {
+        const userPackage = await this.$API.user.checkIn()
+        token = userPackage.token
+        localStorage.setItem('token', token)
+        this.$store.dispatch('JWT_TOKEN', token)
         axios.defaults.headers.common['authorization'] = token
+      } catch(err) {
+        console.log(err)
       }
     },
     setLastVisit() {
       const dateOfLastVisit = localStorage.getItem('today')
-      if (dateOfLastVisit) this.updateLastVisit(dateOfLastVisit)
+      if (dateOfLastVisit) 
+        this.updateLastVisit(dateOfLastVisit)
       const dateToday = new Date().toUTCString()
       localStorage.setItem('today', dateToday)
     },
