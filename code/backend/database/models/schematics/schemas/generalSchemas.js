@@ -174,6 +174,11 @@ const user = new mongoose.Schema({
         required: true,
         min: 100_000_0000,
         max: 999_999_9999
+    },
+    lastLogin: {
+        type: Date,
+        required: false,
+        default: new Date()
     }
 },
 { timestamps: true })

@@ -51,6 +51,9 @@ const khateebExt = API_URL + '/khateeb'
 const khateeb = {
     getAnnouncements() {
         return axios.get(khateebExt + '/announcements')
+    },
+    getCurrentSchedule() {
+        return axios.get(khateebExt + '/')
     }
 } 
 

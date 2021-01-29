@@ -5,9 +5,10 @@
         :logoLeft="`logo1`"
         :logoRight="`logo2`"
       />
-      <user-schedule
-        v-if="scheduleExists"
-        :currentSchedule="currentSchedule"
+      <khateeb-schedule
+        v-if="currentSchedule"
+        :reciever="`khateeb`"
+        :data="currentSchedule"
       />
       <msg-with-pic
         v-if="!scheduleExists"
@@ -19,29 +20,34 @@
 </template>
 
 <script>
-import userSchedule from '@/components/schedules/templates/user.vue'
 import logoDisplay from '@/components/misc/logoDisplay.vue'
-import Schedule from '@/components/schedules/scheduleRenderer.vue'
+import khateebSchedule from '@/components/schedules/khateebSchedule.vue'
 
 export default {
   name: 'Home',
   components: {
-    userSchedule,
+    khateebSchedule,
     logoDisplay,
   },
   data() {
     return {
       scheduleExists: true,
-      currentSchedule: null
+      currentSchedule: {
+                isThisADummyValue: true
+            }
     }
   },
   methods: {
     async getSchedule() {
-      const monthlySchedule = await this.$API.users.monthlySchedule()
-      if (!monthlySchedule || monthlySchedule === `This month's schedule hasn't been created yet`) {
-          this.scheduleExists = false
-      } else {
-          this.currentSchedule = monthlySchedule
+      try {
+        const monthlySchedule = await this.$API.khateeb.getCurrentSchedule()
+        if (monthlySchedule === `non-existent`)
+            this.scheduleExists = false
+        else 
+            this.currentSchedule = monthlySchedule
+        console.log(this.currentSchedule)
+      } catch(err) {
+        this.scheduleExists = false
       }
     }
   },

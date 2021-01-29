@@ -15,7 +15,7 @@ export default {
     },
     notifications: {
         show: false,
-        type: 'none',
-        options: {} 
+        type: 'alert',
+        options: { } 
     }
 }

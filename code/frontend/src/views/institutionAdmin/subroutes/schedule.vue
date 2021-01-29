@@ -2,6 +2,7 @@
     <div>
         <khateeb-schedule
             :data="APIData"
+            :reciever="`institutionAdmin`"
             :emitCopy="true"
             :revertToPreviousMonth="revertToPreviousMonth"
             @copy="saveSchedule($event)"

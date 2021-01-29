@@ -21,8 +21,7 @@
             </button>
             <div v-show="activeMenu" class="menu-container">
               <div class="menu-item" @click="redirect('/khateeb/')"><p>Schedule</p></div>
-              <!-- for now until schedule is made for khateebs -->
-              <div class="menu-item" @click="redirect('/khateeb/')"><p>Announcements</p></div>
+              <div class="menu-item" @click="redirect('/khateeb/announcements')"><p>Announcements</p></div>
               <div class="menu-item" @click="redirect('/institutionAdmin/')">
                 <p v-if="userInfo.__t !== 'khateeb'">Admin Central</p>
               </div>
@@ -191,6 +190,8 @@ button {
 .get-the-app {
   max-width: 120px;
   padding-top: 6px;
+  position: relative;
+  right: 5px;
 }
 
 .get-the-app-text {
@@ -212,6 +213,7 @@ button {
       .get-the-app {
         width: 25%;
         font-weight: 500;
+        right: 3%;
       }
       .get-the-app-text {
         font-size: 1.5vh;

@@ -32,7 +32,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "~@/scss/effects/boxShadow.scss";
+@function boxPosition($left) {
+    @if $left {
+      @return -1;
+    } @else {
+      @return 1;
+    }
+  };
+  
+  @function individualBoxShadow($number, $const, $color) {
+    $bShadow: 5px;
+    @return themeRGBA($color, 0.35) ($const * $number * $bShadow) ($number * $bShadow)
+  };
+  
+  @mixin boxShadow($color, $left: true) {
+    $bShadow: 5px;
+    $const: boxPosition($left);
+    $boxList: ();
+    @for $i from 1 through 5 {
+      $x: individualBoxShadow($i, $const, $color);
+      $boxList: append($boxList, $x, comma)
+    }
+  
+    box-shadow: $boxList;
+  };
+
 .logoContainer {
   display: flex;
   align-items: center;
@@ -40,7 +64,7 @@ export default {
   margin-bottom: 15vh;
 }
 
-@media screen and (max-width: 550px) {
+@media screen and (max-width: $phoneWidth) {
     .logoContainer{
       flex-direction: column;
     }
@@ -53,10 +77,10 @@ img {
   width: $imgDimensions;
   border: solid black 0.1vh;
   &.left {
-    @include boxShadow("blue");
+    @include boxShadow("red");
   }
   &.right {
-    @include boxShadow("blue", false)
+    @include boxShadow("red", false)
   }
 }
 

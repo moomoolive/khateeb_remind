@@ -15,11 +15,21 @@ router.get('/', async (req, res) => {
             year: date.getFullYear(), 
             institutionID: req.headers.institutionid 
         }
-        const currentSchedule = await $db.models.jummahs.findOne(params).exec()
+        const currentSchedule = await $db.models.jummahs.find(params).exec()
         if (!currentSchedule)
-            res.json("This month's schedule hasn't been created yet") 
-        else
-            res.json(currentSchedule)
+            res.json("non-existent") 
+        else {
+            const locations = await $db.models.locations.find({ institutionID: req.headers.institutionid }).exec()
+            const timings = await $db.models.timings.find({ institutionID: req.headers.institutionid }).exec()
+            const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()
+            const data = {
+                jummahs: currentSchedule,
+                locations,
+                timings,
+                khateebs
+            }
+            res.json(data)
+        }
     } catch(err) {
         console.log(err)
         res.status($utils.hCodes.serverError)

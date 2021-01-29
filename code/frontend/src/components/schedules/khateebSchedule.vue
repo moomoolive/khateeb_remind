@@ -30,7 +30,7 @@
                     </button>
                 </div>
             </div>
-            <div class="external-controls">
+            <div v-if="!!$scopedSlots.default" class="external-controls">
                 <slot
                     :date="date"
                     :originalDate="originalDate"
@@ -54,7 +54,7 @@
                             <div class="jummahPreferences">
                                 <component
                                     @changed="changePreference(timing, $event)" 
-                                    :is="'institutionAdmin'"
+                                    :is="reciever"
                                     :timing="timing"
                                     :khateebs="khateebs"
                                     :weekOf="selected.week"
@@ -86,11 +86,16 @@ import equal from 'fast-deep-equal'
 export default {
     name: "khateebSchedule",
     components: {
-        "institutionAdmin": () => import('@/components/schedules/adminCells.vue')
+        "institutionAdmin": () => import('@/components/schedules/adminCells.vue'),
+        "khateeb": () => import("./khateebCells.vue")
     },
     props: {
         data: {
             type: Object,
+            required: true
+        },
+        reciever: {
+            type: String,
             required: true
         },
         revertToPreviousMonth: {
@@ -114,6 +119,8 @@ export default {
             locationsIndex: null,
             timingsIndex: null,
             khateebs: null,
+            jummahs: null,
+            originalJummahs: null,
             cachedDate: null,
             date: new Date(),
             originalDate: new Date(),
@@ -169,13 +176,20 @@ export default {
             return struct
         },
         emitSchedule() {
-            this.$emit('copy', this.data.jummahs)
+            const diff = []
+            for (let i = 0; i < this.jummahs.jummahs.length; i++) {
+                if (!equal(this.jummahs.jummahs[i], this.originalJummahs.jummahs[i]))
+                    diff.push(this.jummahs.jummahs[i])
+            }
+            this.$emit('copy', diff)
         },
-        async init() {
-            this.locationsIndex = this.ArrayToObject('_id', this.data.locations)
-            this.timingsIndex = this.ArrayToObject('_id' ,this.data.timings)
-            this.khateebs = this._.deepCopy(this.data.khateebs)
-            this.struct = this.buildStruct(this.data.jummahs)
+        init() {
+            this.jummahs = this._.deepCopy(this.data)
+            this.originalJummahs = this._.deepCopy(this.jummahs)
+            this.locationsIndex = this.ArrayToObject('_id', this.jummahs.locations)
+            this.timingsIndex = this.ArrayToObject('_id' ,this.jummahs.timings)
+            this.khateebs = this._.deepCopy(this.jummahs.khateebs)
+            this.struct = this.buildStruct(this.jummahs.jummahs)
             this.originalStruct = this._.deepCopy(this.struct)
         }
     },
@@ -206,6 +220,9 @@ export default {
         },
         readyToSubmit() {
             return !equal(this.struct, this.originalStruct)
+        },
+        slotPassed() {
+            return this.$scopedSlots.default
         }
     },
     watch: {

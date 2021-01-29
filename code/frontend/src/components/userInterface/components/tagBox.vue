@@ -65,5 +65,59 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/scss/components/tagBoxes.scss';
+$tags: (
+    "important": "red", 
+    "urgent": "yellow", 
+    "goodNews": "green"
+);
+
+@mixin tagBackground($color) {
+    background-color: getColor($color) !important;
+    color: black;
+}
+
+@mixin tagIcon($color) {
+    background-color: darken(getColor($color), 20%);
+}
+
+@mixin tag($section) {
+    @each $tag, $color in $tags {
+        &.#{$tag} {
+            @if $section == 'background' {
+                @include tagBackground($color)
+            } @else {
+                @include tagIcon($color)
+            }
+        }
+    }
+}
+div {
+    margin: 0;
+}
+
+.tag {
+    display: inline;
+    font-size: 1.4vh !important;
+    pointer-events: none;
+    background-color: getColor("grey") !important;
+    padding: 0.8vh;
+    color: getColor("offWhite");
+    margin: 0 1vh 0 0;
+    @include tag('background');
+}
+
+.words {
+    margin-left: 1vh;
+}
+
+.icon {
+    $padding: 0.5vh;
+    pointer-events: auto;
+    padding: $padding;
+    padding-left: 0.8vh;
+    color: getColor("offWhite");
+    background-color: darken(getColor("grey"), 20%);
+    border-radius: 2px;
+    @include tag('icon')
+}
 </style>
