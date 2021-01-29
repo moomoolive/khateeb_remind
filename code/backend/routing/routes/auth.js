@@ -37,7 +37,6 @@ router.post('/create/khateeb',
     async (req, res) => {
     try {
         console.log(req.body)
-        req.body.confirmed = true // temporary
         const khateebEntry = await $db.funcs.save('khateebs', req.body)
         res.json(`Asalam alaikoum ${khateebEntry.firstName} ${khateebEntry.lastName}, your account has been created (username: ${khateebEntry.username}). Please wait a day or two for the institution administrator to confirm your account.`)
     } catch(err) {

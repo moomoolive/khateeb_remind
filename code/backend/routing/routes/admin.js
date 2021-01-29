@@ -87,7 +87,7 @@ const routerGroup2URL = `/${routerGroup2}`
 
 router.get(routerGroup2URL, async (req, res) => {
     try {
-        const data = await $db.models[routerGroup2].find({ institutionID: req.headers.institutionid }).exec()
+        const data = await $db.models[routerGroup2].find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()
         res.json(data)
     } catch(err) {
         res.json(errors.db(routerGroup2, 'retrieve', err))
@@ -128,12 +128,14 @@ router.post(routerGroup2URL + "/create",
     }
 })
 
-router.post(routerGroup2URL + "/confirm", async (req, res) => {
+router.post(routerGroup2URL + "/confirm", 
+    middleware.allowedFields(requestTypeChecks.confirmKhateebs),
+    async (req, res) => {
     try {
-        if (req.body.all) {
-            const updatedKhateebs = await $db.models[routerGroup2].updateMany({ confirmed: false }, { confirmed: true }).exec()
+        if (req.body._id === 'all') {
+            const updatedKhateebs = await $db.models[routerGroup2].updateMany({  institutionID: req.headers.institutionid, confirmed: false }, { confirmed: true }).exec()
         } else {
-            const updated = await $db.models[routerGroup2].updateOne({ _id: req.body._id })
+            const updated = await $db.models[routerGroup2].updateOne(req.body, { confirmed: true }).exec()
         }
         res.json(`Successfully confirmed`)
     } catch(err) {

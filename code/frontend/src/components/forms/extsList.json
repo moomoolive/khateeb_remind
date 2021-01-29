@@ -6,7 +6,8 @@
         "protected",
         "handle",
         "textArea",
-        "checkbox"
+        "checkbox",
+        "readOnly"
     ],
     "bindedExts": [
         {

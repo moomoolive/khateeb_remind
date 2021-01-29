@@ -8,7 +8,7 @@
             :placeholder="`Area Code`"
             :default="areaCode"
             @changed="toVal('areaCode', $event)"
-        /> -
+        /><p>-</p> 
         <input-primitive 
             class="phone-section"
             :inputType="`text`"
@@ -17,7 +17,7 @@
             :placeholder="`123`"
             :default="first3"
             @changed="toVal('first3', $event)"
-        /> -
+        /><p>-</p>
         <input-primitive 
             class="phone-section"
             :inputType="`text`"
@@ -89,9 +89,9 @@ export default {
     created() {
         if (this.options.default) {
             const startVal = this.options.default.toString()
-            this.areaCode = startVal.slice(0, 4)
-            this.first3 = startVal.slice(4, 7)
-            this.last4 = startVal.slice(7, 10)
+            this.areaCode = startVal.slice(0, 3)
+            this.first3 = startVal.slice(3, 6)
+            this.last4 = startVal.slice(6, 10)
         }
         this.init = true
     }
@@ -111,12 +111,17 @@ export default {
     display: inline;
 }
 
-input {
-    width: 7vh;
+p {
+    font-size: 19px;
+    font-weight: bold;
+    margin: 2px;
+    display: inline;
 }
 
-.last {
-    width: 9vh;
+@media screen and (max-width: $phoneWidth) {
+    p {
+        font-size: 2vh;
+    }
 }
 
 </style>

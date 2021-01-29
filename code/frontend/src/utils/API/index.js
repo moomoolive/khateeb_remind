@@ -101,6 +101,18 @@ const institutionAdmin = {
     },
     saveJummahs(jummahsArray) {
         return axios.post(institutionAdminExt + '/jummahs', jummahsArray)
+    },
+    getKhateebs() {
+        return axios.get(institutionAdminExt + '/khateebs')
+    },
+    updateExistingKhateeb(updatedKhateebInfo) {
+        return axios.post(institutionAdminExt + '/khateebs', updatedKhateebInfo)
+    },
+    deleteKhateeb(id) {
+        return axios.delete(institutionAdminExt + '/khateebs', { data: id })
+    },
+    confirmKhateeb(id) {
+        return axios.post(institutionAdminExt + '/khateebs/confirm', id)
     }
 }
 

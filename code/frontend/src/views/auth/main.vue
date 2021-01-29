@@ -15,6 +15,9 @@
                     <p>Remember Me</p>
                 </div>
             </form-main>
+            <div>
+                <a @click="forgotCredentials()">Forgot Username or Password?</a>
+            </div>
         </div>
     </div>
 </template>
@@ -47,6 +50,10 @@ export default {
     methods: {
         async login($event) {
             try {
+                if (this.$store.getters.tokenExists) {
+                    this._.alert(`You're already logged in! Log out if you want to login with another account.`)
+                    return
+                }
                 const authRes = await this.$API.auth.getToken($event)
                 if (!authRes.token && authRes.msg === 'un-confirmed-khateeb') {
                     const notification = { color: 'yellow', icon: "locked", msg: `Your administrator hasn't confirmed your account yet. Try again later!`, textSize: 'small' }
@@ -57,7 +64,7 @@ export default {
                     this.$store.dispatch('createNotification', { type: 'alert', options: notification })
                 }
                 else if (authRes.token && authRes.msg === 'default')
-                    console.log('default')
+                    console.log('default') // not finished yet
                 else if (authRes.token && authRes.msg === 'success')
                     this.toApp(authRes.token)
             } catch(err) {
@@ -74,11 +81,8 @@ export default {
                 this.$router.push(`/${this.$store.getters.decodedJWT.__t}/`)
             })
         },
-        institutionSignup() {
-            this.$router.push('/create/institutions')
-        },
-        khateebSignup() {
-            this.$router.push('/create/khateebs')
+        forgotCredentials() {
+            this._.alert(`This feature isn't available yet!`)
         }
     },
     watch: {
@@ -117,6 +121,14 @@ p {
     color: getColor("offWhite");
 }
 
+a {
+    position: relative;
+    top: 25px;
+    font-size: 16px;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
 @media screen and (max-width: $phoneWidth) {
       .remember-me {
         font-size: 1.8vh;
@@ -125,6 +137,10 @@ p {
           width: 2vh;
           height: 2vh;
       }
+      a {
+        font-size: 2.4vh;
+        top: 5vh;
+    }
 }
 
 </style>

@@ -23,11 +23,15 @@ const adminRoutes = [
                     requireAuthorization: true,
                     authLevel: 2
                 }
-              },/*
+              },
               {
                 path: 'khateebs',
-                component: () => import('@/views/admin/subroutes/khateebs.vue')
-              }, */
+                component: () => import('@/views/institutionAdmin/subroutes/khateebs.vue'),
+                meta: {
+                    requireAuthorization: true,
+                    authLevel: 2
+                }
+              },
               {
                 path: 'settings',
                 component: () => import('@/views/institutionAdmin/subroutes/settings/main.vue'),

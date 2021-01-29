@@ -66,13 +66,9 @@
         }
     },
     "confirmKhateebs": {
-        "all": {
-            "__type__": "bool",
-            "required": false
-        },
         "_id": {
             "__type__": "str",
-            "required": false
+            "required": true
         }
     },
     "locations": {

@@ -75,8 +75,14 @@ export default {
     },
     methods: {
         async signupKhateeb($event) {
-            this.finishedMsg = await this.$API.auth.createKhateeb($event)
-            this.finished = true
+            try {
+                this.finishedMsg = await this.$API.auth.createKhateeb($event)
+                this.finished = true
+                this._.alert(this.finishedMsg)
+                this.$router.push('/')
+            } catch(err) {
+                console.log(err)
+            }
         },
         toLogin() {
             this.$router.push('/')

@@ -78,6 +78,8 @@ export default {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 0;
+  position: relative;
+  z-index: 0;
   width: 98%;
   &:hover {
     background-color: getColor("grey") !important;
@@ -100,7 +102,10 @@ export default {
     $padding: 15px;
     padding-top: $padding;
     padding-bottom: $padding;
-    overflow: hidden;
+    overflow: auto;
+    max-height: 1500px;
+    position: relative;
+    z-index: 0 !important;
     $rad: 4px;
     border-bottom-left-radius: $rad;
     border-bottom-right-radius: $rad;
