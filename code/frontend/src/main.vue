@@ -2,7 +2,11 @@
   <div id="app">
     <Header class="header" />
     <transition name="dropdown">
-      <notifications v-if="showNotification" class="notifications notifications-size-position" />
+      <notifications 
+        v-if="showNotification" 
+        class="notifications notifications-size-position"
+        ref="note" 
+      />
     </transition>
     <router-view class="displayed-page page-padding"/>
   </div>

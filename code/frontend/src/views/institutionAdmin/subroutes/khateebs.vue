@@ -175,7 +175,7 @@ export default {
             const tags = []
             if (!khateeb.active)
             tags.push({ words: 'Inactive', color: 'urgent', symbol: '📪' })
-            const lastLogin = new Date(khateeb.updatedAt)
+            const lastLogin = new Date(khateeb.lastLogin)
             const display = `Last Active: ${lastLogin.toLocaleString()}`
             const tag = { words: display, color: 'goodNews', symbol: '☀️' }
             tags.push(tag)
@@ -219,6 +219,9 @@ export default {
         },
         async deleteKhateeb(id) {
             try {
+                const confirm = await this._.confirm(`Are you sure you want to permenantly delete this khateeb?`)
+                if (!confirm)
+                    return
                 const deleted = await this.$API.institutionAdmin.deleteKhateeb({ _id: id })
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {

@@ -1,13 +1,8 @@
 <template>
     <div>
         <loading>
-            <div v-if="finished && finishedMsg">
-                <h1>
-                    {{ finishedMsg }}
-                </h1>
-            </div>
             <form-main
-                v-if="structure.institutionID.selectOptions && !finished && !finishedMsg"
+                v-if="structure.institutionID.selectOptions"
                 :structure="structure"
                 :bindedExts="['confirms']"
                 :backgroundColor="`red`"
@@ -68,24 +63,21 @@ export default {
                     type: 'phoneNumber',
                     required: true
                 }
-            },
-            finished: false,
-            finishedMsg: null
+            }
         }
     },
     methods: {
         async signupKhateeb($event) {
             try {
-                this.finishedMsg = await this.$API.auth.createKhateeb($event)
-                this.finished = true
-                this._.alert(this.finishedMsg)
+                const confirm = await this._.confirm(`Are you sure you want to submit this application?`)
+                if (!confirm)
+                    return
+                const res = await this.$API.auth.createKhateeb($event)
+                this._.alert(res)
                 this.$router.push('/')
             } catch(err) {
                 console.log(err)
             }
-        },
-        toLogin() {
-            this.$router.push('/')
         }
     },
     async created() {

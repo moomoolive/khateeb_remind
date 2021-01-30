@@ -5,38 +5,30 @@
             :currentStep="currentStep"
             :stepNames="['Register\nInst', 'Register\nAdmin', 'Wait\nfor\nresponse']"
         />
-        <div v-show="finished" class="msgContainer">
-            <h1>
-                Success!<br><br>
-                {{ apiResponse }}
-            </h1>
-        </div>
-        <div v-show="!finished">
-            <formMain
-                v-show="showInstitutions"
-                :structure="formStructure.institution"
-                :bindedExts="['states']"
-                :backgroundColor="`yellow`"
-                :buttonText="`To Next Step`"
-                @submitted="toStepTwo('institution', $event)"
-                :formTitle="`Institution Details`"
-            />
-            <formMain
-                v-show="showInstitutionAdmin"
-                :structure="formStructure.institutionAdmin"
-                :bindedExts="['confirms']"
-                :backgroundColor="`yellow`"
-                :buttonText="`Sign Up`"
-                @submitted="toAPI('institutionAdmin', $event)"
-                :formTitle="`Institution Admin`"
-            />
-            <button
-                :disabled="firstStep"
-                @click="changeStep(-1)"
-            >
-                To Previous Step
-            </button><br>
-        </div>
+        <formMain
+            v-show="showInstitutions"
+            :structure="formStructure.institution"
+            :bindedExts="['states']"
+            :backgroundColor="`yellow`"
+            :buttonText="`To Next Step`"
+            @submitted="toStepTwo('institution', $event)"
+            :formTitle="`Institution Details`"
+        />
+        <formMain
+            v-show="showInstitutionAdmin"
+            :structure="formStructure.institutionAdmin"
+            :bindedExts="['confirms']"
+            :backgroundColor="`yellow`"
+            :buttonText="`Sign Up`"
+            @submitted="toAPI('institutionAdmin', $event)"
+            :formTitle="`Institution Admin`"
+        />
+        <button
+            :disabled="firstStep"
+            @click="changeStep(-1)"
+        >
+            To Previous Step
+        </button><br>
     </div>
 </template>
 
@@ -54,7 +46,6 @@ export default {
         return {
             showInstitutions: true,
             showInstitutionAdmin: false,
-            finished: false,
             formStructure: {
                 institution: {
                     name: {
@@ -105,8 +96,7 @@ export default {
                 institutionAdmin: null
             },
             totalSteps: 3,
-            currentStep: 1,
-            apiResponse: null
+            currentStep: 1
         }
     },
     methods: {
@@ -134,11 +124,14 @@ export default {
         },
         async toAPI(requestSection, $event) {
             try {
+                const confirm = await this._.confirm(`Are you sure you want to submit this application?`)
+                if (!confirm)
+                    return
                 this.changeStep(1)
                 this.deposit(requestSection, $event)
-                this.apiResponse = await this.$API.auth.createInstitution(this.request)
-                this.finished = true
-                console.log(this.apiResponse)
+                const res = await this.$API.auth.createInstitution(this.request)
+                this._.alert(res)
+                this.$router.push('/')
             } catch(err) {
                 console.log(err)
                 alert(`There was a problem registering your institution`)

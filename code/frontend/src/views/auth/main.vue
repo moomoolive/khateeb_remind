@@ -8,6 +8,7 @@
                 :showInvalidationMsgs="false"
                 :backgroundColor="`darkBlue`"
                 :buttonText="`Log In`"
+                :confirmBeforeSubmit="false"
                 @submitted="login($event)"
             >
                 <div class="remember-me">

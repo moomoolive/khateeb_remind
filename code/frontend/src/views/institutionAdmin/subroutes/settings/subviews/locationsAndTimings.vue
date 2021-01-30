@@ -127,9 +127,10 @@ export default {
             found[$event.type] += $event.increment
             this.$set(this.updatedTimings, index, found)
         },
-        save() {
-            console.log(this.updatedLocations)
-            this.$emit('submitted', { locations: this.updatedLocations, times: this.updatedTimings })
+        async save() {
+            const confirm = await this._.confirm(`Are you sure you want make these changes?`)
+            if (confirm)
+                this.$emit('submitted', { locations: this.updatedLocations, times: this.updatedTimings })
         },
         addNewLocation() {
             const n = this.updatedLocations.length + 1
@@ -140,12 +141,14 @@ export default {
             }
             this.$emit('new-location', [...this.updatedLocations, newest])
         },
-        deleteLocation(id) {
-            if (Object.keys(this.struct).length > 1)
+        async deleteLocation(id) {
+            const confirm = await this._.confirm(`Are you sure you want to permenantly delete this location?`)
+            if (Object.keys(this.struct).length > 1 && confirm)
                 this.$emit('delete', { type: 'location', id })
         },
-        deleteTiming(timing, location) {
-            if (location.timings.length > 1)
+        async deleteTiming(timing, location) {
+            const confirm = await this._.confirm(`Are you sure you want make these changes?`)
+            if (location.timings.length > 1 && confirm)
                 this.$emit('delete', { type: 'timing', id: timing._id })
         },
         updatedStructDependencies() {

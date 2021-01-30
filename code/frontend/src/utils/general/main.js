@@ -23,5 +23,18 @@ export default {
             }
         }
         store.dispatch('createNotification', notificationInfo)
+    },
+    confirm(msg) {
+        return new Promise((resolve) => {
+            const info = {
+                type: 'confirm',
+                options: { 
+                    msg,
+                    resolve,
+                    reject: resolve 
+                }
+            }
+            store.dispatch('createNotification', info)
+        })
     }
 }

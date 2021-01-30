@@ -73,7 +73,7 @@ router.post('/password',
 })
 
 router.get('/check-in',
-    middleware.auth(4),
+    middleware.auth(1),
     async(req, res) => {
     try {
         const lastLogin = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })

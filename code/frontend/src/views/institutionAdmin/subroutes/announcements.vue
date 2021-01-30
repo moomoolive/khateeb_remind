@@ -87,6 +87,9 @@ export default {
         },
         async deleteAnnouncement() {
             try {
+                const confirm = await this._.confirm(`Are you sure you want to permenantly delete this announcement?`)
+                if (!confirm)
+                    return
                 const response = await this.$API.institutionAdmin.deleteAnnouncement({ _id: this.currentlyEditingData._id })
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {

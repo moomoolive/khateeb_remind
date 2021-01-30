@@ -130,6 +130,10 @@ export default {
             type: Boolean,
             required: false,
             default: true
+        },
+        confirmBeforeSubmit: {
+            required: false,
+            default: true
         }
     },
     components: {
@@ -192,8 +196,13 @@ export default {
             this.data = this._.deepCopy(inputData)
             this.originalData = this._.deepCopy(inputData)
         },
-        submit() {
-            this.$emit('submitted', this.data)
+        async submit() {
+            if (this.confirmBeforeSubmit) {
+                const confirm = await this._.confirm(`Are you sure you want to submit?`)
+                if (confirm)
+                    this.$emit('submitted', this.data)
+            } else
+                this.$emit('submitted', this.data)
         },
         extensionInterface(extension, $event) {
             if (typeof $event.val !== "undefined")

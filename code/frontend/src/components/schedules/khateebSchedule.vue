@@ -175,7 +175,10 @@ export default {
             })
             return struct
         },
-        emitSchedule() {
+        async emitSchedule() {
+            const confirm = await this._.confirm(`Are you sure you want make these changes?`)
+            if (!confirm)
+                return
             const diff = []
             for (let i = 0; i < this.jummahs.jummahs.length; i++) {
                 if (!equal(this.jummahs.jummahs[i], this.originalJummahs.jummahs[i]))

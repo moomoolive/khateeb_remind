@@ -17,7 +17,8 @@ export default {
     name: "notificationsMain",
     components: {
         'alert': () => import('./types/alert.vue'),
-        'redirect': () => import('./types/redirect.vue')
+        'redirect': () => import('./types/redirect.vue'),
+        'confirm': () => import('./types/confirm.vue')
     },
     methods: {
         close() {
