@@ -1,24 +1,28 @@
 <template>
     <div>
-        <collapsable-box
-            :headline="`Prayer Locations & Timings`"
-        >
-            <locations-and-timings
-                v-if="locations && timings"
-                :locations="locations"
-                :timings="timings"
-                @new-location="newLocation($event)"
-                @delete="deleteInfo($event)"
-                @submitted="saveLocationsAndTimings($event)" 
-            />
-        </collapsable-box>
-        <collapsable-box
-            :headline="`Text Settings`"
-        >
-            <text-settings 
-                @submitted="saveSettings($event)"
-            />
-        </collapsable-box>
+        <div class="two-settings-container">
+            <collapsable-box
+                class="setting-container"
+                :headline="`Prayer Locations & Timings`"
+            >
+                <locations-and-timings
+                    v-if="locations && timings"
+                    :locations="locations"
+                    :timings="timings"
+                    @new-location="newLocation($event)"
+                    @delete="deleteInfo($event)"
+                    @submitted="saveLocationsAndTimings($event)" 
+                />
+            </collapsable-box>
+            <collapsable-box
+                class="setting-container"
+                :headline="`Text Settings`"
+            >
+                <text-settings 
+                    @submitted="saveSettings($event)"
+                />
+            </collapsable-box>
+        </div>
     </div>
 </template>
 
@@ -99,5 +103,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.two-settings-container {
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    max-height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1200px;
+    max-height: 1500px;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+}
 
+.setting-container {
+    width: 45%;
+}
+
+@media screen and (max-width: $phoneWidth) {
+      .two-settings-container {
+            flex-direction: column;
+        }
+    .setting-container {
+        width: 100%;
+    }
+}
 </style>

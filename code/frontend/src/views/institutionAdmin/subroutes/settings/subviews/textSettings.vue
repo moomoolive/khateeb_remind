@@ -2,6 +2,7 @@
     <div>
         <form-main 
             :structure="structure"
+            :backgroundColor="`none`"
             @submitted="$emit('submitted', $event)"
         />
     </div>
