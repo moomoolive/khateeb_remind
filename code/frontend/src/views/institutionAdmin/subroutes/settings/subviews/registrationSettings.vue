@@ -13,7 +13,7 @@
 import formMain from '@/components/forms/main.vue'
 
 export default {
-    name: "textSettings",
+    name: "registrationSettings",
     components: {
         formMain
     },
@@ -26,16 +26,8 @@ export default {
     data() {
         return {
             structure: {
-                textAllowed: {
-                    type: 'checkbox',
-                    required: true
-                },
-                twilioUser: {
-                    required: true
-                },
-                twilioKey: {
-                    type: 'protected',
-                    toggle: true,
+                autoConfirmKhateebs: {
+                    type: "checkbox",
                     required: true
                 }
             }

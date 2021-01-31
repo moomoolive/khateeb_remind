@@ -1,4 +1,5 @@
 const express = require('express')
+const Cryptr = require('cryptr')
 
 const middleware = require($DIR + '/middleware/main.js')
 const requestTypeChecks = require('./adminTC.json')
@@ -350,8 +351,26 @@ router.get("/schedules" + "/:month/:year", async (req, res) => {
     }
 })
 
-router.post('/settings', async(req, res) => {
+const routerGroup10 = 'settings'
+const routerGroup10URL = `/${routerGroup10}`
+
+const cryptr = new Cryptr(process.env.ENCRYPTION_KEY || '1234')
+
+router.get(routerGroup10URL, async (req, res) => {
     try {
+        const settings = await $db.models.settings.findOne({ institutionID: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
+        settings.twilioUser = cryptr.decrypt(settings.twilioUser)
+        settings.twilioKey = cryptr.decrypt(settings.twilioKey)
+        res.json(settings)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't get institution settings!`)
+    }
+})
+
+router.post(routerGroup10URL, async(req, res) => {
+    try {
+        console.log(req.body)
         req.body.institutionID = req.headers.institutionid
         const saved = await $db.funcs.save('settings', req.body)
         res.json(`Successfully saved settings!`)
@@ -361,5 +380,33 @@ router.post('/settings', async(req, res) => {
     }
     //no type checking yet, don't know exactly what's going into this
 })
+
+const routerGroup9 = 'institution'
+const routerGroup9URL = `/${routerGroup9}`
+
+router.get(routerGroup9URL, 
+    async (req, res) => {
+    try {
+        const institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
+        res.json(institution)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't get institution details`)
+    }
+    }
+)
+
+router.post(routerGroup9URL,
+    middleware.allowedFields(requestTypeChecks.institutionDetails),
+    async (req, res) => {
+        try {
+            const updated = await $db.models.institutions.updateOne({ _id: req.body._id }, req.body)
+            res.json(`Successfully updated institution`)
+        } catch(err) {
+            console.log(err)
+            res.json(`Couldn't update institution details`)
+        }
+    }    
+)
 
 module.exports = router

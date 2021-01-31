@@ -303,7 +303,7 @@ setting.pre('updateOne', function(next) {
         const data = this.getUpdate()
         if (!data.twilioUser || !data.twilioKey) {
             this.update({}, data).exec()
-            next()
+            return next()
         }
         const encryptedUser = cryptr.encrypt(data.twilioUser)
         const encryptedKey = cryptr.encrypt(data.twilioKey)

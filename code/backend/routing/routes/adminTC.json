@@ -122,5 +122,31 @@
             "__type__": "str",
             "required": true
         }
+    },
+    "institutionDetails": {
+        "_id": {
+            "__type__": "str",
+            "required": true
+        },
+        "name": {
+            "__type__": "str",
+            "required": true
+        },
+        "abbreviatedName": {
+            "__type__": "str",
+            "required": false
+        },
+        "timezone": {
+            "__type__": "str",
+            "required": true
+        },
+        "country": {
+            "__type__": "str",
+            "required": true
+        },
+        "state": {
+            "__type__": "str",
+            "required": false
+        }
     }
 }

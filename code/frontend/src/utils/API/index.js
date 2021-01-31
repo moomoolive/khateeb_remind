@@ -98,6 +98,9 @@ const institutionAdmin = {
     deleteTiming(id) {
         return axios.delete(institutionAdminExt + '/timings', { data: id })
     },
+    getSettings() {
+        return axios.get(institutionAdminExt + '/settings')
+    },
     updateSettings(settings) {
         return axios.post(institutionAdminExt + '/settings', settings)
     },
@@ -118,6 +121,12 @@ const institutionAdmin = {
     },
     confirmKhateeb(id) {
         return axios.post(institutionAdminExt + '/khateebs/confirm', id)
+    },
+    getInstitution() {
+        return axios.get(institutionAdminExt + '/institution')
+    },
+    updateInstitution(updatedInstitution) {
+        return axios.post(institutionAdminExt + '/institution', updatedInstitution)
     }
 }
 
