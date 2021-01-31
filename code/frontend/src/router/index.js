@@ -43,6 +43,26 @@ const correctAuthLevel = (routeAuthLevel, decodedJWT) => {
 }
 
 router.beforeEach((to, from, next) => {
+  const baseURL = to.fullPath.split('/')[1]
+  let targetWallpaper
+  switch(baseURL) {
+    case 'user':
+      targetWallpaper = 'user'
+      break
+    case 'root':
+    case 'sysAdmin':
+      targetWallpaper = 'sysAdmin'
+      break
+    case 'institutionAdmin':
+      targetWallpaper = 'institutionAdmin'
+      break
+    default:
+      targetWallpaper = 'main'
+      break
+  }
+  if (store.state.wallpaper !== targetWallpaper)
+    store.dispatch('changeWallpaper', targetWallpaper)
+
   if (to.matched.some(record => record.meta.requireAuthorization)) {
     if (!store.getters.tokenExists) {
       next('/')

@@ -10,10 +10,15 @@
                 </p>
             </button>
         </div>
-        <router-view
-            v-if="!savedChanges" 
-            class="pages"
-        ></router-view>
+        <transition
+        name="fade"
+        mode="out-in"
+        >
+            <router-view
+                v-if="!savedChanges" 
+                class="pages"
+            ></router-view>
+        </transition>
         <div v-if="savedChanges">
             <msg-with-pic
                 title="Alhamdillah!"

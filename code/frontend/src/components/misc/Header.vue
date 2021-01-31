@@ -20,7 +20,9 @@
               <p class="get-the-app-text">Get the App</p>
             </button>
             <div v-show="activeMenu" class="menu-container">
-              <div class="menu-item" @click="redirect('/khateeb/')"><p>Schedule</p></div>
+              <div class="menu-item" @click="redirect('/khateeb/')">
+                <p class="top-item">Schedule</p>
+              </div>
               <div class="menu-item" @click="redirect('/khateeb/announcements')"><p>Announcements</p></div>
               <div class="menu-item" @click="redirect('/institutionAdmin/')">
                 <p v-if="userInfo.__t !== 'khateeb'">Admin Central</p>
@@ -217,6 +219,11 @@ button {
       }
       .get-the-app-text {
         font-size: 1.5vh;
+      }
+      .top-item {
+        margin-left: auto;
+        margin-right: auto;
+        width: 35%;
       }
 }
 

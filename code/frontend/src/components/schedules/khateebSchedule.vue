@@ -314,7 +314,7 @@ export default {
 }
 
 .std-controls {
-    width: 100%;
+    width: 98%;
     background: themeRGBA("grey", 0.8);
     margin-left: auto;
     margin-right: auto;

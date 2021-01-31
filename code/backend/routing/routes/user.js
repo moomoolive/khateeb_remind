@@ -77,11 +77,7 @@ router.get('/check-in',
     async(req, res) => {
     try {
         const lastLogin = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
-        const newToken = await $utils.auth.refreshToken(req.headers.userid)
-        const data = {
-            token: newToken
-        }
-        res.json(data)
+        res.json('checked-in')
     } catch(err) {
         console.log(err)
         res.json(`Check-in failed`)

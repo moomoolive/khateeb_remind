@@ -16,5 +16,6 @@ export default {
         state.notifications.show = true
         state.notifications.type = notificationsInfo.type
         state.notifications.options = notificationsInfo.options
-    }
+    },
+    changeWallpaper(state, newWallpaperName) { state.wallpaper = newWallpaperName }
 }

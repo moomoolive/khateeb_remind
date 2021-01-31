@@ -8,7 +8,12 @@
         ref="note" 
       />
     </transition>
-    <router-view class="displayed-page page-padding"/>
+    <transition
+      name="fade"
+      mode="out-in"
+    >
+      <router-view :class="`displayed-page page-padding ${wallpaper}`"/>
+    </transition>
     <Footer />
   </div>
 </template>
@@ -37,15 +42,11 @@ export default {
     },
     async setJWT() {
       let token = localStorage.getItem('token')
-      axios.defaults.headers.common['authorization'] = token
       if (!token)
         return
+      axios.defaults.headers.common['authorization'] = token
       try {
         const userPackage = await this.$API.user.checkIn()
-        token = userPackage.token
-        localStorage.setItem('token', token)
-        this.$store.dispatch('JWT_TOKEN', token)
-        axios.defaults.headers.common['authorization'] = token
       } catch(err) {
         console.log(err)
       }
@@ -66,6 +67,9 @@ export default {
   computed: {
     showNotification() {
       return this.$store.state.notifications.show
+    },
+    wallpaper() {
+      return this.$store.state.wallpaper
     }
   },
   created() {
@@ -109,10 +113,22 @@ h2 {
 .displayed-page {
     position: relative;
     z-index: 0;
+    background-image: url('~@/assets/wallpaper/app.jpg');
     background-color: getColor("offWhite");
     margin: auto;
-    background-image: url('~@/assets/wallpaper/app.jpg');
     min-height: 76vh;
+    &.main {
+      background-image: url('~@/assets/wallpaper/app.jpg');
+    }
+    &.user {
+      background-image: url('~@/assets/wallpaper/user.png');
+    }
+    &.sysAdmin {
+      background-image: url('~@/assets/wallpaper/sysAdmin.jpg');
+    }
+    &.institutionAdmin {
+      background-image: url('~@/assets/wallpaper/institutionAdmin.jpg');
+    }
 }
 
 .page-padding {
@@ -193,5 +209,17 @@ button {
     }
     &:focus { @include blinkingAnimation(); }
     @include allColors();
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.4s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0
 }
 </style>

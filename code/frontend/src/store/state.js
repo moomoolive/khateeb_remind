@@ -17,5 +17,6 @@ export default {
         show: false,
         type: 'none',
         options: {} 
-    }
+    },
+    wallpaper: 'main'
 }

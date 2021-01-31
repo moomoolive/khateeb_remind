@@ -1,46 +1,50 @@
 <template>
     <div>
-        <progress-tracker 
-            :totalSteps="totalSteps"
-            :currentStep="currentStep"
-            :stepNames="['Register\nInst', 'Register\nAdmin', 'Wait\nfor\nresponse']"
-        />
-        <formMain
-            v-show="showInstitutions"
-            :structure="formStructure.institution"
-            :bindedExts="['states']"
-            :backgroundColor="`yellow`"
-            :buttonText="`To Next Step`"
-            @submitted="toStepTwo('institution', $event)"
-            :formTitle="`Institution Details`"
-        />
-        <formMain
-            v-show="showInstitutionAdmin"
-            :structure="formStructure.institutionAdmin"
-            :bindedExts="['confirms']"
-            :backgroundColor="`yellow`"
-            :buttonText="`Sign Up`"
-            @submitted="toAPI('institutionAdmin', $event)"
-            :formTitle="`Institution Admin`"
-        />
-        <button
-            :disabled="firstStep"
-            @click="changeStep(-1)"
-        >
-            To Previous Step
-        </button><br>
+        <loading>
+            <progress-tracker 
+                :totalSteps="totalSteps"
+                :currentStep="currentStep"
+                :stepNames="['Register\nInst', 'Register\nAdmin', 'Wait\nfor\nresponse']"
+            />
+            <formMain
+                v-show="showInstitutions"
+                :structure="formStructure.institution"
+                :bindedExts="['states']"
+                :backgroundColor="`yellow`"
+                :buttonText="`To Next Step`"
+                @submitted="toStepTwo('institution', $event)"
+                :formTitle="`Institution Details`"
+            />
+            <formMain
+                v-show="showInstitutionAdmin"
+                :structure="formStructure.institutionAdmin"
+                :bindedExts="['confirms']"
+                :backgroundColor="`yellow`"
+                :buttonText="`Sign Up`"
+                @submitted="toAPI('institutionAdmin', $event)"
+                :formTitle="`Institution Admin`"
+            />
+            <button
+                :disabled="firstStep"
+                @click="changeStep(-1)"
+            >
+                To Previous Step
+            </button><br>
+        </loading>
     </div>
 </template>
 
 <script>
 import formMain from '@/components/forms/main.vue'
 import progressTracker from '@/components/userInterface/components/progressTracker.vue'
+import loading from '@/components/userInterface/components/loadingScreen.vue'
 
 export default {
     name: "institutionSignUp",
     components: {
         formMain,
-        progressTracker
+        progressTracker,
+        loading
     },
     data() {
         return {

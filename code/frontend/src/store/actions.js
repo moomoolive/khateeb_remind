@@ -23,5 +23,8 @@ export default {
     },
     createNotification({ commit }, notificationsInfo) {
         commit('createNotification', notificationsInfo)
+    },
+    changeWallpaper({ commit }, newWallpaperName) {
+        commit('changeWallpaper', newWallpaperName)
     }
 }
