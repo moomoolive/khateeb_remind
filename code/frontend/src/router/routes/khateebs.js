@@ -2,7 +2,7 @@ import home from '@/views/khateebs/schedule.vue'
 
 export default [
     {
-        path: '/khateeb/',
+        path: '/khateeb',
         name: 'khateeb-home',
         component: home,
         meta: {

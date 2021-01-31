@@ -27,7 +27,7 @@ export default {
   name: 'Home',
   components: {
     khateebSchedule,
-    logoDisplay,
+    logoDisplay
   },
   data() {
     return {

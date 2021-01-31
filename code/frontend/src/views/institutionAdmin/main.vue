@@ -1,15 +1,9 @@
 <template>
     <div>
-        <admin-button-group v-show="showAdminButtons" />
-        <div v-show="!showAdminButtons" class="return-to-central-container">
-            <button class="back-to-central silver" @click="toAdminCentral()">
-                <p>
-                    <!-- this isn't a mistake, i'm litterally using a lesser sign here -->
-                    <span class="back-arrow"> < </span> 
-                    Back
-                </p>
-            </button>
-        </div>
+        <central-nav 
+            :baseLink="`institutionAdmin`"
+            :outboundLinks="outboundLinks"
+        />
         <transition
         name="fade"
         mode="out-in"
@@ -36,16 +30,34 @@
 </template>
 
 <script>
-import AdminButtonGroup from '@/components/misc/adminButtonGroup.vue'
+import centralNav from '@/components/misc/centralNav.vue'
 
 export default {
     name: 'adminParentRoute',
     components: {
-        AdminButtonGroup
+        centralNav
     },
     data() {
         return {
-            currentRoute: this.$router.currentRoute.fullPath
+            currentRoute: this.$router.currentRoute.fullPath,
+            outboundLinks: [
+                {
+                    name: 'Set Schedule',
+                    route: 'schedule'
+                },
+                {
+                    name: 'Announcements',
+                    route: 'announcements'
+                },
+                {
+                    name: 'Khateebs',
+                    route: 'khateebs'
+                },
+                {
+                    name: 'Settings',
+                    route: 'settings'
+                }
+            ]
         }
     },
     methods: {

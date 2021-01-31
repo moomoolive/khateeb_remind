@@ -6,7 +6,15 @@ export default [
         children: [
             {
                 path: 'cli',
-                component: () => import('@/views/root/cli.vue'),
+                component: () => import('@/views/root/subroutes/cli.vue'),
+                meta: {
+                    requireAuthorization: true,
+                    authLevel: 4
+                }
+            },
+            {
+                path: 'roaming',
+                component: () => import('@/views/root/subroutes/roaming.vue'),
                 meta: {
                     requireAuthorization: true,
                     authLevel: 4

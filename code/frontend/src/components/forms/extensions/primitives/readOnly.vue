@@ -51,6 +51,7 @@ p {
     margin-right: auto;
     font-size: 18px;
     text-align: left;
+    color: getColor("offWhite");
 }
 
 @media screen and (max-width: $phoneWidth) {

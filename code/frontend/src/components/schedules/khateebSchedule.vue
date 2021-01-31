@@ -2,21 +2,25 @@
     <div>
         <div v-if="struct" class="schedule-container">
             <div class="std-controls-container">
-                <div v-show="moreThanOneLocation()" class="std-controls">
-                    <button 
-                        @click="changeViewingLocation('all')"
-                         :class="selected.location === 'all' ? 'active-controls' : ''"
-                    >
-                        All
-                    </button>
-                    <button
-                        :class="selected.location === locationHash ? 'active-controls' : ''"  
-                        v-for="(location, locationHash) in locationsIndex" 
-                        :key="locationHash"
-                        @click="changeViewingLocation(locationHash)"
-                    >
-                        {{ location.name }}
-                    </button>
+                <div class="std-controls">
+                    <div>
+                        <button 
+                            @click="changeViewingLocation('all')"
+                            :class="`location-btns ${selected.location === 'all' ? 'active-controls' : ''}`"
+                        >
+                            {{  moreThanOneLocation ? 'All' : 'All Locations' }}
+                        </button>
+                    </div>
+                    <div v-show="moreThanOneLocation">
+                        <button
+                            :class="`location-btns ${selected.location === locationHash ? 'active-controls' : ''}`"  
+                            v-for="locationHash in locationKeys" 
+                            :key="locationHash"
+                            @click="changeViewingLocation(locationHash)"
+                        >
+                            {{ locationsIndex[locationHash].name }}
+                        </button>
+                    </div>
                 </div>
                 <div class="std-controls">
                     <button
@@ -41,25 +45,39 @@
                 <div 
                     v-for="(location, locationID) in shownLocations" 
                     :key="locationID"
-                    class="location-container"
                 >
-                    <p class="location-label">
-                        {{ locationsIndex[locationID].name }}
-                    </p>
-                    <div v-for="(timing, timingNo) in location[selected.week]" :key="timingNo">
-                        <div class="jummahContainer">
-                            <div class="timingLabel">
-                            <span>{{ timingDisplay(timing.timingID) }}</span>
-                            </div>
-                            <div class="jummahPreferences">
-                                <component
-                                    @changed="changePreference(timing, $event)" 
-                                    :is="reciever"
-                                    :timing="timing"
-                                    :khateebs="khateebs"
-                                    :weekOf="selected.week"
-                                    :viewingMonth="viewingMonth"
-                                />
+                    <div class="location-container">
+                        <p class="location-label">
+                            {{ locationsIndex[locationID].name }}
+                        </p>
+                        <div v-if="weekHasData(location[selected.week])">
+                            <div v-for="(timing, timingNo) in location[selected.week]" :key="timingNo">
+                                <div class="jummahContainer">
+                                    <div class="timing-container">
+                                        <div 
+                                            v-if="reciever === 'institutionAdmin'" 
+                                            class="jummah-status-container"
+                                        >
+                                            <tag-circle 
+                                                :info="adminTimingTag(timing)"
+                                            />
+                                        </div>
+                                        <span class="timingLabel">
+                                            {{ timingDisplay(timing.timingID) }}
+                                        </span>
+                                    </div>
+                                    <div class="jummahPreferences">
+                                        <component
+                                            @changed="changePreference(timing, $event)" 
+                                            :is="reciever"
+                                            :timing="timing"
+                                            :khateebs="khateebs"
+                                            :weekOf="selected.week"
+                                            :viewingMonth="viewingMonth"
+                                            :currentWeek="currentWeek"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -81,13 +99,16 @@
 <script>
 import datetime from '@/utils/dateTime/main.js'
 
+import tagCircle from '@/components/userInterface/components/tagCircle.vue'
+
 import equal from 'fast-deep-equal'
 
 export default {
     name: "khateebSchedule",
     components: {
         "institutionAdmin": () => import('@/components/schedules/adminCells.vue'),
-        "khateeb": () => import("./khateebCells.vue")
+        "khateeb": () => import("./khateebCells.vue"),
+        tagCircle
     },
     props: {
         data: {
@@ -122,8 +143,8 @@ export default {
             jummahs: null,
             originalJummahs: null,
             cachedDate: null,
-            date: new Date(),
-            originalDate: new Date(),
+            date: datetime.upcomingFriday(true),
+            originalDate: null,
             selected: {
                 week: null,
                 location: 'all'
@@ -131,11 +152,88 @@ export default {
         }
     },
     methods: {
+        adminTimingTag(timing) {
+            switch(this.viewingMonth) {
+                case 'past':
+                    if (timing.confirmed)
+                        return {
+                            words: 'Complete',
+                            color: 'green',
+                            icon: '✔️'
+                        }
+                    else
+                        return {
+                            words: 'Missed',
+                            color: 'red',
+                            icon: '❌'
+                        }
+                case 'future':
+                    return {
+                        words: 'Future',
+                        color: 'blue',
+                        icon: '📅'
+                    }
+                case 'current':
+                    if (this.currentWeek === 'current') {
+                        if (timing.confirmed) {
+                            return {
+                                words: 'Confirmed',
+                                color: 'green',
+                                icon: '👍'
+                            }
+                        } else {
+                            if (timing.khateebPreference[0].notified)
+                                return {
+                                    words: 'Notified',
+                                    color: 'purple',
+                                    icon: '📱'
+                                }
+                            else
+                                return {
+                                    words: 'Pending',
+                                    color: 'purple',
+                                    icon: '⏱️'
+                                }
+                        }
+                    }
+                    else if (this.currentWeek === 'future')
+                        return {
+                            words: 'Future',
+                            color: 'blue',
+                            icon: '📅'
+                        }
+                    else {
+                        if (timing.confirmed)
+                            return {
+                                words: 'Complete',
+                                color: 'green',
+                                icon: '✔️'
+                            }
+                        else
+                            return {
+                                words: 'Missed',
+                                color: 'red',
+                                icon: '❌'
+                            }
+                    }
+                default:
+                    return {
+                        words: 'Pending',
+                        color: 'purple',
+                        icon: '⏱️'
+                    }
+            }
+        },
+        locationHasData(location) {
+            const empty = Object.keys(location).length < 1
+            return !empty
+        },
+        weekHasData(week) {
+            const empty = week.length < 1
+            return !empty
+        },
         changeViewingLocation(val) {
             this.selected.location = val
-        },
-        moreThanOneLocation() {
-            return Object.keys(this.locationsIndex).length > 1
         },
         changeViewingWeek(val) {
             this.selected.week = val
@@ -186,6 +284,15 @@ export default {
             }
             this.$emit('copy', diff)
         },
+        filterEmptyLocations(struct) {
+            const copy = this._.deepCopy(struct)
+            for (let [location, weeklyData] of Object.entries(copy)) {
+                const empty = Object.keys(weeklyData) < 1
+                if (empty)
+                    delete copy[location]
+            }
+            return copy
+        },
         init() {
             this.jummahs = this._.deepCopy(this.data)
             this.originalJummahs = this._.deepCopy(this.jummahs)
@@ -193,19 +300,36 @@ export default {
             this.timingsIndex = this.ArrayToObject('_id' ,this.jummahs.timings)
             this.khateebs = this._.deepCopy(this.jummahs.khateebs)
             this.struct = this.buildStruct(this.jummahs.jummahs)
+            this.struct = this.filterEmptyLocations(this.struct)
             this.originalStruct = this._.deepCopy(this.struct)
         }
     },
     computed: {
         viewingMonth() {
-            const viewTime = this.date.getTime()
-            const currentTime = this.originalDate.getTime()
+            let viewTime = new Date(this.date)
+            viewTime.setDate(1)
+            viewTime = viewTime.getTime()
+            let currentTime = new Date(this.originalDate)
+            currentTime.setDate(1)
+            currentTime = currentTime.getTime()
             if (viewTime === currentTime)
                 return 'current'
             else if (viewTime > currentTime)
                 return 'future'
             else
                 return 'past'    
+        },
+        currentWeek() {
+            if (this.viewingMonth !== 'current')
+                return 'null'
+            const currentWeek = this.originalDate.getDate()
+            const selected = parseInt(this.selected.week)
+            if (currentWeek === selected)
+                return 'current'
+            else if (currentWeek > selected)
+                return 'past'
+            else
+                return 'future'
         },
         weeklyKeys() {
             const locationKeys = Object.keys(this.struct)
@@ -226,6 +350,18 @@ export default {
         },
         slotPassed() {
             return this.$scopedSlots.default
+        },
+        locationKeys() {
+            const keys = []
+            for (let [location, weeklyData] of Object.entries(this.struct)) {
+                const empty = weeklyData[this.selected.week].length < 1
+                if (!empty)
+                    keys.push(location)
+            }
+            return keys 
+        },
+        moreThanOneLocation() {
+            return this.locationKeys.length > 1
         }
     },
     watch: {
@@ -242,6 +378,7 @@ export default {
         }
     },
     created() {
+        this.originalDate = new Date(this.date)
         this.$emit('schedule-date', this.date)
     }
 }
@@ -294,15 +431,27 @@ export default {
     text-decoration: underline dotted;
 }
 
-.timingLabel {
+.timing-container {
     background: getColor("offWhite");
     height: auto !important;
     border-top-left-radius: 7px;
     border-bottom-left-radius: 7px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.timingLabel {
     font-size: 19px;
+}
+
+.jummah-status-container {
+    height: 40%;
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .jummahPreferences {
@@ -322,6 +471,13 @@ export default {
     padding-top: 10px;
     padding-bottom: 10px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
+    margin-top: 10px;
+}
+
+.location-btns {
+    width: 30%;
+    margin-left: 10px;
+    margin-right: 10px;
     margin-top: 10px;
 }
 
@@ -375,6 +531,9 @@ export default {
         font-size: 3.6vh;
     }
     .timingLabel {
+        font-size: 3vh;
+    }
+    .timing-container {
         padding-top: 2vh;
         padding-bottom: 2vh;
         background: getColor("offWhite");
@@ -382,7 +541,10 @@ export default {
         border-radius: 0;
         border-top-left-radius: 7px;
         border-top-right-radius: 7px;
-        font-size: 3vh;
+    }
+    .jummah-status-container {
+        margin-bottom: 2vh;
+        height: 5vh;
     }
     .jummahPreferences {
         border-radius: 0;
@@ -407,6 +569,12 @@ export default {
     }
     .submit-schedule {
         font-size: 2vh;
+    }
+    .location-btns {
+        width: 85%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 1vh;
     }
 }
 

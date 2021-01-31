@@ -36,5 +36,18 @@ export default {
             }
             store.dispatch('createNotification', info)
         })
+    },
+    authRequirementsSatisfied(requiredAuthLevel) {
+        const authLevels = {
+            "khateeb": 1,
+            "institutionAdmin": 2,
+            "sysAdmin": 3,
+            "root": 4
+        }
+        if (!store.getters.tokenExists)
+            return false
+        const currentUserType = store.getters.decodedJWT.__t
+        const userAuthLevel = authLevels[currentUserType]
+        return userAuthLevel >= requiredAuthLevel
     }
 }

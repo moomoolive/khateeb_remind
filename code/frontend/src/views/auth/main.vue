@@ -79,7 +79,7 @@ export default {
             axios.defaults.headers.common['authorization'] = token
             this.$store.dispatch('JWT_TOKEN', token)
             this.$nextTick(() => {
-                this.$router.push(`/${this.$store.getters.decodedJWT.__t}/`)
+                this.$router.push(`/${this.$store.getters.decodedJWT.__t}`)
             })
         },
         forgotCredentials() {

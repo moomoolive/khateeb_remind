@@ -8,6 +8,8 @@ import auth from './routes/auth.js'
 import user from './routes/user.js'
 import root from './routes/root.js'
 
+import utils from '@/utils/general/main.js'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -28,19 +30,6 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-
-const authLevels = {
-  "khateeb": 1,
-  "institutionAdmin": 2,
-  "sysAdmin": 3,
-  "root": 4
-}
-
-const correctAuthLevel = (routeAuthLevel, decodedJWT) => {
-  const currentUserType = decodedJWT.__t
-  const authLevel = authLevels[currentUserType]
-  return authLevel >= routeAuthLevel
-}
 
 router.beforeEach((to, from, next) => {
   const baseURL = to.fullPath.split('/')[1]
@@ -66,16 +55,16 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requireAuthorization)) {
     if (!store.getters.tokenExists) {
       next('/')
-      this._.alert('Please login to view this page')
+      utils.alert('Please login to view this page')
       return
     }
     else if (!store.getters.isJWTValid) {
       next('/')
-      this._.alert('Your login has expired. Please sign-in again')
+      utils.alert('Your login has expired. Please sign-in again')
       store.dispatch('logout')
       return
     }
-    else if (!correctAuthLevel(to.meta.authLevel, store.getters.decodedJWT)) {
+    else if (!utils.authRequirementsSatisfied(to.meta.authLevel)) {
       store.dispatch('createNotification', { type: 'alert', options: { template: 'unauthorized' } })
       next(`/${store.getters.decodedJWT.__t}/`)
     }

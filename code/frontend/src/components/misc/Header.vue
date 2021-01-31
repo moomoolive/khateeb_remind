@@ -20,23 +20,47 @@
               <p class="get-the-app-text">Get the App</p>
             </button>
             <div v-show="activeMenu" class="menu-container">
-              <div class="menu-item" @click="redirect('/khateeb/')">
-                <p class="top-item">Schedule</p>
+              <div v-show="_.authRequirementsSatisfied(1) && !_.authRequirementsSatisfied(3)" class="user-items">
+                <div class="menu-item" @click="redirect('/khateeb/')">
+                  <p class="top-item">
+                    {{ _.authRequirementsSatisfied(2) ? 'Khateeb Schedule' : 'Schedule' }}
+                  </p>
+                </div>
+                <div class="menu-item" @click="redirect('/khateeb/announcements')">
+                  <p>Announcements</p>
+                </div>
+                <div class="menu-item" @click="redirect('/institutionAdmin/')">
+                  <p v-if="_.authRequirementsSatisfied(2)">
+                    Admin Central
+                  </p>
+                </div>
+                <div class="menu-item" @click="redirect('/user/')">
+                  <p>My Profile</p>
+                </div>
+                <div class="menu-item" @click="redirect('/user/notifications')">
+                  <p>
+                    Notifications 
+                    <span v-if="notificationNum > 0">
+                      {{ notificationNum }}
+                    </span> 
+                  </p>
+                </div>
               </div>
-              <div class="menu-item" @click="redirect('/khateeb/announcements')"><p>Announcements</p></div>
-              <div class="menu-item" @click="redirect('/institutionAdmin/')">
-                <p v-if="userInfo.__t !== 'khateeb'">Admin Central</p>
+              <div v-if="_.authRequirementsSatisfied(3)" class="user-items">
+                <div class="menu-item" @click="redirect('/root/')">
+                  <p class="top-item">
+                    Admin Central
+                  </p>
+                </div>
+                <div class="menu-item" @click="redirect('/root/roaming')">
+                  <p class="top-item">
+                    Roaming Mode
+                  </p>
+                </div>
               </div>
-              <div class="menu-item" @click="redirect('/user/')"><p>My Profile</p></div>
-              <div class="menu-item" @click="redirect('/user/notifications')">
-                <p>
-                  Notifications 
-                  <span v-if="notificationNum > 0">
-                    {{ notificationNum }}
-                  </span> 
-                </p>
+              <div class="menu-item caution" @click="logout()">
+                <p class="caution-text">Logout</p>
               </div>
-              <div class="menu-item caution" @click="logout()"><p class="caution-text">Logout</p></div>
             </div>
           </div>
         </div>
@@ -143,6 +167,10 @@ span {
   }
 }
 
+.user-items {
+  display: inline;
+}
+
 .menu-icon-container {
   position: relative;
   border-radius: 50%;
@@ -224,6 +252,9 @@ button {
         margin-left: auto;
         margin-right: auto;
         width: 35%;
+      }
+      .menu-item {
+      padding-top: 1vh;
       }
 }
 

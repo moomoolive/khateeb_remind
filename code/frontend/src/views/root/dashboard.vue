@@ -1,6 +1,9 @@
 <template>
     <div>
-        <button @click="toCLI()">To Cli</button>
+        <central-nav 
+            :outboundLinks="outboundLinks"
+            :baseLink="`root`"
+        />
         <transition
             name="fade"
             mode="out-in"
@@ -11,8 +14,27 @@
 </template>
 
 <script>
+import centralNav from '@/components/misc/centralNav.vue'
+
 export default {
     name: 'sysAdminDashboard',
+    components: {
+        centralNav
+    },
+    data() {
+        return {
+            outboundLinks: [
+                {
+                    name: 'Command Line',
+                    route: 'cli'
+                },
+                {
+                    name: 'Roaming Mode',
+                    route: 'roaming'
+                }
+            ]
+        }
+    },
     methods: {
         toCLI() {
             this.$router.push('/root/cli')
