@@ -1,4 +1,18 @@
 {
+    "textSettings": {
+        "off": {
+            "adminIdentityData": {
+                "words": "No Administrator on File",
+                "symbol": "⚠️",
+                "color": "urgent"
+            },
+        "on": {
+            "words": "Online",
+            "symbol": "✔️",
+            "color": "goodNews"
+        }
+    }
+    },
     "main" : {
         "locationTiming": {
             "words": "No Locations or Timings on File",

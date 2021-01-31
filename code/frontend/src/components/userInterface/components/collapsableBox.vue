@@ -1,7 +1,7 @@
 <template>
     <div>
         <button
-            :class="`collapsible ${isActive ? `active` : ``}`"
+            :class="`collapsible ${buttonColor} ${isActive ? `active` : ``}`"
             @click="clicked()"
         >
             {{ headline }}
@@ -18,7 +18,7 @@
         </button>
         <transition name="dropdown">
             <div
-                class="content"
+                :class="`content ${bodyColor}`"
                 :style="`width: ${contentWidth}%;`"
                 v-if="isActive"
             >
@@ -44,6 +44,16 @@ export default {
             type: Number,
             required: false,
             default: 98
+        },
+        buttonColor: {
+            type: String,
+            required: false,
+            default: 'grey'
+        },
+        bodyColor: {
+            type: String,
+            required: false,
+            default: 'blue'
         }
     },
     data() {
@@ -65,8 +75,23 @@ export default {
 <style lang="scss" scoped>
 .active { @include blinkingAnimation($speedOfAnimation: 5s, $opacity: 2); }
 
+.grey {
+    background-color: getColor("grey");
+    &:hover {
+        background-color: getColor("grey") !important;
+        color: getColor("offWhite") !important;
+    }
+}
+
+.red {
+    background-color: getColor("darkRed");
+    &:hover {
+        background-color: getColor("darkRed") !important;
+        color: getColor("offWhite") !important;
+    }
+}
+
 .collapsible {
-  background-color: getColor("grey");
   color: white;
   padding: 20px;
   height: auto !important;
@@ -81,10 +106,6 @@ export default {
   position: relative;
   z-index: 0;
   width: 98%;
-  &:hover {
-    background-color: getColor("grey") !important;
-    color: getColor("offWhite") !important;
-  }
 }
 
 .icon {
@@ -98,7 +119,6 @@ export default {
 }
 
 .content {
-    background: themeRGBA("darkBlue", 0.8);
     $padding: 15px;
     padding-top: $padding;
     padding-bottom: $padding;
@@ -110,6 +130,12 @@ export default {
     border-bottom-left-radius: $rad;
     border-bottom-right-radius: $rad;
     margin: auto;
+    &.blue {
+        background: themeRGBA("darkBlue", 0.8);
+    }   
+    &.silver {
+        background: themeRGBA("silver", 0.8);
+    }
 }
 
 @media screen and (max-width: $phoneWidth) {

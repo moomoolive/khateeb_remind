@@ -4,6 +4,11 @@
             <collapsable-box
                 class="setting-container"
                 :headline="`Institution Details`"
+                :tagDetails="institution ? [{
+                    words: `${institution.timezone} Timezone`,
+                    color: 'goodNews',
+                    symbol: '🌎' 
+                }] : null"
             >
                 <institution-details 
                     v-if="institution"
@@ -29,6 +34,11 @@
             <collapsable-box
                 class="setting-container"
                 :headline="`Text Settings`"
+                :tagDetails="settings ? [{
+                    words: settings.textAllowed ? `Online` : `Offline`,
+                    color: settings.textAllowed ? `goodNews` : `urgent`,
+                    symbol: settings.textAllowed ? `✔️` : `⚠️`
+                }] : null"
             >
                 <text-settings
                     v-if="settings"
@@ -39,6 +49,11 @@
             <collapsable-box
                 class="setting-container"
                 :headline="`Registration Settings`"
+                :tagDetails="settings ? [{
+                    words: settings.autoConfirmKhateebs ? `Auto-Confirm` : `Manual-Confirm`,
+                    color: 'default',
+                    symbol: settings.autoConfirmKhateebs ? `🤖` : `📜`
+                }] : null"
             >
                 <registration-settings
                     v-if="settings" 
@@ -48,6 +63,16 @@
                     }"
                     @submitted="saveSettings($event)"
                 />
+            </collapsable-box>
+        </div>
+        <div class="two-settings-container">
+            <collapsable-box
+                class="setting-container"
+                :headline="`Danger Zone`"
+                :buttonColor="`red`"
+                :bodyColor="`silver`"
+            >
+                <button class="yellow">Delete Institution</button>
             </collapsable-box>
         </div>
     </div>
@@ -146,7 +171,7 @@ export default {
             } catch(err) {
                 console.log(err)
             }
-        }
+        },
     },
     computed: {
 

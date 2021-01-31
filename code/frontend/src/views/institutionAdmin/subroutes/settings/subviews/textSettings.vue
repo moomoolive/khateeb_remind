@@ -31,12 +31,14 @@ export default {
                     required: true
                 },
                 twilioUser: {
-                    required: true
+                    required: true,
+                    tag: 'encrypted'
                 },
                 twilioKey: {
                     type: 'protected',
                     toggle: true,
-                    required: true
+                    required: true,
+                    tag: 'encrypted'
                 }
             }
         }

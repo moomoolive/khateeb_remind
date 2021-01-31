@@ -16,7 +16,8 @@ const discriminators = {
     khateebs: models.users.discriminator('khateeb', schema.khateeb),
     root: models.users.discriminator('root', schema.root),
     institutionAdmins: models.users.discriminator('institutionAdmin', schema.institutionAdmin),
-    sysAdmins: models.users.discriminator('sysAdmin', schema.sysAdmin)
+    sysAdmins: models.users.discriminator('sysAdmin', schema.sysAdmin),
+    rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', schema.rootInstitutionAdmin)
 }
 
 module.exports = { ...models, ...discriminators }

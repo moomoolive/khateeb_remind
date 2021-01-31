@@ -9,12 +9,14 @@
       />
     </transition>
     <router-view class="displayed-page page-padding"/>
+    <Footer />
   </div>
 </template>
 
 <script>
 import Header from '@/components/misc/Header.vue'
 import notifications from '@/components/userInterface/components/notifications/main.vue'
+import Footer from '@/components/misc/Footer.vue'
 
 import datetime from '@/utils/dateTime/main.js'
 
@@ -23,7 +25,8 @@ import axios from 'axios'
 export default {
   components: {
     Header,
-    notifications
+    notifications,
+    Footer
   },
   methods: {
     getDateInformation() {

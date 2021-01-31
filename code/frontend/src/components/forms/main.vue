@@ -8,6 +8,15 @@
                 <div class="formLabel" :for="fieldName">
                     {{  fieldData.alias || _.stringFormat(fieldName) }}
                 </div>
+                <tag-box
+                    v-if="fieldData.tag && fieldData.tag === 'encrypted'"
+                    class="tag-box"
+                    :info="{
+                            words: 'Fully-Encrypted',
+                            color: 'goodNews',
+                            symbol: '⚔️'
+                    }"
+                />
                 <div v-if="extensibleType(fieldData.type)">
                     <component 
                         :is="fieldData.type + `Ext`"
@@ -154,7 +163,8 @@ export default {
         "textAreaExt": () => import('./extensions/primitives/textArea.vue'),
         "checkboxExt": () => import('./extensions/free/checkbox.vue'),
         "readOnlyExt": () => import('./extensions/primitives/readOnly.vue'),
-        defaultExtension
+        "tagBox": () => import('@/components/userInterface/components/tagBox.vue'),
+        defaultExtension,
     },
     data() {
         return {
@@ -292,6 +302,22 @@ button {
     width: 90%;
     color: black;
     font-size: 1.8vh;
+}
+
+.tag-box {
+    width: 89%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+@media screen and (max-width: $phoneWidth) {
+    .tag-box {
+        margin-top: 1vh;
+        margin-bottom: 1.5vh;
+    }
 }
 
 .darkBlue {

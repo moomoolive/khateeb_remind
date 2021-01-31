@@ -99,10 +99,11 @@ div {
     display: inline;
     font-size: 1.4vh !important;
     pointer-events: none;
-    background-color: getColor("grey") !important;
+    background-color: getColor("blue") !important;
     padding: 0.8vh;
     color: getColor("offWhite");
     margin: 0 1vh 0 0;
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 8px;
     @include tag('background');
 }
 
@@ -116,7 +117,7 @@ div {
     padding: $padding;
     padding-left: 0.8vh;
     color: getColor("offWhite");
-    background-color: darken(getColor("grey"), 20%);
+    background-color: darken(getColor("blue"), 20%);
     border-radius: 2px;
     @include tag('icon')
 }

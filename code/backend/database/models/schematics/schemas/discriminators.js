@@ -18,6 +18,9 @@ module.exports = {
         },
         availableTimings: [String]
     }),
+    rootInstitutionAdmin: new mongoose.Schema({
+
+    }),
     institutionAdmin: new mongoose.Schema({
 
     }),
