@@ -188,12 +188,13 @@ router.post(routerGroup6URL,
     middleware.allowedFields(requestTypeChecks.locations),
     async (req, res) => {
     try {
-        console.log(req.body)
         for (let i = 0; i < req.body.locations.length; i++) {
             req.body["institutionID"] = req.headers.institutionid
             const saved = await $db.funcs.save(routerGroup6, req.body.locations[i])
-            if (req.body.new && !req.body.locations[i]._id)
-                await locations.firstTiming(req.headers.institutionid, saved._id.toString())
+            if (req.body.new && !req.body.locations[i]._id) {
+                const newTiming = await locations.firstTiming(req.headers.institutionid, saved._id.toString())
+                const associatedJummahs = await $utils.schedule.createAssociatedJummahs(saved._id.toString(), newTiming._id.toString(), req.headers.institutionid)
+            }
         }
         res.json(`successfully saved locations!`)
     } catch(err) {
@@ -215,13 +216,12 @@ router.delete(routerGroup6URL, async (req, res) => {
             timingsObject[updatedTiming._id] = $utils.general.deepCopy(updatedTiming)
             const updated = await $db.models.timings.updateOne({ _id: updatedTiming._id }, { active: false })
         }
-        /*
         const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).exec()
         for (let i = 0; i < khateebs.length; i++) {
             const newKhateeb = $utils.general.deepCopy(khateebs[i])
             newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => !timingsObject[timing])
             const updated = await $db.models.khateebs.updateOne({ _id: newKhateeb._id }, newKhateeb)
-        }*/
+        }
         res.json(`Successfully deleted location: ${req.body._id} and it's associated jummahs and timings`)
     } catch(err) {
         res.json(errors.db(`${routerGroup6.slice(0, -1)} and associated jummahs and timings.`, 'deleting', err))

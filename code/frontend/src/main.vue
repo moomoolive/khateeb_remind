@@ -109,7 +109,7 @@ h2 {
     background-color: getColor("offWhite");
     margin: auto;
     background-image: url('~@/assets/wallpaper/app.jpg');
-    min-height: 70vh;
+    min-height: 76vh;
 }
 
 .page-padding {

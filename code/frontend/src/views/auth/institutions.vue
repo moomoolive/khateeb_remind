@@ -68,7 +68,7 @@ export default {
                 institutionAdmin: {
                     username: {
                         required: true,
-                        minLength: 6
+                        validators: 'username'
                     },
                     password: {
                         type: 'protected',
@@ -76,7 +76,7 @@ export default {
                         minLength: 6
                     },
                     handle: {
-                        type: 'handle',
+                        validators: 'handle',
                         required: true,
                     },
                     firstName: {

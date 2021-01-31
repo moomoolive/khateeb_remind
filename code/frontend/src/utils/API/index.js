@@ -1,6 +1,3 @@
-import misc from './routes/misc.js'
-import users from './routes/users.js'
-import admin from './routes/admin.js'
 import store from '@/store/index.js'
 
 import axios from 'axios'
@@ -9,12 +6,12 @@ const API_URL = process.env.VUE_APP_API_SERVER_URL || 'http://localhost:80'
 
 const nonErrorResponse = res => res.data
 const errorResponse = err => {
+    const errOrigin = err.response.request.responseURL
+    const splitOrigin = errOrigin.split('/')
     if (!err.response) {
         store.dispatch('createNotification', { type: 'alert', options: { template: 'serverError' } })
         return Promise.reject(err)
     }
-    const errOrigin = err.response.request.responseURL
-    const splitOrigin = errOrigin.split('/')
     const fromCheckin = splitOrigin[3] === 'user' && splitOrigin[4] === 'check-in'
     if (fromCheckin) {
         return Promise.reject(err)
@@ -65,10 +62,10 @@ const khateeb = {
     }
 } 
 
-const rootExt = API_URL + '/root'
-const root = {
+const sysAdminExt = API_URL + '/sysAdmin'
+const sysAdmin = {
     executeCommand(commandArray) {
-        return axios.post(rootExt + '/cli', commandArray)
+        return axios.post(sysAdminExt + '/cli', commandArray)
     }
 }
 
@@ -140,13 +137,19 @@ const user = {
     }
 }
 
+const miscExt = API_URL + '/misc'
+const misc = {
+    uniqueUsername(username) {
+        return axios.post(miscExt + '/unique-username', { username })
+    }
+}
+
+
 export default {
-    misc,
-    users,
-    admin,
     auth,
-    root,
+    sysAdmin,
     khateeb,
     institutionAdmin,
-    user
+    user,
+    misc
 }

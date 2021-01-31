@@ -24,16 +24,19 @@
                         @changed="extensionInterface(fieldName, $event)"
                         :name="fieldName"
                         :options="fieldData"
-                        :defaultValidators="{
-                            minLength
-                        }"
+                        :validators="passValidator(fieldData, fieldName)"
                     />
                 </div>
                 <div 
                     v-if="fieldNeedsValidationAndIsInvalid(fieldName) && showInvalidationMsgs"
-                    class="invalidFeedback"
                 >
-                    ❌ {{ invalidFeedback(fieldName) }}
+                    <div
+                        v-for="(feedback, feedbackNo) in invalidFeedback(fieldName)"
+                        :key="feedbackNo"
+                        class="invalidFeedback"
+                    >
+                        ❌ {{ feedback }}
+                    </div>
                 </div>
                 <div v-if="bindedExtSupported(fieldName)">
                     <transition name="dropdown">
@@ -54,9 +57,14 @@
                             <template #invalidMsgs>
                                 <div 
                                     v-if="fieldNeedsValidationAndIsInvalid(bindedExtName(fieldName).slice(0, -1)) && showInvalidationMsgs"
-                                    class="invalidFeedback"
                                 >
-                                    ❌ {{ invalidFeedback(bindedExtName(fieldName).slice(0, -1)) }}
+                                    <div
+                                        v-for="(feedback, feedbackNo) in invalidFeedback(bindedExtName(fieldName).slice(0, -1))"
+                                        :key="feedbackNo"
+                                        class="invalidFeedback"
+                                    >
+                                        ❌ {{ feedback }}
+                                    </div>
                                 </div>
                             </template>
                         </component>
@@ -84,6 +92,7 @@ import equal from 'fast-deep-equal'
 
 import defaultExtension from './extensions/free/defaultExt.vue'
 import extsList from './extsList.json'
+import validators from './validators.js'
 
 export default {
     name: "formMain",
@@ -142,7 +151,6 @@ export default {
         "phoneNumberExt": () => import('./extensions/free/phoneNumberExt.vue'),
         "dropdownExt": () => import('./extensions/primitives/dropdown.vue'),
         "protectedExt": () => import('./extensions/free/protectedExt.vue'),
-        "handleExt": () => import('./extensions/free/handleExt.vue'),
         "textAreaExt": () => import('./extensions/primitives/textArea.vue'),
         "checkboxExt": () => import('./extensions/free/checkbox.vue'),
         "readOnlyExt": () => import('./extensions/primitives/readOnly.vue'),
@@ -161,6 +169,21 @@ export default {
         fieldNeedsValidationAndIsInvalid(fieldName) {
             if (typeof this.validations[fieldName] !== 'undefined') {
                 return !this.validations[fieldName].state
+            }
+        },
+        passValidator(options, fieldName) {
+            let validationList = [
+                {
+                    name: 'minLength',
+                    min: options.minLength ? options.minLength : 1
+                }
+            ]
+            if (options.validators) {
+                validationList = options.validators
+            }
+            return async (data) => {
+                const validationRes = await validators.getValidators(validationList, data, fieldName)
+                return validationRes
             }
         },
         extensibleType(type) {
@@ -186,9 +209,9 @@ export default {
         },
         invalidFeedback(fieldName) {
             if (this.structureCopy[fieldName] && this.structureCopy[fieldName].invalidMsg)
-                return this.structureCopy[fieldName].invalidMsg
+                return [this.structureCopy[fieldName].invalidMsg]
             else if (this.validations[fieldName])
-                return this.validations[fieldName].msgs.reduce((total, msg) => `${total}\n❌ ${msg}`)
+                return this.validations[fieldName].msgs
             else
                 return `Invalid ${this._.stringFormat(fieldName)}`
         },

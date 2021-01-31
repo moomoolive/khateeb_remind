@@ -63,12 +63,12 @@ export default {
                 username: {
                     username: {
                         required: true,
-                        minLength: 6
+                        validators: 'username'
                     },
                 },
                 profile: {
                     handle: {
-                        type: 'handle',
+                        validators: 'handle',
                         required: true,
                     },
                     firstName: {

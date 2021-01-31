@@ -25,7 +25,37 @@ const futureJummahsAssociated = async (associatedWith) => {
     return helpers.createAssociatedJummahKeys(remainingFridaysDayJs, upcomingMonthFridaysDayJs, associatedWith)
 }
 
+const createAssociatedJummahs =  async (locationID, timingID, institutionID) => {
+    const upcomingFriday = helpers.findUpcomingFriday()
+    const remainingFridaysDayJs = helpers.findAllFridays(upcomingFriday, false)
+    const prayerSlot = {
+        notified: false,
+        confirmed: false,
+        responded: false,
+        khateebID: 'TBD'
+    }
+    const maxKhateebPreference = 3
+    for (let i = 0; i < remainingFridaysDayJs.length; i++) {
+        const jummahDateIdentifier = remainingFridaysDayJs[i]
+        const jummah = {
+            institutionID,
+            locationID,
+            timingID,
+            weekOf: jummahDateIdentifier.date(),
+            year: jummahDateIdentifier.year(),
+            month: jummahDateIdentifier.month(),
+            confirmed: false,
+            khateebPreference: [],
+        }
+        for (let x = 0; x < maxKhateebPreference; x++) {
+            jummah.khateebPreference.push(prayerSlot)
+        }
+        const saved = await new $db.models.jummahs(jummah).save()
+    }
+}
+
 module.exports = {
     build,
-    futureJummahsAssociated
+    futureJummahsAssociated,
+    createAssociatedJummahs
 }

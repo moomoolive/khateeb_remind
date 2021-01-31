@@ -9,7 +9,10 @@ $themeColors: (
     "red": #f44336,
     "darkRed": #D24336,
     "offWhite":  #FDFDFD,
-    "silver": #ddd
+    "silver": #ddd,
+    "orange": #CF7827,
+    "turquoise": #9CE6D2,
+    "purple": #D148EB
 );
 
 @function getColor($name) {

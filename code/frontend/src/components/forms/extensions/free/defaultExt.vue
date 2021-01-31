@@ -17,8 +17,8 @@ export default {
         inputPrimitive
     },
     props: {
-        defaultValidators: {
-            type: Object,
+        validators: {
+            type: Function,
             required: true
         },
         options: {
@@ -31,28 +31,20 @@ export default {
         }
     },
     methods: {
-        process($event) {
-            const state = this.valid($event.val)
-            const msgs = this.invalidMsgs(state)
-            const info = {
-                ...$event,
-                state,
-                msgs
+        async process($event) {
+            let info = { ...$event }
+            try {
+                const validationInfo = await this.validators($event.val)
+                info = {
+                    ...$event,
+                    ...validationInfo
+                }
+            } catch(err) {
+                console.log(err)
+                this.$router.push('/')
+                this._.alert(`There was a problem with our servers, try signing up later`)
             }
             this.$emit('changed', info)
-        },
-        valid(data) {
-            if (this.options.minLength)
-                return this.defaultValidators.minLength(data, this.options.minLength)
-            else
-                return this.defaultValidators.minLength(data, 1)
-        },
-        invalidMsgs(state) {
-            if (!state) {
-                const msg = this.options.minLength ? `${this._.stringFormat(this.name)} cannot be less than ${this.options.minLength} characters` : `${this._.stringFormat(this.name)} cannot be empty`
-                return [msg]
-            } else
-                return []
         }
     }
 }

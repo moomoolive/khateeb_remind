@@ -264,20 +264,21 @@ const setting = new mongoose.Schema({
     },
     twilioUser: {
         type: String,
-        required: false,
-        default: 'TBD',
+        required: true,
         minlength: 1
     },
     twilioKey: {
         type: String,
-        required: false,
-        default: 'TBD',
+        required: true,
         minlength: 1
     },
     textAllowed: {
         type: Boolean,
         required: true,
-        default: false
+    },
+    autoConfirmKhateebs: {
+        type: Boolean,
+        required: true
     }
 })
 

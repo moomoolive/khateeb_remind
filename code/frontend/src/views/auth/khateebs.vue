@@ -38,15 +38,15 @@ export default {
                 },
                 username: {
                     required: true,
-                    minLength: 6
+                    validators: 'username'
                 },
                 password: {
                     required: true,
                     minLength: 6
                 },
                 handle: {
-                    type: 'handle',
                     required: true,
+                    validators: 'handle'
                 },
                 title: {
                     type: "dropdown",
