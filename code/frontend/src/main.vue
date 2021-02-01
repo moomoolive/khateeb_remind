@@ -33,6 +33,11 @@ export default {
     notifications,
     Footer
   },
+  data() {
+    return {
+      firstNotification: true
+    }
+  },
   methods: {
     getDateInformation() {
       const info = {
@@ -77,13 +82,17 @@ export default {
   },
   watch: {
     notificationsQueue(newVal) {
-      if (newVal.length < 1)
+      if (newVal.length < 1) {
+        this.firstNotification = true
         return
-      const twoAndAHalfSeconds = 2_500
+      }
+      const milliseconds = this.firstNotification ? 100 : 2_500
+      if (this.firstNotification)
+        this.firstNotification = false
       const upcomingNotification = newVal[0]
       window.setTimeout(() => 
         { this.$store.dispatch('displayNotification', upcomingNotification) }
-        , twoAndAHalfSeconds
+        , milliseconds
       )
     }
   },

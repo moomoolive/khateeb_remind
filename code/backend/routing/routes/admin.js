@@ -177,8 +177,6 @@ const locations = {
 router.get(routerGroup6URL + "/:_id", async (req, res) => {
     try {
         let data = await funcs.query(req, routerGroup6, { active: true }).exec()
-        if (data.length < 1 && req.params._id === 'all')
-            data = await locations.build(req.headers.institutionid)
         res.json(data)
     } catch(err) {
         res.json(errors.getReq(routerGroup6, err))

@@ -69,11 +69,8 @@ export default {
     methods: {
         async signupKhateeb($event) {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to submit this application?`)
-                if (!confirm)
-                    return
                 const res = await this.$API.auth.createKhateeb($event)
-                this._.alert(res)
+                this._.alert(res, 'success')
                 this.$router.push('/')
             } catch(err) {
                 console.log(err)

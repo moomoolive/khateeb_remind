@@ -78,6 +78,19 @@ const sysAdmin = {
     }
 }
 
+const rootInstitutionAdminExt = API_URL + '/rootInstitutionAdmin'
+const rootInstitutionAdmin = {
+    getOtherAdmins() {
+        return axios.get(rootInstitutionAdminExt + '/institutionAdmin')
+    },
+    updateAdmin(updatedAdmin) {
+        return axios.post(rootInstitutionAdminExt + '/institutionAdmin', updatedAdmin)
+    },
+    deleteAdmin(adminId) {
+        return axios.delete(rootInstitutionAdminExt + '/institutionAdmin', { data: adminId })
+    }
+}
+
 const institutionAdminExt = API_URL + '/institutionAdmin'
 const institutionAdmin = {
     getAnnouncements() {
@@ -169,5 +182,6 @@ export default {
     khateeb,
     institutionAdmin,
     user,
-    misc
+    misc,
+    rootInstitutionAdmin
 }

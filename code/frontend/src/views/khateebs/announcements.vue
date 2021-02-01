@@ -17,7 +17,7 @@
                     class="announcement-container"
                     :key="ID"
                     :headline="
-                        `${dateLoader(announcement.updatedAt)} || ${announcement.headline}`
+                        `${_.dynamicDisplayDate(announcement.updatedAt)} || ${announcement.headline}`
                     "
                     :tagDetails="tagLoader(announcement)"
                 >

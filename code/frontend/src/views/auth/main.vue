@@ -56,7 +56,6 @@ export default {
                     return
                 }
                 const authRes = await this.$API.auth.getToken($event)
-                console.log(authRes)
                 if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin')) {
                     const notification = { color: 'yellow', icon: "locked", msg: `Your administrator hasn't confirmed your account yet. Try again later!`, textSize: 'small' }
                     this.$store.dispatch('createNotification', { type: 'alert', options: notification })
@@ -80,7 +79,7 @@ export default {
             axios.defaults.headers.common['authorization'] = token
             this.$store.dispatch('JWT_TOKEN', token)
             this.$nextTick(() => {
-                this.$router.push(`/${this.$store.getters.decodedJWT.__t}`)
+                this._.toHomePage()
             })
         },
         forgotCredentials() {

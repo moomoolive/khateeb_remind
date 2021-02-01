@@ -1,0 +1,32 @@
+{
+    "institutionAdmin": {
+        "_id": {
+            "__type__": "str",
+            "required": false
+        },
+        "username": {
+            "__type__": "str",
+            "required": true
+        },
+        "password": {
+            "__type__": "str",
+            "required": true
+        },
+        "handle": {
+            "__type__": "str",
+            "required": false
+        },
+        "firstName": {
+            "__type__": "str",
+            "required": true
+        },
+        "lastName": {
+            "__type__": "str",
+            "required": true
+        },
+        "phoneNumber": {
+            "__type__": "num",
+            "required": true
+        }
+    }
+}

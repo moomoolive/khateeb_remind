@@ -41,6 +41,7 @@ button {
     width: 30%;
     height: 15%;
     font-size: 17px;
+    margin-bottom: 15%;
 }
 
 p {

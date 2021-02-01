@@ -174,10 +174,8 @@ export default {
                 return [{ words: 'Registration Pending', color: 'important', symbol: '⏳' }]
             const tags = []
             if (!khateeb.active)
-            tags.push({ words: 'Inactive', color: 'urgent', symbol: '📪' })
-            const lastLogin = new Date(khateeb.lastLogin)
-            const display = `Last Active: ${lastLogin.toLocaleString()}`
-            const tag = { words: display, color: 'goodNews', symbol: '☀️' }
+                tags.push({ words: 'Inactive', color: 'urgent', symbol: '📪' })
+            const tag = { words: this._.dynamicDisplayDate(khateeb.lastLogin), color: 'goodNews', symbol: '☀️' }
             tags.push(tag)
             return tags
         },

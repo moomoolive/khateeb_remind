@@ -69,5 +69,20 @@ export default {
             destintation = `/${user}`
         router.push(destintation)
     },
-
+    dynamicDisplayDate(date) {
+        date = new Date(date)
+        const amOrPm = date.getHours() > 11 ? 'PM' : 'AM'
+        const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
+        let base = `${hours}:${date.getMinutes()} ${amOrPm}`
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        if (date > yesterday)
+            return `Today ${base}`
+        const lastWeek = new Date()
+        lastWeek.setDate(lastWeek.getDate() - 6)
+        if (date > lastWeek)
+            return `${date.toLocaleString('default', { weekday: 'short' })} ${base}`
+        const locale = date.toLocaleString().split(',')[0]
+        return `${locale} ${base}`
+    }
 }

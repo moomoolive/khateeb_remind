@@ -54,6 +54,10 @@ p {
     color: getColor("offWhite");
 }
 
+div {
+    cursor: not-allowed;
+}
+
 @media screen and (max-width: $phoneWidth) {
     p {
         font-size: 2.4vh;

@@ -28,20 +28,26 @@ export default {
 
 <style lang="scss" scoped>
 img {
-    $size: 40vh;
-    width: $size;
-    height: $size;
+    height: 40vh;
     max-width: 1000px;
     max-height: 1000px;
 }
 
 h2 {
-    font-size: 4vh;
+    font-size: 35px;
 }
 
 div {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
+    max-width: 1100px;
 }
+
+@media screen and (max-width: $phoneWidth) {
+    h2 {
+        font-size: 4vh;
+    }
+}
+
 </style>

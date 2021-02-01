@@ -54,9 +54,14 @@ export default {
                     route: 'khateebs'
                 },
                 {
+                    name: 'Other Administrators',
+                    route: 'create-others',
+                    authLevel: 3
+                },
+                {
                     name: 'Settings',
                     route: 'settings'
-                }
+                },
             ]
         }
     },

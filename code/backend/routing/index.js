@@ -5,6 +5,7 @@ const  text  = require('./routes/text.js')
 const auth = require('./routes/auth.js')
 const sysAdmin = require('./routes/sysAdmin.js')
 const user = require('./routes/user.js')
+const rootInstitutionAdmin = require('./routes/rootInstitutionAdmin.js')
 
 const routesList = {
     misc,
@@ -13,7 +14,8 @@ const routesList = {
     text,
     auth,
     sysAdmin,
-    user
+    user,
+    rootInstitutionAdmin
 }
 
 module.exports = routesList

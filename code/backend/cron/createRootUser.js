@@ -1,7 +1,7 @@
 const cron = (callback) => {
     const CronJob = require('cron').CronJob
     const time = new Date()
-    time.setSeconds(time.getSeconds() + 5)
+    time.setSeconds(time.getSeconds() + 10)
     const job = new CronJob(time, async () => {
         callback()
         try {

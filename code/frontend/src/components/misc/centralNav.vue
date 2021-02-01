@@ -5,6 +5,7 @@
                 v-for="(link, index) in outboundLinks" :key="index"
             >
                 <button
+                    v-if="!link.authLevel || _.authRequirementsSatisfied(link.authLevel)"
                     class="admin-nav silver"
                     @click="outbound(link.route)"
                 >
@@ -40,27 +41,30 @@ export default {
     data() {
         return {
             buttonLinks: ['schedule', 'announcements', 'khateebs', 'settings'],
-            selected: null,
-            navMode: 'central'
+            currentRoute: this.$router.currentRoute.fullPath
         }
     },
     methods: {
         outbound(extension) {
             this.$router.push(`/${this.baseLink}/${extension}`)
-            this.navMode = 'outbound'
         },
         toCentral() {
             this.$router.push(`/${this.baseLink}`)
-            this.navMode = 'central'
+        },
+    },
+    computed: {
+        navMode() {
+            if (this.currentRoute === `/${this.baseLink}`)
+                return 'central'
+            else
+                return 'outbound'
         }
     },
-    created() {
-        const currentRoute = this.$router.currentRoute.fullPath
-        if (currentRoute === `/${this.baseLink}`)
-            this.navMode = 'central'
-        else
-            this.navMode = 'outbound'
-    }       
+    watch: {
+        $route (to, from) {
+            this.currentRoute = to.path
+        }
+    }      
 }
 </script>
 

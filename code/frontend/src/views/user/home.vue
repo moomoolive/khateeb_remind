@@ -98,7 +98,7 @@ export default {
             try {
                 const res = await this.$API.user.changePassword($event)
                 this._.alert(`Successfully changed password`, 'success')
-                this.pushToHome()
+                this._.toHomePage()
             } catch(err) {
                 console.log(err)
             }
@@ -108,7 +108,7 @@ export default {
                 const res = await this.$API.user.changeUsername($event)
                 this.storeToken(res.token)
                 this._.alert(`Successfully changed username`, 'success')
-                this.pushToHome()
+                this._.toHomePage()
             } catch(err) {
                 console.log(err)
             }
@@ -124,13 +124,10 @@ export default {
                 const res = await this.$API.user.changeProfile(updated)
                 this.storeToken(res.token)
                 this._.alert(`Successfully updated profile`, 'success')
-                this.pushToHome()
+                this._.toHomePage()
             } catch(err) {
                 console.log(err)
             }
-        },
-        pushToHome() {
-            this.$router.push(`/${this.$store.getters.decodedJWT.__t}`)
         },
         storeToken(token) {
             localStorage.setItem('token', token)

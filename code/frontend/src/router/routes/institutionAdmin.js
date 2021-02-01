@@ -17,6 +17,14 @@ const adminRoutes = [
                 }
               },
               {
+                path: 'create-others',
+                component: () => import('@/views/rootInstitutionAdmin/institutionAdminViewer.vue'),
+                meta: {
+                  requireAuthorization: true,
+                  authLevel: 3
+                }
+              },
+              {
                 path: 'announcements',
                 component: () => import('@/views/institutionAdmin/subroutes/announcements.vue'),
                 meta: {
