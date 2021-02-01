@@ -12,13 +12,13 @@ export default {
     isNumeric(value) {
         return /^\d+$/.test(value)
     },
-    alert(msg, color="yellow") {
+    alert(msg, type="caution") {
         const notificationInfo = {
             type: 'alert',
             options: {
                 textSize: "small",
-                icon: "exclamation",
-                color,
+                icon: type === 'caution' ? "exclamation" : 'success',
+                color: type === 'caution' ? "yellow" : 'green',
                 msg
             }
         }

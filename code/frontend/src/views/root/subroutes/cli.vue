@@ -1,17 +1,25 @@
 <template>
     <div>
+        <button class="doc-btn" @click="toggleDocs()">
+            {{ showDocs ? '📖' : '📘' }} {{ showDocs ? 'Close' : 'Read'}} Docs
+        </button>
+        <div v-show="showDocs" class="docs-container">
+            <docs />
+        </div>
         <div class="outputBox">
-            <p 
-                v-for="(info, index) in output" 
-                :key="index"
-                :class="info.status"
-            >
-                {{ `[ ${index} ]` }} 
-                <span :class="prefix(info.from, false)">
-                    {{ prefix(info.from) }}
-                </span>  
-                {{ info.msg }}
-            </p>
+            <div class="output">
+                <p 
+                    v-for="(info, index) in output" 
+                    :key="index"
+                    :class="info.status"
+                >
+                    {{ `[ ${index} ]` }} 
+                    <span :class="prefix(info.from, false)">
+                        {{ prefix(info.from) }}
+                    </span>  
+                    {{ info.msg }}
+                </p>
+            </div>
         </div>
         <div class="inputContainer">
             <button class="silver" @click="execute(input)">Execute</button><br>
@@ -21,8 +29,13 @@
 </template>
 
 <script>
+import docs from './docs.vue' // temp for now
+
 export default {
     name: "cloudCLI",
+    components: {
+        docs
+    },
     data() {
         return {
             input: '',
@@ -41,7 +54,8 @@ export default {
                 ser: '📡',
                 usr: '⌨️',
                 sys: '☁️'
-            }
+            },
+            showDocs: false
         }
     },
     methods:{
@@ -65,6 +79,9 @@ export default {
         addToOutput(msg, status="okay", from="s") {
             this.outputQueue.push({ from, status, msg })
         },
+        toggleDocs() {
+            this.showDocs = !this.showDocs
+        },
         keyBindings($event) {
             const enter = 13
             if ($event.keyCode === enter)
@@ -75,6 +92,9 @@ export default {
             const downKey = 40
             if ($event.keyCode === downKey)
                 this.retrieveCommandHistory(-1)
+            const escapeKey = 27
+            if ($event.keyCode === escapeKey && this.showDocs)
+                this.showDocs = false
         },
         retrieveCommandHistory(incrementSelector) {
             if (incrementSelector === 1)
@@ -122,6 +142,10 @@ export default {
                 case "exit":
                     this.exit()
                     return { msg: `cya later ${this.name} 👋`, status: 'okay' }
+                case "docs":
+                case '-d':
+                    this.showDocs = !this.showDocs
+                    break
                 default:
                     return { msg: 'Command Not Found', status: 'fail' }
             }
@@ -198,15 +222,50 @@ export default {
     scroll-padding: 10%;
 }
 
+.docs-container {
+    background: getColor("lightGrey");
+    padding-top: 10px;
+    height: 50vh;
+    max-height: 450px;
+    width: 80%;
+    max-width: 1090px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: auto;
+    margin-bottom: 0;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.doc-btn {
+    margin-top: 10px;
+    margin-bottom: 0;
+    height: 6vh;
+    max-height: 60px;
+    &:focus {
+        animation: none;
+        background: themeRGBA("green", 0.9) !important;
+    }
+}
+
+.output {
+    padding-top: 6px;
+    height: 6500px;
+    width: 99%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
 .inputContainer {
     margin-top: 6vh;
 }
 
 p {
     margin-left: 1vw;
-    line-height: 10px;
+    line-height: 17px;
     font-weight: bold;
     margin-bottom: 0;
+    font-size: 16px;
     width: 90%;
     &.okay {
         color: getColor("offWhite")
@@ -265,13 +324,18 @@ button {
 
 @media screen and (max-width: $phoneWidth) {
     p {
-        line-height: 4vh;
+        line-height: 3.4vh;
         margin-top: 1vh;
         margin-left: 1vh;
+        font-size: 2.2vh;
     }
     .outputBox {
         background: getColor('grey');
         height: 70vh;
+        width: 90%;
+    }
+    .docs-container {
+        height: 60vh;
         width: 90%;
     }
     input {

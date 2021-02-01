@@ -34,20 +34,9 @@
                     Admin Central
                   </p>
                 </div>
-                <div class="menu-item" @click="redirect('/user/')">
-                  <p>My Profile</p>
-                </div>
-                <div class="menu-item" @click="redirect('/user/notifications')">
-                  <p>
-                    Notifications 
-                    <span v-if="notificationNum > 0">
-                      {{ notificationNum }}
-                    </span> 
-                  </p>
-                </div>
               </div>
               <div v-if="_.authRequirementsSatisfied(3)" class="user-items">
-                <div class="menu-item" @click="redirect('/root/')">
+                <div class="menu-item" @click="redirect('/root')">
                   <p class="top-item">
                     Admin Central
                   </p>
@@ -57,6 +46,17 @@
                     Roaming Mode
                   </p>
                 </div>
+              </div>
+              <div class="menu-item" @click="redirect('/user/')">
+                <p>My Profile</p>
+              </div>
+              <div class="menu-item" @click="redirect('/user/notifications')">
+                <p>
+                  Notifications 
+                  <span v-if="notificationNum > 0">
+                    {{ notificationNum }}
+                  </span> 
+                </p>
               </div>
               <div class="menu-item caution" @click="logout()">
                 <p class="caution-text">Logout</p>
@@ -103,7 +103,7 @@ export default {
         this.$store.dispatch('createNotification', info)
       },
       toHome() {
-        const to = this.$store.getters.decodedJWT ? `/${this.$store.getters.decodedJWT.__t}/` : `/`
+        const to = this.$store.getters.decodedJWT ? `/${this.$store.getters.decodedJWT.__t}` : `/`
         if (this.$router.currentRoute.fullPath !== to)
           this.$router.push(to)
       },
