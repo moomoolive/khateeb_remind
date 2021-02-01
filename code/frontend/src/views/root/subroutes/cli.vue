@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import docs from './docs.vue' // temp for now
+import docs from '@/components/staticHTML/docs.vue' // temp for now
 
 export default {
     name: "cloudCLI",
@@ -152,7 +152,6 @@ export default {
         },
         async cli(command) {
             let cmd = this.preprocessCommand(command)
-            console.log(cmd)
             if (cmd.length === 1) {
                 const res = await this.cloudCommands(cmd[0])
                 return [res]
@@ -167,8 +166,13 @@ export default {
         },
         preprocessCommand(command) {
             let cmd = command.trim()
-            cmd = cmd.toLowerCase()
-            return cmd.split(' ')
+            cmd = cmd.replace(/ +/g, ' ')
+            cmd = cmd.split(' ')
+            const lowerCaseRange = cmd.length > 2 ? 2 : cmd.length
+            for (let i = 0; i < lowerCaseRange; i++) {
+                cmd[i] = cmd[i].toLowerCase()
+            }
+            return cmd
         },
         async execute(input) {
             this.addToOutput(this.input, 'okay', 'u')
@@ -249,7 +253,7 @@ export default {
 
 .output {
     padding-top: 6px;
-    height: 6500px;
+    height: 10000px;
     width: 99%;
     margin-left: auto;
     margin-right: auto;

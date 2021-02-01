@@ -276,7 +276,7 @@ const setting = new mongoose.Schema({
         type: Boolean,
         required: true,
     },
-    autoConfirmKhateebs: {
+    autoConfirmKhateebs: { //change to autoConfirmRegistration
         type: Boolean,
         required: true
     }
@@ -301,14 +301,14 @@ setting.pre('save', function(next) {
 setting.pre('updateOne', function(next) {
     try {
         const data = this.getUpdate()
-        if (!data.twilioUser || !data.twilioKey) {
+        if (!data.twilioUser && !data.twilioKey) {
             this.update({}, data).exec()
             return next()
         }
-        const encryptedUser = cryptr.encrypt(data.twilioUser)
-        const encryptedKey = cryptr.encrypt(data.twilioKey)
-        data.twilioKey = encryptedKey
-        data.twilioUser = encryptedUser
+        if (data.twilioUser)
+            data.twilioUser = cryptr.encrypt(data.twilioUser)
+        if (data.twilioKey)
+            data.twilioKey = cryptr.encrypt(data.twilioKey)
         this.update({}, data).exec()
         next()
     } catch(err) {

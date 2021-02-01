@@ -19,6 +19,9 @@ const supportedTimezones = {
 }
 
 module.exports = {
+    isNumeric(value) {
+        return /^\d+$/.test(value)
+    },
     capitalize(string) {
         return string.charAt(0).toUpperCase() + string.slice(1)
     },

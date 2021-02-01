@@ -1,5 +1,6 @@
 <template>
     <div>
+        <img :src="require('@/assets/logos/twillio.png')">
         <form-main 
             :structure="structure"
             :backgroundColor="`none`"
@@ -46,6 +47,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+img {
+    width: 80%;
+}
 </style>

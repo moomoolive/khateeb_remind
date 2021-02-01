@@ -1,4 +1,6 @@
 const express = require('express')
+const Cryptr = require('cryptr')
+const cryptr = new Cryptr(process.env.ENCRYPTION_KEY || '1234')
 
 const middleware = require($DIR + "/middleware/main.js")
 const requestTypeChecks = require('./sysAdminTC.json')
@@ -159,8 +161,172 @@ const inst = {
     }
 }
 
+const expandSyntax = (items, skipIncrement) => {
+    const copy = $utils.general.deepCopy(items)
+    const increment = 1 + skipIncrement
+    for (let i = skipIncrement; i < copy.length; i += increment) {
+        const item = copy[i]
+        if (item[0] === "`") {
+            let str = item
+            if (str.slice(-1) !== '`') {
+                let sameString = true
+                while(sameString) {
+                    const currentIndex = i + 1
+                    str += ` ${copy[currentIndex]}`
+                    if (copy[currentIndex].slice(-1) === "`")
+                        sameString = false
+                    copy.splice(currentIndex , 1)
+                }
+            }
+            copy[i] = str.replace(/`/g, "")
+        }
+        else if (item === 'f' || item === 'false')
+            copy[i] = false
+        else if (item === 't' || item === 'true')
+            copy[i] = true
+        else {
+            const num = parseInt(item)
+            if (!$utils.general.isNumeric(item) || num === NaN)
+                throw SyntaxError(`${item} is not a valid type. Supported types str, true, false, int`)
+            else
+                copy[i] = num
+        }
+    }
+    return copy
+}
+
+const sett = {
+    async view(options) {
+        const msgs = []
+        if (options.length < 1)
+            options.push('-r')
+        for (let i = 0; i < options.length; i++) {
+            switch(options[i]) {
+                case 'root':
+                case '-r':
+                    const settings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
+                    if (!settings)
+                        msgs.push({ 
+                            msg: `Root account settings doesn't exist yet. Use 'sett init' to initialize`, 
+                            status: 'extraInfo',
+                            from: 'a' 
+                        })
+                    else {
+                        settings.twilioUser = cryptr.decrypt(settings.twilioUser)
+                        settings.twilioKey = cryptr.decrypt(settings.twilioKey)
+                        msgs.push({ 
+                            msg: settings, 
+                            status: 'extraInfo',
+                            from: 'a' 
+                        }) 
+                    } 
+                    break
+                case 'options':
+                case '-o':
+                    msgs.push({ 
+                            msg: `Type 'sett set <target value>'. Possible options: twilioUser <str>, twilioKey <str>, textAllowed <bool>.`, 
+                            status: 'extraInfo',
+                            from: 'a' 
+                    })
+                    break
+                default:
+                    msgs.push({ 
+                            msg: `"${options[i]}" option doesn't exist. Available options: -r, -o. Check documentation for more details.`, 
+                            status: 'extraInfo',
+                            from: 'a' 
+                    })
+            }
+        }
+        return msgs
+    },
+    async init(options) {
+        const msgs = []
+        if (options.length < 1)
+            options.push('-e')
+        const newSettings = {
+            twilioKey: 'TBD',
+            twilioUser: 'TBD',
+            textAllowed: false,
+            institutionID: '__ROOT__',
+            autoConfirmKhateebs: false
+        }
+        for (let i = 0; i < options.length; i++) {
+            switch(options[i]) {
+                case 'elegant':
+                case '-e':
+                    const settings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
+                    if (settings)
+                        msgs.push({ 
+                            msg: `Already exists. Use -f option to overwrite`, 
+                            status: 'extraInfo',
+                            from: 'a' 
+                        })
+                    else {
+                        const saved = await new $db.models.settings(newSettings).save()
+                        msgs.push({ 
+                            msg: `Successfully initialized settings`, 
+                            status: 'extraInfo',
+                            from: 'a' 
+                        })
+                    } 
+                    break
+                case 'force':
+                case '-f':
+                    const oldSettings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
+                    const toBeAdded = $utils.general.deepCopy(newSettings)
+                    if (oldSettings) {
+                        toBeAdded._id = oldSettings._id.toString()
+                    }
+                    let forced = await $db.funcs.save('settings', toBeAdded)
+                    msgs.push({ 
+                            msg: `Successfully ${oldSettings ? 'overwrote' : 'initialized'} settings with default values`, 
+                            status: 'extraInfo',
+                            from: 'a' 
+                    })
+                    break
+                default:
+                    msgs.push({ 
+                            msg: `"${options[i]}" option doesn't exist. Available options: -r, -o. Check documentation for more details.`, 
+                            status: 'extraInfo',
+                            from: 'a' 
+                    })
+            }
+        }
+        return msgs
+    },
+    async set(options) {
+        const msgs = []
+        if (options.length < 1) {
+            msgs.push({ 
+                msg: `Options must be provided. Format: <property name> <value> <property name> <value>`, 
+                status: 'extraInfo',
+                from: 'a' 
+            })
+            return msgs
+        }
+        options = expandSyntax(options, 1)
+        const settings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
+        const saveObj = {}
+        for (let i = 0; i < options.length; i += 2) {
+            const targetData = options[i]
+            const val = options[i + 1]
+            if (typeof settings[targetData] === 'undefined')
+                throw ReferenceError(`${targetData} is not a valid setting`)
+            saveObj[targetData] = val
+            msgs.push({ 
+                msg: `Successfully set ${targetData} to ${val}`, 
+                status: 'success',
+                from: 'a' 
+            })
+        }
+        const saved = await $db.models.settings.updateOne({ institutionID: '__ROOT__' }, saveObj)
+        return msgs
+    }
+}
+
 const targetDatas = {
-    inst
+    inst,
+    sett
 }
 
 const cli = {
@@ -203,7 +369,6 @@ router.post('/cli',
                 else {
                     const options =  req.body.command.slice(2)
                     const cmdRes = await found(options)
-                    console.log(cmdRes)
                     res.json(cmdRes)
                 }
             }
