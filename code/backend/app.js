@@ -15,6 +15,8 @@ const middleware = require($DIR + '/middleware/main.js')
 const routes = require($DIR + '/routing/index.js')
 const dbSettings =  require($DIR + '/database/settings.js')
 
+const createRootUserScript = require('./cron/createRootUser.js')
+
 const PORT = 80
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
 const dbType = DATABASE.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
@@ -50,3 +52,6 @@ app.use('/user', routes.user)
 db.once('open', () => { console.log(`${dbType} Mongo is listening`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
 app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })
+
+if (process.env.NODE_ENV === 'production')
+    createRootUserScript(() => { console.log(`Root User Creation Script Initiatied`) })
