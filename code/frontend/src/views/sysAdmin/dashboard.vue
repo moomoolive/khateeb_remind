@@ -2,7 +2,7 @@
     <div>
         <central-nav 
             :outboundLinks="outboundLinks"
-            :baseLink="`root`"
+            :baseLink="`sysAdmin`"
         />
         <transition
             name="fade"

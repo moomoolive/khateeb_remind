@@ -6,7 +6,7 @@ import institutionAdmin from './routes/institutionAdmin.js'
 import khateebs from './routes/khateebs.js'
 import auth from './routes/auth.js'
 import user from './routes/user.js'
-import root from './routes/root.js'
+import sysAdmin from './routes/sysAdmin.js'
 
 import utils from '@/utils/general/main.js'
 
@@ -20,7 +20,7 @@ const routes = [
   },
   ...khateebs,
   ...auth,
-  ...root,
+  ...sysAdmin,
   ...institutionAdmin,
   ...user
 ]
@@ -65,8 +65,21 @@ router.beforeEach((to, from, next) => {
       return
     }
     else if (!utils.authRequirementsSatisfied(to.meta.authLevel)) {
-      store.dispatch('createNotification', { type: 'alert', options: { template: 'unauthorized' } })
-      next(`/${store.getters.decodedJWT.__t}/`)
+      const options = {
+        color: "red",
+        icon: "locked",
+        msg: "Unauthorized"
+      }
+      store.dispatch('createNotification', { type: 'alert', options})
+      let destination
+      const user = store.getters.decodedJWT.__t
+      if (user === 'root')
+        destination = '/sysAdmin'
+      else if (user === 'rootInstitutionAdmin')
+        destination = '/institutionAdmin'
+      else
+        destination = `/${user}`
+      next(`/${destination}`)
     }
     next() 
   } else {

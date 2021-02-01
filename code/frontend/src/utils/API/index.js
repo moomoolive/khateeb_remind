@@ -4,12 +4,19 @@ import axios from 'axios'
 
 const API_URL = process.env.VUE_APP_API_SERVER_URL || 'http://localhost:80'
 
+const serverErrorTag = {
+    "color": "yellow",
+    "icon": "unknown",
+    "msg": "Our servers aren't responding right now. Try again later!",
+    "textSize": "small"
+}
+
 const nonErrorResponse = res => res.data
 const errorResponse = err => {
     const errOrigin = err.response.request.responseURL
     const splitOrigin = errOrigin.split('/')
     if (!err.response) {
-        store.dispatch('createNotification', { type: 'alert', options: { template: 'serverError' } })
+        store.dispatch('createNotification', { type: 'alert', options: serverErrorTag })
         return Promise.reject(err)
     }
     const fromCheckin = splitOrigin[3] === 'user' && splitOrigin[4] === 'check-in'
@@ -21,12 +28,17 @@ const errorResponse = err => {
         if (fromLogin)
             return Promise.reject(err.response)
         else {
-            store.dispatch('createNotification', { type: 'alert', options: { template: 'unauthorized' } })
+            const options = {
+                color: "red",
+                icon: "locked",
+                msg: "Unauthorized"
+            }
+            store.dispatch('createNotification', { type: 'alert', options })
             return Promise.reject(err)
         }
     }
     else {
-        store.dispatch('createNotification', { type: 'alert', options: { template: 'serverError' } })
+        store.dispatch('createNotification', { type: 'alert', options: serverErrorTag })
         return Promise.reject(err)
     }
 }
@@ -40,9 +52,6 @@ const auth = {
     },
     createInstitution(institutionAndAdminInfo) {
         return axios.post(authExt + '/create/institution', institutionAndAdminInfo)
-    },
-    createRoot(rootInfo) {
-        return axios.post(authExt + '/create/root', rootInfo)
     },
     getAvailableInstitutions() {
         return axios.get(authExt + '/institution-selection')

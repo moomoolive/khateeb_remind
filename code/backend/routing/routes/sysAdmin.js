@@ -7,7 +7,7 @@ const requestTypeChecks = require('./sysAdminTC.json')
 
 const router = express.Router()
 
-router.use(middleware.auth(3))
+router.use(middleware.auth(4))
 
 const inst = {
     async view(options) {
@@ -121,7 +121,7 @@ const inst = {
                     }
                 case "user":
                 case "-u":
-                    const updatedAdmin = await $db.models.institutionAdmins.updateOne({ institutionID: id }, { confirmed: true })
+                    const updatedAdmin = await $db.models.rootInstitutionAdmins.updateOne({ institutionID: id }, { confirmed: true })
                     msgs.push(
                         { 
                             msg: `Confirmed institution ${id}'s admin status`,

@@ -75,7 +75,6 @@ export default {
                         validators: 'username'
                     },
                     password: {
-                        type: 'protected',
                         required: true,
                         minLength: 6
                     },
@@ -114,12 +113,6 @@ export default {
             }
             this.currentStep = this.currentStep + val
         },
-        toLogin() {
-            if (!this.finished && window.confirm('Are you sure you want to go back to login? All progress current progress will be lost')) {
-                this.$router.push('/')
-            } else
-                this.$router.push('/')
-        },
         toStepTwo(requestSection, $event) {
             this.showInstitutions = false
             this.changeStep(1)
@@ -134,11 +127,10 @@ export default {
                 this.changeStep(1)
                 this.deposit(requestSection, $event)
                 const res = await this.$API.auth.createInstitution(this.request)
-                this._.alert(res)
+                this._.alert(res, 'success')
                 this.$router.push('/')
             } catch(err) {
                 console.log(err)
-                alert(`There was a problem registering your institution`)
             }
         }
     },

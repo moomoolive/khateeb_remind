@@ -56,11 +56,12 @@ export default {
                     return
                 }
                 const authRes = await this.$API.auth.getToken($event)
-                if (!authRes.token && authRes.msg === 'un-confirmed-khateeb') {
+                console.log(authRes)
+                if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin')) {
                     const notification = { color: 'yellow', icon: "locked", msg: `Your administrator hasn't confirmed your account yet. Try again later!`, textSize: 'small' }
                     this.$store.dispatch('createNotification', { type: 'alert', options: notification })
                 }
-                else if (!authRes.token && authRes.msg === 'un-confirmed-institutionAdmin') {
+                else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin') {
                     const notification = { color: 'yellow', icon: "locked", msg: `Khateeb Remind hasn't confirmed your institution yet. Try again later!`, textSize: 'small' }
                     this.$store.dispatch('createNotification', { type: 'alert', options: notification })
                 }

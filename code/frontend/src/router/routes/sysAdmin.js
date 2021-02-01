@@ -1,12 +1,12 @@
 export default [
     {
-        path: '/root',
+        path: '/sysAdmin',
         name: "rootMain",
-        component: () => import('@/views/root/dashboard.vue'),
+        component: () => import('@/views/sysAdmin/dashboard.vue'),
         children: [
             {
                 path: 'cli',
-                component: () => import('@/views/root/subroutes/cli.vue'),
+                component: () => import('@/views/sysAdmin/subroutes/cli.vue'),
                 meta: {
                     requireAuthorization: true,
                     authLevel: 4
@@ -14,7 +14,7 @@ export default [
             },
             {
                 path: 'roaming',
-                component: () => import('@/views/root/subroutes/roaming.vue'),
+                component: () => import('@/views/sysAdmin/subroutes/roaming.vue'),
                 meta: {
                     requireAuthorization: true,
                     authLevel: 4

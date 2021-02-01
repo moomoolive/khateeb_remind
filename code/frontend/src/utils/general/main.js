@@ -1,5 +1,6 @@
 import helpers from './helpers.js'
 import store from '@/store/index.js'
+import router from '@/router/index.js'
 
 export default {
     deepCopy(item) {
@@ -30,6 +31,7 @@ export default {
                 type: 'confirm',
                 options: { 
                     msg,
+                    color: 'yellow',
                     resolve,
                     reject: resolve 
                 }
@@ -41,13 +43,31 @@ export default {
         const authLevels = {
             "khateeb": 1,
             "institutionAdmin": 2,
-            "sysAdmin": 3,
-            "root": 4
+            "rootInstitutionAdmin": 3,
+            "sysAdmin": 4,
+            "root": 5
         }
         if (!store.getters.tokenExists)
             return false
         const currentUserType = store.getters.decodedJWT.__t
         const userAuthLevel = authLevels[currentUserType]
         return userAuthLevel >= requiredAuthLevel
-    }
+    },
+    toHomePage() {
+        const token = store.getters.decodedJWT
+        if (!token) {
+            router.push('/')
+            return
+        }
+        let destintation
+        const user = token.__t
+        if (user === 'root')
+            destintation = '/sysAdmin'
+        else if (user === 'rootInstitutionAdmin')
+            destintation = '/institutionAdmin'
+        else
+            destintation = `/${user}`
+        router.push(destintation)
+    },
+
 }

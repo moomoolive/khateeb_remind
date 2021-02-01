@@ -9,11 +9,10 @@ router.post('/create/institution',
     middleware.allowedFields(requestTypeChecks.createInstitution), 
     async (req, res) => {
     try {
-        console.log(req.body)
         const institutionEntry = await $db.funcs.save('institutions', req.body.institution)
         req.body.institutionAdmin.institutionID = institutionEntry._id.toString()
-        const institutionAdminEntry = await $db.funcs.save('institutionAdmins', req.body.institutionAdmin)
-        res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${institutionAdminEntry.firstName} ${institutionAdminEntry.lastName} as it's administrator (username: ${institutionAdminEntry.username}). Please wait a day or two for 'khateeb.com' to confirm your institution before logging in.`)
+        const rootInstitutionAdminEntry = await $db.funcs.save('rootInstitutionAdmins', req.body.institutionAdmin)
+        res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
     } catch(err) {
         console.log(err)
         res.status($utils.hCodes.serverError)
@@ -82,32 +81,6 @@ router.post('/',
         console.log(err)
         res.status($utils.hCodes.serverError)
         res.json(`Couldn't sign in user - this probably a problem with the server. Please try again later`)
-    }
-})
-
-router.post('/create/root',
-    middleware.allowedFields(requestTypeChecks.createRoot), 
-    async (req, res) => {
-    try {
-        console.log(req.body)
-        const rootExists = await $db.models.root.findOne({}).exec()
-        if (!!rootExists)
-            res.json('already exists')
-        else {
-            const apiKey = process.env.EMERGENCY_KEY || '1234'
-            if (req.body.apiKey !== apiKey) {
-                res.status($utils.hCodes.unauthorized)
-                res.json('unauthorized')
-            } else {
-                req.body.user.confirmed = true
-                req.body.user.institutionID = "__ROOT__"
-                const rootEntry = await $db.funcs.save('root', req.body.user)
-                res.json(`Successfully created root user with username: ${rootEntry.username}`)
-            }
-        }
-    } catch(err) {
-        console.log(err)
-        res.json('There was an issue creating root user, check console output for errors')
     }
 })
 

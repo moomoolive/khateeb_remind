@@ -3,7 +3,7 @@
         <div class="topAnchor">
             <span @click="close()">Close</span>
         </div>
-        <div class="content">
+        <div :class="`content ${notificationInfo.options.color || 'yellow'}`">
             <component
                 :is="notificationInfo.type"
                 :options="notificationInfo.options"
@@ -42,7 +42,20 @@ export default {
 }
 
 .content {
-    height: 86%;
+    overflow: auto;
+    max-height: 10000px;
+}
+
+.green {
+        background: themeRGBA("green", 0.75);
+}
+
+.red {
+        background: themeRGBA("red", 0.75);
+}
+
+.yellow {
+        background: themeRGBA("yellow", 0.55);
 }
 
 span {

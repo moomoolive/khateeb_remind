@@ -26,5 +26,11 @@ export default {
     },
     changeWallpaper({ commit }, newWallpaperName) {
         commit('changeWallpaper', newWallpaperName)
+    },
+    removeNotificationFromQueue({ commit }) {
+        commit('removeNotificationFromQueue')
+    },
+    displayNotification({ commit }, notificationsInfo) {
+        commit('displayNotification', notificationsInfo)
     }
 }

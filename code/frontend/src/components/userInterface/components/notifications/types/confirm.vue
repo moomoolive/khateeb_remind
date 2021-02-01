@@ -1,5 +1,5 @@
 <template>
-    <div class="background">
+    <div>
         <img :src="require(`@/assets/notifications/exclamation.png`)">
         <p>
             {{ options.msg }}
@@ -32,10 +32,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.background {
-    background: themeRGBA("yellow", 0.75);
-}
-
 img {
     height: 40%;
     padding-top: 7%;

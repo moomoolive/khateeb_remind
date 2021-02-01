@@ -70,6 +70,21 @@ export default {
     },
     wallpaper() {
       return this.$store.state.wallpaper
+    },
+    notificationsQueue() {
+      return this.$store.state.notificationsQueue
+    }
+  },
+  watch: {
+    notificationsQueue(newVal) {
+      if (newVal.length < 1)
+        return
+      const twoAndAHalfSeconds = 2_500
+      const upcomingNotification = newVal[0]
+      window.setTimeout(() => 
+        { this.$store.dispatch('displayNotification', upcomingNotification) }
+        , twoAndAHalfSeconds
+      )
     }
   },
   created() {

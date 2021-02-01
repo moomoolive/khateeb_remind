@@ -3,7 +3,7 @@
         <img 
             class="logo" 
             :src="require('@/assets/logos/khateebRemindLogo.svg')"
-            @click="toHome()"
+            @click="_.toHomePage()"
         >
         <div>
           <div v-if="!loggedIn">
@@ -20,7 +20,7 @@
               <p class="get-the-app-text">Get the App</p>
             </button>
             <div v-show="activeMenu" class="menu-container">
-              <div v-show="_.authRequirementsSatisfied(1) && !_.authRequirementsSatisfied(3)" class="user-items">
+              <div v-show="_.authRequirementsSatisfied(1) && !_.authRequirementsSatisfied(4)" class="user-items">
                 <div class="menu-item" @click="redirect('/khateeb/')">
                   <p class="top-item">
                     {{ _.authRequirementsSatisfied(2) ? 'Khateeb Schedule' : 'Schedule' }}
@@ -29,14 +29,14 @@
                 <div class="menu-item" @click="redirect('/khateeb/announcements')">
                   <p>Announcements</p>
                 </div>
-                <div class="menu-item" @click="redirect('/institutionAdmin/')">
+                <div class="menu-item" @click="redirect('/institutionAdmin')">
                   <p v-if="_.authRequirementsSatisfied(2)">
                     Admin Central
                   </p>
                 </div>
               </div>
-              <div v-if="_.authRequirementsSatisfied(3)" class="user-items">
-                <div class="menu-item" @click="redirect('/root')">
+              <div v-if="_.authRequirementsSatisfied(4)" class="user-items">
+                <div class="menu-item" @click="redirect('/sysAdmin')">
                   <p class="top-item">
                     Admin Central
                   </p>
@@ -88,7 +88,8 @@ export default {
         const info = {
           type: 'redirect',
           options: {
-              redirections: [
+            color: 'green',
+            redirections: [
                   {
                       text: 'Khateebs',
                       to: '/create/khateebs'

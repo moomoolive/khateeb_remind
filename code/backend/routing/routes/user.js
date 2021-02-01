@@ -4,6 +4,8 @@ const middleware = require($DIR + '/middleware/main.js')
 
 const router = express.Router()
 
+router.use(middleware.auth(1))
+
 const typeChecks = {
     "userPassword": {
         "password": {
@@ -32,9 +34,7 @@ const funcs = {
     }
 }
 
-router.post('/profile',
-    middleware.auth(1),
-    async (req, res) => {
+router.post('/profile', async (req, res) => {
     try {
         const updated = await $db.models[funcs.modelNames(req.headers.usertype)].updateOne({ _id: req.headers.userid }, req.body)
         const response = await funcs.getNewToken(req.headers.userid, 'user profile')
@@ -46,7 +46,7 @@ router.post('/profile',
 })
 
 router.post('/username', 
-    [middleware.auth(1), middleware.allowedFields(typeChecks.userUsername)],
+    middleware.allowedFields(typeChecks.userUsername),
     async (req, res) => {
     try {
         const userEntry = await $db.models[funcs.modelNames(req.headers.usertype)].updateOne({ _id: req.headers.userid }, req.body)
@@ -59,7 +59,7 @@ router.post('/username',
 })
 
 router.post('/password',
-    [middleware.auth(1), middleware.allowedFields(typeChecks.userPassword)],
+    middleware.allowedFields(typeChecks.userPassword),
     async (req, res) => {
     console.log(req.body)
     try {
@@ -72,9 +72,7 @@ router.post('/password',
     }
 })
 
-router.get('/check-in',
-    middleware.auth(1),
-    async(req, res) => {
+router.get('/check-in', async(req, res) => {
     try {
         const lastLogin = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
         res.json('checked-in')
@@ -82,7 +80,6 @@ router.get('/check-in',
         console.log(err)
         res.json(`Check-in failed`)
     }
-    }
-)
+})
 
 module.exports = router

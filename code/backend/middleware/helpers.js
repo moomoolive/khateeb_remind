@@ -47,8 +47,10 @@ const authLevelToUser = (authLevel) => {
         case 2:
             allowedUserType.push('institutionAdmin')
         case 3:
-            allowedUserType.push('sysAdmin')
+            allowedUserType.push('rootInstitutionAdmin')
         case 4:
+            allowedUserType.push('sysAdmin')
+        case 5:
             allowedUserType.push('root')
     }
     return allowedUserType

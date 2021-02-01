@@ -5,20 +5,18 @@
             <img :src="require(`@/assets/notifications/${display.icon}.png`)">
             <div :class="`msg ${display.textSize ? display.textSize : 'large'}`">
                 {{ display.msg }}<br>
-                <button
-                    class="grey" 
-                    @click="close()"
-                >
-                    OK
-                </button>
             </div>
+            <button
+                class="grey" 
+                @click="close()"
+            >
+                OK
+            </button>
         </div>
     </div>
 </template>
 
 <script>
-import alertExtras from './alertExtras.json'
-
 export default {
     name: 'alertNotification',
     props: {
@@ -29,18 +27,10 @@ export default {
     },
     data() {
         return {
-            templates: { ...alertExtras.templates },
             display: null
         }
     },
     methods: {
-        fillTemplate(templateName) {
-            const display = {}
-            for (let [key, value] of Object.entries(this.templates[templateName])) {
-                display[key] = value
-            }
-            return display
-        },
         handleEnter($event) {
             const enter = 13
             if ($event.keyCode === enter)
@@ -51,10 +41,7 @@ export default {
         }
     },
     created() {
-        if (this.options.template)
-            this.display = this.fillTemplate(this.options.template)
-        else
-            this.display = this._.deepCopy(this.options)
+        this.display = this._.deepCopy(this.options)
         document.addEventListener('keyup', this.handleEnter)
     },
     destroyed() {
@@ -68,9 +55,6 @@ div {
     margin: 0;
     padding: 0;
 }
-.green {
-        background: themeRGBA("green", 0.75);
-}
 
 .red {
         background: themeRGBA("red", 0.75);
@@ -82,9 +66,10 @@ div {
 
 .msg {
     margin-top: 5%;
-    width: 80%;
     margin-left: auto;
     margin-right: auto;
+    width: 90%;
+    height: auto;
     color: black;
     &.small {
         font-size: 2vh;
@@ -107,6 +92,7 @@ button {
     margin-top: 7%;
     width: 30%;
     height: 15%;
+    margin-bottom: 20%;
 }
 
 </style>

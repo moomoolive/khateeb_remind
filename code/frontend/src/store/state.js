@@ -18,5 +18,6 @@ export default {
         type: 'none',
         options: {} 
     },
+    notificationsQueue: [],
     wallpaper: 'main'
 }
