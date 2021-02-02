@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const bcyrpt = require('bcrypt')
-const Cryptr = require('cryptr')
 
 const subDocs = require('./subDocs')
 
@@ -282,14 +281,11 @@ const setting = new mongoose.Schema({
     }
 })
 
-const cryptr = new Cryptr(process.env.ENCRYPTION_KEY || '1234')
 setting.pre('save', function(next) {
     try {
         const setting = this
-        const encryptedUser = cryptr.encrypt(setting.twilioUser)
-        const encryptedKey = cryptr.encrypt(setting.twilioKey)
-        setting.twilioKey = encryptedKey
-        setting.twilioUser = encryptedUser
+        setting.twilioKey = $utils.general.encrypt(setting.twilioKey)
+        setting.twilioUser = $utils.general.encrypt(setting.twilioUser)
         next()
     } catch(err) {
         console.log('There was a problem encrypting settings')
@@ -306,9 +302,9 @@ setting.pre('updateOne', function(next) {
             return next()
         }
         if (data.twilioUser)
-            data.twilioUser = cryptr.encrypt(data.twilioUser)
+            data.twilioUser = $utils.general.encrypt(data.twilioUser)
         if (data.twilioKey)
-            data.twilioKey = cryptr.encrypt(data.twilioKey)
+            data.twilioKey = $utils.general.encrypt(data.twilioKey)
         this.update({}, data).exec()
         next()
     } catch(err) {

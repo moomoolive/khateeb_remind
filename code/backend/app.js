@@ -51,7 +51,7 @@ app.use('/rootInstitutionAdmin', routes.rootInstitutionAdmin)
 
 db.once('open', () => { console.log(`${dbType} Mongo is listening`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
-app.listen(PORT, () => { console.log(`App listening on port ${PORT}`) })
+app.listen(PORT, () => { console.log(`App is listening on port ${PORT}`) })
 
 if (process.env.NODE_ENV === 'production')
-    createRootUserScript(() => { console.log(`Root User Creation Script Initiatied`) })
+    createRootUserScript(() => { console.log(`Root User Creation Script Initiated`) })

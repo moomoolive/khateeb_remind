@@ -1,6 +1,4 @@
 const express = require('express')
-const Cryptr = require('cryptr')
-const cryptr = new Cryptr(process.env.ENCRYPTION_KEY || '1234')
 
 const middleware = require($DIR + "/middleware/main.js")
 const requestTypeChecks = require('./sysAdminTC.json')
@@ -195,6 +193,9 @@ const expandSyntax = (items, skipIncrement) => {
     return copy
 }
 
+const crypto = require('crypto')
+const key = crypto.createDecipher('aes-128-cbc', process.env.ENCRYPTION_KEY || '1234')
+
 const sett = {
     async view(options) {
         const msgs = []
@@ -212,8 +213,8 @@ const sett = {
                             from: 'a' 
                         })
                     else {
-                        settings.twilioUser = cryptr.decrypt(settings.twilioUser)
-                        settings.twilioKey = cryptr.decrypt(settings.twilioKey)
+                        settings.twilioUser = $utils.general.decrypt(settings.twilioUser)
+                        settings.twilioKey = $utils.general.decrypt(settings.twilioKey)
                         msgs.push({ 
                             msg: settings, 
                             status: 'extraInfo',

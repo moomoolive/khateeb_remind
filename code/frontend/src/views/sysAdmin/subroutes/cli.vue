@@ -109,7 +109,7 @@ export default {
         },
         exit() {
             window.setTimeout(() => {
-                this.$router.push('/root/')
+                this.$router.push('/sysAdmin')
             }, 2_300)
         },
         async cloudCommands(command) {

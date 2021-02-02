@@ -1,5 +1,4 @@
 const express = require('express')
-const Cryptr = require('cryptr')
 
 const middleware = require($DIR + '/middleware/main.js')
 const requestTypeChecks = require('./adminTC.json')
@@ -352,13 +351,13 @@ router.get("/schedules" + "/:month/:year", async (req, res) => {
 const routerGroup10 = 'settings'
 const routerGroup10URL = `/${routerGroup10}`
 
-const cryptr = new Cryptr(process.env.ENCRYPTION_KEY || '1234')
-
 router.get(routerGroup10URL, async (req, res) => {
     try {
         const settings = await $db.models.settings.findOne({ institutionID: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
-        settings.twilioUser = cryptr.decrypt(settings.twilioUser)
-        settings.twilioKey = cryptr.decrypt(settings.twilioKey)
+        console.log(settings)
+        settings.twilioUser = $utils.general.decrypt(settings.twilioUser)
+        settings.twilioKey = $utils.general.decrypt(settings.twilioKey)
+        console.log(settings)
         res.json(settings)
     } catch(err) {
         console.log(err)

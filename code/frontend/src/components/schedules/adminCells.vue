@@ -134,6 +134,7 @@ select {
     height: 4vh;
     max-height: 40px;
     font-size: 15px;
+    color: getColor("offWhite");
     background-color: themeRGBA("grey", 1);
     &:focus {
         background-color: themeRGBA("grey", 0.5);
