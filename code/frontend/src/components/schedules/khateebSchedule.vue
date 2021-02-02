@@ -76,6 +76,10 @@
                                             :viewingMonth="viewingMonth"
                                             :currentWeek="currentWeek"
                                         />
+                                        <div class="last-updated">
+                                            <span class="timing">Last Updated:</span><br>
+                                            {{ _.dynamicDisplayDate(timing.updatedAt) }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -244,9 +248,12 @@ export default {
             this.$emit('schedule-date', this.date)
         },
         changePreference(timing, $event) {
+            console.log($event)
             const targetPreference = this._.deepCopy(timing.khateebPreference[$event.number])
             targetPreference.khateebID = $event.val
+            console.log(timing.khateebPreference[$event.number])
             this.$set(timing.khateebPreference, $event.number, targetPreference)
+            console.log(timing.khateebPreference[$event.number])
         },
         timingDisplay(timingID) {
             const time = this.timingsIndex[timingID]
@@ -279,13 +286,14 @@ export default {
                 return
             const diff = []
             for (let i = 0; i < this.jummahs.jummahs.length; i++) {
+                console.log(this.jummahs.jummahs[i], this.originalJummahs.jummahs[i])
                 if (!equal(this.jummahs.jummahs[i], this.originalJummahs.jummahs[i]))
                     diff.push(this.jummahs.jummahs[i])
             }
             this.$emit('copy', diff)
         },
         filterEmptyLocations(struct) {
-            const copy = this._.deepCopy(struct)
+            const copy = struct
             for (let [location, weeklyData] of Object.entries(copy)) {
                 const empty = Object.keys(weeklyData) < 1
                 if (empty)
@@ -512,7 +520,32 @@ export default {
     color: black;
 }
 
+.last-updated {
+    font-size: 16px;
+    margin-top: 10px;
+    font-weight: bold;
+    background: themeRGBA("red", 0.9);
+    margin-left: auto;
+    margin-right: auto;
+    width: 87%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
+}
+
+span {
+    &.timing {
+        font-size: 14px;
+        text-decoration: underline;
+        color: getColor("offWhite");
+    }
+}
+
 @media screen and (max-width: $phoneWidth) {
+    .last-updated {
+        font-size: 2.2vh;
+    }
     .schedule-container {
             background: themeRGBA("darkBlue", 0.5);
             width: 90%;

@@ -1,5 +1,6 @@
 <template>
     <div>
+        <p v-if="handle"><span>@{{ handle }}</span></p>
         <p>{{ display }}</p>
         <tag-box v-if="updated" :info="`new`" />
     </div>
@@ -47,9 +48,17 @@ export default {
             const update = new Date(this.timing.updatedAt)
             return user.getTime() < update.getTime()
         },
+        khateebData() {
+            return this.findDisplay(this.timing.khateebPreference)
+        },
         display() {
-            const val = this.findDisplay(this.timing.khateebPreference)
-            return this.organizeDisplay(val)
+            return this.organizeDisplay(this.khateebData)
+        },
+        handle() {
+            if (this.khateebData === 'TBD')
+                return null
+            else
+                return this.khateebData.handle
         }
     }
 }
@@ -61,6 +70,11 @@ p {
     font-size: 19px;
     padding-top: 10px;
     padding-bottom: 10px;
+    width: 95%;
+}
+
+span {
+    color: getColor('blue');
 }
 
 @media screen and (max-width: $phoneWidth) {
