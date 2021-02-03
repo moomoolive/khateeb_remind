@@ -75,15 +75,17 @@ export default {
         const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
         let base = `${hours}:${date.getMinutes()} ${amOrPm}`
         const yesterday = new Date()
-        yesterday.setDate(yesterday.getDate() - 1)
+        yesterday.setHours(0, 0, 0, 0)
         if (date.getTime() > yesterday.getTime())
-            return `Today ${base}`
+            return base
         const twoDaysAgo = new Date()
-        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+        twoDaysAgo.setDate(twoDaysAgo.getDate() - 1)
+        twoDaysAgo.setHours(0, 0, 0, 0)
         if (date.getTime() > twoDaysAgo.getTime())
             return `Yesterday ${base}`
         const lastWeek = new Date()
-        lastWeek.setDate(lastWeek.getDate() - 6)
+        lastWeek.setDate(lastWeek.getDate() - 5)
+        lastWeek.setDate(0, 0, 0, 0)
         if (date.getTime() > lastWeek.getTime())
             return `${date.toLocaleString('default', { weekday: 'short' })} ${base}`
         const locale = date.toLocaleString().split(',')[0]

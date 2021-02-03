@@ -1,13 +1,15 @@
 <template>
   <div id="app">
     <Header class="header" />
-    <transition name="dropdown">
-      <notifications 
-        v-if="showNotification" 
-        class="notifications notifications-size-position"
-        ref="note" 
-      />
-    </transition>
+    <div class="notifications-layer" v-if="showNotification">
+      <transition name="dropdown">
+        <notifications 
+          v-if="showNotificationDisplay" 
+          class="notifications notifications-size-position"
+          ref="note" 
+        />
+      </transition>
+    </div>
     <transition
       name="fade"
       mode="out-in"
@@ -35,7 +37,8 @@ export default {
   },
   data() {
     return {
-      firstNotification: true
+      firstNotification: true,
+      showNotificationDisplay: false
     }
   },
   methods: {
@@ -45,6 +48,24 @@ export default {
       }
       this.$store.dispatch('dateInfo', info)
     },
+    notificationCreator(notification) {
+      if (notification.__t === 'generalNotification') {
+        if (notification.tag === "welcome") {
+          const options = {
+            type: 'alert',
+            options: {
+              color: 'green',
+              textSize: 'small',
+              icon: 'asalam',
+              graphicType: 'gif',
+              msg: notification.msg,
+              _id: notification._id
+            }
+          }
+          this.$store.dispatch('createNotification', options)
+        }
+      } 
+    },
     async setJWT() {
       let token = localStorage.getItem('token')
       if (!token)
@@ -52,6 +73,9 @@ export default {
       axios.defaults.headers.common['authorization'] = token
       try {
         const userPackage = await this.$API.user.checkIn()
+        const toBeShown = userPackage.filter(note => !note.seen)
+        toBeShown.forEach(note => { this.notificationCreator(note) })
+        this.$store.dispatch('storeNotificationsFromAPI', userPackage)
       } catch(err) {
         console.log(err)
       }
@@ -81,6 +105,13 @@ export default {
     }
   },
   watch: {
+    showNotification(newVal) {
+      const time = 50
+      if (newVal)
+        window.setTimeout(() => { this.showNotificationDisplay = true }, time)
+      else
+        window.setTimeout(() => { this.showNotificationDisplay = false }, time)
+    },
     notificationsQueue(newVal) {
       if (newVal.length < 1) {
         this.firstNotification = true
@@ -167,29 +198,29 @@ h2 {
 }
 
 .notifications {
-    position: fixed;
+    position: relative;
     z-index: 9;
     overflow: hidden;
     border-radius: 4px;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    right: 0;
-    top: 20%;
+    bottom: 5%;
+}
+
+.notifications-layer {
+  z-index: 9;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .notifications-size-position {
-  height: 300px;
-  width: 300px;
-  font-size: 17px;
+  width: 80%;
+  height: auto;
+  max-height: 400px;
+  max-width: 400px;
 }
 
 @media screen and (max-width: $phoneWidth) {
-      .notifications-size-position {
-        width: 70%;
-        height: 35vh;
-        font-size: 2vh;
-      }
       .page-padding {
         padding-bottom: 5%;
         padding-top: 13% !important;

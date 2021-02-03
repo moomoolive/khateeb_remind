@@ -80,7 +80,7 @@ const inst = {
                             institutionID: id,
                             twilioUser: 'TBD',
                             twilioKey: 'TBD',
-                            autoConfirmKhateebs: false,
+                            autoConfirmRegistration: false,
                             textAllowed: false
                         }
                         const saved = await new $db.models.settings(settings).save()
@@ -119,7 +119,9 @@ const inst = {
                     }
                 case "user":
                 case "-u":
-                    const updatedAdmin = await $db.models.rootInstitutionAdmins.updateOne({ institutionID: id }, { confirmed: true })
+                    const rootAdmin = await $db.models.rootInstitutionAdmins.findOne({ institutionID: id }).exec()
+                    const updatedRootAdmin = await $db.models.rootInstitutionAdmins.updateOne({ _id: rootAdmin._id.toString() }, { confirmed: true })
+                    const note = await $utils.notifications.welcome(rootAdmin)
                     msgs.push(
                         { 
                             msg: `Confirmed institution ${id}'s admin status`,
@@ -249,7 +251,7 @@ const sett = {
             twilioUser: 'TBD',
             textAllowed: false,
             institutionID: '__ROOT__',
-            autoConfirmKhateebs: false
+            autoConfirmRegistration: false
         }
         for (let i = 0; i < options.length; i++) {
             switch(options[i]) {

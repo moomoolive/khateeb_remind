@@ -50,15 +50,15 @@
                 class="setting-container"
                 :headline="`Registration Settings`"
                 :tagDetails="settings ? [{
-                    words: settings.autoConfirmKhateebs ? `Auto-Confirm` : `Manual-Confirm`,
+                    words: settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
                     color: 'default',
-                    symbol: settings.autoConfirmKhateebs ? `🤖` : `📜`
+                    symbol: settings.autoConfirmRegistration ? `🤖` : `📜`
                 }] : null"
             >
                 <registration-settings
                     v-if="settings" 
                     :settings="{
-                        autoConfirmKhateebs: settings.autoConfirmKhateebs,
+                        autoConfirmRegistration: settings.autoConfirmRegistration,
                         _id: settings._id
                     }"
                     @submitted="saveSettings($event)"
@@ -72,7 +72,7 @@
                 :buttonColor="`red`"
                 :bodyColor="`silver`"
             >
-                <button class="yellow">Delete Institution</button>
+                <button class="yellow delete-institution" @click="deleteInstitution()">Delete Institution</button>
             </collapsable-box>
         </div>
     </div>
@@ -172,9 +172,19 @@ export default {
                 console.log(err)
             }
         },
-    },
-    computed: {
-
+        async deleteInstitution() {
+            const confirm = await this._.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
+            if (confirm) {
+                try {
+                    const deleted = await this.$API.rootInstitutionAdmin.deleteInstitution({ _id: "rootAdmin" })
+                    this._.alert(`You've successfully deleted your institution`, 'success')
+                    this.$router.push('/')
+                    this.$store.dispatch('logout')
+                } catch(err) {
+                    console.log(err)
+                }
+            }
+        }
     },
     created() {
         this.getLocationsAndTimings()
@@ -203,12 +213,23 @@ export default {
     width: 45%;
 }
 
+.delete-institution {
+    width: 80%;
+    height: 6vh;
+    max-height: 60px;
+    font-size: 20px;
+    color: red;
+}
+
 @media screen and (max-width: $phoneWidth) {
       .two-settings-container {
             flex-direction: column;
         }
     .setting-container {
         width: 100%;
+    }
+    .delete-institution {
+        font-size: 3vh;
     }
 }
 </style>

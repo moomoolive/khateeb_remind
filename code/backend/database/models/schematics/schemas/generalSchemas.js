@@ -144,10 +144,6 @@ const user = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    isDefault: {
-        type: Boolean,
-        default: false
-    },
     handle: {
         type: String,
         required: false,
@@ -275,7 +271,7 @@ const setting = new mongoose.Schema({
         type: Boolean,
         required: true,
     },
-    autoConfirmKhateebs: { //change to autoConfirmRegistration
+    autoConfirmRegistration: {
         type: Boolean,
         required: true
     }
@@ -313,6 +309,27 @@ setting.pre('updateOne', function(next) {
     }
 })
 
+const notification = new mongoose.Schema({
+    userID: {
+        type: String,
+        required: true,
+        minlength: 1
+    },
+    msg: {
+        type: String,
+        required: true,
+        minlength: 1
+    },
+    seen: {
+        type: Boolean,
+        default: false
+    },
+    seenAt: {
+        type: Date,
+        required: false
+    }
+}, { timestamps: true })
+
 module.exports = {
     jummah,
     announcement,
@@ -320,5 +337,6 @@ module.exports = {
     location,
     institution,
     user,
-    setting
+    setting,
+    notification
 }

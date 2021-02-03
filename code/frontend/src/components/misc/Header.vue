@@ -47,15 +47,12 @@
                   </p>
                 </div>
               </div>
-              <div class="menu-item" @click="redirect('/user/')">
+              <div class="menu-item" @click="redirect('/user')">
                 <p>My Profile</p>
               </div>
               <div class="menu-item" @click="redirect('/user/notifications')">
                 <p>
-                  Notifications 
-                  <span v-if="notificationNum > 0">
-                    {{ notificationNum }}
-                  </span> 
+                  Notifications
                 </p>
               </div>
               <div class="menu-item caution" @click="logout()">

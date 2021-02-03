@@ -88,6 +88,9 @@ const rootInstitutionAdmin = {
     },
     deleteAdmin(adminId) {
         return axios.delete(rootInstitutionAdminExt + '/institutionAdmin', { data: adminId })
+    },
+    deleteInstitution(rootAdminId) {
+        return axios.delete(rootInstitutionAdminExt + '/delete-institution', { data: rootAdminId })
     }
 }
 
@@ -165,6 +168,9 @@ const user = {
     },
     checkIn() {
         return axios.get(userExt + '/check-in')
+    },
+    markNotificationAsSeen(notificationId) {
+        return axios.post(userExt + '/mark-notification-as-seen', notificationId)
     }
 }
 

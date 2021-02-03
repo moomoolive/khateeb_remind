@@ -23,5 +23,12 @@ export default {
         state.notifications.show = true
         state.notifications.type = notificationsInfo.type
         state.notifications.options = notificationsInfo.options
+    },
+    storeNotificationsFromAPI(state, notificationsArray) {
+        state.notificationsFromServer = notificationsArray
+    },
+    markNotificationAsSeen(state, notificationId) {
+        const found = state.notificationsFromServer.find(note => note._id === notificationId)
+        found.seen = true
     }
 }

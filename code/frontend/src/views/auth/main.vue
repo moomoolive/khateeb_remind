@@ -64,8 +64,6 @@ export default {
                     const notification = { color: 'yellow', icon: "locked", msg: `Khateeb Remind hasn't confirmed your institution yet. Try again later!`, textSize: 'small' }
                     this.$store.dispatch('createNotification', { type: 'alert', options: notification })
                 }
-                else if (authRes.token && authRes.msg === 'default')
-                    console.log('default') // not finished yet
                 else if (authRes.token && authRes.msg === 'success')
                     this.toApp(authRes.token)
             } catch(err) {
@@ -93,6 +91,10 @@ export default {
             else
                 localStorage.removeItem('rememberMe')
         }
+    },
+    created() {
+        if (this.$store.getters.isJWTValid)
+            this._.toHomePage()
     }
 }
 </script>

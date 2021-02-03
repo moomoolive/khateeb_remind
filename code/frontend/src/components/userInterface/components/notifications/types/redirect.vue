@@ -38,7 +38,7 @@ export default {
 
 button {
     width: 75%;
-    font-size: 2vh;
+    font-size: 18px;
 }
 
 .redirectContainer {
@@ -46,6 +46,14 @@ button {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+@media screen and (max-width: $phoneWidth) {
+    button {
+        font-size: 2.3vh;
+    }
 }
 
 </style>

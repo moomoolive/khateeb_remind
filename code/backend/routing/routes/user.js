@@ -75,10 +75,21 @@ router.post('/password',
 router.get('/check-in', async(req, res) => {
     try {
         const lastLogin = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
-        res.json('checked-in')
+        const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
+        res.json(notifications)
     } catch(err) {
         console.log(err)
         res.json(`Check-in failed`)
+    }
+})
+
+router.post('/mark-notification-as-seen', async (req, res) => {
+    try {
+        const updated = await $db.models.notifications.updateOne(req.body, { seen: true })
+        res.json(`Successfully updated notification ${req.body._id}`)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't update notification status`)
     }
 })
 

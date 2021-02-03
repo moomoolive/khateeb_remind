@@ -45,4 +45,21 @@ router.delete(routerGroup1URL, async (req, res) => {
     }
 })
 
+router.delete('/delete-institution', async (req, res) => {
+    try {
+        const models = Object.keys($db.models)
+        const deletedInstitution = await $db.models.institutions.deleteOne({ _id: req.headers.institutionid })
+        for (let i = 0; i < models.length; i++) {
+            const model = models[i]
+            if (model === 'institutions')
+                continue
+            const deleted = await $db.models[model].deleteMany({ institutionID: req.headers.institutionid })
+        }
+        res.json('Successfully deleted institution')
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't delete institution`)
+    }
+})
+
 module.exports = router

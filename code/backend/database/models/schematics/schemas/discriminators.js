@@ -29,5 +29,11 @@ module.exports = {
     }),
     sysAdmin: new mongoose.Schema({
         
+    }),
+    generalNotification: new mongoose.Schema({
+        tag: {
+            type: String,
+            required: true
+        }
     })
 }

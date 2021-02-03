@@ -1,8 +1,8 @@
 <template>
     <div v-if="display">
-        <div :class="display.color">
+        <div>
             <div class="topAnchor"></div>
-            <img :src="require(`@/assets/notifications/${display.icon}.png`)">
+            <img :src="require(`@/assets/notifications/${graphicType(display.icon)}`)">
             <div :class="`msg ${display.textSize ? display.textSize : 'large'}`">
                 {{ display.msg }}<br>
             </div>
@@ -38,6 +38,12 @@ export default {
         },
         close() {
             this.$store.dispatch('closeNotification')
+        },
+        graphicType(name) {
+            if (this.options.graphicType)
+                return `${name}.${this.options.graphicType}`
+            else
+                return `${name}.png`
         }
     },
     created() {
@@ -56,13 +62,6 @@ div {
     padding: 0;
 }
 
-.red {
-        background: themeRGBA("red", 0.75);
-}
-
-.yellow {
-        background: themeRGBA("yellow", 0.75);
-}
 
 .msg {
     margin-top: 5%;
@@ -72,27 +71,41 @@ div {
     height: auto;
     color: black;
     &.small {
-        font-size: 2vh;
+        font-size: 16px;
         font-weight: bold;
+    }
+    &.large {
+        font-size: 32px;
+    }
+}
+
+.topAnchor {
+    height: 8px;
+}
+
+img {
+    height: 18vh;
+    max-height: 150px;
+}
+
+
+button {
+    margin-top: 4%;
+    width: 30%;
+    height: 15%;
+    max-height: 40px;
+    margin-bottom: 15px;
+}
+
+@media screen and (max-width: $phoneWidth) {
+    .msg {
+    &.small {
+        font-size: 2vh;
     }
     &.large {
         font-size: 4vh;
     }
 }
-
-.topAnchor {
-    height: 1vh;
-}
-
-img {
-    height: 40%;
-}
-
-button {
-    margin-top: 7%;
-    width: 30%;
-    height: 15%;
-    margin-bottom: 20%;
 }
 
 </style>

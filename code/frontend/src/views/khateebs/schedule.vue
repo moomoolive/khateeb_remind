@@ -1,10 +1,12 @@
 <template>
   <div>
+    <loading>
       <logo-display
         class="logo"
         :logoLeft="`logo1`"
         :logoRight="`logo2`"
       />
+    </loading>
       <khateeb-schedule
         v-if="currentSchedule"
         :reciever="`khateeb`"
@@ -22,12 +24,14 @@
 <script>
 import logoDisplay from '@/components/misc/logoDisplay.vue'
 import khateebSchedule from '@/components/schedules/khateebSchedule.vue'
+import loading from '@/components/userInterface/components/loadingScreen.vue'
 
 export default {
   name: 'Home',
   components: {
     khateebSchedule,
-    logoDisplay
+    logoDisplay,
+    loading
   },
   data() {
     return {
@@ -41,7 +45,7 @@ export default {
     async getSchedule() {
       try {
         const monthlySchedule = await this.$API.khateeb.getCurrentSchedule()
-        if (monthlySchedule === `non-existent`)
+        if (monthlySchedule === `non-existent` || monthlySchedule.jummahs.length < 1)
             this.scheduleExists = false
         else 
             this.currentSchedule = monthlySchedule

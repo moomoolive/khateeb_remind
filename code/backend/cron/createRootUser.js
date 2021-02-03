@@ -15,7 +15,6 @@ const cron = (callback) => {
                 username: 'rootUser',
                 password: process.env.DEFAULT_ROOT_PASS || 'password123',
                 confirmed: true,
-                isDefault: false,
                 firstName: 'rootfirst',
                 lastName: 'rootlast',
                 phoneNumber: 999_999_9999

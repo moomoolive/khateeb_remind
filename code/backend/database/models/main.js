@@ -10,9 +10,10 @@ const models = {
     users: mongoose.model('user', schema.user),
     announcements: mongoose.model('announcement', schema.announcement),
     settings: mongoose.model('setting', schema.setting),
+    notifications: mongoose.model('notification', schema.notification)
 }
 
-const discriminators = {
+const userTypes = {
     khateebs: models.users.discriminator('khateeb', schema.khateeb),
     root: models.users.discriminator('root', schema.root),
     institutionAdmins: models.users.discriminator('institutionAdmin', schema.institutionAdmin),
@@ -20,4 +21,12 @@ const discriminators = {
     rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', schema.rootInstitutionAdmin)
 }
 
-module.exports = { ...models, ...discriminators }
+const notificationTypes = {
+    generalNotifications: models.notifications.discriminator('generalNotification', schema.generalNotification)
+}
+
+module.exports = { 
+    ...models, 
+    ...userTypes, 
+    ...notificationTypes 
+}

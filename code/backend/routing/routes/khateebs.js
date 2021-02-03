@@ -39,8 +39,7 @@ router.get('/', async (req, res) => {
 
 router.get('/announcements', async (req, res) => {
     try {
-        const mostRecent = { _id: -1 }
-        const announcements = await $db.models.announcements.find({}).limit(10).sort(mostRecent).exec()
+        const announcements = await $db.models.announcements.find({}).limit(10).sort('-createdAt').exec()
         res.json(announcements)
     } catch(err) {
         console.log(err)

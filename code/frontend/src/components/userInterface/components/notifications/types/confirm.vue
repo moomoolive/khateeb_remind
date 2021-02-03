@@ -33,15 +33,16 @@ export default {
 
 <style lang="scss" scoped>
 img {
-    height: 40%;
-    padding-top: 7%;
+    height: 18vh;
+    max-height: 150px;
+    padding-top: 10px;
 }
 
 button {
     width: 30%;
     height: 15%;
     font-size: 17px;
-    margin-bottom: 15%;
+    margin-bottom: 5%;
 }
 
 p {
@@ -49,6 +50,7 @@ p {
     margin-left: auto;
     margin-right: auto;
     font-size: 16px;
+    font-weight: bold;
 }
 
 @media screen and (max-width: $phoneWidth) {

@@ -4,6 +4,7 @@ const hCodes = require('./httpCodes.js')
 const text = require('./textHub/main.js')
 const areaCodes = require('./areaCodes/main.js')
 const schedule = require('./schedules/main.js')
+const notifications = require('./notifications.js')
 
 module.exports = {
     general,
@@ -11,5 +12,6 @@ module.exports = {
     hCodes,
     text,
     areaCodes,
-    schedule
+    schedule,
+    notifications
 }

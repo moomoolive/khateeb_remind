@@ -19,5 +19,6 @@ export default {
         options: {} 
     },
     notificationsQueue: [],
-    wallpaper: 'main'
+    wallpaper: 'main',
+    notificationsFromServer: []
 }

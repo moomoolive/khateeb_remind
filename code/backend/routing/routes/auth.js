@@ -36,6 +36,11 @@ router.post('/create/khateeb',
     async (req, res) => {
     try {
         console.log(req.body)
+        const institution = req.body.institutionID
+        const settings = await $db.models.settings.find({ institutionID: institution }).exec()
+        console.log(settings)
+        if (settings.autoConfirmRegistration)
+            req.body.confirmed = true
         const khateebEntry = await $db.funcs.save('khateebs', req.body)
         res.json(`Asalam alaikoum ${khateebEntry.firstName} ${khateebEntry.lastName}, your account has been created (username: ${khateebEntry.username}). Please wait a day or two for the institution administrator to confirm your account.`)
     } catch(err) {
@@ -60,19 +65,18 @@ router.post('/',
         let response
         const user = req.__USER__
         validPassword = await user.comparePassword(req.body.password)
+        console.log(req.body.password)
+        console.log(validPassword)
         if (!validPassword) {
             res.status($utils.hCodes.unauthorized)
             response = {  msg: 'unauthorized', token: null }
         }
-        else if (user.isDefault)
-            response = 'default'
         else {
             if (!user.confirmed && user.__t !== 'root') {
                 response = { msg: `un-confirmed-${user.__t}`, token: null }
             } else {
                 const tokenInfo = $utils.general.deepCopy(user)
-                delete tokenInfo.password; delete tokenInfo.isDefault; 
-                delete tokenInfo.confirmed; delete tokenInfo.__v;
+                delete tokenInfo.password; delete tokenInfo.confirmed; delete tokenInfo.__v;
                 response = { msg: 'success', token: $utils.auth.createToken(tokenInfo) }
             }
         }

@@ -10,7 +10,7 @@ const createToken = (info={}, expiresAfter='60-days') => {
 
 const refreshToken = async (userId) => {
     try {
-        const unwantedFields = ["-password", "-__v", "-isDefault", "-confirmed"]
+        const unwantedFields = ["-password", "-__v", "-confirmed"]
         let user = await $db.models.users.findOne({ _id: userId }).select(unwantedFields).exec()
         user = JSON.parse(JSON.stringify(user))
         return createToken(user)

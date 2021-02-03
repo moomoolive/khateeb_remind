@@ -26,7 +26,7 @@ export default {
     data() {
         return {
             structure: {
-                autoConfirmKhateebs: {
+                autoConfirmRegistration: {
                     type: "checkbox",
                     required: true
                 }

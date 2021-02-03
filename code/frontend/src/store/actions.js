@@ -32,5 +32,11 @@ export default {
     },
     displayNotification({ commit }, notificationsInfo) {
         commit('displayNotification', notificationsInfo)
+    },
+    storeNotificationsFromAPI({ commit }, notificationsArray) {
+        commit('storeNotificationsFromAPI', notificationsArray)
+    },
+    markNotificationAsSeen({ commit }, notificationId) {
+        commit('markNotificationAsSeen', notificationId)
     }
 }

@@ -119,7 +119,6 @@ router.post(routerGroup2URL + "/create",
     async(req, res) => {
     try {
         req.body.institutionID = req.headers.institutionid
-        req.body.isDefault = true
         req.body.confirmed = true
         const khateebEntry = await $db.funcs.save(routerGroup2, req.body)
         res.json(`You've successfully made ${khateebEntry.firstName} ${khateebEntry.lastName} a khateeb (username: ${khateebEntry.username}).`)
