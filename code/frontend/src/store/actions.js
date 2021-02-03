@@ -1,9 +1,6 @@
 import axios from 'axios'
 
 export default {
-    dateInfo({ commit }, info) {
-        commit('dateInfo', info)
-    },
     JWT_TOKEN({ commit }, token) {
         commit('updateToken', token)
     },

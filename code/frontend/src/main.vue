@@ -25,8 +25,6 @@ import Header from '@/components/misc/Header.vue'
 import notifications from '@/components/userInterface/components/notifications/main.vue'
 import Footer from '@/components/misc/Footer.vue'
 
-import datetime from '@/utils/dateTime/main.js'
-
 import axios from 'axios'
 
 export default {
@@ -42,12 +40,6 @@ export default {
     }
   },
   methods: {
-    getDateInformation() {
-      const info = {
-        upcomingFridayInfo: datetime.upcomingFriday()
-      }
-      this.$store.dispatch('dateInfo', info)
-    },
     notificationCreator(notification) {
       if (notification.__t === 'generalNotification') {
         if (notification.tag === "welcome") {
@@ -136,7 +128,6 @@ export default {
   },
   created() {
     this.setJWT()
-    this.getDateInformation()
     this.setLastVisit()
   }
 }
