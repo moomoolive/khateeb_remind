@@ -15,7 +15,7 @@ router.post('/create/institution',
         res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
     } catch(err) {
         console.log(err)
-        res.status($utils.hCodes.serverError)
+        res.status(_.hCodes.serverError)
         res.json(`Couldn't create Institution and Administrator - this is probably a server issue. Please try again later.`)
     }
     }
@@ -43,7 +43,7 @@ router.post('/create/khateeb',
         res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}). Please wait a day or two for the institution administrator to confirm your account.`)
     } catch(err) {
         console.log(err)
-        res.status($utils.hCodes.serverError)
+        res.status(_.hCodes.serverError)
         res.json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)
     }
 })
@@ -66,7 +66,7 @@ router.post('/',
         console.log(req.body.password)
         console.log(validPassword)
         if (!validPassword) {
-            res.status($utils.hCodes.unauthorized)
+            res.status(_.hCodes.unauthorized)
             response = {  msg: 'unauthorized', token: null }
         }
         else {
@@ -74,17 +74,17 @@ router.post('/',
                 response = { msg: `un-confirmed-${user.__t}`, token: null }
             } else {
                 console.log(user)
-                const tokenInfo = $utils.general.deepCopy(user)
+                const tokenInfo = _.deepCopy(user)
                 delete tokenInfo.password; delete tokenInfo.confirmed; delete tokenInfo.__v;
                 const updated = await $db.models.users.updateOne({ _id: user._id.toString() }, { lastLogin: new Date() })
                 const notifications = await $db.models.notifications.find({ userID: user._id.toString() }).limit(10).exec()
-                response = { msg: 'success', token: $utils.auth.createToken(tokenInfo), notifications }
+                response = { msg: 'success', token: _.auth.createToken(tokenInfo), notifications }
             }
         }
         res.json(response)
     } catch(err) {
         console.log(err)
-        res.status($utils.hCodes.serverError)
+        res.status(_.hCodes.serverError)
         res.json(`Couldn't sign in user - this probably a problem with the server. Please try again later`)
     }
 })

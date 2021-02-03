@@ -190,7 +190,7 @@ router.post(routerGroup6URL,
             const saved = await $db.funcs.save(routerGroup6, req.body.locations[i])
             if (req.body.new && !req.body.locations[i]._id) {
                 const newTiming = await locations.firstTiming(req.headers.institutionid, saved._id.toString())
-                const associatedJummahs = await $utils.schedule.createAssociatedJummahs(saved._id.toString(), newTiming._id.toString(), req.headers.institutionid)
+                const associatedJummahs = await _.schedule.createAssociatedJummahs(saved._id.toString(), newTiming._id.toString(), req.headers.institutionid)
             }
         }
         res.json(`successfully saved locations!`)
@@ -202,20 +202,20 @@ router.post(routerGroup6URL,
 router.delete(routerGroup6URL, async (req, res) => {
     try {
         const deleted = await $db.models[routerGroup6].updateOne({ ...req.body }, { active: false })
-        const associatedJummahs = await $utils.schedule.futureJummahsAssociated({ locationID: req.body._id, institutionID: req.headers.institutionid })
+        const associatedJummahs = await _.schedule.futureJummahsAssociated({ locationID: req.body._id, institutionID: req.headers.institutionid })
         for (let i = 0; i < associatedJummahs.length; i++) {
             const deleted = await $db.models.jummahs.deleteMany(associatedJummahs[i])
         }
         const associatedTimings = await $db.models.timings.find({ locationID: req.body._id, institutionID: req.headers.institutionid }).exec()
         const timingsObject = {}
         for (let i = 0; i < associatedTimings.length; i++) {
-            const updatedTiming = $utils.general.deepCopy(associatedTimings[i])
-            timingsObject[updatedTiming._id] = $utils.general.deepCopy(updatedTiming)
+            const updatedTiming = _.deepCopy(associatedTimings[i])
+            timingsObject[updatedTiming._id] = _.deepCopy(updatedTiming)
             const updated = await $db.models.timings.updateOne({ _id: updatedTiming._id }, { active: false })
         }
         const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).exec()
         for (let i = 0; i < khateebs.length; i++) {
-            const newKhateeb = $utils.general.deepCopy(khateebs[i])
+            const newKhateeb = _.deepCopy(khateebs[i])
             newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => !timingsObject[timing])
             const updated = await $db.models.khateebs.updateOne({ _id: newKhateeb._id }, newKhateeb)
         }
@@ -255,13 +255,13 @@ router.post(routerGroup7URL,
 router.delete(routerGroup7URL, async (req, res) => {
     try {
         const deleted = await $db.models[routerGroup7].updateOne({ ...req.body }, { active: false })
-        const associatedJummahs = await $utils.schedule.futureJummahsAssociated({ timingID: req.body._id, institutionID: req.headers.institutionid })
+        const associatedJummahs = await _.schedule.futureJummahsAssociated({ timingID: req.body._id, institutionID: req.headers.institutionid })
         for (let i = 0; i < associatedJummahs.length; i++) {
             const deleted = await $db.models.jummahs.deleteMany(associatedJummahs[i])
         }
         const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).exec()
         for (let i = 0; i < khateebs.length; i++) {
-            const newKhateeb = $utils.general.deepCopy(khateebs[i])
+            const newKhateeb = _.deepCopy(khateebs[i])
             newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => timing !== req.body._id)
             const updated = await $db.models.khateebs.updateOne({ _id: newKhateeb._id }, newKhateeb)
         }
@@ -329,7 +329,7 @@ router.get("/schedules" + "/:month/:year", async (req, res) => {
         else {
             console.log(req.headers.institutionid)
             if (jummahs.length < 1) {
-                jummahs = await $utils.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
+                jummahs = await _.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
             }
             const locations = await $db.models.locations.find({ institutionID: req.headers.institutionid }).exec()
             const timings = await $db.models.timings.find({ institutionID: req.headers.institutionid }).exec()
@@ -354,8 +354,8 @@ router.get(routerGroup10URL, async (req, res) => {
     try {
         const settings = await $db.models.settings.findOne({ institutionID: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
         console.log(settings)
-        settings.twilioUser = $utils.general.decrypt(settings.twilioUser)
-        settings.twilioKey = $utils.general.decrypt(settings.twilioKey)
+        settings.twilioUser = $db.funcs.decrypt(settings.twilioUser)
+        settings.twilioKey = $db.funcs.decrypt(settings.twilioKey)
         console.log(settings)
         res.json(settings)
     } catch(err) {

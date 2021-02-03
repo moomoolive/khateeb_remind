@@ -5,7 +5,7 @@ const dotenv = require('dotenv')
 const path = require('path')
 
 global.$DIR = path.resolve(__dirname)
-global.$utils = require($DIR + '/utils/index.js')
+global._ = require($DIR + '/utils/index.js')
 global.$db = require($DIR + '/database/index.js')
 
 if (process.env.NODE_ENV === 'production')
@@ -43,7 +43,6 @@ app.delete('*', [middleware.noEmptyBody, middleware.allowedFields(deleteRequestP
 app.use('/khateeb', routes.khateeb)
 app.use('/institutionAdmin', routes.admin)
 app.use('/misc', routes.misc)
-app.use('/text', routes.text)
 app.use('/auth', routes.auth)
 app.use('/sysAdmin', routes.sysAdmin)
 app.use('/user', routes.user)

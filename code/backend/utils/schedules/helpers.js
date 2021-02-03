@@ -32,7 +32,7 @@ const loopOverLinkedStructAndFillJummahs = (linkedStruct, emptyJummah, fridays, 
     for (let [locationID, timingIDs] of Object.entries(linkedStruct)) {
         fridays.forEach(friday => {
             timingIDs.forEach(timingID => {
-                const jummah = $utils.general.deepCopy(emptyJummah)
+                const jummah = _.deepCopy(emptyJummah)
                 jummah.institutionID = institutionID
                 jummah.month = month
                 jummah.year = year
@@ -146,7 +146,7 @@ const createAssociatedJummahKeys = (remainingJummahsDayJs, nextMonthJummahsDayJs
     const allJummahs = [...remainingJummahsDayJs, ...nextMonthJummahsDayJs]
     const keys = []
     allJummahs.forEach(jummah => {
-        const ID = $utils.general.deepCopy(associatedKey)
+        const ID = _.deepCopy(associatedKey)
         const jummahKey = { ...ID }
         jummahKey.month = jummah.month()
         jummahKey.weekOf = jummah.date()

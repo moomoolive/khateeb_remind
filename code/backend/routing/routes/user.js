@@ -26,7 +26,7 @@ const funcs = {
         return userType === 'root' ? userType : userType + 's'
     },
     async getNewToken(userId, updateType) {
-        const newToken = await $utils.auth.refreshToken(userId)
+        const newToken = await _.auth.refreshToken(userId)
         return {
             token: newToken,
             msg: `Successfully updated ${updateType}`

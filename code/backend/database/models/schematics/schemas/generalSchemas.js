@@ -280,8 +280,8 @@ const setting = new mongoose.Schema({
 setting.pre('save', function(next) {
     try {
         const setting = this
-        setting.twilioKey = $utils.general.encrypt(setting.twilioKey)
-        setting.twilioUser = $utils.general.encrypt(setting.twilioUser)
+        setting.twilioKey = $db.funcs.encrypt(setting.twilioKey)
+        setting.twilioUser = _.funcs.encrypt(setting.twilioUser)
         next()
     } catch(err) {
         console.log('There was a problem encrypting settings')
@@ -298,9 +298,9 @@ setting.pre('updateOne', function(next) {
             return next()
         }
         if (data.twilioUser)
-            data.twilioUser = $utils.general.encrypt(data.twilioUser)
+            data.twilioUser = $db.funcs.encrypt(data.twilioUser)
         if (data.twilioKey)
-            data.twilioKey = $utils.general.encrypt(data.twilioKey)
+            data.twilioKey = $db.funcs.encrypt(data.twilioKey)
         this.update({}, data).exec()
         next()
     } catch(err) {

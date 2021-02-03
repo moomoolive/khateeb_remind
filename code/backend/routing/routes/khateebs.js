@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
         }
     } catch(err) {
         console.log(err)
-        res.status($utils.hCodes.serverError)
+        res.status(_.hCodes.serverError)
         res.json(`Couldn't retrieve current schedule. This is probably a server error. Try again later.`)
     }
 })
@@ -43,7 +43,7 @@ router.get('/announcements', async (req, res) => {
         res.json(announcements)
     } catch(err) {
         console.log(err)
-        res.status($utils.hCodes.serverError)
+        res.status(_.hCodes.serverError)
         res.json(`Couldn't retrieve announcements. This is probably a server error. Try again later.`)
     }
 })
