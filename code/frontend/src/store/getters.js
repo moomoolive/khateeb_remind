@@ -21,5 +21,8 @@ export default {
             const jsonTokenInfo = JSON.parse(decodedTokenInfo)
             return jsonTokenInfo
         } else return null
+    },
+    urgentNotifications() {
+        return state.notificationsFromServer.filter(note => !note.seen) //should be actions performed
     }
 }

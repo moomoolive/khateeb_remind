@@ -19,6 +19,7 @@ export default {
         options: {} 
     },
     notificationsQueue: [],
+    userPromptedNotifications: [],
     wallpaper: 'main',
     notificationsFromServer: []
 }

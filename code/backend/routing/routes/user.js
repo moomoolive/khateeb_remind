@@ -74,7 +74,7 @@ router.post('/password',
 
 router.get('/check-in', async(req, res) => {
     try {
-        const lastLogin = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
+        const lastLogin = await $db.models.users.updateOne({ _id: req.headers.userid }, { lastLogin: new Date() })
         const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
         res.json(notifications)
     } catch(err) {
@@ -90,6 +90,19 @@ router.post('/mark-notification-as-seen', async (req, res) => {
     } catch(err) {
         console.log(err)
         res.json(`Couldn't update notification status`)
+    }
+})
+
+router.delete('/account', async (req, res) => {
+    try {
+        const user = req.headers.userid
+        const deletedUser = await $db.models.users.deleteOne({ _id: user })
+        const deletedNotifications = await $db.models.notifications.deleteMany({ userID: user })
+        // if khateeb delete jummahs too
+        res.json('hi')
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't delete account`)
     }
 })
 

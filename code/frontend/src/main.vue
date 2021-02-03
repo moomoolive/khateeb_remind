@@ -59,7 +59,8 @@ export default {
               icon: 'asalam',
               graphicType: 'gif',
               msg: notification.msg,
-              _id: notification._id
+              _id: notification._id,
+              notificationOrigin: 'server'
             }
           }
           this.$store.dispatch('createNotification', options)
@@ -102,6 +103,9 @@ export default {
     },
     notificationsQueue() {
       return this.$store.state.notificationsQueue
+    },
+    userPromptedNotifications() {
+      return this.$store.state.userPromptedNotifications
     }
   },
   watch: {
@@ -116,6 +120,9 @@ export default {
       if (newVal.length < 1) {
         this.firstNotification = true
         return
+      }
+      else if (newVal[0] === '__USER__') {
+        newVal[0] = this.userPromptedNotifications[0]
       }
       const milliseconds = this.firstNotification ? 100 : 2_500
       if (this.firstNotification)
@@ -218,6 +225,7 @@ h2 {
   height: auto;
   max-height: 400px;
   max-width: 400px;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
 }
 
 @media screen and (max-width: $phoneWidth) {

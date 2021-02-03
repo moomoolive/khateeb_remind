@@ -121,9 +121,6 @@ export default {
         },
         async toAPI(requestSection, $event) {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to submit this application?`)
-                if (!confirm)
-                    return
                 this.changeStep(1)
                 this.deposit(requestSection, $event)
                 const res = await this.$API.auth.createInstitution(this.request)

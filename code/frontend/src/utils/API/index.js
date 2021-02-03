@@ -171,6 +171,9 @@ const user = {
     },
     markNotificationAsSeen(notificationId) {
         return axios.post(userExt + '/mark-notification-as-seen', notificationId)
+    },
+    deleteAccount() {
+        return axios.delete(userExt + '/account', { data: { _id: 'myAccount' } })
     }
 }
 

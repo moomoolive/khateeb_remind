@@ -13,10 +13,18 @@ export default {
     adminSavedChangesScreen(state, onOrOff) { state.admin.savedChanges = onOrOff },
     closeNotification(state) { 
         state.notifications.show = false
-        state.notificationsQueue.shift() 
+        state.notificationsQueue.shift()
+        if (!state.notifications.options.notificationOrigin)
+            state.userPromptedNotifications.shift()
     },
     createNotification(state, notificationsInfo) { 
-        state.notificationsQueue.push(notificationsInfo)
+        if (!notificationsInfo.notificationOrigin) {
+            if (state.userPromptedNotifications.length < 1) {
+                state.userPromptedNotifications.push(notificationsInfo)
+                state.notificationsQueue.push('__USER__')
+            }
+        } else
+            state.notificationsQueue.push(notificationsInfo) 
     },
     changeWallpaper(state, newWallpaperName) { state.wallpaper = newWallpaperName },
     displayNotification(state, notificationsInfo) { 

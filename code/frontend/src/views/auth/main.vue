@@ -64,8 +64,10 @@ export default {
                     const notification = { color: 'yellow', icon: "locked", msg: `Khateeb Remind hasn't confirmed your institution yet. Try again later!`, textSize: 'small' }
                     this.$store.dispatch('createNotification', { type: 'alert', options: notification })
                 }
-                else if (authRes.token && authRes.msg === 'success')
+                else if (authRes.token && authRes.msg === 'success') {
                     this.toApp(authRes.token)
+                    this.$store.dispatch('storeNotificationsFromAPI', authRes.notifications)
+                }
             } catch(err) {
                 if (err.status === 401)
                     this.errorMsg = 'Incorrect Username or Password'
