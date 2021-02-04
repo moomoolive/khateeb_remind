@@ -94,7 +94,7 @@ export default {
     name: 'Header',
     data() {
       return {
-        activeMenu: true
+        activeMenu: false
       }
     },
     methods: {

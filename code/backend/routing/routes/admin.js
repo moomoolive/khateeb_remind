@@ -1,4 +1,5 @@
 const express = require('express')
+const { save } = require('../../database/funcs')
 
 const middleware = require($DIR + '/middleware/main.js')
 const requestTypeChecks = require('./adminTC.json')
@@ -231,22 +232,26 @@ const routerGroup7URL = `/${routerGroup7}`
 router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
     try {
         const data = await funcs.query(req, routerGroup7, { active: true }).exec()
-        console.log(data)
         res.json(data)
     } catch(err) {
         res.json(errors.getReq(routerGroup7, err))
     }
 })
 
+
+
 router.post(routerGroup7URL, 
     middleware.allowedFields(requestTypeChecks.timings),
     async (req, res) => {
-    console.log(req.body)
-    console.log(req.body.times.length)
     try {
         for (let i = 0; i < req.body.times.length; i++) {
             req.body.times[i]["institutionID"] = req.headers.institutionid
+            console.log(req.body.times[i]._id, req.body.times[i].locationID)
             const saved = await $db.funcs.save(routerGroup7, req.body.times[i])
+            console.log(saved._id)
+            if (!req.body.times[i]._id) {
+                const associatedJummahs = await _.schedule.createAssociatedJummahs(saved.locationID, saved._id.toString(), req.headers.institutionid)
+            }
         }
         res.json('timings successfully saved')
     } catch(err) {
@@ -355,10 +360,8 @@ const routerGroup10URL = `/${routerGroup10}`
 router.get(routerGroup10URL, async (req, res) => {
     try {
         const settings = await $db.models.settings.findOne({ institutionID: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
-        console.log(settings)
         settings.twilioUser = $db.funcs.decrypt(settings.twilioUser)
         settings.twilioKey = $db.funcs.decrypt(settings.twilioKey)
-        console.log(settings)
         res.json(settings)
     } catch(err) {
         console.log(err)

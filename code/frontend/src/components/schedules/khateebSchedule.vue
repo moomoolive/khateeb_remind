@@ -437,6 +437,7 @@ export default {
     height: 20%;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20px;
     flex-direction: row;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
     border-radius: 7px;
