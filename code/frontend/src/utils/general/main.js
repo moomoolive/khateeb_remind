@@ -73,7 +73,6 @@ export default {
         date = new Date(date)
         const amOrPm = date.getHours() > 11 ? 'PM' : 'AM'
         const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
-        console.log(date)
         let base = `${hours}:${date.getMinutes()} ${amOrPm}`
         const yesterday = new Date()
         yesterday.setHours(0, 0, 0, 0)

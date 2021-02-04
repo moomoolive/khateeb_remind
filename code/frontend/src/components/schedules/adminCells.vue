@@ -29,7 +29,7 @@
                         {{ khateebDisplay(khateeb) }}
                     </option>
                 </select>
-                <div v-if="currentWeek = 'current'">
+                <div v-if="currentWeek === 'current'">
                     <div 
                         v-for="(notifiction, index) in currentWeekNotifications(preference)" 
                         :key="index"
