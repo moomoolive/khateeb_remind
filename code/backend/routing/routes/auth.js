@@ -63,8 +63,6 @@ router.post('/',
         let response
         const user = req.__USER__
         validPassword = await user.comparePassword(req.body.password)
-        console.log(req.body.password)
-        console.log(validPassword)
         if (!validPassword) {
             res.status(_.hCodes.unauthorized)
             response = {  msg: 'unauthorized', token: null }
@@ -73,7 +71,6 @@ router.post('/',
             if (!user.confirmed && user.__t !== 'root') {
                 response = { msg: `un-confirmed-${user.__t}`, token: null }
             } else {
-                console.log(user)
                 const tokenInfo = _.deepCopy(user)
                 delete tokenInfo.password; delete tokenInfo.confirmed; delete tokenInfo.__v;
                 const updated = await $db.models.users.updateOne({ _id: user._id.toString() }, { lastLogin: new Date() })

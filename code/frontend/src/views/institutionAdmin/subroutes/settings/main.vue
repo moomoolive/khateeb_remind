@@ -120,8 +120,13 @@ export default {
         },
         async saveLocationsAndTimings($event) {
             try {
-                console.log($event)
                 const locations = await this.$API.institutionAdmin.saveLocations({ locations: $event.locations })
+                $event.times.forEach(time => {
+                    if (time.new) {
+                        delete time.new
+                        delete time._id
+                    }
+                })
                 const timings = await this.$API.institutionAdmin.saveTimings({ times: $event.times })
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {

@@ -91,7 +91,8 @@ export default {
             struct: null,
             originalStruct: null,
             updatedLocations: null,
-            updatedTimings: null
+            updatedTimings: null,
+            newTimingsCreatedThisSession: 0
         }
     },
     methods: {
@@ -102,11 +103,15 @@ export default {
         addTiming(previousTimings, id) {
             const last = previousTimings[previousTimings.length - 1]
             let newest = this._.deepCopy(last)
-            delete newest._id; delete newest.createdAt; delete newest.updatedAt;
-            newest.minute ++
+            newest._id = `newTiming${this.newTimingsCreatedThisSession}` 
+            delete newest.createdAt; delete newest.updatedAt; delete newest.__v;
+            newest.new = true
+            newest.minute++
             this.updatedTimings.push(newest)
             delete this.struct[id].timings
             this.buildStruct(this.updatedTimings)
+            this.newTimingsCreatedThisSession++
+            
         },
         ArrayToObject(array, keyNameProperty) {
             const obj = {}
@@ -152,11 +157,21 @@ export default {
             const confirm = await this._.confirm(`Are you sure you want to permenantly delete this location?`)
             if (Object.keys(this.struct).length > 1 && confirm)
                 this.$emit('delete', { type: 'location', id })
+            else
+                this._.alert(`You must have at least one location at your institution`)
         },
         async deleteTiming(timing, location) {
             const confirm = await this._.confirm(`Are you sure you want make these changes?`)
-            if (location.timings.length > 1 && confirm)
+            const hasNotBeenLoggedToSystemYet = timing._id.slice(0, -1) === 'newTiming'
+            if (hasNotBeenLoggedToSystemYet) {
+                const position = this.updatedTimings.map(time => time._id).indexOf(timing._id)
+                this.updatedTimings.splice(position, 1)
+                this.$store.dispatch('adminSavedChangesScreen', true)
+            }
+            else if (location.timings.length > 1 && confirm)
                 this.$emit('delete', { type: 'timing', id: timing._id })
+            else
+                this._.alert('You must have at least one timing per location')
         },
         updatedStructDependencies() {
             this.updatedLocations = this._.deepCopy(this.locations)

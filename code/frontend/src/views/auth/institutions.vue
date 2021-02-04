@@ -12,6 +12,7 @@
                 :bindedExts="['states']"
                 :backgroundColor="`yellow`"
                 :buttonText="`To Next Step`"
+                :confirmBeforeSubmit="false"
                 @submitted="toStepTwo('institution', $event)"
                 :formTitle="`Institution Details`"
             />

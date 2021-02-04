@@ -77,7 +77,7 @@
               </div>
               <div class="menu-item get-the-app" @click="downloadApp()">
                 <p class="get-the-app-text">
-                  Get the App
+                  Download the App
                 </p>
               </div>
               <div class="menu-item caution" @click="logout()">
@@ -94,7 +94,7 @@ export default {
     name: 'Header',
     data() {
       return {
-        activeMenu: false
+        activeMenu: true
       }
     },
     methods: {
@@ -190,9 +190,6 @@ svg {
   height: 70%;
   float: left;
   padding: 1vh;
-  &.blue {
-    fill: getColor("blue") !important;
-  }
 }
 
 .notifications {
@@ -214,25 +211,25 @@ span {
 .menu-item {
   height: 15%;
   max-height: 45px;
-  background-color: themeRGBA("darkBlue", 0.7);
+  background-color: themeRGBA("darkBlue", 0.9);
   cursor: default;
   &:hover {
-    background-color: lighten(themeRGBA("darkBlue", 0.7), 20%);
+    background-color: lighten(themeRGBA("darkBlue", 1), 20%);
   }
 }
 
 .caution {
-    background-color: themeRGBA("yellow", 0.7) !important;
+    background-color: themeRGBA("yellow", 0.9) !important;
     &:hover {
-      background-color: lighten(themeRGBA("yellow", 0.7), 20%) !important;
+      background-color: lighten(themeRGBA("yellow", 1), 20%) !important;
     }
   }
 
 .get-the-app {
-    background-color: themeRGBA("green", 0.7) !important;
+    background-color: themeRGBA("green", 0.9) !important;
     color: black !important;
     &:hover {
-      background-color: lighten(themeRGBA("green", 0.7), 20%) !important;
+      background-color: lighten(themeRGBA("green", 1), 20%) !important;
     }
 }
 

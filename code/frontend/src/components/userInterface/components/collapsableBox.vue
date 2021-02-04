@@ -73,7 +73,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.active { @include blinkingAnimation($speedOfAnimation: 5s, $opacity: 2); }
+.active { 
+    @include blinkingAnimation($speedOfAnimation: 5s, $opacity: 2);
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0; 
+}
 
 .grey {
     background-color: getColor("grey");

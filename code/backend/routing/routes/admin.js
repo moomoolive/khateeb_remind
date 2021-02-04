@@ -231,6 +231,7 @@ const routerGroup7URL = `/${routerGroup7}`
 router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
     try {
         const data = await funcs.query(req, routerGroup7, { active: true }).exec()
+        console.log(data)
         res.json(data)
     } catch(err) {
         res.json(errors.getReq(routerGroup7, err))
@@ -241,6 +242,7 @@ router.post(routerGroup7URL,
     middleware.allowedFields(requestTypeChecks.timings),
     async (req, res) => {
     console.log(req.body)
+    console.log(req.body.times.length)
     try {
         for (let i = 0; i < req.body.times.length; i++) {
             req.body.times[i]["institutionID"] = req.headers.institutionid

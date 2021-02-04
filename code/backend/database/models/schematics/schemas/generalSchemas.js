@@ -281,7 +281,7 @@ setting.pre('save', function(next) {
     try {
         const setting = this
         setting.twilioKey = $db.funcs.encrypt(setting.twilioKey)
-        setting.twilioUser = _.funcs.encrypt(setting.twilioUser)
+        setting.twilioUser = $db.funcs.encrypt(setting.twilioUser)
         next()
     } catch(err) {
         console.log('There was a problem encrypting settings')
@@ -310,6 +310,10 @@ setting.pre('updateOne', function(next) {
 })
 
 const notification = new mongoose.Schema({
+    institutionID: {
+        type: String,
+        required: true
+    },
     userID: {
         type: String,
         required: true,
