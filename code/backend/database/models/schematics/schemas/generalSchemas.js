@@ -331,6 +331,10 @@ const notification = new mongoose.Schema({
     seenAt: {
         type: Date,
         required: false
+    },
+    tag: {
+        type: String,
+        required: true
     }
 }, { timestamps: true })
 

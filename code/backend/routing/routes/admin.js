@@ -132,11 +132,9 @@ router.post(routerGroup2URL + "/confirm",
     middleware.allowedFields(requestTypeChecks.confirmKhateebs),
     async (req, res) => {
     try {
-        if (req.body._id === 'all') {
-            const updatedKhateebs = await $db.models[routerGroup2].updateMany({  institutionID: req.headers.institutionid, confirmed: false }, { confirmed: true }).exec()
-        } else {
-            const updated = await $db.models[routerGroup2].updateOne(req.body, { confirmed: true }).exec()
-        }
+        const khateeb = await $db.models[routerGroup2].findOne(req.body).exec()
+        const updated = await $db.models[routerGroup2].updateOne(req.body, { confirmed: true }).exec()
+        const welcomeMsg = await _.notifications.welcome(khateeb)
         res.json(`Successfully confirmed`)
     } catch(err) {
         res.json(errors.db(`khateebs`, `confirming`, err ))
@@ -334,7 +332,6 @@ router.get("/schedules" + "/:month/:year", async (req, res) => {
         else if (jummahs.length < 1 && schedules.twoMonthsAhead(req.params.month, req.params.year))
             res.json(`nobuild-future`)
         else {
-            console.log(req.headers.institutionid)
             if (jummahs.length < 1) {
                 jummahs = await _.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
             }

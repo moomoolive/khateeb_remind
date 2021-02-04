@@ -66,36 +66,12 @@ export default {
                 }
                 else if (authRes.token && authRes.msg === 'success') {
                     this.toApp(authRes.token)
-                    this.$store.dispatch('storeNotificationsFromAPI', authRes.notifications)
-                    authRes.notifications.forEach(note =>{
-                        if (!note.seen) {
-                            this.notificationCreator(note)
-                        }
-                    })
+                    this.$API.utils.assignUserPackage(authRes.notifications)
                 }
             } catch(err) {
                 if (err.status === 401)
                     this.errorMsg = 'Incorrect Username or Password'
             }
-        },
-        notificationCreator(notification) {
-            if (notification.__t === 'generalNotification') {
-                if (notification.tag === "welcome") {
-                const options = {
-                    type: 'alert',
-                    options: {
-                    color: 'green',
-                    textSize: 'small',
-                    icon: 'asalam',
-                    graphicType: 'gif',
-                    msg: notification.msg,
-                    _id: notification._id,
-                    notificationOrigin: 'server'
-                    }
-                }
-                this.$store.dispatch('createNotification', options)
-                }
-            } 
         },
         toApp(token) {
             if (this.rememberMe)

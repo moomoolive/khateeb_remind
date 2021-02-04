@@ -3,6 +3,7 @@
         <central-nav 
             :baseLink="`institutionAdmin`"
             :outboundLinks="outboundLinks"
+            @to-central="closeSuccessScreen()"
         />
         <transition
         name="fade"
@@ -21,7 +22,7 @@
             />
             <button 
                 class="green make-more-changes"
-                @click="$store.dispatch('adminSavedChangesScreen', false)"
+                @click="closeSuccessScreen()"
             >
                 Make More Changes
             </button>
@@ -51,7 +52,8 @@ export default {
                 },
                 {
                     name: 'Khateebs',
-                    route: 'khateebs'
+                    route: 'khateebs',
+                    indicator: null
                 },
                 {
                     name: 'Other Administrators',
@@ -66,23 +68,39 @@ export default {
         }
     },
     methods: {
-        toAdminCentral() {
-            this.$router.push('/institutionAdmin/')
-        }
+        closeSuccessScreen() {
+            const successScreenOpen = this.$store.state.admin.savedChanges
+            if (successScreenOpen)
+                this.$store.dispatch('adminSavedChangesScreen', false)
+        },
+        async verifyPending() {
+            try {
+                const pendingCount = await this.$API.misc.pendingKhateebCount()
+                this.outboundLinks[2].indicator = pendingCount ? `${pendingCount} Pending` : pendingCount
+            } catch(err) {
+                console.log(err)
+            }
+        },
     },
     computed: {
         savedChanges() {
             return this.$store.state.admin.savedChanges
-        },
-        showAdminButtons() {
-            return this.currentRoute === '/institutionAdmin/'
+        }
+    },
+    watch:{
+        currentRoute(newVal) {
+            if (newVal === '/institutionAdmin')
+                this.verifyPending()
         }
     },
     updated() {
         this.currentRoute = this.$router.currentRoute.fullPath
     },
     destroyed() {
-        this.$store.dispatch('adminSavedChangesScreen', false)
+        this.closeSuccessScreen()
+    },
+    created() {
+        this.verifyPending()
     }
 }
 </script>

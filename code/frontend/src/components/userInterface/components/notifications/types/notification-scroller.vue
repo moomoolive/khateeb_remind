@@ -58,7 +58,7 @@ export default {
         tagLoader(notification) {
             const tag = notification.tag ? notification.tag : notification.__t
             const name = this._.stringFormat(tag)
-            let val = {}
+            let val = { color: 'blue' }
             switch(name) {
                 case 'Jummah':
                     if (!notification.actionPerformed)
@@ -68,27 +68,18 @@ export default {
                     val.icon = '🤲'
                     break
                 case 'Welcome':
-                    val = {
-                        color: 'green',
-                        icon: '🖐️'
-                    }
+                    val.color = 'green'
+                    val.icon = '🖐️'
                     break
                 case 'Feature':
-                    val = {
-                        color: 'blue',
-                        icon: '💎'
-                    }
+                    val.icon = '💎'
                     break
                 case 'Message':
-                    val = {
-                        color: 'blue',
-                        icon: '✉️'
-                    }
+                    val.icon = '✉️'
                     break
-                default:
-                    val = {
-                        color: 'blue'
-                    }
+                case 'Khateebs':
+                    val.icon = "🕌"
+                    break
             }
             val.words = name
             return val

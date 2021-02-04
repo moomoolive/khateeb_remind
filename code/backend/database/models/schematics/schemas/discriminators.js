@@ -31,9 +31,6 @@ module.exports = {
         
     }),
     generalNotification: new mongoose.Schema({
-        tag: {
-            type: String,
-            required: true
-        }
+        
     })
 }

@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="topAnchor">
-            <div class="close-notification-container">
-                <span @click="close()">Close</span>
+            <div class="close-notification-container" @click="close()">
+                <span>Close</span>
             </div>
         </div>
         <div :class="`content ${notificationInfo.options.color || 'yellow'}`">

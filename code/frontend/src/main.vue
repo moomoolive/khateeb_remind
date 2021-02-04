@@ -40,25 +40,6 @@ export default {
     }
   },
   methods: {
-    notificationCreator(notification) {
-      if (notification.__t === 'generalNotification') {
-        if (notification.tag === "welcome") {
-          const options = {
-            type: 'alert',
-            options: {
-              color: 'green',
-              textSize: 'small',
-              icon: 'asalam',
-              graphicType: 'gif',
-              msg: notification.msg,
-              _id: notification._id,
-              notificationOrigin: 'server'
-            }
-          }
-          this.$store.dispatch('createNotification', options)
-        }
-      } 
-    },
     async setJWT() {
       let token = localStorage.getItem('token')
       if (!token)
@@ -66,9 +47,7 @@ export default {
       axios.defaults.headers.common['authorization'] = token
       try {
         const userPackage = await this.$API.user.checkIn()
-        const toBeShown = userPackage.filter(note => !note.seen)
-        toBeShown.forEach(note => { this.notificationCreator(note) })
-        this.$store.dispatch('storeNotificationsFromAPI', userPackage)
+        this.$API.utils.assignUserPackage(userPackage)
       } catch(err) {
         console.log(err)
       }

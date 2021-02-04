@@ -40,6 +40,10 @@ router.post('/create/khateeb',
         if (settings.autoConfirmRegistration)
             req.body.confirmed = true
         const khateebEntry = await $db.funcs.save('khateebs', req.body)
+        if (settings.autoConfirmRegistration) {
+            const welcomeMsg = await _.notifications.welcome(khateebEntry)
+        }
+        const notification = await _.notifications.khateebSignup(khateebEntry, settings.autoConfirmRegistration)
         res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}). Please wait a day or two for the institution administrator to confirm your account.`)
     } catch(err) {
         console.log(err)

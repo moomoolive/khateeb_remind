@@ -37,7 +37,7 @@
               focusable="false" 
               data-prefix="fas" 
               data-icon="envelope" 
-              class="notifications svg-inline--fa fa-envelope fa-w-16" 
+              :class="`notifications ${vibrateNotificationsIcon} svg-inline--fa fa-envelope fa-w-16`" 
               role="img" 
               xmlns="http://www.w3.org/2000/svg" 
               viewBox="0 0 512 512"
@@ -94,7 +94,8 @@ export default {
     name: 'Header',
     data() {
       return {
-        activeMenu: false
+        activeMenu: false,
+        alertAboutUrgent: false
       }
     },
     methods: {
@@ -166,8 +167,14 @@ export default {
       userInfo() {
         return this.$store.getters.decodedJWT
       },
+      alertUserAboutUrgentNotifications() {
+        return this.alertAboutUrgent && this.$store.getters.urgentNotifications.length > 0
+      },
       notificationsIconColor() {
-        return this.$store.getters.urgentNotifications.length > 0 ? '#F3C620' : '#2196F3' // yellow : blue 
+        return this.alertUserAboutUrgentNotifications ? '#F3C620' : '#2196F3' // yellow : blue 
+      },
+      vibrateNotificationsIcon() {
+        return this.alertUserAboutUrgentNotifications > 0 ? 'vibrate' : ''
       },
       notificationInfo() {
         return this.$store.state.notifications
@@ -175,6 +182,10 @@ export default {
       showingNotificationScroller() {
         return this.notificationInfo.show && this.notificationInfo.type === 'notificationScroller'
       }
+    },
+    created() {
+      const fiveSeconds = 5_000
+      window.setTimeout(() => { this.alertAboutUrgent = true }, fiveSeconds)
     }
 }
 </script>
@@ -186,10 +197,35 @@ img {
   padding: 1vh;
 }
 
+@keyframes vibrate {
+  0%, 2%, 4%, 6%, 8%, 10%, 12%, 14%, 16%, 18% {
+    -webkit-transform: translate3d(-1px, 0, 0);
+            transform: translate3d(-1px, 0, 0);
+  }
+  1%, 3%, 5%, 7%, 9%, 11%, 13%, 15%, 17%, 19% {
+    -webkit-transform: translate3d(1px, 0, 0);
+            transform: translate3d(1px, 0, 0);
+  }
+  20%, 100% {
+    -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+  }
+}
+
 svg {
   height: 70%;
   float: left;
   padding: 1vh;
+  &.vibrate {
+    -webkit-animation: vibrate 5s cubic-bezier(.36, .07, .19, .97) infinite;
+    animation: vibrate 5s cubic-bezier(.36, .07, .19, .97) infinite;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 300px;
+    perspective: 300px;
+  }
 }
 
 .notifications {

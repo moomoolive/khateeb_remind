@@ -6,8 +6,29 @@ const welcome = async (userInfo) => {
         institutionID: userInfo.institutionID
     }
     const note = await new $db.models.generalNotifications(welcomeMsg).save()
+    return 'success'
 }
 
+const khateebSignup = async (khateebInfo, autoConfirm=false) => {
+    const name = `${khateebInfo.title !== 'none' ? `${khateebInfo.title} ` : '' }${khateebInfo.firstName} ${khateebInfo.lastName}`
+    const rootAdmin = await $db.models.rootInstitutionAdmins.findOne({ institutionID: khateebInfo.institutionID }).exec()
+    const otherAdmins = await $db.models.institutionAdmins.find({ institutionID: khateebInfo.institutionID }).exec()
+    otherAdmins.push(rootAdmin)
+    const msg = {
+        userID: null,
+        tag: 'khateebs',
+        msg: autoConfirm ? `${name} is now a khateeb at your institution! If you want to manually register khateebs turn off auto-confirm in settings` : `${name} wants to become a khateeb at your institution! Confirm them by heading to Admin Central and press the khateebs tab.`,
+        institutionID: khateebInfo.institutionID
+    }
+    for (let i = 0; i < otherAdmins.length; i++) {
+        const admin = otherAdmins[i]
+        msg.userID = admin._id.toString()
+        const note = await new $db.models.generalNotifications(msg).save()
+    }
+    return 'success'
+} 
+
 module.exports = {
-    welcome
+    welcome,
+    khateebSignup
 }

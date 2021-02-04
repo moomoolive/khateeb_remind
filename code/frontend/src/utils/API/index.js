@@ -181,9 +181,43 @@ const miscExt = API_URL + '/misc'
 const misc = {
     uniqueUsername(username) {
         return axios.post(miscExt + '/unique-username', { username })
+    },
+    pendingKhateebCount() {
+        return axios.get(miscExt + '/pending-khateebs')
     }
 }
 
+const utils = {
+    assignUserPackage(userPkg) {
+        store.dispatch('storeNotificationsFromAPI', userPkg)
+        const urgentNotifications = userPkg.filter(note => !note.seen)
+        urgentNotifications.forEach(note => {
+            const notification = this.prepNotification(note)
+            store.dispatch('createNotification', notification)
+        })
+    },
+    prepNotification(notification) {
+        const options = {
+            textSize: 'small',
+            icon: 'asalam',
+            msg: notification.msg,
+            _id: notification._id,
+            notificationOrigin: 'server',
+            color: 'green'
+        }
+        const type = 'alert'
+        switch(notification.tag) {
+            case 'welcome':
+                options.icon = 'asalam'
+                options.graphicType = 'gif'
+                break
+            case 'khateebs':
+                options.icon = 'khateebs'
+                break
+        }
+        return { type, options }
+    }
+}
 
 export default {
     auth,
@@ -192,5 +226,6 @@ export default {
     institutionAdmin,
     user,
     misc,
-    rootInstitutionAdmin
+    rootInstitutionAdmin,
+    utils
 }

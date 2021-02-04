@@ -11,8 +11,8 @@ export default {
         if (!state.notifications.options.notificationOrigin)
             state.userPromptedNotifications.shift()
     },
-    createNotification(state, notificationsInfo) { 
-        if (!notificationsInfo.notificationOrigin) {
+    createNotification(state, notificationsInfo) {
+        if (!notificationsInfo.options.notificationOrigin) {
             if (state.userPromptedNotifications.length < 1) {
                 state.userPromptedNotifications.push(notificationsInfo)
                 state.notificationsQueue.push('__USER__')

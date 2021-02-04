@@ -63,7 +63,6 @@ router.post('/password',
     async (req, res) => {
     console.log(req.body)
     try {
-        console.log(req.headers.usertype)
         const userEntry = await $db.models[funcs.modelNames(req.headers.usertype)].updateOne({ _id: req.headers.userid }, req.body)
         res.json(`Successfully username information!`)
     } catch(err) {
