@@ -48,4 +48,21 @@ router.get('/announcements', async (req, res) => {
     }
 })
 
+router.get('/jummah-confirm/:jummahID/:notificationID', async (req, res) => {
+    try {
+        const returnPackage = {}
+        console.log(req.headers)
+        const notification = await $db.models.notifications.findOne({ _id: req.params.notificationID, userID: req.params.userid }).exec()
+        console.log(notification)
+        if (!notification)
+            return res.status(_.hCodes.unauthorized).json(`Incorrect user credentials`)
+        returnPackage.notification = notification
+        returnPackage.jummah = await $db.models.jummahs.findOne({ _id: req.params.jummahID }).exec()
+        res.json(returnPackage)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't get confirmation package`)
+    }
+})
+
 module.exports = router

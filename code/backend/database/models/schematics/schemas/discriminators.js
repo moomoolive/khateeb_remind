@@ -32,5 +32,21 @@ module.exports = {
     }),
     generalNotification: new mongoose.Schema({
         
+    }),
+    actionNotification: new mongoose.Schema({
+        actionPerformed: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        actionLink: {
+            type: String,
+            required: true,
+            default: 'TBD'
+        },
+        buttonText: {
+            type: String,
+            required: true
+        }
     })
 }

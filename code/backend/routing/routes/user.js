@@ -84,7 +84,7 @@ router.get('/check-in', async(req, res) => {
 
 router.post('/mark-notification-as-seen', async (req, res) => {
     try {
-        const updated = await $db.models.notifications.updateOne(req.body, { seen: true })
+        const updated = await $db.models.notifications.updateOne(req.body, { seen: true, seenAt: new Date() })
         res.json(`Successfully updated notification ${req.body._id}`)
     } catch(err) {
         console.log(err)

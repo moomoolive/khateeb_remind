@@ -58,5 +58,6 @@ const createAssociatedJummahs =  async (locationID, timingID, institutionID) => 
 module.exports = {
     build,
     futureJummahsAssociated,
-    createAssociatedJummahs
+    createAssociatedJummahs,
+    findUpcomingFriday: helpers.findUpcomingFriday
 }

@@ -68,6 +68,9 @@ const khateeb = {
     },
     getCurrentSchedule() {
         return axios.get(khateebExt + '/')
+    },
+    confirmJummahPackage(jummahID, notificationID) {
+        return axios.get(khateebExt + `/jummah-confirm/${jummahID}/${notificationID}`)
     }
 } 
 
@@ -189,6 +192,11 @@ const misc = {
 
 const utils = {
     assignUserPackage(userPkg) {
+        userPkg.forEach(note => {
+            if (note.actionLink) {
+                note.actionLink = note.actionLink.replace('__ID__', note._id)
+            }
+        })
         store.dispatch('storeNotificationsFromAPI', userPkg)
         const urgentNotifications = userPkg.filter(note => !note.seen)
         urgentNotifications.forEach(note => {
@@ -205,7 +213,7 @@ const utils = {
             notificationOrigin: 'server',
             color: 'green'
         }
-        const type = 'alert'
+        let type = 'alert'
         switch(notification.tag) {
             case 'welcome':
                 options.icon = 'asalam'
@@ -213,6 +221,15 @@ const utils = {
                 break
             case 'khateebs':
                 options.icon = 'khateebs'
+                break
+            case 'jummah':
+                type = 'redirect'
+                options.redirections = [
+                    {
+                        to: notification.actionLink,
+                        text: 'confirm'
+                    }
+                ]
                 break
         }
         return { type, options }

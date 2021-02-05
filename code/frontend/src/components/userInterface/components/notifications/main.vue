@@ -2,7 +2,7 @@
     <div>
         <div class="topAnchor">
             <div class="close-notification-container" @click="close()">
-                <span>Close</span>
+                <span>{{ this.notificationInfo.type === 'confirm' ? 'Cancel' : 'Close' }}</span>
             </div>
         </div>
         <div :class="`content ${notificationInfo.options.color || 'yellow'}`">
@@ -25,6 +25,8 @@ export default {
     },
     methods: {
         close() {
+            if (this.notificationInfo.type === 'confirm')
+                this.notificationInfo.options.reject(false)
             this.$store.dispatch('closeNotification')
         }
     },

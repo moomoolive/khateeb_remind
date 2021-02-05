@@ -67,7 +67,8 @@ export default {
             destintation = '/institutionAdmin'
         else
             destintation = `/${user}`
-        router.push(destintation)
+        if (router.currentRoute.fullPath !== destintation)
+            router.push(destintation)
     },
     dynamicDisplayDate(date) {
         date = new Date(date)

@@ -22,7 +22,8 @@ const userTypes = {
 }
 
 const notificationTypes = {
-    generalNotifications: models.notifications.discriminator('generalNotification', schema.generalNotification)
+    generalNotifications: models.notifications.discriminator('generalNotification', schema.generalNotification),
+    actionNotifications: models.notifications.discriminator('actionNotification', schema.actionNotification)
 }
 
 module.exports = { 

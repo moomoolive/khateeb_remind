@@ -16,6 +16,7 @@ const routes = require($DIR + '/routing/index.js')
 const dbSettings =  require($DIR + '/database/settings.js')
 
 const createRootUserScript = require('./cron/createRootUser.js')
+const wednesdayNotifications = require('./cron/wednesdayNotification.js')
 
 const PORT = 80
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
@@ -54,3 +55,4 @@ app.listen(PORT, () => { console.log(`App is listening on port ${PORT}`) })
 
 if (process.env.NODE_ENV === 'production')
     createRootUserScript(() => { console.log(`Root User Creation Script Initiated`) })
+wednesdayNotifications(() => { console.log(`Set jummah notifications!`) })

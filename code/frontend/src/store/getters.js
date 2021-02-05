@@ -23,6 +23,6 @@ export default {
         } else return null
     },
     urgentNotifications() {
-        return state.notificationsFromServer.filter(note => !note.seen) //should be actions performed
+        return state.notificationsFromServer.filter(note => !note.seen || note.actionPerformed === false) //should be actions performed
     }
 }

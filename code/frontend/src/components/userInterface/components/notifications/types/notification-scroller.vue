@@ -24,6 +24,7 @@
                         v-if="!!notification.actionLink"
                         :disabled="notification.actionPerformed"
                         :class="`actions-btn ${notification.actionPerformed ? 'green' : 'darkRed'}`"
+                        @click="pushToActionPage(notification.actionLink)"
                     >
                         {{  notification.actionPerformed ? notification.completedButtonText || 'Completed' : notification.buttonText }}
                     </button>
@@ -92,6 +93,11 @@ export default {
             if (index === notificationCount - 1)
                 position += 'last'
             return position
+        },
+        pushToActionPage(link) {
+            if (this.$router.currentRoute.fullPath !== 'link')
+                this.$router.push(link)
+            this.$store.dispatch('closeNotification')
         }
     },
     computed: {

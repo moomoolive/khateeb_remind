@@ -105,9 +105,10 @@ export default {
       )
     }
   },
-  created() {
+  async created() {
     this.setJWT()
-    this.setLastVisit()
+    this.setLastVisit() 
+    console.log(this.$router)
   }
 }
 </script>
