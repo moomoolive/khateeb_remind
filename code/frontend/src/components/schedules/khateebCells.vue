@@ -2,7 +2,7 @@
     <div>
         <p v-if="handle"><span>@{{ handle }}</span></p>
         <p>{{ display }}</p>
-        <tag-box v-if="updated" :info="`new`" />
+        <tag-box v-if="updated && khateebData !== 'TBD'" :info="`new`" />
     </div>
 </template>
 

@@ -32,5 +32,9 @@ export default {
     markNotificationAsSeen(state, notificationId) {
         const found = state.notificationsFromServer.find(note => note._id === notificationId)
         found.seen = true
+    },
+    markNotificationActionAsComplete(state, notificationId) {
+        const found = state.notificationsFromServer.find(note => note._id === notificationId)
+        found.actionPerformed = true
     }
 }

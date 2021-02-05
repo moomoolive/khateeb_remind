@@ -110,6 +110,8 @@ export default {
         },
         currentWeekNotifications(preference) {
             const notifications = []
+            if (this.data.confirmed)
+                return notifications
             if (preference.notified)
                 notifications.push('📦 Notified')
             if (preference.notified && !preference.responded)

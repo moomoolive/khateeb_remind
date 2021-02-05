@@ -35,5 +35,8 @@ export default {
     },
     markNotificationAsSeen({ commit }, notificationId) {
         commit('markNotificationAsSeen', notificationId)
+    },
+    markNotificationActionAsComplete({ commit }, notificationId) {
+        commit('markNotificationActionAsComplete', notificationId)
     }
 }

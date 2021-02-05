@@ -24,7 +24,7 @@
                         v-if="!!notification.actionLink"
                         :disabled="notification.actionPerformed"
                         :class="`actions-btn ${notification.actionPerformed ? 'green' : 'darkRed'}`"
-                        @click="pushToActionPage(notification.actionLink)"
+                        @click="pushToActionPage(notification)"
                     >
                         {{  notification.actionPerformed ? notification.completedButtonText || 'Completed' : notification.buttonText }}
                     </button>
@@ -80,6 +80,8 @@ export default {
                     break
                 case 'Khateebs':
                     val.icon = "🕌"
+                    if (notification.meta && notification.meta.dropout)
+                        val.color = 'red'
                     break
             }
             val.words = name
@@ -94,9 +96,10 @@ export default {
                 position += 'last'
             return position
         },
-        pushToActionPage(link) {
-            if (this.$router.currentRoute.fullPath !== 'link')
-                this.$router.push(link)
+        pushToActionPage(notification) {
+            const actionLink = notification.actionLink.replace("__ID__", notification._id)
+            if (this.$router.currentRoute.fullPath !== actionLink)
+                this.$router.push(actionLink)
             this.$store.dispatch('closeNotification')
         }
     },

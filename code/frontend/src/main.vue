@@ -108,7 +108,6 @@ export default {
   async created() {
     this.setJWT()
     this.setLastVisit() 
-    console.log(this.$router)
   }
 }
 </script>

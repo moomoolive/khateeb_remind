@@ -51,17 +51,37 @@ router.get('/announcements', async (req, res) => {
 router.get('/jummah-confirm/:jummahID/:notificationID', async (req, res) => {
     try {
         const returnPackage = {}
-        console.log(req.headers)
-        const notification = await $db.models.notifications.findOne({ _id: req.params.notificationID, userID: req.params.userid }).exec()
-        console.log(notification)
-        if (!notification)
-            return res.status(_.hCodes.unauthorized).json(`Incorrect user credentials`)
+        const unwantedFields = ['-createdAt', '-updatedAt', '-__v']
+        const notification = await $db.models.notifications.findOne({ _id: req.params.notificationID }).select(unwantedFields).exec()
+        if (!notification || req.headers.userid !== notification.userID)
+            return res.json(`non-existent`)
         returnPackage.notification = notification
-        returnPackage.jummah = await $db.models.jummahs.findOne({ _id: req.params.jummahID }).exec()
+        returnPackage.jummah = await $db.models.jummahs.findOne({ _id: req.params.jummahID }).select(unwantedFields).exec()
+        returnPackage.location = await $db.models.locations.findOne({ _id: returnPackage.jummah.locationID }).exec()
+        returnPackage.timing = await $db.models.timings.findOne({ _id: returnPackage.jummah.timingID }).exec()
         res.json(returnPackage)
     } catch(err) {
         console.log(err)
         res.json(`Couldn't get confirmation package`)
+    }
+})
+
+router.post('/jummah-confirm', async (req, res) => {
+    try {
+        //const savedJummah = await $db.models.jummahs.updateOne({ _id: req.body.jummah._id }, req.body.jummah)
+        //console.log(req.body.notification)
+        //console.log(req.body.jummah)
+        //console.log(req.body.jummah.khateebPreference[0])
+        //const savedNotification = await $db.models.actionNotifications.updateOne({ _id: req.body.notification._id }, req.body.notification)
+        //console.log(savedNotification)
+        if (req.body.preferenceIndicator === 0 && !req.body.jummah.confirmed) {
+            const addDropout = await $db.models.khateebs.findOneAndUpdate({ _id: req.headers.userid }, { $inc: { dropouts: 1 } })
+            const dropoutAdminNotification = await _.notifications.khateebDropOut(addDropout)
+        }
+        res.json('Updated Notification and Associated Jummah')
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't update notification status!`)
     }
 })
 
