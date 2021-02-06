@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div  v-show="navMode === 'central'">
+        <div  v-if="navMode === 'central'">
             <div 
                 v-for="(link, index) in outboundLinks" :key="index"
             >
@@ -9,11 +9,12 @@
                     class="admin-nav silver"
                     @click="outbound(link.route)"
                 >
-                <p>{{ _.stringFormat(link.name) }} <span class="arrow-icon">></span></p>
+                <p>{{ _.stringFormat(link.name) }}<span v-if="link.indicator" class="indicator">{{ link.indicator }}</span> 
+                    <span class="arrow-icon">></span></p>
                 </button>
             </div>
         </div>
-        <div v-show="navMode === 'outbound'" class="return-to-central-container">
+        <div v-if="navMode === 'outbound'" class="return-to-central-container">
             <button class="back-to-central silver" @click="toCentral()">
                 <p>
                     <!-- this isn't a mistake, i'm litterally using a lesser sign here -->
@@ -50,6 +51,7 @@ export default {
         },
         toCentral() {
             this.$router.push(`/${this.baseLink}`)
+            this.$emit('to-central')
         },
     },
     computed: {
@@ -90,6 +92,12 @@ p {
     float: right;
     margin-right: 0;
     right: -5%;
+}
+
+.indicator {
+    background: getColor('yellow');
+    padding: 2px 2px 2px 2px;
+    margin-left: 7px;
 }
 
 .return-to-central-container {

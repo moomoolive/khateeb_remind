@@ -68,7 +68,7 @@ module.exports = {
             delete request.body.confirm
             next()
         } else {
-            response.status($utils.hCodes.unauthorized)
+            response.status(_.hCodes.unauthorized)
             response.json('Incorrect Credentials')
         }
     },

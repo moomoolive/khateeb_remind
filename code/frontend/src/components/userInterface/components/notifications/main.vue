@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="topAnchor">
-            <div class="close-notification-container">
-                <span @click="close()">Close</span>
+            <div class="close-notification-container" @click="close()">
+                <span>{{ this.notificationInfo.type === 'confirm' ? 'Cancel' : 'Close' }}</span>
             </div>
         </div>
         <div :class="`content ${notificationInfo.options.color || 'yellow'}`">
@@ -20,10 +20,13 @@ export default {
     components: {
         'alert': () => import('./types/alert.vue'),
         'redirect': () => import('./types/redirect.vue'),
-        'confirm': () => import('./types/confirm.vue')
+        'confirm': () => import('./types/confirm.vue'),
+        'notificationScroller': () => import('./types/notification-scroller.vue')
     },
     methods: {
         close() {
+            if (this.notificationInfo.type === 'confirm')
+                this.notificationInfo.options.reject(false)
             this.$store.dispatch('closeNotification')
         }
     },
@@ -37,7 +40,6 @@ export default {
             if (this.notificationInfo.options._id) {
                 this.$store.dispatch('markNotificationAsSeen', this.notificationInfo.options._id)
                 const updated = await this.$API.user.markNotificationAsSeen({ _id: this.notificationInfo.options._id })
-                console.log(updated)
             }
         })
     }
@@ -56,9 +58,7 @@ export default {
 .close-notification-container {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    margin-left: 2.5%;
-    width: 30%;
+    justify-content: center;
     height: 100%;
 }
 
@@ -78,14 +78,20 @@ export default {
         background: themeRGBA("yellow", 0.88);
 }
 
+.blue {
+    background: themeRGBA("blue", 0.88);
+}
+
+.grey {
+    background: themeRBGA("grey", 0.88)
+}
+
 span {
     margin: 0;
     padding: 1px 2px 1px 2px;
-    text-align: left;
     position: absolute;
     border-radius: 3px;
-    color: getColor("offWhite");
-    background-color: getColor("red");
+    color: getColor("grey");
     font-weight: bold;
     font-size: 19px;
     cursor: default;

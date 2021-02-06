@@ -267,6 +267,11 @@ const setting = new mongoose.Schema({
         required: true,
         minlength: 1
     },
+    twilioPhoneNumber: {
+        type: String,
+        required: true,
+        minlength: 12
+    },
     textAllowed: {
         type: Boolean,
         required: true,
@@ -280,8 +285,8 @@ const setting = new mongoose.Schema({
 setting.pre('save', function(next) {
     try {
         const setting = this
-        setting.twilioKey = $utils.general.encrypt(setting.twilioKey)
-        setting.twilioUser = $utils.general.encrypt(setting.twilioUser)
+        setting.twilioKey = $db.funcs.encrypt(setting.twilioKey)
+        setting.twilioUser = $db.funcs.encrypt(setting.twilioUser)
         next()
     } catch(err) {
         console.log('There was a problem encrypting settings')
@@ -298,9 +303,9 @@ setting.pre('updateOne', function(next) {
             return next()
         }
         if (data.twilioUser)
-            data.twilioUser = $utils.general.encrypt(data.twilioUser)
+            data.twilioUser = $db.funcs.encrypt(data.twilioUser)
         if (data.twilioKey)
-            data.twilioKey = $utils.general.encrypt(data.twilioKey)
+            data.twilioKey = $db.funcs.encrypt(data.twilioKey)
         this.update({}, data).exec()
         next()
     } catch(err) {
@@ -310,6 +315,10 @@ setting.pre('updateOne', function(next) {
 })
 
 const notification = new mongoose.Schema({
+    institutionID: {
+        type: String,
+        required: true
+    },
     userID: {
         type: String,
         required: true,
@@ -326,6 +335,14 @@ const notification = new mongoose.Schema({
     },
     seenAt: {
         type: Date,
+        required: false
+    },
+    tag: {
+        type: String,
+        required: true
+    },
+    meta: {
+        type: Object,
         required: false
     }
 }, { timestamps: true })

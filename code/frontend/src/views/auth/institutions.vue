@@ -12,6 +12,7 @@
                 :bindedExts="['states']"
                 :backgroundColor="`yellow`"
                 :buttonText="`To Next Step`"
+                :confirmBeforeSubmit="false"
                 @submitted="toStepTwo('institution', $event)"
                 :formTitle="`Institution Details`"
             />
@@ -121,9 +122,6 @@ export default {
         },
         async toAPI(requestSection, $event) {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to submit this application?`)
-                if (!confirm)
-                    return
                 this.changeStep(1)
                 this.deposit(requestSection, $event)
                 const res = await this.$API.auth.createInstitution(this.request)

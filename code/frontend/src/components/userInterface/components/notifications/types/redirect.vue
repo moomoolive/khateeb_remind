@@ -1,6 +1,7 @@
 <template>
     <div class="green">
         <div class="redirectContainer">
+            <p v-if="options.msg">{{ options.msg }}</p>
             <button
                 v-for="(redirect, index) in options.redirections"
                 :key="index"
@@ -50,9 +51,23 @@ button {
     padding-bottom: 10px;
 }
 
+p {
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+    height: auto;
+    color: black;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 @media screen and (max-width: $phoneWidth) {
     button {
         font-size: 2.3vh;
+    }
+    p {
+        font-size: 2vh;
     }
 }
 

@@ -4,7 +4,7 @@
             class="yellow"
             @click="changeMonth(-1)"
         >
-            Previous Month
+            Last Month
         </button>
         <button
             class="yellow"

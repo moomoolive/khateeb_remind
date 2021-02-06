@@ -74,16 +74,23 @@ export default {
             return this.areaCode + this.first3 + this.last4
         },
         readyToSubmit() {
-            return this._.isNumeric(this.completeNumber) && this.completeNumber.length === 10
+            return this._.isNumeric(this.completeNumber) && this.completeNumber.length === 10 && this.no0AtChar0
         },
         completeNumberInt() {
             return parseInt(this.completeNumber)
         },
+        no0AtChar0() {
+            return this.completeNumber[0] !== '0'
+        },
         invalidMsg() {
-            if (!this.readyToSubmit)
-                return [`Phone number must be 9 numeric characters`]
-            else
-                return []
+            const msgs = []
+            if (!this._.isNumeric(this.completeNumber))
+                msgs.push(`Must be Numeric`)
+            if (!this.completeNumber.length !== 10)
+                msgs.push(`Must Be 10 Digits`)
+            if (!this.no0AtChar0)
+                msgs.push(`You cannot have a zero as the first digit`)
+            return msgs
         }
     },
     created() {

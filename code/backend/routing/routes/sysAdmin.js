@@ -80,6 +80,7 @@ const inst = {
                             institutionID: id,
                             twilioUser: 'TBD',
                             twilioKey: 'TBD',
+                            twilioPhoneNumber: '+10001112222',
                             autoConfirmRegistration: false,
                             textAllowed: false
                         }
@@ -121,7 +122,7 @@ const inst = {
                 case "-u":
                     const rootAdmin = await $db.models.rootInstitutionAdmins.findOne({ institutionID: id }).exec()
                     const updatedRootAdmin = await $db.models.rootInstitutionAdmins.updateOne({ _id: rootAdmin._id.toString() }, { confirmed: true })
-                    const note = await $utils.notifications.welcome(rootAdmin)
+                    const note = await _.notifications.welcome(rootAdmin)
                     msgs.push(
                         { 
                             msg: `Confirmed institution ${id}'s admin status`,
@@ -162,7 +163,7 @@ const inst = {
 }
 
 const expandSyntax = (items, skipIncrement) => {
-    const copy = $utils.general.deepCopy(items)
+    const copy = _.deepCopy(items)
     const increment = 1 + skipIncrement
     for (let i = skipIncrement; i < copy.length; i += increment) {
         const item = copy[i]
@@ -186,7 +187,7 @@ const expandSyntax = (items, skipIncrement) => {
             copy[i] = true
         else {
             const num = parseInt(item)
-            if (!$utils.general.isNumeric(item) || num === NaN)
+            if (!_.isNumeric(item) || num === NaN)
                 throw SyntaxError(`${item} is not a valid type. Supported types str, true, false, int`)
             else
                 copy[i] = num
@@ -215,8 +216,8 @@ const sett = {
                             from: 'a' 
                         })
                     else {
-                        settings.twilioUser = $utils.general.decrypt(settings.twilioUser)
-                        settings.twilioKey = $utils.general.decrypt(settings.twilioKey)
+                        settings.twilioUser = $db.funcs.decrypt(settings.twilioUser)
+                        settings.twilioKey = $db.funcs.decrypt(settings.twilioKey)
                         msgs.push({ 
                             msg: settings, 
                             status: 'extraInfo',
@@ -227,7 +228,7 @@ const sett = {
                 case 'options':
                 case '-o':
                     msgs.push({ 
-                            msg: `Type 'sett set <target value>'. Possible options: twilioUser <str>, twilioKey <str>, textAllowed <bool>.`, 
+                            msg: `Type 'sett set <target value>'. Possible options: twilioUser <str>, twilioKey <str>, textAllowed <bool>, twilioPhoneNumber <str>.`, 
                             status: 'extraInfo',
                             from: 'a' 
                     })
@@ -251,6 +252,7 @@ const sett = {
             twilioUser: 'TBD',
             textAllowed: false,
             institutionID: '__ROOT__',
+            twilioPhoneNumber: '+10001112222',
             autoConfirmRegistration: false
         }
         for (let i = 0; i < options.length; i++) {
@@ -276,7 +278,7 @@ const sett = {
                 case 'force':
                 case '-f':
                     const oldSettings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
-                    const toBeAdded = $utils.general.deepCopy(newSettings)
+                    const toBeAdded = _.deepCopy(newSettings)
                     if (oldSettings) {
                         toBeAdded._id = oldSettings._id.toString()
                     }
@@ -336,7 +338,7 @@ const cli = {
     createCommand(commandArray) {
         const targetData = commandArray.shift()
         const verb = commandArray.shift()
-        const options = $utils.general.deepCopy(commandArray)
+        const options = _.deepCopy(commandArray)
         return {
             targetData,
             verb,

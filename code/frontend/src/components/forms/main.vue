@@ -245,7 +245,7 @@ export default {
             }
             if ($event.deleted) {
                 delete this.data[extension]
-                this.setData(this.data)
+                delete this.originalData[extension]
             }
             const fieldNeedsValidation = typeof $event.state !== 'undefined'
             if (fieldNeedsValidation) {

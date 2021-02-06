@@ -50,6 +50,7 @@ const createAssociatedJummahs =  async (locationID, timingID, institutionID) => 
         for (let x = 0; x < maxKhateebPreference; x++) {
             jummah.khateebPreference.push(prayerSlot)
         }
+        console.log(jummah)
         const saved = await new $db.models.jummahs(jummah).save()
     }
 }
@@ -57,5 +58,6 @@ const createAssociatedJummahs =  async (locationID, timingID, institutionID) => 
 module.exports = {
     build,
     futureJummahsAssociated,
-    createAssociatedJummahs
+    createAssociatedJummahs,
+    findUpcomingFriday: helpers.findUpcomingFriday
 }

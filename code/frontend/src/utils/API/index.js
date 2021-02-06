@@ -68,6 +68,12 @@ const khateeb = {
     },
     getCurrentSchedule() {
         return axios.get(khateebExt + '/')
+    },
+    confirmJummahPackage(jummahID, notificationID) {
+        return axios.get(khateebExt + `/jummah-confirm/${jummahID}/${notificationID}`)
+    },
+    confirmJummah(confirmedPackage) {
+        return axios.post(khateebExt + '/jummah-confirm', confirmedPackage)
     }
 } 
 
@@ -171,6 +177,9 @@ const user = {
     },
     markNotificationAsSeen(notificationId) {
         return axios.post(userExt + '/mark-notification-as-seen', notificationId)
+    },
+    deleteAccount() {
+        return axios.delete(userExt + '/account', { data: { _id: 'myAccount' } })
     }
 }
 
@@ -178,9 +187,54 @@ const miscExt = API_URL + '/misc'
 const misc = {
     uniqueUsername(username) {
         return axios.post(miscExt + '/unique-username', { username })
+    },
+    pendingKhateebCount() {
+        return axios.get(miscExt + '/pending-khateebs')
     }
 }
 
+const utils = {
+    assignUserPackage(userPkg) {
+        store.dispatch('storeNotificationsFromAPI', userPkg)
+        const urgentNotifications = userPkg.filter(note => !note.seen)
+        urgentNotifications.forEach(note => {
+            const notification = this.prepNotification(note)
+            store.dispatch('createNotification', notification)
+        })
+    },
+    prepNotification(notification) {
+        const options = {
+            textSize: 'small',
+            icon: 'asalam',
+            msg: notification.msg,
+            _id: notification._id,
+            notificationOrigin: 'server',
+            color: 'green'
+        }
+        let type = 'alert'
+        switch(notification.tag) {
+            case 'welcome':
+                options.icon = 'asalam'
+                options.graphicType = 'gif'
+                break
+            case 'khateebs':
+                options.icon = 'khateebs'
+                if (notification.meta && notification.meta.dropout)
+                    options.color = 'yellow'
+                break
+            case 'jummah':
+                type = 'redirect'
+                options.redirections = [
+                    {
+                        to: notification.actionLink.replace("__ID__", notification._id),
+                        text: 'confirm'
+                    }
+                ]
+                break
+        }
+        return { type, options }
+    }
+}
 
 export default {
     auth,
@@ -189,5 +243,6 @@ export default {
     institutionAdmin,
     user,
     misc,
-    rootInstitutionAdmin
+    rootInstitutionAdmin,
+    utils
 }

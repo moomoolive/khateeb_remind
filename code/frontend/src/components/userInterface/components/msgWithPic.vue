@@ -38,7 +38,7 @@ h2 {
 }
 
 div {
-    width: 90%;
+    width: 88%;
     margin-left: auto;
     margin-right: auto;
     max-width: 1100px;
@@ -47,6 +47,12 @@ div {
 @media screen and (max-width: $phoneWidth) {
     h2 {
         font-size: 4vh;
+    }
+}
+
+@media screen and (min-width: $desktopWidth) {
+    h2 {
+        font-size: 37px;
     }
 }
 

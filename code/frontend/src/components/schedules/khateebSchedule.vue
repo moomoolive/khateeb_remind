@@ -68,7 +68,9 @@
                                     </div>
                                     <div class="jummahPreferences">
                                         <component
-                                            @changed="changePreference(timing, $event)" 
+                                            v-if="showCell"
+                                            @changed="changePreference(timing, $event)"
+                                            @override="overrideJummah(timing)" 
                                             :is="reciever"
                                             :timing="timing"
                                             :khateebs="khateebs"
@@ -149,6 +151,7 @@ export default {
             cachedDate: null,
             date: datetime.upcomingFriday(true),
             originalDate: null,
+            showCell: true,
             selected: {
                 week: null,
                 location: 'all'
@@ -228,6 +231,13 @@ export default {
                     }
             }
         },
+        overrideJummah(jummah) {
+            jummah.khateebPreference[0].confirmed = true
+            jummah.khateebPreference[0].notified = true
+            jummah.khateebPreference[0].responded = true
+            jummah.confirmed = true
+            this.$emit('override', [jummah])
+        },
         locationHasData(location) {
             const empty = Object.keys(location).length < 1
             return !empty
@@ -248,12 +258,9 @@ export default {
             this.$emit('schedule-date', this.date)
         },
         changePreference(timing, $event) {
-            console.log($event)
             const targetPreference = this._.deepCopy(timing.khateebPreference[$event.number])
             targetPreference.khateebID = $event.val
-            console.log(timing.khateebPreference[$event.number])
             this.$set(timing.khateebPreference, $event.number, targetPreference)
-            console.log(timing.khateebPreference[$event.number])
         },
         timingDisplay(timingID) {
             const time = this.timingsIndex[timingID]
@@ -286,7 +293,6 @@ export default {
                 return
             const diff = []
             for (let i = 0; i < this.jummahs.jummahs.length; i++) {
-                console.log(this.jummahs.jummahs[i], this.originalJummahs.jummahs[i])
                 if (!equal(this.jummahs.jummahs[i], this.originalJummahs.jummahs[i]))
                     diff.push(this.jummahs.jummahs[i])
             }
@@ -310,6 +316,10 @@ export default {
             this.struct = this.buildStruct(this.jummahs.jummahs)
             this.struct = this.filterEmptyLocations(this.struct)
             this.originalStruct = this._.deepCopy(this.struct)
+        },
+        rerenderJummahCell() {
+            this.showCell = false
+            this.$nextTick(() => { this.showCell = true })
         }
     },
     computed: {
@@ -370,6 +380,9 @@ export default {
         },
         moreThanOneLocation() {
             return this.locationKeys.length > 1
+        },
+        selectedWeek() {
+            return this.selected.week
         }
     },
     watch: {
@@ -379,10 +392,14 @@ export default {
                 this.selected.week = datetime.upcomingFriday(true).getDate().toString()
             else
                 this.selected.week = this.weeklyKeys[0]
+            this.rerenderJummahCell()
         },
         revertToPreviousMonth(newVal) {
             if (newVal)
                 this.date = new Date(this.cachedDate)
+        },
+        selectedWeek() {
+            this.rerenderJummahCell()
         }
     },
     created() {
@@ -428,6 +445,7 @@ export default {
     height: 20%;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20px;
     flex-direction: row;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
     border-radius: 7px;

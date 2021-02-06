@@ -7,6 +7,7 @@
             :revertToPreviousMonth="revertToPreviousMonth"
             @copy="saveSchedule($event)"
             @schedule-date="getSchedule($event)"
+            @override="saveSchedule($event)"
         >   
             <template #default="props">
                 <change-month-buttons

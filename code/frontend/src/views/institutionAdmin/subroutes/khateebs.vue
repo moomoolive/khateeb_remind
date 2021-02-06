@@ -175,7 +175,7 @@ export default {
             const tags = []
             if (!khateeb.active)
                 tags.push({ words: 'Inactive', color: 'urgent', symbol: '📪' })
-            const tag = { words: this._.dynamicDisplayDate(khateeb.lastLogin), color: 'goodNews', symbol: '☀️' }
+            const tag = { words: `Last Active ${this._.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }
             tags.push(tag)
             return tags
         },
@@ -260,6 +260,12 @@ export default {
                 }
             }
             return query
+        }
+    },
+    watch: {
+        showSearchTools(newVal) {
+            if (!newVal)
+                this.resetSearch()
         }
     },
     created() {

@@ -1,9 +1,6 @@
 import axios from 'axios'
 
 export default {
-    dateInfo({ commit }, info) {
-        commit('dateInfo', info)
-    },
     JWT_TOKEN({ commit }, token) {
         commit('updateToken', token)
     },
@@ -38,5 +35,8 @@ export default {
     },
     markNotificationAsSeen({ commit }, notificationId) {
         commit('markNotificationAsSeen', notificationId)
+    },
+    markNotificationActionAsComplete({ commit }, notificationId) {
+        commit('markNotificationActionAsComplete', notificationId)
     }
 }

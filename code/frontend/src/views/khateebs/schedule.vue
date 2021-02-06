@@ -49,7 +49,6 @@ export default {
             this.scheduleExists = false
         else 
             this.currentSchedule = monthlySchedule
-        console.log(this.currentSchedule)
       } catch(err) {
         this.scheduleExists = false
       }

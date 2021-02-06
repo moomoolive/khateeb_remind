@@ -26,4 +26,18 @@ router.post('/unique-username',
     }
 )
 
+router.get('/pending-khateebs', 
+    middleware.auth(2),
+    async (req, res) => {
+        try {
+            const pending = await $db.models.khateebs.find({ institutionID: req.headers.institutionid, confirmed: false }).exec()
+            const count = pending.length
+            res.json(count === 0 ? null : count)
+        } catch(err) {
+            console.log(err)
+            res.json(`Couldn't retrieve pending khateebs`)
+        }
+    }
+)
+
 module.exports = router

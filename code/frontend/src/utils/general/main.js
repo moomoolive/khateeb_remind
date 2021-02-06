@@ -67,13 +67,15 @@ export default {
             destintation = '/institutionAdmin'
         else
             destintation = `/${user}`
-        router.push(destintation)
+        if (router.currentRoute.fullPath !== destintation)
+            router.push(destintation)
     },
     dynamicDisplayDate(date) {
         date = new Date(date)
         const amOrPm = date.getHours() > 11 ? 'PM' : 'AM'
         const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
-        let base = `${hours}:${date.getMinutes()} ${amOrPm}`
+        const mins = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
+        let base = `${hours}:${mins} ${amOrPm}`
         const yesterday = new Date()
         yesterday.setHours(0, 0, 0, 0)
         if (date.getTime() > yesterday.getTime())

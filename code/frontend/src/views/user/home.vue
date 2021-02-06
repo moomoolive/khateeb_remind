@@ -36,6 +36,15 @@
                 @submitted="updateProfile($event)"
             />
         </collapsable-box>
+        <collapsable-box
+            v-if="showDelete"
+            class="user-setting"
+            :headline="`Danger Zone`"
+            :buttonColor="`red`"
+            :bodyColor="`silver`"
+        >
+            <button class="yellow delete-account" @click="deleteAccount()">Delete My Account</button>
+        </collapsable-box>
     </div>
 </template>
 
@@ -90,7 +99,8 @@ export default {
                     selectOptions: ['none', 'Shiekh', 'Imam']
                 },
                 //available times
-            }
+            },
+            showDelete: null
         }
     },
     methods: {
@@ -133,9 +143,23 @@ export default {
             localStorage.setItem('token', token)
             axios.defaults.headers.common['authorization'] = token
             this.$store.dispatch('JWT_TOKEN', token)
+        },
+        async deleteAccount() {
+            try {
+                const confirm = await this._.confirm(`Are you sure you want to permenantly delete your account?`)
+                const res = await this.$API.user.deleteAccount()
+                this.$store.dispatch('logout')
+                this._.toHomePage()
+                this._.alert(`Successfully delete account`, 'success')
+                console.log(res)
+            } catch(err) {
+                console.log(err)
+            }
         }
     },
     created() {
+        const accountType = this.$store.getters.decodedJWT.__t
+        this.showDelete = accountType !== 'rootInstitutionAdmin' && accountType !== 'root'
         if (this.$store.getters.decodedJWT.__t == 'khateeb')
             this.structure.profile = { ...this.structure.profile, ...this.khateebExtras }
     }
@@ -149,5 +173,19 @@ export default {
     margin-left: auto;
     margin-right: auto;
     max-height: 1500px;
+}
+
+.delete-account {
+    width: 80%;
+    height: 6vh;
+    max-height: 60px;
+    font-size: 20px;
+    color: red;
+}
+
+@media screen and (max-width: $phoneWidth) {
+    .delete-account {
+        font-size: 3vh;
+    }
 }
 </style>

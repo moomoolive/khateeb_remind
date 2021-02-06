@@ -1,5 +1,9 @@
 {
     "announcements": {
+        "_id": {
+            "__type__": "str",
+            "required": false
+        },
         "institutionID": {
             "__type__": "str",
             "required": false

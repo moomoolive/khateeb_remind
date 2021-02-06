@@ -25,8 +25,6 @@ import Header from '@/components/misc/Header.vue'
 import notifications from '@/components/userInterface/components/notifications/main.vue'
 import Footer from '@/components/misc/Footer.vue'
 
-import datetime from '@/utils/dateTime/main.js'
-
 import axios from 'axios'
 
 export default {
@@ -42,30 +40,6 @@ export default {
     }
   },
   methods: {
-    getDateInformation() {
-      const info = {
-        upcomingFridayInfo: datetime.upcomingFriday()
-      }
-      this.$store.dispatch('dateInfo', info)
-    },
-    notificationCreator(notification) {
-      if (notification.__t === 'generalNotification') {
-        if (notification.tag === "welcome") {
-          const options = {
-            type: 'alert',
-            options: {
-              color: 'green',
-              textSize: 'small',
-              icon: 'asalam',
-              graphicType: 'gif',
-              msg: notification.msg,
-              _id: notification._id
-            }
-          }
-          this.$store.dispatch('createNotification', options)
-        }
-      } 
-    },
     async setJWT() {
       let token = localStorage.getItem('token')
       if (!token)
@@ -73,9 +47,7 @@ export default {
       axios.defaults.headers.common['authorization'] = token
       try {
         const userPackage = await this.$API.user.checkIn()
-        const toBeShown = userPackage.filter(note => !note.seen)
-        toBeShown.forEach(note => { this.notificationCreator(note) })
-        this.$store.dispatch('storeNotificationsFromAPI', userPackage)
+        this.$API.utils.assignUserPackage(userPackage)
       } catch(err) {
         console.log(err)
       }
@@ -102,6 +74,9 @@ export default {
     },
     notificationsQueue() {
       return this.$store.state.notificationsQueue
+    },
+    userPromptedNotifications() {
+      return this.$store.state.userPromptedNotifications
     }
   },
   watch: {
@@ -117,6 +92,9 @@ export default {
         this.firstNotification = true
         return
       }
+      else if (newVal[0] === '__USER__') {
+        newVal[0] = this.userPromptedNotifications[0]
+      }
       const milliseconds = this.firstNotification ? 100 : 2_500
       if (this.firstNotification)
         this.firstNotification = false
@@ -127,10 +105,9 @@ export default {
       )
     }
   },
-  created() {
+  async created() {
     this.setJWT()
-    this.getDateInformation()
-    this.setLastVisit()
+    this.setLastVisit() 
   }
 }
 </script>
@@ -207,7 +184,7 @@ h2 {
 
 .notifications-layer {
   z-index: 9;
-  position: absolute;
+  position: fixed;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,6 +195,7 @@ h2 {
   height: auto;
   max-height: 400px;
   max-width: 400px;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
 }
 
 @media screen and (max-width: $phoneWidth) {

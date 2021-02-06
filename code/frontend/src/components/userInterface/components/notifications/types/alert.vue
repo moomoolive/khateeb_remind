@@ -62,7 +62,6 @@ div {
     padding: 0;
 }
 
-
 .msg {
     margin-top: 5%;
     margin-left: auto;
