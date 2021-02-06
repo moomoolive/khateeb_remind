@@ -219,14 +219,14 @@ const utils = {
                 break
             case 'khateebs':
                 options.icon = 'khateebs'
-                if (notification.meta.dropout)
+                if (notification.meta && notification.meta.dropout)
                     options.color = 'yellow'
                 break
             case 'jummah':
                 type = 'redirect'
                 options.redirections = [
                     {
-                        to: notification.actionLink,
+                        to: notification.actionLink.replace("__ID__", notification._id),
                         text: 'confirm'
                     }
                 ]

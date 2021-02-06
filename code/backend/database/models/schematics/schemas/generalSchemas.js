@@ -267,6 +267,11 @@ const setting = new mongoose.Schema({
         required: true,
         minlength: 1
     },
+    twilioPhoneNumber: {
+        type: String,
+        required: true,
+        minlength: 12
+    },
     textAllowed: {
         type: Boolean,
         required: true,

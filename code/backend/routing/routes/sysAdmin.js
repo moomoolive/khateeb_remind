@@ -80,6 +80,7 @@ const inst = {
                             institutionID: id,
                             twilioUser: 'TBD',
                             twilioKey: 'TBD',
+                            twilioPhoneNumber: '+10001112222',
                             autoConfirmRegistration: false,
                             textAllowed: false
                         }
@@ -227,7 +228,7 @@ const sett = {
                 case 'options':
                 case '-o':
                     msgs.push({ 
-                            msg: `Type 'sett set <target value>'. Possible options: twilioUser <str>, twilioKey <str>, textAllowed <bool>.`, 
+                            msg: `Type 'sett set <target value>'. Possible options: twilioUser <str>, twilioKey <str>, textAllowed <bool>, twilioPhoneNumber <str>.`, 
                             status: 'extraInfo',
                             from: 'a' 
                     })
@@ -251,6 +252,7 @@ const sett = {
             twilioUser: 'TBD',
             textAllowed: false,
             institutionID: '__ROOT__',
+            twilioPhoneNumber: '+10001112222',
             autoConfirmRegistration: false
         }
         for (let i = 0; i < options.length; i++) {

@@ -68,12 +68,8 @@ router.get('/jummah-confirm/:jummahID/:notificationID', async (req, res) => {
 
 router.post('/jummah-confirm', async (req, res) => {
     try {
-        //const savedJummah = await $db.models.jummahs.updateOne({ _id: req.body.jummah._id }, req.body.jummah)
-        //console.log(req.body.notification)
-        //console.log(req.body.jummah)
-        //console.log(req.body.jummah.khateebPreference[0])
-        //const savedNotification = await $db.models.actionNotifications.updateOne({ _id: req.body.notification._id }, req.body.notification)
-        //console.log(savedNotification)
+        const savedJummah = await $db.models.jummahs.updateOne({ _id: req.body.jummah._id }, req.body.jummah)
+        const savedNotification = await $db.models.actionNotifications.updateOne({ _id: req.body.notification._id }, req.body.notification)
         if (req.body.preferenceIndicator === 0 && !req.body.jummah.confirmed) {
             const addDropout = await $db.models.khateebs.findOneAndUpdate({ _id: req.headers.userid }, { $inc: { dropouts: 1 } })
             const dropoutAdminNotification = await _.notifications.khateebDropOut(addDropout)

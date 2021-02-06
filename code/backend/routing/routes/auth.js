@@ -36,15 +36,19 @@ router.post('/create/khateeb',
     async (req, res) => {
     try {
         const institution = req.body.institutionID
-        const settings = await $db.models.settings.find({ institutionID: institution }).exec()
+        const settings = await $db.models.settings.findOne({ institutionID: institution }).exec()
+        if (!settings)
+            return res.json(`That institution doesn't exist!`)
         if (settings.autoConfirmRegistration)
             req.body.confirmed = true
+        else
+            req.body.confirmed = false
         const khateebEntry = await $db.funcs.save('khateebs', req.body)
         if (settings.autoConfirmRegistration) {
             const welcomeMsg = await _.notifications.welcome(khateebEntry)
         }
         const notification = await _.notifications.khateebSignup(khateebEntry, settings.autoConfirmRegistration)
-        res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}). Please wait a day or two for the institution administrator to confirm your account.`)
+        res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
         console.log(err)
         res.status(_.hCodes.serverError)

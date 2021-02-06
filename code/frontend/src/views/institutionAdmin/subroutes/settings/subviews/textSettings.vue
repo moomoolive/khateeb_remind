@@ -40,7 +40,11 @@ export default {
                     toggle: true,
                     required: true,
                     tag: 'encrypted'
-                }
+                },
+                twilioPhoneNumber: {
+                    required: true,
+                    minLength: 12
+                },
             }
         }
     }

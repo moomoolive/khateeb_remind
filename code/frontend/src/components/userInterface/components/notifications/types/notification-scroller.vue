@@ -99,6 +99,7 @@ export default {
         },
         pushToActionPage(notification) {
             const actionLink = notification.actionLink.replace("__ID__", notification._id)
+            console.log(actionLink)
             if (this.$router.currentRoute.fullPath !== actionLink)
                 this.$router.push(actionLink)
             this.$store.dispatch('closeNotification')

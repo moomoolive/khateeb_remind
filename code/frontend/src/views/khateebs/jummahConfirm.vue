@@ -6,7 +6,7 @@
                     <div class="confirm-container" v-if="jummahMeta">
                         <div class="confirm-action-box">
                             <p>
-                                Are you still able to give the following khutbah insha'Allah?<br><br>
+                                Are you able to give the following khutbah insha'Allah?<br><br>
                                 <span class="purple">{{ jummahMeta.time }}</span><br>
                                 at<br>
                                 <span class="orange">{{ jummahMeta.locationName }}</span><br>
