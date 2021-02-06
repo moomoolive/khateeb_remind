@@ -17,6 +17,7 @@
                     </span>
                 </div>
                 <div class="notification-msg">
+                    <span class="notification-date">{{ _.dynamicDisplayDate(notification.createdAt) }}</span><br><br>
                     {{ notification.msg }}
                 </div>
                 <div>
@@ -166,8 +167,14 @@ export default {
     margin-right: auto;
     text-align: left;
     padding-top: 2%;
+    font-size: 16px;
     padding-bottom: 5%;
     color: getColor("offWhite");
+}
+
+.notification-date {
+    font-size: 12px;
+    color: getColor("purple");
 }
 
 .actions-btn {

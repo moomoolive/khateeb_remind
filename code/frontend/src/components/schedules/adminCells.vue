@@ -1,18 +1,26 @@
 <template>
     <div>
         <div v-if="data">
+            <button
+                v-if="viewingMonth !== 'past' && currentWeek && currentWeek !== 'past' && !data.confirmed" 
+                class="yellow"
+                @click="manualOverride()"
+            >
+                Manual Override
+            </button>
             <div 
                 v-for="(preference, preferenceNo) in data.khateebPreference"
                 :key="preferenceNo"
             >
                 <p>Preference {{ preferenceNo + 1 }}</p>
                 <div v-if="readOnly(preference)">
-                    <p>{{ readOnlyKhateebDisplay(preference.khateebID) }} 
+                    <p>
                         <span 
                             v-if="preference.notified && preference.responded && preference.confirmed"
                         >
                             ⭐
                         </span>
+                        {{ readOnlyKhateebDisplay(preference.khateebID) }} 
                     </p>
                 </div>
                 <select
@@ -119,6 +127,11 @@ export default {
             if (preference.notified && preference.responded && !preference.confirmed)
                 notifications.push('❌ Canceled')
             return notifications
+        },
+        async manualOverride() {
+            const confirm = await this._.confirm(`Manual Override will stop all notifications from reaching khateebs associated with this jummah, make this jummah uneditable, and set the first preference as scheduled khateeb. Are you sure you want to manually override?`)
+            if (confirm)
+                this.$emit('override')
         }
     },
     created() {
@@ -163,6 +176,12 @@ p {
     font-weight: bold;
 }
 
+button {
+    width: 80%;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
 @media screen and (max-width: $phoneWidth) {
     select {
         font-size: 2vh;
@@ -173,6 +192,9 @@ p {
     }
     .current-week-notification {
         font-size: 2.7vh;
+    }
+    button {
+        font-size: 2.2vh;
     }
 }
 </style>

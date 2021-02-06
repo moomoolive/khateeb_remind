@@ -69,7 +69,8 @@
                                     <div class="jummahPreferences">
                                         <component
                                             v-if="showCell"
-                                            @changed="changePreference(timing, $event)" 
+                                            @changed="changePreference(timing, $event)"
+                                            @override="overrideJummah(timing)" 
                                             :is="reciever"
                                             :timing="timing"
                                             :khateebs="khateebs"
@@ -229,6 +230,13 @@ export default {
                         icon: '⏱️'
                     }
             }
+        },
+        overrideJummah(jummah) {
+            jummah.khateebPreference[0].confirmed = true
+            jummah.khateebPreference[0].notified = true
+            jummah.khateebPreference[0].responded = true
+            jummah.confirmed = true
+            this.$emit('override', [jummah])
         },
         locationHasData(location) {
             const empty = Object.keys(location).length < 1
