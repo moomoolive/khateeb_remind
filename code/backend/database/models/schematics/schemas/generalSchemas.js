@@ -40,6 +40,20 @@ const jummah = new mongoose.Schema({
     khateebPreference: [subDocs.prayerSlot]
 }, { timestamps: true })
 
+jummah.methods.gatherMeta = async function() {
+    try {
+        const location = await $db.models.locations.findOne({ _id: this.locationID }).exec()
+        const timing = await $db.models.timings.findOne({ _id: this.timingID }).exec()
+        return {
+            location,
+            timing
+        } 
+    } catch(err) {
+        console.log(err)
+        console.log(`Couldn't gather jummah meta`)
+    }
+}
+
 const institution = new mongoose.Schema({
     name: {
         type: String,

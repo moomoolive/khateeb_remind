@@ -14,8 +14,14 @@ const cron = (callback) => {
             title: 'none'
         }
         //const note = new _.notifications.welcome(randomUser)
-        const note = new _.notifications.jummahDropout(randomUser)
+        /*const note = new _.notifications.jummahDropout(randomUser)
         await note.setRecipentsToAdmins("602177dc94349e1ff89b2d7a")
+        const msgs = await note.create()
+        console.log(msgs)*/
+        const jummah = await $db.models.jummahs.findOne({ _id: "6021780f94349e1ff89b2d87" }).exec()
+        const meta = await jummah.gatherMeta()
+        const khateeb = await $db.models.khateebs.findOne({ _id: "60219bfd40eb880f0cba632f" }).exec()
+        const note = new _.notifications.jummahReminder(khateeb, jummah, meta, 1)
         const msgs = await note.create()
         console.log(msgs)
         callback()

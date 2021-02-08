@@ -13,15 +13,16 @@ const cron = (callback) => {
                     const jummah = jummahsThisWeek[x]
                     if (jummah.confirmed || jummah.khateebPreference[0].khateebID === 'TBD')
                         continue
-                    jummah.khateebPreference[0].notified = true // test
-                    const settings = await $db.models.settings.findOne({ institutionID: institution._id.toString() }).exec()
-                    if (!jummah.khateebPreference[0].notified)
-                        _.notifications.createJummahMessage(jummah)
-                    else {
-                        if (jummah.khateebPreference[1].khateebID !== 'TBD')
-                            _.notifications.createJummahMessage(jummah, preference=2)
-                        if (jummah.khateebPreference[2].khateebID !== 'TBD')
-                            _.notifications.createJummahMessage(jummah, preference=3)
+                    const meta = await jummah.gatherMeta()
+                    for (let y = 0; y < jummah.khateebPreference.length; y++) {
+                        const preference = jummah.khateebPreference[y]
+                        if (preference.notified || preference.khateebID === 'TBD')
+                            continue
+                        const khateeb = await $db.models.khateebs.findOne({ _id: preference.khateebID.toString() }).exec()
+                        const note = new _.notifications.jummahReminder(khateeb, jummah, meta, y + 1)
+                        const msgs = await note.create()
+                        if (y === 0)
+                            break 
                     }
                 }
             }

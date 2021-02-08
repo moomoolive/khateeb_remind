@@ -5,6 +5,7 @@ class Notification {
         this.type = type,
         this.tag = tag
         this.meta = meta
+        this.additonalNotificationInfo = {}
     }
     async create(text=false, pwa=false) {
         const msgsInfo = []
@@ -46,7 +47,8 @@ class Notification {
             institutionID: user.institutionID.toString(),
             tag: this.tag,
             msg: this.msg(user),
-            meta: this.meta
+            meta: this.meta,
+            ...this.additonalNotificationInfo
         }
     }
     async init(user) {
@@ -114,24 +116,31 @@ class jummahDropout extends Notification {
     }
 }
 
-const khateebDropOut = async (khateebInfo) => {
-    const admins = await findInstitutionAdmins(khateebInfo.institutionID)
-    const name = khateebName(khateebInfo)
-    const msg = {
-        userID: null,
-        tag: 'khateebs',
-        msg: `${name} has cancel his assigned jummah this week! Khateeb Remind will be messaging other backups if applicable.`,
-        institutionID: khateebInfo.institutionID,
-        meta: { dropout: true }
+class jummahReminder extends Notification {
+    constructor(khateeb ,jummah, jummahMeta, preference) {
+        super(khateeb, 'actionNotifications', 'jummah', { jummah, ...jummahMeta })
+        this.preference = preference
+        this.additonalNotificationInfo = {
+            actionLink: `/jummah/confirm/jummah=${jummah._id.toString()}/note=__ID__`,
+            buttonText: 'Confirm'
+        }
     }
-    for (let i = 0; i < admins.length; i++) {
-        const admin = admins[i]
-        msg.userID = admin._id.toString()
-        const note = await new $db.models.generalNotifications(msg).save()
+    msg() {
+        const base = `to give the ${this.timing} khutbah at ${this.msgInfo.location.name} (${this.msgInfo.location.address}) this week${this.preference > 1 ? '?' : '.'} Click here to confirm your attendance, JAK!`
+        const prefix = this.preference > 1 ? 'Are you able ' : 'You are scheduled '
+        return prefix + base
     }
-    return 'success'
+    get timing() {
+        let militaryhour = this.msgInfo.timing.hour
+        const hour = militaryhour > 12 ? militaryhour - 12 : militaryhour
+        let min = this.msgInfo.timing.minute
+        min = min < 10 ? `0${min}` : min
+        const amOrPm = militaryhour > 11 ? 'PM' : 'AM'
+        return `${hour}:${min} ${amOrPm}`
+    }
 }
 
+/*
 const createJummahMessage = async (jummah, preference=1) => {
     try {
         const targetPreference = jummah.khateebPreference[preference - 1]
@@ -164,11 +173,11 @@ const createJummahMessage = async (jummah, preference=1) => {
         console.log(err)
         return err
     }
-}
+}*/
 
 module.exports = {
     welcome,
     khateebSignup,
     jummahDropout,
-    createJummahMessage
+    jummahReminder
 }
