@@ -2,34 +2,48 @@
     <div class="scroller-container">
         <loading
             :loadingTime="900"
+            :textColor="`white`"
         >
-            <div 
-                v-for="(notification, index) in allNotifications" :key="index"
-                :class="`notification-container ${notificationPosition(index)}`"
-            >       
-                <div>
-                    <tag-circle
-                        class="tag" 
-                        :info="tagLoader(notification)"
-                    />
-                    <span class="needs-attention" v-if="notification.actionLink && !notification.actionPerformed">
-                        ⚠️
-                    </span>
+            <div v-if="allNotifications.length > 0">
+                <div 
+                    v-for="(notification, index) in allNotifications" :key="index"
+                    :class="`notification-container ${notificationPosition(index)}`"
+                >       
+                    <div>
+                        <tag-circle
+                            class="tag" 
+                            :info="tagLoader(notification)"
+                        />
+                        <span class="needs-attention" v-if="notification.actionLink && !notification.actionPerformed">
+                            ⚠️
+                        </span>
+                    </div>
+                    <div class="notification-msg">
+                        <span class="notification-date">{{ _.dynamicDisplayDate(notification.createdAt) }}</span><br><br>
+                        {{ notification.msg }}
+                    </div>
+                    <div>
+                        <button 
+                            v-if="!!notification.actionLink"
+                            :disabled="notification.actionPerformed"
+                            :class="`actions-btn ${notification.actionPerformed ? 'green' : 'darkRed'}`"
+                            @click="pushToActionPage(notification)"
+                        >
+                            {{  notification.actionPerformed ? notification.completedButtonText || 'Completed' : notification.buttonText }}
+                        </button>
+                    </div>
                 </div>
-                <div class="notification-msg">
-                    <span class="notification-date">{{ _.dynamicDisplayDate(notification.createdAt) }}</span><br><br>
-                    {{ notification.msg }}
-                </div>
-                <div>
-                    <button 
-                        v-if="!!notification.actionLink"
-                        :disabled="notification.actionPerformed"
-                        :class="`actions-btn ${notification.actionPerformed ? 'green' : 'darkRed'}`"
-                        @click="pushToActionPage(notification)"
-                    >
-                        {{  notification.actionPerformed ? notification.completedButtonText || 'Completed' : notification.buttonText }}
-                    </button>
-                </div>
+            </div>
+            <div
+                v-else 
+                class="empty-notifications-container"
+            >
+                <msg-with-pic
+                    class="empty-notifications-msg" 
+                    :gif="`sadCat`"
+                    :msg="`No notifications to show...`"
+                    :textColor="`white`"
+                />
             </div>
         </loading>
     </div>
@@ -141,6 +155,11 @@ export default {
         box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
         -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
     }
+}
+
+.empty-notifications-container {
+    background-color: getColor("grey");
+    padding-bottom: 8%;
 }
 
 .notification-container {

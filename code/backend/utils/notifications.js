@@ -1,43 +1,117 @@
-const findInstitutionAdmins = async (institutionID) => {
-    const rootAdmin = await $db.models.rootInstitutionAdmins.findOne({ institutionID }).exec()
-    const otherAdmins = await $db.models.institutionAdmins.find({ institutionID }).exec()
-    otherAdmins.push(rootAdmin)
-    return otherAdmins
+class Notification {
+    constructor(userInfo, type='none', tag='none', msgInfo=userInfo, meta={}) {
+        this.setRecipents([userInfo])
+        this.msgInfo = msgInfo,
+        this.type = type,
+        this.tag = tag
+        this.meta = meta
+    }
+    async create(text=false, pwa=false) {
+        const msgsInfo = []
+        for (let i = 0; i < this.userInfo.length; i++) {
+            const user = this.userInfo[i]
+            try {
+                const info = await this.init(user)
+                const returnObject = { info }
+                if (text) {
+                    const text = await this.text()
+                    returnObject.text = `text was successfully send for notification ${info._id.toString()}`
+                }
+                if (pwa) {
+                    const pwa = await this.pwa()
+                    returnObject.pwa =  `pwa push notification was successfully sent for notification ${info._id.toString()}`
+                }
+                msgsInfo.push(returnObject) 
+            } catch(err) {
+                console.log(err)
+                console.log(`Couldn't create notification!`)
+            }
+        }
+        return msgsInfo
+    }
+    async setRecipentsToAdmins(institutionID) {
+        try {
+            const rootAdmin = await $db.models.rootInstitutionAdmins.findOne({ institutionID }).exec()
+            const otherAdmins = await $db.models.institutionAdmins.find({ institutionID }).exec()
+            otherAdmins.push(rootAdmin)
+            this.setRecipents(otherAdmins)
+        } catch(err) {
+            console.log(err)
+            console.log(`Couldn't get institution admins`)
+        }
+    }
+    compileMsg(user) {
+        return {
+            userID: user._id.toString(),
+            institutionID: user.institutionID.toString(),
+            tag: this.tag,
+            msg: this.msg(user),
+            meta: this.meta
+        }
+    }
+    async init(user) {
+        try {
+            const msg = this.compileMsg(user)
+            const note = await new $db.models[this.type](msg).save()
+            return note
+        } catch(err) {
+            console.log(err)
+            console.log(`Couldn't create notification`)
+        }
+    }
+    async text() {
+        console.log('texted')
+    }
+    async pwa() {
+        console.log('push notification')
+    }
+    setRecipents(recipents) {
+        this.userInfo = recipents
+    }
 }
 
-const khateebName = (khateebInfo) => {
-    let base = `${khateebInfo.firstName} ${khateebInfo.lastName}`
-    if (khateebInfo.title !== 'none')
-        base = `${khateebInfo.title} ` + base
+class welcome extends Notification {
+    constructor(userInfo) {
+        super(userInfo, 'generalNotifications', 'welcome')
+    }
+    msg() {
+        return `Asalam aliakoum ${this.msgInfo.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. Feel free to take a look around, and ask your administrator if you need any help!`
+    }
+}
+
+const khateebName = (msgInfo) => {
+    let base = `${msgInfo.firstName} ${msgInfo.lastName}`
+    if (msgInfo.title.toLowerCase() !== 'none')
+        base = `${msgInfo.title} ` + base
     return base
 }
 
-const welcome = async (userInfo) => {
-    const welcomeMsg = {
-        userID: userInfo._id.toString(),
-        tag: 'welcome',
-        msg: `Asalam aliakoum ${userInfo.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. Feel free to take a look around, and ask your administrator if you need any help!`,
-        institutionID: userInfo.institutionID
+class khateebSignup extends Notification {
+    constructor(khateeb, autoConfirm) {
+        super({}, 'generalNotifications', 'khateebs', khateeb)
+        this.autoConfirm = autoConfirm
     }
-    const note = await new $db.models.generalNotifications(welcomeMsg).save()
-    return 'success'
+    msg() {
+        if (this.autoConfirm)
+            return `${this.khateebName} is now a khateeb at your institution, if you want khateebs to manual confirm in the future - head to settings and turn off auto-confirm!`
+        else
+            return `${this.khateebName} wants to be a khateeb at your institution. Confirm him by heading to your Admin Central, pressing khateebs, and then pressing 'confirm registration'.`
+    }
+    get khateebName() {
+        return khateebName(this.msgInfo)
+    }
 }
 
-const khateebSignup = async (khateebInfo, autoConfirm=false) => {
-    const name = khateebName(khateebInfo)
-    const msg = {
-        userID: null,
-        tag: 'khateebs',
-        msg: autoConfirm ? `${name} is now a khateeb at your institution! If you want to manually register khateebs turn off auto-confirm in settings` : `${name} wants to become a khateeb at your institution! Confirm them by heading to Admin Central and press the khateebs tab.`,
-        institutionID: khateebInfo.institutionID
+class jummahDropout extends Notification {
+    constructor(khateeb) {
+        super({}, 'generalNotifications', 'khateebs', khateeb, { dropout: true })
     }
-    const otherAdmins = await findInstitutionAdmins(khateebInfo.institutionID)
-    for (let i = 0; i < otherAdmins.length; i++) {
-        const admin = otherAdmins[i]
-        msg.userID = admin._id.toString()
-        const note = await new $db.models.generalNotifications(msg).save()
+    msg() {
+        return `${this.khateebName} has canceled his assigned jummah this week! Khateeb Remind will be messaging other backups by Thursday morning insha'Allah if applicable.`
     }
-    return 'success'
+    get khateebName() {
+        return khateebName(this.msgInfo)
+    }
 }
 
 const khateebDropOut = async (khateebInfo) => {
@@ -95,6 +169,6 @@ const createJummahMessage = async (jummah, preference=1) => {
 module.exports = {
     welcome,
     khateebSignup,
-    khateebDropOut,
+    jummahDropout,
     createJummahMessage
 }

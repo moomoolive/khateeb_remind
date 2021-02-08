@@ -343,7 +343,7 @@ const notification = new mongoose.Schema({
     },
     meta: {
         type: Object,
-        required: false
+        required: true
     }
 }, { timestamps: true })
 

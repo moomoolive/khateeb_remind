@@ -110,9 +110,14 @@ const inst = {
                             minute: 30
                         }
                         const savedTiming = await new $db.models.timings(timing).save()
+                        const associatedJummahs = await _.schedule.createAssociatedJummahs(
+                            savedLocation._id.toString(), 
+                            savedTiming._id.toString(), 
+                            id
+                        )
                         msgs.push(
                             { 
-                                msg: `Created timing and location for institution ${id}`,
+                                msg: `Created timing, location, first jummahs for institution ${id}`,
                                 status: 'okay',
                                 from: 'a' 
                             }
@@ -122,7 +127,8 @@ const inst = {
                 case "-u":
                     const rootAdmin = await $db.models.rootInstitutionAdmins.findOne({ institutionID: id }).exec()
                     const updatedRootAdmin = await $db.models.rootInstitutionAdmins.updateOne({ _id: rootAdmin._id.toString() }, { confirmed: true })
-                    const note = await _.notifications.welcome(rootAdmin)
+                    const welcomeMsg = new _.notifications.welcome(rootAdmin)
+                    const saved = await welcomeMsg.create()
                     msgs.push(
                         { 
                             msg: `Confirmed institution ${id}'s admin status`,
