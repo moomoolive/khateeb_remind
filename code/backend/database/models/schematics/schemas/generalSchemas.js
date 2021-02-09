@@ -393,7 +393,7 @@ const shortenedURL = new mongoose.Schema({
 }, { timestamps: true })
 
 shortenedURL.pre('save', function(next) {
-    this.shortURLCode = nanoId.nanoid(8)
+    this.shortURLCode = nanoId.nanoid(10)
     next()
 })
 
