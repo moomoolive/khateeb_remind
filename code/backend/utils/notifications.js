@@ -14,9 +14,14 @@ class Notification {
             try {
                 const info = await this.init(user)
                 const returnObject = { info }
+                if (!text && !pwa) {
+                    msgsInfo.push(returnObject)
+                    continue
+                }
+                if (info.actionLink)
+                    info.actionLink = info.actionLink.replace('__ID__', info._id.toString())
                 if (text && options.text.textAllowed) {
-                    const text = await this.text(options.text, info)
-                    returnObject.text = `text was successfully send for notification ${info._id.toString()}`
+                    returnObject.text  = await this.text(options.text, info, user)
                 }
                 if (pwa) {
                     const pwa = await this.pwa()
@@ -61,14 +66,35 @@ class Notification {
             console.log(`Couldn't create notification`)
         }
     }
-    async text(textOptions, notificationInfo) {
+    async text(textOptions, notificationInfo, userInfo) {
         try {
             const twilio = require('twilio')(textOptions.twilioUser, textOptions.twilioKey)
+            const khateebRemindSignature = `\n\n🤖 Sent from Khateeb Remind Bot`
+            let actionLink = ''
+            if (notificationInfo.actionLink)
+                actionLink = await this.compileTextURL(notificationInfo)
+            const textMsg = `${notificationInfo.msg}${actionLink}${khateebRemindSignature}`
             const webhookRes = await twilio.messages.create({
-                body: notificationInfo.msg,
+                body: textMsg,
                 from: textOptions.twilioPhoneNumber,
-                to: this.userInfo.phoneNumber
+                to: `+1${userInfo.phoneNumber}`// canada and US only right now
             })
+            return `text was successfully send for notification ${notificationInfo._id.toString()}`
+        } catch(err) {
+            console.log(err)
+            const webHookRespondsWithError = err.status > 399
+            if (webHookRespondsWithError)
+                return `Error occurred when attempting to send text phone number: ${userInfo.phoneNumber}`
+        }
+    }
+    async compileTextURL(notificationInfo) {
+        try {
+            const baseURL = 'app.khateebs.com'
+            const actionURL = notificationInfo.actionLink
+            const completeURL = baseURL + actionURL
+            const shortURL = await new $db.models.shortenedURLs({ longURL: completeURL }).save()
+            const textURL = 's.khateebs.com/' + shortURL.shortURLCode
+            return `\n${textURL}`
         } catch(err) {
             console.log(err)
         }

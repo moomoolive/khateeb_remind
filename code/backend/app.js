@@ -59,4 +59,4 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const testScript = require('./cron/test.js')
-testScript(() => { console.log('Script finished') })
+//testScript(() => { console.log('Script finished') })

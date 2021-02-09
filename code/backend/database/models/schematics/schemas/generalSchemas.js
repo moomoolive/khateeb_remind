@@ -296,6 +296,19 @@ const setting = new mongoose.Schema({
     }
 })
 
+setting.methods.decrypt = function() {
+    try {
+        if (this.twilioKey)
+            this.twilioKey = $db.funcs.decrypt(this.twilioKey)
+        if (this.twilioUser)
+            this.twilioUser = $db.funcs.decrypt(this.twilioUser)
+        return this
+    } catch(err) {
+        console.log(err)
+        console.log(`Couldn't unencrypt settings`)
+    }
+}
+
 setting.pre('save', function(next) {
     try {
         const setting = this
@@ -361,6 +374,29 @@ const notification = new mongoose.Schema({
     }
 }, { timestamps: true })
 
+const nanoId = require('nanoid')
+
+const shortenedURL = new mongoose.Schema({
+    longURL: {
+        type: String,
+        required: true
+    },
+    shortURLCode: {
+        type: String,
+        required: false
+    },
+    active: {
+        type: Boolean,
+        required: true,
+        default: true
+    }
+}, { timestamps: true })
+
+shortenedURL.pre('save', function(next) {
+    this.shortURLCode = nanoId.nanoid(8)
+    next()
+})
+
 module.exports = {
     jummah,
     announcement,
@@ -369,5 +405,6 @@ module.exports = {
     institution,
     user,
     setting,
-    notification
+    notification,
+    shortenedURL
 }
