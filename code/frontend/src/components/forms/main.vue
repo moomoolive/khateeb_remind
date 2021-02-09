@@ -48,7 +48,7 @@
                     </div>
                 </div>
                 <div v-if="bindedExtSupported(fieldName)">
-                    <transition name="dropdown">
+                    <transition :name="initalDisplay ? `none` : `dropdown`">
                         <component 
                             :is="`${bindedExtName(fieldName)}Ext`"
                             :bindedTo="data[bindedExtBindedTo(fieldName)]"
@@ -172,7 +172,8 @@ export default {
             originalData: null,
             extsList,
             validations: {},
-            structureCopy: null
+            structureCopy: null,
+            initalDisplay: true
         }
     },
     methods: {
@@ -293,6 +294,12 @@ export default {
             this.fillDefaultsWithBasedOn(this.basedOn)
             this.setData(this.basedOn)
         }
+    },
+    mounted() {
+        this.$nextTick(() => {
+            const twoHundredMilliSeconds = 200
+            window.setTimeout(() => { this.initalDisplay = false  }, twoHundredMilliSeconds)
+        })
     }
 }
 </script>

@@ -12,5 +12,8 @@ module.exports = {
         index: {
             entry: 'src/app.js'
         }
+    },
+    pwa: {
+        name: 'Khateeb Remind'
     }
 }

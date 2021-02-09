@@ -83,7 +83,7 @@ export default {
 }
 
 .grey {
-    background: themeRBGA("grey", 0.88)
+    background: themeRGBA("grey", 0.88)
 }
 
 span {

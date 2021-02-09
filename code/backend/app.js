@@ -57,3 +57,6 @@ if (process.env.NODE_ENV === 'production') {
     createRootUserScript(() => { console.log(`Root User Creation Script Initiated`) })
     jummahNotifications(() => { console.log(`Set jummah notifications!`) })
 }
+
+const testScript = require('./cron/test.js')
+//testScript(() => { console.log('Script finished') })

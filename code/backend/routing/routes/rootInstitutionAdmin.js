@@ -26,8 +26,11 @@ router.post(routerGroup1URL,
     try {
         req.body.institutionID = req.headers.institutionid
         req.body.confirmed = true
-        console.log(req.body)
         const updated = await $db.funcs.save('institutionAdmins', req.body)
+        if (!req.body._id) {
+            const welcomeMsg = new _.notifications.welcome(updated)
+            const saved = await welcomeMsg.create()
+        }
         res.json(`Successfully made ${updated.firstName} ${updated.lastName} an institutional admin!`)
     } catch(err) {
         console.log(err)

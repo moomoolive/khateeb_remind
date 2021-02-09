@@ -2,7 +2,7 @@
     <div>
         <h2 v-if="title">{{ title }}</h2>
         <img :src="require(`@/assets/gifs/${gif}.gif`)" alt="">
-        <h2>{{ msg }}</h2>
+        <h2 :class="textColor" >{{ msg }}</h2>
     </div>
 </template>
 
@@ -21,6 +21,11 @@ export default {
         gif: {
             required: true,
             type: String
+        },
+        textColor: {
+            type: String,
+            required: false,
+            default: 'default'
         }
     }
 }
@@ -35,6 +40,9 @@ img {
 
 h2 {
     font-size: 35px;
+    &.white {
+        color: getColor("offWhite");
+    }
 }
 
 div {

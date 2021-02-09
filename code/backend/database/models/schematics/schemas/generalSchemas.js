@@ -40,6 +40,20 @@ const jummah = new mongoose.Schema({
     khateebPreference: [subDocs.prayerSlot]
 }, { timestamps: true })
 
+jummah.methods.gatherMeta = async function() {
+    try {
+        const location = await $db.models.locations.findOne({ _id: this.locationID }).exec()
+        const timing = await $db.models.timings.findOne({ _id: this.timingID }).exec()
+        return {
+            location,
+            timing
+        } 
+    } catch(err) {
+        console.log(err)
+        console.log(`Couldn't gather jummah meta`)
+    }
+}
+
 const institution = new mongoose.Schema({
     name: {
         type: String,
@@ -282,6 +296,19 @@ const setting = new mongoose.Schema({
     }
 })
 
+setting.methods.decrypt = function() {
+    try {
+        if (this.twilioKey)
+            this.twilioKey = $db.funcs.decrypt(this.twilioKey)
+        if (this.twilioUser)
+            this.twilioUser = $db.funcs.decrypt(this.twilioUser)
+        return this
+    } catch(err) {
+        console.log(err)
+        console.log(`Couldn't unencrypt settings`)
+    }
+}
+
 setting.pre('save', function(next) {
     try {
         const setting = this
@@ -343,9 +370,32 @@ const notification = new mongoose.Schema({
     },
     meta: {
         type: Object,
-        required: false
+        required: true
     }
 }, { timestamps: true })
+
+const nanoId = require('nanoid')
+
+const shortenedURL = new mongoose.Schema({
+    longURL: {
+        type: String,
+        required: true
+    },
+    shortURLCode: {
+        type: String,
+        required: false
+    },
+    active: {
+        type: Boolean,
+        required: true,
+        default: true
+    }
+}, { timestamps: true })
+
+shortenedURL.pre('save', function(next) {
+    this.shortURLCode = nanoId.nanoid(10)
+    next()
+})
 
 module.exports = {
     jummah,
@@ -355,5 +405,6 @@ module.exports = {
     institution,
     user,
     setting,
-    notification
+    notification,
+    shortenedURL
 }

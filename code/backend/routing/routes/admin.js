@@ -134,7 +134,8 @@ router.post(routerGroup2URL + "/confirm",
     try {
         const khateeb = await $db.models[routerGroup2].findOne(req.body).exec()
         const updated = await $db.models[routerGroup2].updateOne(req.body, { confirmed: true }).exec()
-        const welcomeMsg = await _.notifications.welcome(khateeb)
+        const welcomeMsg = new _.notifications.welcome(khateeb)
+        const saved = await welcomeMsg.create()
         res.json(`Successfully confirmed`)
     } catch(err) {
         res.json(errors.db(`khateebs`, `confirming`, err ))

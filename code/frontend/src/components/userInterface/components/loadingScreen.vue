@@ -4,6 +4,7 @@
             v-if="isLoading || !externalFinishSignal"
             :msg="`Loading...`"
             :gif="`loading`"
+            :textColor="textColor"
         />
         <div v-if="!isLoading && externalFinishSignal">
             <slot></slot>
@@ -24,6 +25,11 @@ export default {
             type: Boolean,
             required: false,
             default: true
+        },
+        textColor: {
+            required: false,
+            type: String,
+            default: 'default'
         }
     },
     data() {
