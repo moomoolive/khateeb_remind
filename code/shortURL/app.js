@@ -1,5 +1,9 @@
 const express = require('express')
 const mongo = require("mongodb")
+const dotenv = require('dotenv')
+
+if (process.env.NODE_ENV === 'production')
+    dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 90
@@ -21,7 +25,7 @@ app.get('/:shortCode', async (req, res) => {
         const redirect = url ? `https://${url.longURL}` : 'https://app.khateebs.com'
         let script = `window.location.replace("${redirect}")`
         if (!url)
-            script += `\nalert("That link doesn't exist or has expired! Redirecting you to home.")`
+            script += `\nwindow.alert("That link doesn't exist or has expired! Redirecting you to home.")`
         res.send(`<script>${script}</script>`)
     } catch(err) {
         console.log(`Couldn't get short url`)

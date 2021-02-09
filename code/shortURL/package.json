@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/moomoolive/khateeb_remind#readme",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongodb": "^3.6.4"
   },
