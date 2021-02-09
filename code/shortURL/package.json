@@ -1,0 +1,28 @@
+{
+  "name": "shorturl",
+  "version": "1.0.0",
+  "description": "A url-shortening service for khateeb remind",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "app": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moomoolive/khateeb_remind.git"
+  },
+  "author": "Mostafa Elbannan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/moomoolive/khateeb_remind/issues"
+  },
+  "homepage": "https://github.com/moomoolive/khateeb_remind#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongodb": "^3.6.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
