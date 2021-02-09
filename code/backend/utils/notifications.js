@@ -7,15 +7,15 @@ class Notification {
         this.meta = meta
         this.additonalNotificationInfo = {}
     }
-    async create(text=false, pwa=false) {
+    async create(text=false, pwa=false, options={}) {
         const msgsInfo = []
         for (let i = 0; i < this.userInfo.length; i++) {
             const user = this.userInfo[i]
             try {
                 const info = await this.init(user)
                 const returnObject = { info }
-                if (text) {
-                    const text = await this.text()
+                if (text && options.text.textAllowed) {
+                    const text = await this.text(options.text, info)
                     returnObject.text = `text was successfully send for notification ${info._id.toString()}`
                 }
                 if (pwa) {
@@ -61,8 +61,17 @@ class Notification {
             console.log(`Couldn't create notification`)
         }
     }
-    async text() {
-        console.log('texted')
+    async text(textOptions, notificationInfo) {
+        try {
+            const twilio = require('twilio')(textOptions.twilioUser, textOptions.twilioKey)
+            const webhookRes = await twilio.messages.create({
+                body: notificationInfo.msg,
+                from: textOptions.twilioPhoneNumber,
+                to: this.userInfo.phoneNumber
+            })
+        } catch(err) {
+            console.log(err)
+        }
     }
     async pwa() {
         console.log('push notification')

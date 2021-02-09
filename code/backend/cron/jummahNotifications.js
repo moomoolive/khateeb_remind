@@ -1,6 +1,6 @@
 const cron = (callback) => {
     const crobJob = require('cron').CronJob
-    const time = '00 00 6 * * 3-4' // every tuesday and wednesday 6AM
+    const time = '00 00 6 * * 3-4' // every wednesday and thursday 6AM
     const job = new crobJob(time, async () => {
         try {
             const institutions = await $db.models.institutions.find({ confirmed: true }).exec()
