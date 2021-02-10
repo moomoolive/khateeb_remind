@@ -397,6 +397,24 @@ shortenedURL.pre('save', function(next) {
     next()
 })
 
+const verificationCode = new mongoose.Schema({
+    code: {
+        type: String,
+        required: false,
+        minlength: 11,
+        maxlength: 11
+    },
+    userID: {
+        type: String,
+        required: true
+    }
+}, { timestamps: true })
+
+verificationCode.pre('save', function(next) {
+    this.code = "KR-" + nanoId.nanoid(8)
+    next()
+})
+
 module.exports = {
     jummah,
     announcement,
@@ -406,5 +424,6 @@ module.exports = {
     user,
     setting,
     notification,
-    shortenedURL
+    shortenedURL,
+    verificationCode
 }

@@ -11,7 +11,8 @@ const models = {
     announcements: mongoose.model('announcement', schema.announcement),
     settings: mongoose.model('setting', schema.setting),
     notifications: mongoose.model('notification', schema.notification),
-    shortenedURLs: mongoose.model('shortenedURL', schema.shortenedURL)
+    shortenedURLs: mongoose.model('shortenedURL', schema.shortenedURL),
+    verificationCodes: mongoose.model('verificationCode', schema.verificationCode)
 }
 
 const userTypes = {
