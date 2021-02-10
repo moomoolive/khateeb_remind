@@ -28,6 +28,10 @@ export default {
             if (this.notificationInfo.type === 'confirm')
                 this.notificationInfo.options.reject(false)
             this.$store.dispatch('closeNotification')
+        },
+        keyBinds($event) {
+            if ($event.key === "Escape")
+                this.close()
         }
     },
     computed: {
@@ -42,6 +46,9 @@ export default {
                 const updated = await this.$API.user.markNotificationAsSeen({ _id: this.notificationInfo.options._id })
             }
         })
+    },
+    created() {
+        window.addEventListener('keyup', this.keyBinds)
     }
 }
 </script>

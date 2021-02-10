@@ -15,5 +15,10 @@ export default [
         path: "/create/khateebs",
         name: "khateebsSignup",
         component: () => import('@/views/auth/khateebs.vue')
+    },
+    {
+        path: "/forgot/:type",
+        name: "accountRecovery",
+        component: () => import('@/views/auth/accountRecovery.vue')
     }
 ]

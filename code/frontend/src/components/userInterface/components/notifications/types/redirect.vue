@@ -1,5 +1,5 @@
 <template>
-    <div class="green">
+    <div>
         <div class="redirectContainer">
             <p v-if="options.msg">{{ options.msg }}</p>
             <button
@@ -33,9 +33,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.green {
-        background: themeRGBA("green", 0.75);
-}
 
 button {
     width: 75%;

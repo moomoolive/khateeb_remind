@@ -58,6 +58,12 @@ const auth = {
     },
     createKhateeb(khateebInfo) {
         return axios.post(authExt + "/create/khateeb", khateebInfo)
+    },
+    forgot(usernameOrPassword, data) {
+        return axios.post(authExt + `/forgot/${usernameOrPassword}`, data)
+    },
+    verificationCode(passwordAndCode) {
+        return axios.post(authExt + '/verification-code', passwordAndCode)
     }
 }
 
