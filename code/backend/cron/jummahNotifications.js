@@ -1,9 +1,13 @@
-const cron = (callback) => {
+const cron = (
+        time='00 00 6 * * 3-4', // every wednesday and thursday 6AM
+        test=false,
+        callback= () => { console.log(`Set jummah notifications!`) }
+    ) => {
     const crobJob = require('cron').CronJob
-    const time ='00 00 6 * * 3-4' // every wednesday and thursday 6AM
     const job = new crobJob(time, async () => {
         try {
-            const institutions = await $db.models.institutions.find({ confirmed: true }).exec()
+            const institutionQuery = test ? { name: "__TEST__" } : { confirmed: true }
+            const institutions = await $db.models.institutions.find(institutionQuery).exec()
             const upcomingFriday = _.schedule.findUpcomingFriday()
             const query = { weekOf: upcomingFriday.date(), year: upcomingFriday.year(), month: upcomingFriday.month() }
             for (let i = 0; i < institutions.length; i++) {
@@ -23,6 +27,9 @@ const cron = (callback) => {
                         const khateeb = await $db.models.khateebs.findOne({ _id: preference.khateebID.toString() }).exec()
                         const note = new _.notifications.jummahReminder(khateeb, jummah, meta, y + 1)
                         const msgs = await note.create(true, false, { text: settings })
+                        console.log(msgs)
+                        preference.notified = true
+                        await $db.models.jummahs.updateOne({ _id: jummah._id.toString() }, jummah)
                         if (y === 0)
                             break 
                     }

@@ -49,6 +49,9 @@ export default {
     },
     created() {
         window.addEventListener('keyup', this.keyBinds)
+    },
+    destroyed() {
+        window.removeEventListener('keyup', this.keyBinds)
     }
 }
 </script>

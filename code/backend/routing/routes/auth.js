@@ -9,6 +9,8 @@ router.post('/create/institution',
     middleware.allowedFields(requestTypeChecks.createInstitution), 
     async (req, res) => {
     try {
+        if (req.body.institution.name === '__TEST__')
+            return res.json({ msg: `You cannot name your institution __TEST__. Pick another name please.`, status: "reserved" })
         const institutionEntry = await $db.funcs.save('institutions', req.body.institution)
         req.body.institutionAdmin.institutionID = institutionEntry._id.toString()
         const rootInstitutionAdminEntry = await $db.funcs.save('rootInstitutionAdmins', req.body.institutionAdmin)

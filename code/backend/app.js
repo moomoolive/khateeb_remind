@@ -18,6 +18,7 @@ const dbSettings =  require($DIR + '/database/settings.js')
 const createRootUserScript = require('./cron/createRootUser.js')
 const jummahNotifications = require('./cron/jummahNotifications.js')
 const deleteVerificationCodes = require('./cron/deleteVerificationCodes.js')
+const createTestInstitution = require('./cron/createTestInstitution.js')
 
 const PORT = 80
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
@@ -58,4 +59,5 @@ if (process.env.NODE_ENV === 'production') {
     createRootUserScript(() => { console.log(`Root User Creation Script Initiated`) })
     jummahNotifications(() => { console.log(`Set jummah notifications!`) })
     deleteVerificationCodes(() => { console.log(`Expired Verification Codes Deleted`) })
+    createTestInstitution(() => { console.log(`Created test institution`) })
 }

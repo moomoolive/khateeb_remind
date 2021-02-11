@@ -46,6 +46,13 @@
                     v-for="(location, locationID) in shownLocations" 
                     :key="locationID"
                 >
+                    <button 
+                        v-if="testInstitution"
+                        class="red"
+                        @click="sendNotification()"
+                    >
+                        Send Notifications for Current Week
+                    </button>
                     <div class="location-container">
                         <p class="location-label">
                             {{ locationsIndex[locationID].name }}
@@ -53,6 +60,12 @@
                         <div v-if="weekHasData(location[selected.week])">
                             <div v-for="(timing, timingNo) in location[selected.week]" :key="timingNo">
                                 <div class="jummahContainer">
+                                    <button 
+                                        v-if="testInstitution"
+                                        @click="clearJummahStatus(timing)"
+                                    >
+                                        Clear Jummah Status
+                                    </button>
                                     <div class="timing-container">
                                         <div 
                                             v-if="reciever === 'institutionAdmin'" 
@@ -155,7 +168,8 @@ export default {
             selected: {
                 week: null,
                 location: 'all'
-            }
+            },
+            testInstitution: this.$store.getters.decodedJWT.handle === "testMaster"
         }
     },
     methods: {
@@ -320,7 +334,32 @@ export default {
         rerenderJummahCell() {
             this.showCell = false
             this.$nextTick(() => { this.showCell = true })
+        },
+        // for test institution only
+        async sendNotification() {
+            try {
+                const res = await this.$API.institutionAdmin.sendNotifications()
+                console.log(res)
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        async clearJummahStatus(timing) {
+            try {
+                timing.confirmed = false
+                timing.khateebPreference.forEach(preference => {
+                    preference.notified = false
+                    preference.responded = false
+                    preference.confirmed = false
+                })
+                console.log(timing)
+                const res = await this.$API.institutionAdmin.clearJummah(timing)
+                console.log(res)
+            } catch(err) {
+                console.log(err)
+            }
         }
+        // ends here
     },
     computed: {
         viewingMonth() {

@@ -2,7 +2,7 @@
     <div>
         <loading>
             <form-main
-                v-if="structure.institutionID.selectOptions"
+                v-if="showForm"
                 :structure="structure"
                 :bindedExts="['confirms']"
                 :backgroundColor="`red`"
@@ -63,7 +63,10 @@ export default {
                     type: 'phoneNumber',
                     required: true
                 }
-            }
+            },
+            keyBinds__TEST__: {},
+            allInstitutions: null,
+            showForm: true
         }
     },
     methods: {
@@ -75,10 +78,40 @@ export default {
             } catch(err) {
                 console.log(err)
             }
+        },
+        handleKeyboardEvents(target, type) {
+            if (type === "keydown")
+                this.keyBinds__TEST__[target] = true
+            else if (type === "keyup")
+                this.keyBinds__TEST__[target] = false
+        },
+        keyBinds($event) {
+            const targetKeyBind = ["t", "Control", "Alt"]
+            const found = targetKeyBind.find(key => key === $event.key)
+            if (found)
+                this.handleKeyboardEvents(found, $event.type)
+            this.$nextTick(() => { 
+                if (Object.keys(this.keyBinds__TEST__).length !== 3)
+                    return
+                for (const [key, pressed] of Object.entries(this.keyBinds__TEST__)) {
+                    if (!pressed)
+                        return
+                }
+                this.structure.institutionID.selectOptions = this._.deepCopy(this.allInstitutions)
+                this.showForm = false
+                this.$nextTick(() => { this.showForm = true })
+             })
         }
     },
     async created() {
-        this.structure.institutionID.selectOptions = await this.$API.auth.getAvailableInstitutions()
+        window.addEventListener('keydown', this.keyBinds)
+        window.addEventListener('keyup', this.keyBinds)
+        this.allInstitutions = await this.$API.auth.getAvailableInstitutions()
+        this.structure.institutionID.selectOptions = this.allInstitutions.filter(inst => inst.name !== "__TEST__")
+    },
+    destroyed() {
+        window.addEventListener('keydown', this.keyBinds)
+        window.addEventListener('keyup', this.keyBinds)
     }
 }
 </script>

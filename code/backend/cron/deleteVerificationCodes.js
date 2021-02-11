@@ -1,7 +1,7 @@
 const cron = (callback) => {
-    const crobJob = require('cron').CronJob
+    const cronJob = require('cron').CronJob
     const time = "0 */8 * * * *" // every eight minutes
-    const job = new crobJob(time, async (req, res) => {
+    const job = new cronJob(time, async () => {
         try {
             const expiration = new Date()
             expiration.setMinutes(expiration.getMinutes() - 15)

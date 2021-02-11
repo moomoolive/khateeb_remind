@@ -164,6 +164,12 @@ const institutionAdmin = {
     },
     updateInstitution(updatedInstitution) {
         return axios.post(institutionAdminExt + '/institution', updatedInstitution)
+    },
+    sendNotifications() {
+        return axios.get(institutionAdminExt + '/send-notifications')
+    },
+    clearJummah(clearedJummah) {
+        return axios.post(institutionAdminExt + '/clear-jummah', clearedJummah)
     }
 }
 
