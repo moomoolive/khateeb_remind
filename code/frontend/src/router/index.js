@@ -31,7 +31,13 @@ const router = new VueRouter({
   routes
 })
 
+let firstPage = true
 router.beforeEach((to, from, next) => {
+  if (firstPage) {
+    const landingPage = to.fullPath
+    store.dispatch('registerLandingPage', landingPage)
+    firstPage = false
+  }
   const baseURL = to.fullPath.split('/')[1]
   let targetWallpaper
   switch(baseURL) {
@@ -79,7 +85,7 @@ router.beforeEach((to, from, next) => {
         destination = '/institutionAdmin'
       else
         destination = `/${user}`
-      next(`/${destination}`)
+      next(`${destination}`)
     }
     next() 
   } else {

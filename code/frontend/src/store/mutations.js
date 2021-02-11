@@ -36,5 +36,8 @@ export default {
     markNotificationActionAsComplete(state, notificationId) {
         const found = state.notificationsFromServer.find(note => note._id === notificationId)
         found.actionPerformed = true
+    },
+    registerLandingPage(state, landingPageFullPath) {
+        state.landingPage = landingPageFullPath
     }
 }

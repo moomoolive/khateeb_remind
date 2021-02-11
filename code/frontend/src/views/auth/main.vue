@@ -79,7 +79,11 @@ export default {
             axios.defaults.headers.common['authorization'] = token
             this.$store.dispatch('JWT_TOKEN', token)
             this.$nextTick(() => {
-                this._.toHomePage()
+                const landingPage = this.$store.state.landingPage
+                if (landingPage !== this.$router.currentRoute.fullPath)
+                    this.$router.push(landingPage)
+                else
+                    this._.toHomePage()
             })
         },
         forgotCredentials() {

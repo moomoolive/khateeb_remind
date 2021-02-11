@@ -38,5 +38,8 @@ export default {
     },
     markNotificationActionAsComplete({ commit }, notificationId) {
         commit('markNotificationActionAsComplete', notificationId)
+    },
+    registerLandingPage({ commit }, landingPageFullPath) {
+        commit("registerLandingPage", landingPageFullPath)
     }
 }

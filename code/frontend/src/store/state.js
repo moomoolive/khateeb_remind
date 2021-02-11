@@ -12,5 +12,6 @@ export default {
     notificationsQueue: [],
     userPromptedNotifications: [],
     wallpaper: 'main',
-    notificationsFromServer: []
+    notificationsFromServer: [],
+    landingPage: null
 }
