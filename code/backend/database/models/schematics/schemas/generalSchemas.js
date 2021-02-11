@@ -265,6 +265,9 @@ const announcement = new mongoose.Schema({
     },
 }, { timestamps: true })
 
+const phoneNumberWithOneDigitCountryCode = 12
+const phoneNumberWithOnlyTwoDigitCountryCode = 13
+
 const setting = new mongoose.Schema({
     institutionID: {
         type: String,
@@ -284,7 +287,8 @@ const setting = new mongoose.Schema({
     twilioPhoneNumber: {
         type: String,
         required: true,
-        minlength: 12
+        minlength: phoneNumberWithOneDigitCountryCode,
+        maxlength: phoneNumberWithOnlyTwoDigitCountryCode
     },
     textAllowed: {
         type: Boolean,

@@ -58,6 +58,12 @@ const auth = {
     },
     createKhateeb(khateebInfo) {
         return axios.post(authExt + "/create/khateeb", khateebInfo)
+    },
+    forgot(usernameOrPassword, data) {
+        return axios.post(authExt + `/forgot/${usernameOrPassword}`, data)
+    },
+    verificationCode(passwordAndCode) {
+        return axios.post(authExt + '/verification-code', passwordAndCode)
     }
 }
 
@@ -158,6 +164,12 @@ const institutionAdmin = {
     },
     updateInstitution(updatedInstitution) {
         return axios.post(institutionAdminExt + '/institution', updatedInstitution)
+    },
+    sendNotifications() {
+        return axios.get(institutionAdminExt + '/send-notifications')
+    },
+    clearJummah(clearedJummah) {
+        return axios.post(institutionAdminExt + '/clear-jummah', clearedJummah)
     }
 }
 

@@ -83,7 +83,23 @@ export default {
             })
         },
         forgotCredentials() {
-            this._.alert(`This feature isn't available yet!`)
+            const info = {
+            type: 'redirect',
+            options: {
+                    color: 'grey',
+                    redirections: [
+                        {
+                            text: 'Forgot Password?',
+                            to: '/forgot/password'
+                        },
+                        {
+                            text: 'Forgot Username?',
+                            to: '/forgot/username'
+                        }
+                    ]
+                }
+            }
+            this.$store.dispatch('createNotification', info)
         }
     },
     watch: {
