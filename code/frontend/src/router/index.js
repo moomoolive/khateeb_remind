@@ -59,14 +59,20 @@ router.beforeEach((to, from, next) => {
     store.dispatch('changeWallpaper', targetWallpaper)
 
   if (to.matched.some(record => record.meta.requireAuthorization)) {
+    const origin = { notificationOrigin: "Khateeb Remind Client" }
+    const threeTenthsOfASecond = 300
     if (!store.getters.tokenExists) {
       next('/')
-      utils.alert('Please login to view this page')
+      window.setTimeout(() => { 
+        utils.alert('Please login to view this page', "caution", origin) 
+        }, threeTenthsOfASecond)
       return
     }
     else if (!store.getters.isJWTValid) {
       next('/')
-      utils.alert('Your login has expired. Please sign-in again')
+      window.setTimeout(() => {
+        utils.alert('Your login has expired. Please sign-in again', "caution", origin)
+      }, threeTenthsOfASecond)
       store.dispatch('logout')
       return
     }
@@ -74,9 +80,12 @@ router.beforeEach((to, from, next) => {
       const options = {
         color: "red",
         icon: "locked",
-        msg: "Unauthorized"
+        msg: "Unauthorized",
+        ...origin
       }
-      store.dispatch('createNotification', { type: 'alert', options})
+      window.setTimeout(() => {
+        store.dispatch('createNotification', { type: 'alert', options})
+      }, threeTenthsOfASecond)
       let destination
       const user = store.getters.decodedJWT.__t
       if (user === 'root')

@@ -13,14 +13,15 @@ export default {
     isNumeric(value) {
         return /^\d+$/.test(value)
     },
-    alert(msg, type="caution") {
+    alert(msg, type="caution", options) {
         const notificationInfo = {
             type: 'alert',
             options: {
                 textSize: "small",
                 icon: type === 'caution' ? "exclamation" : 'success',
                 color: type === 'caution' ? "yellow" : 'green',
-                msg
+                msg,
+                ...options
             }
         }
         store.dispatch('createNotification', notificationInfo)

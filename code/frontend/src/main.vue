@@ -63,10 +63,6 @@ export default {
       localStorage.setItem('lastVisit', cachedDate)
       const parsedLastVisit = new Date(cachedDate)
       this.$store.dispatch('setLastVisit', cachedDate)
-    },
-    catchLandingPage() {
-      const currentCurrentRoute = this.$router.currentRoute.fullPath
-      console.log(currentCurrentRoute)
     }
   },
   computed: {

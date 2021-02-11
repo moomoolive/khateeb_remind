@@ -22,18 +22,24 @@ export default {
     methods: {
         findDisplay(khateebPreference) {
             const first = khateebPreference[0]
-            if (first.khateebID === 'TBD')
+            if (first.khateebID === 'TBD' && !this.timing.confirmed)
                 return first.khateebID
-            else if (!first.notified || first.notified && !first.responded || first.notified && first.responded && first.confirmed)
-                return this.khateebs.find(khateeb => khateeb._id === first.khateebID)
+            else if (!first.notified || this.preferenceHasConfirmed(first))
+                return this.findKhateeb(first.khateebID)
             else {
-                for (let i = 1; i < khateebPreference; i++) {
+                for (let i = 1; i < khateebPreference.length; i++) {
                     const preference = khateebPreference[i]
-                    if (preference.notified && preference.responded && preference.confirmed)
-                        return this.khateebs.find(khateeb => khateeb._id === preference.khateebID)
+                    if (this.preferenceHasConfirmed(preference))
+                        return this.findKhateeb(preference.khateebID)
                 }
                 return 'TBD'
             }
+        },
+        preferenceHasConfirmed(preference) {
+            return preference.notified && preference.responded && preference.confirmed
+        },
+        findKhateeb(khateebID) {
+            return this.khateebs.find(khateeb => khateeb._id === khateebID)
         },
         organizeDisplay(displayVal) {
             if (displayVal === 'TBD')
