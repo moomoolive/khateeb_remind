@@ -57,7 +57,7 @@ app.listen(PORT, () => { console.log(`App is listening on port ${PORT}`) })
 
 if (process.env.NODE_ENV === 'production') {
     createRootUserScript(() => { console.log(`Root User Creation Script Initiated`) })
-    jummahNotifications(() => { console.log(`Set jummah notifications!`) })
+    jummahNotifications()
     deleteVerificationCodes(() => { console.log(`Expired Verification Codes Deleted`) })
     createTestInstitution(() => { console.log(`Created test institution`) })
 }
