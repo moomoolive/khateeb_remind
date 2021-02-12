@@ -24,10 +24,10 @@ export default {
             const first = khateebPreference[0]
             if (first.khateebID === 'TBD' && !this.timing.confirmed)
                 return first.khateebID
-            else if (!first.notified || this.preferenceHasConfirmed(first))
+            else if (!first.notified)
                 return this.findKhateeb(first.khateebID)
             else {
-                for (let i = 1; i < khateebPreference.length; i++) {
+                for (let i = 0; i < khateebPreference.length; i++) {
                     const preference = khateebPreference[i]
                     if (this.preferenceHasConfirmed(preference))
                         return this.findKhateeb(preference.khateebID)

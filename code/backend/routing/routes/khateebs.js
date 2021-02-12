@@ -83,4 +83,20 @@ router.post('/jummah-confirm', async (req, res) => {
     }
 })
 
+router.get('/available-timings', async (req, res) => {
+    try {
+        const locations = await $db.models.locations.find({ institutionID: req.headers.institutionid, active: true }).exec()
+        for (let i = 0; i < locations.length; i++) {
+            const timings = await locations[i].findTimings({ active: true })
+            locations[i] = _.deepCopy(locations[i])
+            locations[i].timings = timings
+        }
+        const userInfo = await $db.models.users.findOne({ _id: req.headers.userid }).exec()
+        res.json({ locations, availableTimings: userInfo.availableTimings })
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't fetch available timings`)
+    }
+})
+
 module.exports = router

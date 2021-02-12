@@ -37,6 +37,19 @@
             />
         </collapsable-box>
         <collapsable-box
+            v-if="$store.getters.decodedJWT.__t === 'khateeb'"
+            class="user-setting"
+            :headline="`Available Timings`"
+            :tagDetails="availableTimingsTag"
+        >
+            <selection-picker
+                v-if="khateebs.struct"
+                :options="khateebs.struct"
+                :currentlySelected="khateebs.availableTimings"
+                @changed="modifyAvailableTimings($event)"
+            />
+        </collapsable-box>
+        <collapsable-box
             v-if="showDelete"
             class="user-setting"
             :headline="`Danger Zone`"
@@ -51,6 +64,7 @@
 <script>
 import collapsableBox from '@/components/userInterface/components/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
+import selectionPicker from '@/components/userInterface/components/selectionPicker.vue'
 
 import axios from 'axios'
 
@@ -58,7 +72,8 @@ export default {
     name: 'userHome',
     components: {
         collapsableBox,
-        formMain
+        formMain,
+        selectionPicker
     },
     data() {
         return {
@@ -97,10 +112,14 @@ export default {
                     type: "dropdown",
                     required: true,
                     selectOptions: ['none', 'Shiekh', 'Imam']
-                },
-                //available times
+                }
             },
-            showDelete: null
+            showDelete: null,
+            khateebs: {
+                struct: null,
+                availableTimings: null,
+                locations: null
+            }
         }
     },
     methods: {
@@ -155,13 +174,64 @@ export default {
             } catch(err) {
                 console.log(err)
             }
+        },
+        async getAvailableTimings() {
+            try {
+                const data = await this.$API.khateeb.getAvailableTimings()
+                this.khateebs.locations = data.locations
+                this.khateebs.availableTimings = data.availableTimings
+                this.khateebs.struct = this.buildStructs(data.locations)
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        buildStructs(data) {
+            const arrayOfStructs = []
+            data.forEach(location => {
+                location.timings.forEach(timing => {
+                    let time = new Date()
+                    time.setHours(timing.hour, timing.minute, 0, 0)
+                    time = time.toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' })
+                    const struct = {
+                        display: [location.name, time],
+                        val: timing._id,
+                        extraInfo: `Address: ${location.address}`
+                    }
+                    arrayOfStructs.push(struct)
+                })
+            })
+            return arrayOfStructs
+        },
+        async modifyAvailableTimings($event) {
+            try {
+                this.khateebs.availableTimings = $event
+                const res = await this.$API.user.changeProfile({ availableTimings: $event })
+                this.storeToken(res.token)
+            } catch(err) {
+                console.log(err)
+            }
+        }
+    },
+    computed: {
+        availableTimingsTag() {
+            const tag = [{
+                words: 'Available for All Times',
+                symbol: '⌚',
+                color: 'goodNews'
+            }]
+            if (!this.khateebs.availableTimings)
+                return tag
+            else
+                return this.khateebs.availableTimings.length < 1 ? tag : null
         }
     },
     created() {
         const accountType = this.$store.getters.decodedJWT.__t
         this.showDelete = accountType !== 'rootInstitutionAdmin' && accountType !== 'root'
-        if (this.$store.getters.decodedJWT.__t == 'khateeb')
+        if (this.$store.getters.decodedJWT.__t == 'khateeb') {
             this.structure.profile = { ...this.structure.profile, ...this.khateebExtras }
+            this.getAvailableTimings()
+        }
     }
 }
 </script>

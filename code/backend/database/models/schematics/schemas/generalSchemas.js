@@ -110,6 +110,16 @@ const location = new mongoose.Schema({
     }
 }, { timestamps: true })
 
+location.methods.findTimings = async function(options) {
+    try {
+        const timings = await $db.models.timings.find({ locationID: this._id.toString(), ...options }).exec()
+        return timings
+    } catch(err) {
+        console.log(err)
+        console.log(`Couldn't find associated timings`)
+    }
+}
+
 const timing = new mongoose.Schema({
     institutionID: {
         type: String,

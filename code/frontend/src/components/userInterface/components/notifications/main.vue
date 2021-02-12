@@ -21,7 +21,8 @@ export default {
         'alert': () => import('./types/alert.vue'),
         'redirect': () => import('./types/redirect.vue'),
         'confirm': () => import('./types/confirm.vue'),
-        'notificationScroller': () => import('./types/notification-scroller.vue')
+        'notificationScroller': () => import('./types/notification-scroller.vue'),
+        "tutorial": () => import('./types/tutorial.vue')
     },
     methods: {
         close() {
@@ -73,7 +74,7 @@ export default {
 }
 
 .content {
-    max-height: 10000px;
+  max-height: 100000px;
 }
 
 .green {

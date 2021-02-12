@@ -80,6 +80,9 @@ const khateeb = {
     },
     confirmJummah(confirmedPackage) {
         return axios.post(khateebExt + '/jummah-confirm', confirmedPackage)
+    },
+    getAvailableTimings() {
+        return axios.get(khateebExt + '/available-timings')
     }
 } 
 

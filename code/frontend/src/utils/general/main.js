@@ -13,6 +13,17 @@ export default {
     isNumeric(value) {
         return /^\d+$/.test(value)
     },
+    tutorial(category, number) {
+        const info = {
+            type: "tutorial",
+            options: {
+                category,
+                number,
+                color: "grey"
+            }
+        }
+        store.dispatch('createNotification', info)
+    },
     alert(msg, type="caution", options) {
         const notificationInfo = {
             type: 'alert',
