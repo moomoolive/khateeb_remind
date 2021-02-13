@@ -80,11 +80,24 @@ export default {
     },
     data() {
         return {
-            data: null
+            data: null,
+            cachedKhateebPreferences: []
         }
     },
     methods: {
-        change($event, number, id) {
+        async change($event, number, id) {
+            if ($event !== 'TBD') {
+                const khateebFullInfo = this.khateebs.find(khateeb => khateeb._id === $event)
+                const notAvailableForAllTimings = khateebFullInfo.availableTimings.length > 0
+                if (notAvailableForAllTimings && !this.isAvailableTiming(khateebFullInfo)) {
+                    const confirm = await this._.confirm(`This is timing is not one of ${khateebFullInfo.firstName} ${khateebFullInfo.lastName}'s available timings! Are you sure you want to schedule him for this jummah anyway?`)
+                    if (!confirm) {
+                        const originalKhateeb = this.cachedKhateebPreferences[number].khateebID
+                        return this.data.khateebPreference[number].khateebID = originalKhateeb
+                    } 
+                }    
+            }
+            this.cachedKhateebPreferences[number].khateebID = $event
             const info = {
                 val: $event,
                 number,
@@ -97,6 +110,14 @@ export default {
             if (khateeb.title !== 'none')
                 base = `${khateeb.title} ${base}`
             return base 
+        },
+        isAvailableTiming(khateebFullInfo) {
+            let currentTimingIsOneOfAvailableTimings = false
+            khateebFullInfo.availableTimings.forEach(timing => {
+                if (timing === this.timing.timingID)
+                    currentTimingIsOneOfAvailableTimings = true
+            })
+            return currentTimingIsOneOfAvailableTimings
         },
         readOnlyKhateebDisplay(khateebID) {
             const found = this.khateebs.find(khateeb => khateeb._id === khateebID)
@@ -136,6 +157,7 @@ export default {
     },
     created() {
         this.data = this._.deepCopy(this.timing)
+        this.cachedKhateebPreferences = this._.deepCopy(this.data.khateebPreference)
     }
 }
 </script>
