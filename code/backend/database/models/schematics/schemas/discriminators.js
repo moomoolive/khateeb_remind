@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+const subDocs = require('./subDocs.js')
+
 const khateeb = new mongoose.Schema({
     title: {
         type: String,
@@ -15,7 +17,8 @@ const khateeb = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    availableTimings: [String]
+    availableTimings: [String],
+    unavailableDates: [subDocs.unavailableDate]
 })
 
 const rootInstitutionAdmin = new mongoose.Schema({})

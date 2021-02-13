@@ -154,11 +154,15 @@ export default {
                     type: 'readOnly',
                     required: true
                 },
+                unavailableDates: {
+                    type: 'readOnly',
+                    required: true,
+                    alias: 'Unavailable Days this Month'
+                },
                 active: {
                     type: 'checkbox',
                     required: true
-                },
-                //availabletimings --> later
+                }
             }
         }
     },
@@ -167,15 +171,40 @@ export default {
             try {
                 const data = await this.$API.institutionAdmin.getKhateebs()
                 this.khateebs = data
-                this.khateebsWithReadableAvailableTimings = await this.substituteTimingIDsWithTimingInformation(data)
+                this.khateebsWithReadableAvailableTimings = await this.createReadableTimingsAndUnavailableDates(data)
                 this.khateebsInArraysOfTwos = this.toArraysOfTwo(data)
             } catch(err) {
                 console.log(err)
             }
         },
-        async substituteTimingIDsWithTimingInformation(data) {
+        async createReadableTimingsAndUnavailableDates(data) {
+            data = this._.deepCopy(data)
+            const khateebs = await this.substituteTimingIDsWithTimingInformation(data)
+            return this.createReadableUnavailableDates(khateebs)
+        },
+        createReadableUnavailableDates(khateebs) {
+            let msg = ""
+            khateebs.forEach(khateeb => {
+                if (khateeb.unavailableDates.length < 1)
+                    msg += "👍 Available for all"
+                else {
+                    const month = new Date().getMonth()
+                    const year = new Date().getFullYear()
+                    const unavailableThisMonth = khateeb.unavailableDates.filter(date => {
+                        const dateObject = new Date(date.date)
+                        return dateObject.getMonth() === month && dateObject.getFullYear() === year
+                    })
+                    unavailableThisMonth.forEach(unavailableDate => {
+                        const date = new Date(unavailableDate.date)
+                        msg += `📅 ${date.toLocaleString('en-US', { month: 'short' })} ${date.getDate()}\n`
+                    })
+                }
+                khateeb.unavailableDates = msg
+            })
+            return khateebs
+        },
+        async substituteTimingIDsWithTimingInformation(khateebs) {
             try {
-                const khateebs = this._.deepCopy(data)
                 this.locations = await this.$API.institutionAdmin.getLocations('all')
                 this.timings = await this.$API.institutionAdmin.getTimings("all", "all")
                 khateebs.forEach(khateeb => {

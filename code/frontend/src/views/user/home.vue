@@ -50,6 +50,16 @@
             />
         </collapsable-box>
         <collapsable-box
+            v-if="$store.getters.decodedJWT.__t === 'khateeb'"
+            class="user-setting"
+            :headline="`Unavailable Dates`"
+        >
+            <calendar
+                :originalVal="$store.getters.decodedJWT.unavailableDates" 
+                @changed="modifyUnavailableDates($event)"
+            />
+        </collapsable-box>
+        <collapsable-box
             v-if="showDelete"
             class="user-setting"
             :headline="`Danger Zone`"
@@ -65,6 +75,7 @@
 import collapsableBox from '@/components/userInterface/components/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
 import selectionPicker from '@/components/userInterface/components/selectionPicker.vue'
+import calendar from './subviews/calendar.vue'
 
 import axios from 'axios'
 
@@ -73,7 +84,8 @@ export default {
     components: {
         collapsableBox,
         formMain,
-        selectionPicker
+        selectionPicker,
+        calendar
     },
     data() {
         return {
@@ -210,6 +222,14 @@ export default {
             } catch(err) {
                 console.log(err)
             }
+        },
+        async modifyUnavailableDates($event) {
+            try {
+                const res = await this.$API.user.changeProfile({ unavailableDates: $event })
+                this.storeToken(res.token)
+            } catch(err) {
+                console.log(err)
+            }
         }
     },
     computed: {
@@ -237,6 +257,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .user-setting {
     width: 80%;
     max-width: 900px;

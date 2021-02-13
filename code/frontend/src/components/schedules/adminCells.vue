@@ -89,8 +89,10 @@ export default {
             if ($event !== 'TBD') {
                 const khateebFullInfo = this.khateebs.find(khateeb => khateeb._id === $event)
                 const notAvailableForAllTimings = khateebFullInfo.availableTimings.length > 0
-                if (notAvailableForAllTimings && !this.isAvailableTiming(khateebFullInfo)) {
-                    const confirm = await this._.confirm(`This is timing is not one of ${khateebFullInfo.firstName} ${khateebFullInfo.lastName}'s available timings! Are you sure you want to schedule him for this jummah anyway?`)
+                const isAvailableDate = this.isAvailableDate(khateebFullInfo)
+                if (notAvailableForAllTimings && (!this.isAvailableTiming(khateebFullInfo) || !isAvailableDate)) {
+                    const violation = !isAvailableDate ? 'date' : 'timing'
+                    const confirm = await this._.confirm(`This is ${violation} is not one of ${khateebFullInfo.firstName} ${khateebFullInfo.lastName}'s available ${violation}s! Are you sure you want to schedule him for this jummah anyway?`)
                     if (!confirm) {
                         const originalKhateeb = this.cachedKhateebPreferences[number].khateebID
                         return this.data.khateebPreference[number].khateebID = originalKhateeb
@@ -110,6 +112,14 @@ export default {
             if (khateeb.title !== 'none')
                 base = `${khateeb.title} ${base}`
             return base 
+        },
+        isAvailableDate(khateebFullInfo) {
+            const unavailableDatesThisMonth = khateebFullInfo.unavailableDates.filter(date => this.timing.month === new Date(date.date).getMonth())
+            if (unavailableDatesThisMonth.length < 1)
+                return true
+            const found = unavailableDatesThisMonth.find(date => date.date === new Date(this.timing.year, this.timing.month, this.timing.weekOf, 0, 0, 0, 0).toISOString())
+            if (found)
+                return false
         },
         isAvailableTiming(khateebFullInfo) {
             let currentTimingIsOneOfAvailableTimings = false

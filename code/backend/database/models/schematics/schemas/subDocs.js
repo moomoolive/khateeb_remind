@@ -18,6 +18,16 @@ module.exports = {
             type: String,
             required: true
         }
+    }, { timestamps: true }),
+    unavailableDate: new mongoose.Schema({
+        vCalendarId: {
+            type: String,
+            required: true
+        }, 
+        date: {
+            type: Date,
+            required: true
+        }
     }, { timestamps: true })
 }
 
