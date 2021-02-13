@@ -1,6 +1,7 @@
 # Khateeb Remind Server
 
 ## Require Enviromental Variables
+### Note: .env file must be present in the root folder 
 ### Note: these variables are case-sensitive
 ```
 * DATABASE: a url pointing an instance of MongoDB (such as mongo Atlas)
@@ -23,4 +24,10 @@ npm run dev
 ### Runs production server
 ```
 npm run app
+```
+
+## Recommended Hosting
+```
+If you intend to host this server independantly it's recommended to containerize with docker first. You will find the same dockerfile that is used for the official build in the root folder. 
+**Important: this app is configured to set all the enviromental variables (except "NODE_ENV") via node and NOT through docker**
 ```
