@@ -1,6 +1,10 @@
 <template>
     <div class="banner-container">
-        {{ currentlyDisplayedMsg }}
+        <transition name="fade">
+            <span v-show="showMsg">
+                {{ currentlyDisplayedMsg }}
+            </span>
+        </transition>
     </div>
 </template>
 
@@ -9,12 +13,19 @@ export default {
     name: "websiteBanner",
     data() {
         return {
-            displayMsgs: [
-                "🎉 اليوم يوم الجمعة 🎉",
-                "🎉 Today is Friday 🎉"
-            ],
+            displayMsgs: [],
+            defaultDisplayMsgs: {
+                friday: [
+                    "🎉 اليوم يوم الجمعة 🎉",
+                    "🤲🏽 صلو على نبي 🤲🏽",
+                    "🎉 Today is Friday 🎉",
+                    "🤲🏽 Send Salams Upon the Prophet 🤲🏽"
+                ]
+            },
             displayIndex: 0,
-            componentIsDestroyed: false
+            componentIsDestroyed: false,
+            showMsg: true,
+            currentlyDisplayedMsg: ''
         }
     },
     methods: {
@@ -40,18 +51,56 @@ export default {
             const closeAfter = timePerItem * numberOfItems
             window.setTimeout(() => { 
                 this.$store.dispatch('hideSiteBanner')
-                this.componentIsDestroyed = true
             }, closeAfter)
+        },
+        siteBannerHasContent() {
+            return this.displayMsgs.length > 0
+        },
+        createBanner() {
+            const oneSecondInMilliseconds = 1_000
+            window.setTimeout(() => {
+                this.currentlyDisplayedMsg = this.displayMsgs[0]
+                this.$store.dispatch("showSiteBanner")
+                this.msgLoop()
+                this.scheduleBannerHiding()
+            }, oneSecondInMilliseconds)
+        },
+        fillBannerContent() {
+            const todayIsFriday = new Date().getDay() === 5
+            if (todayIsFriday)
+                this.displayMsgs = this._.deepCopy(this.defaultDisplayMsgs.friday)
         }
     },
     computed: {
-        currentlyDisplayedMsg() {
-            return this.displayMsgs[this.displayIndex]
+        userIsLoggedIn() {
+            return this.$store.getters.isJWTValid
+        }
+    },
+    watch: {
+        userIsLoggedIn(newVal) {
+            if (newVal && this.siteBannerHasContent())
+                this.createBanner()    
+        },
+        displayIndex(newVal) {
+            this.showMsg = false
+            const halfASecondInMilliseconds = 500
+            window.setTimeout(() => {
+                this.currentlyDisplayedMsg = this.displayMsgs[newVal]
+                this.showMsg = true
+            }, halfASecondInMilliseconds)
         }
     },
     created() {
-        this.msgLoop()
-        this.scheduleBannerHiding()
+        this.fillBannerContent()
+    },
+    mounted() {
+        this.$nextTick(() => {
+            if (this.userIsLoggedIn && this.siteBannerHasContent())
+                this.createBanner()
+        })
+    },
+    destroyed() {
+        this.componentIsDestroyed = true
     }
 }
 </script>
@@ -63,5 +112,16 @@ export default {
     padding-bottom: 3px;
     padding-top: 3px;
     height: 24px;
+}
+
+.slide-leave-active,
+.slide-enter-active {
+  transition: 1s;
+}
+.slide-enter {
+  transform: translate(100%, 0);
+}
+.slide-leave-to {
+  transform: translate(-100%, 0);
 }
 </style>

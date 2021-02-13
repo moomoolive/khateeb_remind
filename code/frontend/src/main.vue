@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <div class="header">
-      <website-banner v-if="siteBanner.show" />
+      <collapse-transition>
+        <website-banner v-show="siteBanner.show" />
+      </collapse-transition>
       <Header />
     </div>
     <div class="notifications-layer" v-if="showNotification">
@@ -28,6 +30,7 @@ import Header from '@/components/misc/Header.vue'
 import notifications from '@/components/userInterface/components/notifications/main.vue'
 import Footer from '@/components/misc/Footer.vue'
 import websiteBanner from '@/components/misc/websiteBanner.vue'
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 import axios from 'axios'
 
@@ -36,7 +39,8 @@ export default {
     Header,
     notifications,
     Footer,
-    websiteBanner
+    websiteBanner,
+    CollapseTransition
   },
   data() {
     return {
@@ -48,7 +52,7 @@ export default {
     async setJWT() {
       let token = localStorage.getItem('token')
       if (!token)
-        return false
+        return
       axios.defaults.headers.common['authorization'] = token
       try {
         const userPackage = await this.$API.user.checkIn()
@@ -56,7 +60,6 @@ export default {
       } catch(err) {
         console.log(err)
       }
-      return true
     },
     setLastVisit() {
       const dateOfLastVisit = localStorage.getItem('today')
@@ -70,11 +73,6 @@ export default {
       const parsedLastVisit = new Date(cachedDate)
       this.$store.dispatch('setLastVisit', cachedDate)
     },
-    siteBannerHasContent() {
-      const friday = 5
-      const today = new Date()
-      return true//today.getDay() === friday
-    }
   },
   computed: {
     showNotification() {
@@ -91,16 +89,9 @@ export default {
     },
     siteBanner() {
       return this.$store.state.siteBanner
-    },
-    userIsLoggedIn() {
-      return this.$store.getters.isJWTValid
     }
   },
   watch: {
-    userIsLoggedIn(newVal) {
-      if (newVal && this.siteBannerHasContent())
-        this.$store.dispatch("showSiteBanner")
-    },
     showNotification(newVal) {
       const time = 50
       if (newVal)
@@ -127,10 +118,8 @@ export default {
     }
   },
   created() {
-    const JWTwasSet = this.setJWT()
+    this.setJWT()
     this.setLastVisit()
-    if (JWTwasSet && this.siteBannerHasContent())
-      this.$store.dispatch("showSiteBanner")
   }
 }
 </script>
@@ -142,6 +131,7 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
+    min-width: 350px;
 }
 
 div {
@@ -272,13 +262,10 @@ button {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition-duration: 0.4s;
-  transition-property: opacity;
-  transition-timing-function: ease;
+  transition: opacity 0.5s;
 }
-
 .fade-enter,
-.fade-leave-active {
-  opacity: 0
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
