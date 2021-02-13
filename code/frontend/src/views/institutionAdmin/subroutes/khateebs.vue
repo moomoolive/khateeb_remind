@@ -109,7 +109,10 @@ export default {
     data() {
         return {
             khateebs: [],
+            khateebsWithReadableAvailableTimings: [],
             khateebsInArraysOfTwos: [],
+            locations: [],
+            timings: [],
             query: {
                 confirmed: 'any',
                 active: 'any',
@@ -147,6 +150,10 @@ export default {
                     format: 'phoneNumber',
                     required: true
                 },
+                availableTimings: {
+                    type: 'readOnly',
+                    required: true
+                },
                 active: {
                     type: 'checkbox',
                     required: true
@@ -160,10 +167,39 @@ export default {
             try {
                 const data = await this.$API.institutionAdmin.getKhateebs()
                 this.khateebs = data
+                this.khateebsWithReadableAvailableTimings = await this.substituteTimingIDsWithTimingInformation(data)
                 this.khateebsInArraysOfTwos = this.toArraysOfTwo(data)
             } catch(err) {
                 console.log(err)
             }
+        },
+        async substituteTimingIDsWithTimingInformation(data) {
+            try {
+                const khateebs = this._.deepCopy(data)
+                this.locations = await this.$API.institutionAdmin.getLocations('all')
+                this.timings = await this.$API.institutionAdmin.getTimings("all", "all")
+                khateebs.forEach(khateeb => {
+                    if (khateeb.availableTimings.length < 1)
+                        return khateeb.availableTimings = "👍 Available for\n   all timings"
+                    else
+                        khateeb.availableTimings = this.createReadableTiming(khateeb)
+                })
+                return khateebs
+            } catch(err) {
+                console.log()
+            }
+        },
+        createReadableTiming(khateeb) {
+            let msg = ''
+            khateeb.availableTimings.forEach(availableTiming => {
+                const timingMeta = this.timings.find(timing => timing._id === availableTiming)
+                const locationMeta = this.locations.find(location => location._id === timingMeta.locationID)
+                let time = new Date()
+                time.setHours(timingMeta.hour, timingMeta.minute, 0, 0)
+                const readableTime = time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+                msg += `⌚ ${locationMeta.name}\n   at ${readableTime}\n`
+            })
+            return msg
         },
         resetSearch() {
             this.query.active = 'any'; this.query.confirmed = 'any';
@@ -233,10 +269,10 @@ export default {
         },
         filteredKhateebs() {
             if (!this.searchQuery)
-                return this.khateebs
+                return this.khateebsWithReadableAvailableTimings
             let filtered
             for (let [queryField, queryVal] of Object.entries(this.searchQuery)) {
-                let toBeSearched = filtered ? filtered : this.khateebs
+                let toBeSearched = filtered ? filtered : this.khateebsWithReadableAvailableTimings
                 if (queryField === 'firstName' || queryField === 'lastName')
                     filtered = toBeSearched.filter(khateeb => khateeb[queryField].toLowerCase().includes(queryVal.toLowerCase()))
                 else

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p>{{ display(options.default) }}</p>
+        <p><pre>{{ display(options.default) }}</pre></p>
     </div>
 </template>
 
