@@ -191,14 +191,21 @@ export default {
         },
         createReadableTiming(khateeb) {
             let msg = ''
+            const locations = {}
             khateeb.availableTimings.forEach(availableTiming => {
                 const timingMeta = this.timings.find(timing => timing._id === availableTiming)
                 const locationMeta = this.locations.find(location => location._id === timingMeta.locationID)
+                if (!locations[locationMeta._id])
+                    locations[locationMeta._id] = [locationMeta.name]
                 let time = new Date()
                 time.setHours(timingMeta.hour, timingMeta.minute, 0, 0)
                 const readableTime = time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
-                msg += `⌚ ${locationMeta.name}\n   at ${readableTime}\n`
+                locations[locationMeta._id].push(`⌚ ${readableTime}`)
             })
+            for (let [location, msgs] of Object.entries(locations) ) {
+                msgs.push(`\n`)
+                msg += msgs.reduce((total, msg) => `${total}\n${msg}`)
+            }
             return msg
         },
         resetSearch() {
