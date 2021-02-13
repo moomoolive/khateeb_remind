@@ -41,5 +41,11 @@ export default {
     },
     registerLandingPage({ commit }, landingPageFullPath) {
         commit("registerLandingPage", landingPageFullPath)
+    },
+    showSiteBanner({ commit }) {
+        commit('showSiteBanner')
+    },
+    hideSiteBanner({ commit }) {
+        commit('hideSiteBanner')
     }
 }

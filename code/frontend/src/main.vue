@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <Header class="header" />
+    <div class="header">
+      <website-banner v-if="siteBanner.show" />
+      <Header />
+    </div>
     <div class="notifications-layer" v-if="showNotification">
       <transition name="dropdown">
         <notifications 
@@ -24,6 +27,7 @@
 import Header from '@/components/misc/Header.vue'
 import notifications from '@/components/userInterface/components/notifications/main.vue'
 import Footer from '@/components/misc/Footer.vue'
+import websiteBanner from '@/components/misc/websiteBanner.vue'
 
 import axios from 'axios'
 
@@ -31,7 +35,8 @@ export default {
   components: {
     Header,
     notifications,
-    Footer
+    Footer,
+    websiteBanner
   },
   data() {
     return {
@@ -43,7 +48,7 @@ export default {
     async setJWT() {
       let token = localStorage.getItem('token')
       if (!token)
-        return
+        return false
       axios.defaults.headers.common['authorization'] = token
       try {
         const userPackage = await this.$API.user.checkIn()
@@ -51,6 +56,7 @@ export default {
       } catch(err) {
         console.log(err)
       }
+      return true
     },
     setLastVisit() {
       const dateOfLastVisit = localStorage.getItem('today')
@@ -63,6 +69,11 @@ export default {
       localStorage.setItem('lastVisit', cachedDate)
       const parsedLastVisit = new Date(cachedDate)
       this.$store.dispatch('setLastVisit', cachedDate)
+    },
+    siteBannerHasContent() {
+      const friday = 5
+      const today = new Date()
+      return true//today.getDay() === friday
     }
   },
   computed: {
@@ -77,9 +88,19 @@ export default {
     },
     userPromptedNotifications() {
       return this.$store.state.userPromptedNotifications
+    },
+    siteBanner() {
+      return this.$store.state.siteBanner
+    },
+    userIsLoggedIn() {
+      return this.$store.getters.isJWTValid
     }
   },
   watch: {
+    userIsLoggedIn(newVal) {
+      if (newVal && this.siteBannerHasContent())
+        this.$store.dispatch("showSiteBanner")
+    },
     showNotification(newVal) {
       const time = 50
       if (newVal)
@@ -106,8 +127,10 @@ export default {
     }
   },
   created() {
-    this.setJWT()
+    const JWTwasSet = this.setJWT()
     this.setLastVisit()
+    if (JWTwasSet && this.siteBannerHasContent())
+      this.$store.dispatch("showSiteBanner")
   }
 }
 </script>
@@ -169,9 +192,12 @@ h2 {
 }
 
 .header {
-    overflow: hidden;
+    overflow: visible;
     position: fixed;
     z-index: 10;
+    left: 0;
+    top: 0;
+    height: auto;
 }
 
 .notifications {

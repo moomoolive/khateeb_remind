@@ -344,12 +344,10 @@ button {
 
 .topnav {
   background-color: themeRGBA("grey", 0.5);
-  top: 0;
   height: 5vh;
   min-height: 40px;
   max-height: 50px;
   width: 100%;
-  left: 0;
   overflow: visible;
 }
 

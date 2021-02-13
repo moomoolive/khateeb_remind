@@ -39,5 +39,11 @@ export default {
     },
     registerLandingPage(state, landingPageFullPath) {
         state.landingPage = landingPageFullPath
+    },
+    hideSiteBanner(state) {
+        state.siteBanner.show = false
+    },
+    showSiteBanner(state) {
+        state.siteBanner.show = true
     }
 }

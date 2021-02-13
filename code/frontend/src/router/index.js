@@ -58,6 +58,11 @@ router.beforeEach((to, from, next) => {
   if (store.state.wallpaper !== targetWallpaper)
     store.dispatch('changeWallpaper', targetWallpaper)
 
+  if (to.matched.some(record => record.meta.noSiteBanner)) {
+    if (store.state.siteBanner.show)
+      store.dispatch("hideSiteBanner")
+  }
+
   if (to.matched.some(record => record.meta.requireAuthorization)) {
     const origin = { notificationOrigin: "Khateeb Remind Client" }
     const threeTenthsOfASecond = 300

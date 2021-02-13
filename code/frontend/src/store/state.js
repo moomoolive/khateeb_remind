@@ -13,5 +13,8 @@ export default {
     userPromptedNotifications: [],
     wallpaper: 'main',
     notificationsFromServer: [],
-    landingPage: null
+    landingPage: null,
+    siteBanner: {
+        show: false
+    }
 }
