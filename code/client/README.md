@@ -1,4 +1,10 @@
-# frontend
+# Khateeb Remind Client
+
+## Require Enviromental Variables
+### Note: these variables are case-sensitive
+```
+* VUE_APP_API_SERVER_URL: a url pointing to the khateeb remind server, needs to be prefixed by protocol ("http://", "https://", "ws://", etc...)
+```
 
 ## Project setup
 ```
