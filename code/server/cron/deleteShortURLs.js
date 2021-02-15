@@ -8,7 +8,7 @@ const cron = () => {
             expired.setDate(expired.getDate() - 7)
             const anyURLsThatAreSevenDaysOrOlder = { createdAt: { $lte: expired } }
             const dbRes = await $db.models.shortenedURLs.deleteMany(anyURLsThatAreSevenDaysOrOlder)
-            console.log(`Successfully delete expired urls. Database response ${dbRes}`)
+            console.log(`Successfully deleted expired urls. Database response ${dbRes}`)
         } catch(err) {
             console.log(`Couldn't delete expired short urls!`)
         }

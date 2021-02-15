@@ -86,8 +86,6 @@ router.post('/',
             } else {
                 const tokenInfo = _.deepCopy(user)
                 delete tokenInfo.password; delete tokenInfo.confirmed; delete tokenInfo.__v;
-                const updated = await $db.models.users.updateOne({ _id: user._id.toString() }, { lastLogin: new Date() })
-                const notifications = await $db.models.notifications.find({ userID: user._id.toString() }).sort('-createdAt').limit(10).exec()
                 response = { msg: 'success', token: _.auth.createToken(tokenInfo), notifications }
             }
         }
