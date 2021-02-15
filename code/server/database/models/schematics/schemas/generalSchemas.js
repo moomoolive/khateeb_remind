@@ -399,11 +399,6 @@ const shortenedURL = new mongoose.Schema({
         type: String,
         required: false
     },
-    active: {
-        type: Boolean,
-        required: true,
-        default: true
-    }
 }, { timestamps: true })
 
 shortenedURL.pre('save', function(next) {

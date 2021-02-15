@@ -18,6 +18,11 @@ const routes = [
     name: 'Not Found',
     component: () => import ('@/views/404.vue')
   },
+  {
+    path: '/s/:shortCode',
+    name: 'redirect',
+    component: () => import('@/views/redirect.vue')
+  },
   ...khateebs,
   ...auth,
   ...sysAdmin,

@@ -205,6 +205,9 @@ const misc = {
     },
     pendingKhateebCount() {
         return axios.get(miscExt + '/pending-khateebs')
+    },
+    redirect(shortURLExtension) {
+        return axios.get(miscExt + `/redirect/${shortURLExtension}`)
     }
 }
 
