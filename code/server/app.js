@@ -51,6 +51,7 @@ app.use('/auth', routes.auth)
 app.use('/sysAdmin', routes.sysAdmin)
 app.use('/user', routes.user)
 app.use('/rootInstitutionAdmin', routes.rootInstitutionAdmin)
+app.use('/khateebs', routes.khateebs)
 
 db.once('open', () => { console.log(`${dbType} Mongo is listening`) })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
