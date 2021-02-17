@@ -86,7 +86,7 @@ router.post('/',
             } else {
                 const tokenInfo = _.deepCopy(user)
                 delete tokenInfo.password; delete tokenInfo.confirmed; delete tokenInfo.__v;
-                response = { msg: 'success', token: _.auth.createToken(tokenInfo), notifications }
+                response = { msg: 'success', token: _.auth.createToken(tokenInfo) }
             }
         }
         res.json(response)

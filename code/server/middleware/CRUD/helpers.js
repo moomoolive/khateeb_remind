@@ -1,30 +1,30 @@
 const queries = {
-    parse(requestParams) {
+    parse(requestParams, queryTypeOptions={}, queryFilterOptions={}) {
         const queryOptions = {
             type: {},
             fields: {}
         }
         const splitParameters = this.splitQueryTypeAndQueryFieldParams(requestParams)
-        queryOptions.type = this.loopOverFieldsAndValues(splitParameters.type)
-        queryOptions.fields = this.loopOverFieldsAndValues(splitParameters.fields)
+        queryOptions.type = this.loopOverFieldsAndValues(splitParameters.type, queryTypeOptions)
+        queryOptions.fields = this.loopOverFieldsAndValues(splitParameters.fields, queryFilterOptions)
         return queryOptions
     },
     splitQueryTypeAndQueryFieldParams(requestParams) {
-        // query type parameters and query field parameters are separated by $
-        // queryTypeParam=value1$queryFieldParam=value2, many=true$age=10
         const split = requestParams.query.split('$')
         return {
             type: split[0],
             fields: split[1]
         }
     },
-    loopOverFieldsAndValues(parameters) {
-        // queries are seperated by &
-        // example query1=value1&query2=value2, name=mo&age=10
-        const seperateQueryParams = parameters.split('&')
+    loopOverFieldsAndValues(parameters, parseOptions) {
         const queryConstructed = {}
+        if (!parameters || parameters.length < 1)
+            return queryConstructed
+        const seperateQueryParams = parameters.split('&')
         seperateQueryParams.forEach(queryParam => {
             const query = this.splitQueryFieldAndValue(queryParam)
+            if (!this.allowedParameter(query, parseOptions))
+                return
             const isArrayType = query.value[0] === '[' && query.value.slice(-1) === ']'
             const isObjectType = query.value.split(';').length > 1
             const isComplexQueryValue = isArrayType || isObjectType
@@ -33,9 +33,15 @@ const queries = {
         })
         return queryConstructed
     },
+    allowedParameter(parameter, parseOptions) {
+        if (!parseOptions.allowedParameters || parseOptions.allowedParameters.length < 1)
+            return true
+        else if (parseOptions.allowedParameters === 'none')
+            return false
+        else 
+            return parseOptions.allowedParameters.find(param => param === parameter.field)    
+    },
     splitQueryFieldAndValue(fieldAndValue) {
-        // generally query field and value are seperated by =
-        // example field=value, age=10
         const queryParamNameAndValue = fieldAndValue.split('=')
         return {
             field: queryParamNameAndValue[0],
@@ -94,7 +100,7 @@ const queries = {
 }
 
 const CRUD = {
-    async operation(query, request, targetCollection, operationOptions, info=null) {
+    async operation(query, request, targetCollection, operationOptions={}, info=null) {
         try {
             const mongooseOperator = this.mongooseCRUDMapping(query.type.many, request.method)
             const mongooseOperationInfo = this.mongooseOperationOptions(mongooseOperator, operationOptions)
@@ -108,33 +114,43 @@ const CRUD = {
         switch(routeMethod) {
             case 'GET':
                 return `find${operationOnManyDocuments ? '' : 'One'}`
+            case 'DELETE':
+                return `delete${operationOnManyDocuments ? 'Many' : 'One'}`
         }
     },
     mongooseOperation(operationInfo, targetCollection, query, info) {
+        query.fields = { ...query.fields, ...operationInfo.extraQueryFilters }
         switch(operationInfo.method) {
             case 'find':
             case 'findOne':
                 return $db.models[targetCollection][operationInfo.method](query.fields).select(operationInfo.select).exec()
+            case 'deleteOne':
+            case 'deleteMany':
+                return $db.models[targetCollection][operationInfo.method](query.fields)
         }
     },
     mongooseOperationOptions(mongooseOperator, options) {
+        let mongooseOptions = {}
+        mongooseOptions.method = mongooseOperator
         switch(mongooseOperator) {
             case 'find':
             case 'findOne':
-                return {
-                    method: mongooseOperator,
-                    select: options.select ? options.select : []
-                }
+                mongooseOptions = { ...mongooseOptions, select: options.select ? options.select : [] }
+                break
+            default:
+                break
         }
+        mongooseOptions.extraQueryFilters = options.extraQueryFilters
+        return mongooseOptions
     }
 }
 
 const postHook = {
     querySpecified(data, queryOptions) {
-        const infoFromAllHooks = { originalData: _.deepCopy(data) }
         if (!queryOptions.type["post-hook"])
-            return infoFromAllHooks
+            return data
         const isArray = Array.isArray(data)
+        const infoFromAllHooks = { originalData: _.deepCopy(data) }
         queryOptions["post-hook"].forEach(hook => {
             // all query specificed post hooks are mongoose model methods, 
             // that take no arguments and return objects
@@ -154,15 +170,39 @@ const postHook = {
     execute(data, queryOptions, hardCodedPostHook) {
         // query specified hooks take precedent
         const hookTransformations = this.querySpecified(data, queryOptions)
-        return hardCodedPostHook(hookTransformations, queryOptions)
+        return hardCodedPostHook(hookTransformations, queryOptions) || hookTransformations
     },
     default(data) {
         return data
     }
 }
 
+const middleware = require($DIR + '/middleware/main.js')
+const routes = {
+    defaultCRUDRouteOptions(options) {
+        return {
+            authLevel: options.authLevel || 0,
+            postHook: options.postHook || postHook.default,
+            extraMiddleware: options.extraMiddleWare || [],
+        }
+    },
+    // auth is always first, followed by identification of target model,
+    // any extra middleware, then the crud middleware
+    middlewarePipleine(options) {
+        return [
+            middleware.auth(options.authLevel),
+            (request, res, next) => {
+                request.headers.targetCollection = request.baseUrl.replace('/', '')
+                next()
+            },
+            ...options.extraMiddleware
+        ]
+    }
+}
+
 module.exports = {
     CRUD,
     queries,
-    postHook
+    postHook,
+    routes
 }

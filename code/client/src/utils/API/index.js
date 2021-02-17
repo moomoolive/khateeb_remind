@@ -254,6 +254,23 @@ const utils = {
     }
 }
 
+const khateebsExt = API_URL + '/khateebs'
+const khateebs = {
+    get(queryOptions, queryFilters='') {
+        return axios.get(khateebsExt + `/${queryOptions}$${queryFilters}`)
+    },
+    delete(options={}) {
+        const query = {
+            options: options.queryOptions || '',
+            filter: options.queryFilters || null
+        }
+        if (!query.filter)
+            throw TypeError(`Query filter cannot be empty`)
+        else
+            return axios.delete(khateebsExt + `/${query.options}$${query.filter}`)
+    }
+}
+
 export default {
     auth,
     sysAdmin,
@@ -262,5 +279,6 @@ export default {
     user,
     misc,
     rootInstitutionAdmin,
-    utils
+    utils,
+    khateebs
 }

@@ -34,15 +34,8 @@ app.use(express.json())
 app.use(middleware.generalError)
 
 app.options('*', cors())
-
 app.post('*', middleware.noEmptyBody)
-const deleteRequestParams = {
-    _id: {
-        __type__: "str",
-        required: true
-    }
-}
-app.delete('*', [middleware.noEmptyBody, middleware.allowedFields(deleteRequestParams)])
+app.put('*', middleware.noEmptyBody)
 
 app.use('/khateeb', routes.khateeb)
 app.use('/institutionAdmin', routes.admin)
