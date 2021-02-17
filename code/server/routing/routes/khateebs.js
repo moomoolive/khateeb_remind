@@ -14,8 +14,6 @@ const validator = require('express-validator')
 
 CRUD.GET(router, { authLevel: 2, restrictions })
 
-const mongooseIdLength = 24
-
 const postPostHook = async (data) => {
     try {
         const institutionSetting = await $db.models.settings.findOne({ institutionID: data.institutionID })
@@ -34,6 +32,8 @@ const postPostHook = async (data) => {
     }
 }
 
+const mongooseIdLength = 24
+
 CRUD.POST(router, { 
         bodyValidators: [
             validator.body("institutionID").isLength(mongooseIdLength),
@@ -46,6 +46,15 @@ CRUD.POST(router, {
             validator.body("title").isLength({ min: 1 })
         ],
         postHook: postPostHook
+    }
+)
+
+CRUD.PUT(router, { 
+        authLevel: 2,
+        bodyValidators: [
+            validator.body("institutionID").isLength(mongooseIdLength),
+            validator.body('active').isBoolean().optional()
+        ] 
     }
 )
 

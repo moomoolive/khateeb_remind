@@ -274,6 +274,12 @@ const khateebs = {
             throw TypeError(`Information must be present`)
         else
             return axios.post(khateebsExt + '/', info)
+    },
+    put(info) {
+        if (typeof info === 'undefined')
+            throw TypeError(`Information must be present`)
+        else
+            return axios.put(khateebsExt + '/', info)
     }
 }
 

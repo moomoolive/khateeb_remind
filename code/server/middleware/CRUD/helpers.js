@@ -122,7 +122,10 @@ const CRUD = {
                 else
                     return 'create'
             case 'PUT':
-                return `update${operationOnManyDocuments ? '' : 'One'}`
+                if (operationOnManyDocuments)
+                    return 'update'
+                else
+                    return 'findOneAndUpdate'
         }
     },
     mongooseOperation(operationInfo, targetCollection, query) {
@@ -137,6 +140,11 @@ const CRUD = {
             case 'insertMany':
             case 'create':
                 return $db.models[targetCollection][operationInfo.method](query.fields)
+            // this one still needs work
+            case 'update':
+                return $db.models[targetCollection][operationInfo.method](query.query, query.fields)
+            case 'findOneAndUpdate':
+                return $db.models[targetCollection][operationInfo.method](query.fields._id, query.fields, operationInfo.updateOptions).select(["-password", "-username"])
         }
     },
     mongooseOperationOptions(mongooseOperator, options) {
@@ -146,6 +154,9 @@ const CRUD = {
             case 'find':
             case 'findOne':
                 mongooseOptions = { ...mongooseOptions, select: options.select ? options.select : [] }
+                break
+            case 'findOneAndUpdate':
+                mongooseOptions = { ...mongooseOptions, updateOptions: { new: true } }
                 break
             default:
                 break

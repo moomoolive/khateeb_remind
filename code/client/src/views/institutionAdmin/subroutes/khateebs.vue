@@ -277,13 +277,8 @@ export default {
         },
         async editKhateeb($event) {
             try {
-                const preppedData = {
-                    _id: $event._id,
-                    phoneNumber: $event.phoneNumber,
-                    active: $event.active,
-                    availableTimings: []
-                }
-                const res = await this.$API.institutionAdmin.updateExistingKhateeb(preppedData)
+                const res = await this.$API.khateebs.put($event)
+                console.log(res)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)

@@ -65,6 +65,7 @@ const helpers = require('./helpers.js')
 const get = require('./get.js')
 const Delete = require('./delete.js')
 const post = require('./post.js')
+const put = require('./put.js')
 
 const GET = (router, options={}) => {
     const routeOptions = {
@@ -98,6 +99,23 @@ const POST = (router, options={}) => {
     )
 }
 
+const PUT = (router, options={}) => {
+    const routeOptions = {
+        ...helpers.routes.defaultCRUDRouteOptions(options),
+        bodyValidators: options.bodyValidators || [],
+        targetInfo: options.targetInfo || 'body'
+    }
+    routeOptions.extraMiddleware = [...routeOptions.extraMiddleware, ...routeOptions.bodyValidators]
+    router.put(
+        '/',
+        ...helpers.routes.middlewarePipleine(routeOptions),
+        put(
+            routeOptions.targetInfo,
+            routeOptions.postHook
+        )
+    )
+}
+
 const DELETE = (router, options={}) => {
     const routeOptions = {
         ...helpers.routes.defaultCRUDRouteOptions(options),
@@ -118,5 +136,6 @@ const DELETE = (router, options={}) => {
 module.exports = {
     GET,
     DELETE,
-    POST
+    POST,
+    PUT
 }
