@@ -30,6 +30,8 @@ const allowedFields = (fields={}) => {
 
 const auth = (authLevel) => {
     return (request, response, next) => {
+        if (authLevel === 0)
+            return next()
         const token = request.headers.authorization
         const secret = process.env.JWT_SECRET || 'secret'
         jwt.verify(token, secret, (err, decoded) => {

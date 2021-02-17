@@ -33,6 +33,7 @@ router.get('/institution-selection', async (req, res) => {
     }
 })
 
+// deprecated route
 router.post('/create/khateeb',
     middleware.allowedFields(requestTypeChecks.createKhateeb),
     async (req, res) => {

@@ -295,9 +295,8 @@ export default {
                 if (!confirm)
                     return
                 const res = await this.$API.khateebs.delete({ queryFilters: `_id=${id}` })
-                console.log(res)
-                //const deleted = await this.$API.institutionAdmin.deleteKhateeb({ _id: id })
-                //this.$store.dispatch('adminSavedChangesScreen', true)
+                const deleted = await this.$API.institutionAdmin.deleteKhateeb({ _id: id })
+                this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)
             }

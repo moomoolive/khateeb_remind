@@ -72,7 +72,7 @@ export default {
     methods: {
         async signupKhateeb($event) {
             try {
-                const res = await this.$API.auth.createKhateeb($event)
+                const res = await this.$API.khateebs.post($event)
                 this._.alert(res, 'success')
                 this.$router.push('/')
             } catch(err) {

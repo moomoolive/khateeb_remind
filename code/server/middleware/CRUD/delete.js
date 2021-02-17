@@ -9,7 +9,7 @@ const Delete = (postHook, queryFilterRestrictions, queryOptionRestrictions) => {
                 { allowedParameters: queryOptionRestrictions }, 
                 { allowedParameters: queryFilterRestrictions }
             )
-            const data = await helpers.CRUD.operation(queryOptions, request, request.headers.targetCollection)
+            const data = await helpers.CRUD.operation(queryOptions, request)
             const returnVal = await helpers.postHook.execute(data, queryOptions, postHook)
             return response.json(returnVal)
         } catch(err) {

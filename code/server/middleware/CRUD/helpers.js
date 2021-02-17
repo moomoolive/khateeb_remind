@@ -100,11 +100,11 @@ const queries = {
 }
 
 const CRUD = {
-    async operation(query, request, targetCollection, operationOptions={}, info=null) {
+    async operation(query, request, operationOptions={}) {
         try {
             const mongooseOperator = this.mongooseCRUDMapping(query.type.many, request.method)
             const mongooseOperationInfo = this.mongooseOperationOptions(mongooseOperator, operationOptions)
-            const mongooseRes = await this.mongooseOperation(mongooseOperationInfo, targetCollection, query, info)
+            const mongooseRes = await this.mongooseOperation(mongooseOperationInfo, request.headers.targetCollection, query)
             return mongooseRes
         } catch(err) {
             console.log(err)
@@ -116,9 +116,16 @@ const CRUD = {
                 return `find${operationOnManyDocuments ? '' : 'One'}`
             case 'DELETE':
                 return `delete${operationOnManyDocuments ? 'Many' : 'One'}`
+            case 'POST':
+                if (operationOnManyDocuments)
+                    return 'insertMany'
+                else
+                    return 'create'
+            case 'PUT':
+                return `update${operationOnManyDocuments ? '' : 'One'}`
         }
     },
-    mongooseOperation(operationInfo, targetCollection, query, info) {
+    mongooseOperation(operationInfo, targetCollection, query) {
         query.fields = { ...query.fields, ...operationInfo.extraQueryFilters }
         switch(operationInfo.method) {
             case 'find':
@@ -126,6 +133,9 @@ const CRUD = {
                 return $db.models[targetCollection][operationInfo.method](query.fields).select(operationInfo.select).exec()
             case 'deleteOne':
             case 'deleteMany':
+                return $db.models[targetCollection][operationInfo.method](query.fields)
+            case 'insertMany':
+            case 'create':
                 return $db.models[targetCollection][operationInfo.method](query.fields)
         }
     },
@@ -140,7 +150,7 @@ const CRUD = {
             default:
                 break
         }
-        mongooseOptions.extraQueryFilters = options.extraQueryFilters
+        mongooseOptions.extraQueryFilters = options.extraQueryFilters || {}
         return mongooseOptions
     }
 }
@@ -177,6 +187,22 @@ const postHook = {
     }
 }
 
+const validator = require('express-validator')
+
+const bodyValidation = {
+    isValid(request) {
+        const errors = validator.validationResult(request)
+        if (!errors.isEmpty())
+            return { passed: false, errors: errors.array() }
+        else {
+            // remove any extra fields from request body
+            request.body = validator.matchedData(request, { includeOptionals: true })
+            return { passed: true }
+        }
+    }
+}
+
+
 const middleware = require($DIR + '/middleware/main.js')
 const routes = {
     defaultCRUDRouteOptions(options) {
@@ -197,6 +223,24 @@ const routes = {
             },
             ...options.extraMiddleware
         ]
+    },
+}
+
+const commit = {
+    options(data, targetInfo) {
+        const commitOptions = {
+            type: {},
+            fields: {}
+        }
+        if (targetInfo === 'body')
+            commitOptions.fields = data
+        else {
+            commitOptions.fields = data[targetInfo]
+            commitOptions.fullData = data
+        }
+        if (Array.isArray(commitOptions.fields))
+            commitOptions.type.many = true
+        return commitOptions
     }
 }
 
@@ -204,5 +248,7 @@ module.exports = {
     CRUD,
     queries,
     postHook,
-    routes
+    routes,
+    bodyValidation,
+    commit
 }

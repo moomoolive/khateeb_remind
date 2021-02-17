@@ -20,7 +20,7 @@ const get = (restrictions, postHook, includeInstitutionId=true) => {
             let operationOptions = { select: queryRestrictions }
             if (includeInstitutionId)
                 operationOptions = { ...operationOptions, extraQueryFilters: { institutionID: request.headers.institutionid } }
-            const data = await helpers.CRUD.operation(queryOptions, request, request.headers.targetCollection, operationOptions)
+            const data = await helpers.CRUD.operation(queryOptions, request, operationOptions)
             const returnVal = await helpers.postHook.execute(data, queryOptions, postHook)
             return response.json(returnVal)
         } catch(err) {

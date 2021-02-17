@@ -64,6 +64,7 @@ request and creates response
 const helpers = require('./helpers.js')
 const get = require('./get.js')
 const Delete = require('./delete.js')
+const post = require('./post.js')
 
 const GET = (router, options={}) => {
     const routeOptions = {
@@ -75,6 +76,23 @@ const GET = (router, options={}) => {
         ...helpers.routes.middlewarePipleine(routeOptions), 
         get(
             routeOptions.restrictions, 
+            routeOptions.postHook
+        )
+    )
+}
+
+const POST = (router, options={}) => {
+    const routeOptions = {
+        ...helpers.routes.defaultCRUDRouteOptions(options),
+        bodyValidators: options.bodyValidators || [],
+        targetInfo: options.targetInfo || 'body'
+    }
+    routeOptions.extraMiddleware = [...routeOptions.extraMiddleware, ...routeOptions.bodyValidators]
+    router.post(
+        '/',
+        ...helpers.routes.middlewarePipleine(routeOptions),
+        post(
+            routeOptions.targetInfo,
             routeOptions.postHook
         )
     )
@@ -99,5 +117,6 @@ const DELETE = (router, options={}) => {
 
 module.exports = {
     GET,
-    DELETE
+    DELETE,
+    POST
 }

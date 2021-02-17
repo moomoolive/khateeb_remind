@@ -268,6 +268,12 @@ const khateebs = {
             throw TypeError(`Query filter cannot be empty`)
         else
             return axios.delete(khateebsExt + `/${query.options}$${query.filter}`)
+    },
+    post(info) {
+        if (typeof info === 'undefined')
+            throw TypeError(`Information must be present`)
+        else
+            return axios.post(khateebsExt + '/', info)
     }
 }
 
