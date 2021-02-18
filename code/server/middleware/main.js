@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const validator = require('express-validator')
 
 const helpers = require('./helpers.js')
 
@@ -49,6 +50,8 @@ const auth = (authLevel) => {
     } 
 }
 
+
+
 const userExists = async (request, response, next) => {
     const user = await $db.models.users.findOne({ username: request.body.username }).select(["-createdAt", "-updatedAt", "-__v"]).exec()
     if (!user){
@@ -61,4 +64,18 @@ const userExists = async (request, response, next) => {
 
 }
 
-module.exports = { allowedFields, userExists, auth, noEmptyBody, generalError }
+const validateRequest = (validators=[], section="body") => {
+    return [
+        ...validators,
+        (req, res, next) => {
+            const errors = validator.validationResult(req)
+            if (!errors.isEmpty())
+                return res.status(406).json(errors.array())
+            req[section] = validator.matchedData(req, { includeOptionals: false })
+            next()
+            
+        }
+    ]
+}
+
+module.exports = { allowedFields, userExists, auth, noEmptyBody, generalError, validateRequest }

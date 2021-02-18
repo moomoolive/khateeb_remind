@@ -178,8 +178,8 @@ const institutionAdmin = {
 
 const userExt = API_URL + `/user`
 const user = {
-    changePassword(newPassword) {
-        return axios.post(userExt + '/password', newPassword)
+    updateInfo(updates) {
+        return axios.put(userExt + '/', updates)
     },
     changeUsername(newUsername) {
         return axios.post(userExt + '/username', newUsername)
@@ -254,12 +254,12 @@ const utils = {
     }
 }
 
-const khateebsExt = API_URL + '/khateebs'
-const khateebs = {
-    get(queryOptions, queryFilters='') {
-        return axios.get(khateebsExt + `/${queryOptions}$${queryFilters}`)
+
+const crud = {
+    get(targetCollection, queryOptions='', queryFilters='') {
+        return axios.get(this.targetURL(targetCollection) + `${queryOptions}$${queryFilters}`)
     },
-    delete(options={}) {
+    delete(targetCollection, options={}) {
         const query = {
             options: options.queryOptions || '',
             filter: options.queryFilters || null
@@ -267,19 +267,22 @@ const khateebs = {
         if (!query.filter)
             throw TypeError(`Query filter cannot be empty`)
         else
-            return axios.delete(khateebsExt + `/${query.options}$${query.filter}`)
+            return axios.delete(this.targetURL(targetCollection)  + `${query.options}$${query.filter}`)
     },
-    post(info) {
+    post(targetCollection, info) {
         if (typeof info === 'undefined')
             throw TypeError(`Information must be present`)
         else
-            return axios.post(khateebsExt + '/', info)
+            return axios.post(this.targetURL(targetCollection), info)
     },
-    put(info) {
+    put(targetCollection, info) {
         if (typeof info === 'undefined')
             throw TypeError(`Information must be present`)
         else
-            return axios.put(khateebsExt + '/', info)
+            return axios.put(this.targetURL(targetCollection), info)
+    },
+    targetURL(targetCollection) {
+        return API_URL + `/${targetCollection}/`
     }
 }
 
@@ -292,5 +295,5 @@ export default {
     misc,
     rootInstitutionAdmin,
     utils,
-    khateebs
+    crud
 }

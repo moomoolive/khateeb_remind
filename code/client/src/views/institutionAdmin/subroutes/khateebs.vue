@@ -167,11 +167,9 @@ export default {
         }
     },
     methods: {
-        // many=true$confirmed=false
         async getAllKhateebs() {
             try {
-                const data = await this.$API.khateebs.get('many=true')
-                //const data = await this.$API.institutionAdmin.getKhateebs()
+                const data = await this.$API.institutionAdmin.getKhateebs()
                 this.khateebs = data
                 this.khateebsWithReadableAvailableTimings = await this.createReadableTimingsAndUnavailableDates(data)
                 this.khateebsInArraysOfTwos = this.toArraysOfTwo(data)
@@ -277,8 +275,7 @@ export default {
         },
         async editKhateeb($event) {
             try {
-                const res = await this.$API.khateebs.put($event)
-                console.log(res)
+                const res = await this.$API.institutionAdmin.updateExistingKhateeb($event)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)
@@ -289,8 +286,7 @@ export default {
                 const confirm = await this._.confirm(`Are you sure you want to permenantly delete this khateeb?`)
                 if (!confirm)
                     return
-                const res = await this.$API.khateebs.delete({ queryFilters: `_id=${id}` })
-                const deleted = await this.$API.institutionAdmin.deleteKhateeb({ _id: id })
+                const res = await this.$API.institutionAdmin.deleteKhateeb(id)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)

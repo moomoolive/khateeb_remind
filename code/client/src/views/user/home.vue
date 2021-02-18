@@ -9,7 +9,7 @@
                 :backgroundColor="`none`"
                 :basedOn="{ username: $store.getters.decodedJWT.username }"
                 :buttonText="`Change Username`"
-                @submitted="changeUsername($event)"
+                @submitted="updateInfo($event)"
             />
         </collapsable-box>
         <collapsable-box
@@ -21,7 +21,7 @@
                 :bindedExts="['confirms']"
                 :backgroundColor="`none`"
                 :buttonText="`Change Password`"
-                @submitted="changePassword($event)"
+                @submitted="updateInfo($event)"
             />
         </collapsable-box>
         <collapsable-box
@@ -33,7 +33,7 @@
                 :basedOn="$store.getters.decodedJWT"
                 :backgroundColor="`none`"
                 :buttonText="`Update Profile`"
-                @submitted="updateProfile($event)"
+                @submitted="updateInfo($event)"
             />
         </collapsable-box>
         <collapsable-box
@@ -56,7 +56,7 @@
         >
             <calendar
                 :originalVal="$store.getters.decodedJWT.unavailableDates" 
-                @changed="modifyUnavailableDates($event)"
+                @changed="updateInfo($event)"
             />
         </collapsable-box>
         <collapsable-box
@@ -135,36 +135,11 @@ export default {
         }
     },
     methods: {
-        async changePassword($event) {
+        async updateInfo($event) {
             try {
-                const res = await this.$API.user.changePassword($event)
-                this._.alert(`Successfully changed password`, 'success')
-                this._.toHomePage()
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async changeUsername($event) {
-            try {
-                const res = await this.$API.user.changeUsername($event)
+                const res = await this.$API.user.updateInfo($event)
                 this.storeToken(res.token)
-                this._.alert(`Successfully changed username`, 'success')
-                this._.toHomePage()
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async updateProfile($event) {
-            try {
-                const updated = {
-                    firstName: $event.firstName,
-                    lastName: $event.lastName,
-                    phoneNumber: $event.phoneNumber,
-                    handle: $event.handle
-                }
-                const res = await this.$API.user.changeProfile(updated)
-                this.storeToken(res.token)
-                this._.alert(`Successfully updated profile`, 'success')
+                this._.alert(`Successfully updated!`, 'success')
                 this._.toHomePage()
             } catch(err) {
                 console.log(err)
@@ -223,14 +198,6 @@ export default {
                 console.log(err)
             }
         },
-        async modifyUnavailableDates($event) {
-            try {
-                const res = await this.$API.user.changeProfile({ unavailableDates: $event })
-                this.storeToken(res.token)
-            } catch(err) {
-                console.log(err)
-            }
-        }
     },
     computed: {
         availableTimingsTag() {

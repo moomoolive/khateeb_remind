@@ -43,8 +43,8 @@ export default {
     mounted() {
         this.$nextTick(async () => {
             if (this.notificationInfo.options._id) {
-                this.$store.dispatch('markNotificationAsSeen', this.notificationInfo.options._id)
                 const updated = await this.$API.user.markNotificationAsSeen({ _id: this.notificationInfo.options._id })
+                this.$store.dispatch('storeNotificationsFromAPI', updated)
             }
         })
     },
