@@ -357,10 +357,7 @@ const routerGroup10URL = `/${routerGroup10}`
 router.get(routerGroup10URL, async (req, res) => {
     try {
         const settings = await $db.models.settings.findOne({ institutionID: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
-        // use created method
-        settings.twilioUser = $db.funcs.decrypt(settings.twilioUser)
-        settings.twilioKey = $db.funcs.decrypt(settings.twilioKey)
-        res.json(settings)
+        return res.json(settings.decrypt())
     } catch(err) {
         console.log(err)
         res.json(`Couldn't get institution settings!`)

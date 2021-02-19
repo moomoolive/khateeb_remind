@@ -16,16 +16,16 @@ const models = {
 }
 
 const userTypes = {
-    khateebs: models.users.discriminator('khateeb', schema.khateeb),
-    root: models.users.discriminator('root', schema.root),
-    institutionAdmins: models.users.discriminator('institutionAdmin', schema.institutionAdmin),
-    sysAdmins: models.users.discriminator('sysAdmin', schema.sysAdmin),
-    rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', schema.rootInstitutionAdmin)
+    khateebs: models.users.discriminator('khateeb', schema.discriminators.khateeb),
+    root: models.users.discriminator('root', schema.discriminators.root),
+    institutionAdmins: models.users.discriminator('institutionAdmin', schema.discriminators.institutionAdmin),
+    sysAdmins: models.users.discriminator('sysAdmin', schema.discriminators.sysAdmin),
+    rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', schema.discriminators.rootInstitutionAdmin)
 }
 
 const notificationTypes = {
-    generalNotifications: models.notifications.discriminator('generalNotification', schema.generalNotification),
-    actionNotifications: models.notifications.discriminator('actionNotification', schema.actionNotification)
+    generalNotifications: models.notifications.discriminator('generalNotification', schema.discriminators.generalNotification),
+    actionNotifications: models.notifications.discriminator('actionNotification', schema.discriminators.actionNotification)
 }
 
 module.exports = { 
