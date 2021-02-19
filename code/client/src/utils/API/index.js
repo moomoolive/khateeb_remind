@@ -187,8 +187,15 @@ const user = {
     changeProfile(updatedProfile) {
         return axios.post(userExt + '/profile', updatedProfile)
     },
-    checkIn() {
-        return axios.get(userExt + '/check-in')
+    async checkIn() {
+        try {
+            const userPackage = await axios.get(userExt + '/check-in')
+            utils.assignUserPackage(userPackage)
+            console.log(`Successfully assigned user package`)
+        } catch(err) {
+            console.log(err)
+            console.log(`Couldn't assign user package`)
+        }
     },
     markNotificationAsSeen(notificationId) {
         return axios.post(userExt + '/mark-notification-as-seen', notificationId)
@@ -213,8 +220,8 @@ const misc = {
 
 const utils = {
     assignUserPackage(userPkg) {
-        store.dispatch('storeNotificationsFromAPI', userPkg)
-        const urgentNotifications = userPkg.filter(note => !note.seen)
+        store.dispatch('storeUserPackage', userPkg)
+        const urgentNotifications = userPkg.notifications.filter(note => !note.seen)
         urgentNotifications.forEach(note => {
             const notification = this.prepNotification(note)
             store.dispatch('createNotification', notification)

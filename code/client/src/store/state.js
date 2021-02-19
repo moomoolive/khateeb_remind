@@ -16,5 +16,6 @@ export default {
     landingPage: null,
     siteBanner: {
         show: false
-    }
+    },
+    institutionInfo: null
 }

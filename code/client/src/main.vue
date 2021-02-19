@@ -55,23 +55,10 @@ export default {
         return
       axios.defaults.headers.common['authorization'] = token
       try {
-        const userPackage = await this.$API.user.checkIn()
-        this.$API.utils.assignUserPackage(userPackage)
+        await this.$API.user.checkIn()
       } catch(err) {
         console.log(err)
       }
-    },
-    setLastVisit() {
-      const dateOfLastVisit = localStorage.getItem('today')
-      if (dateOfLastVisit) 
-        this.updateLastVisit(dateOfLastVisit)
-      const dateToday = new Date().toUTCString()
-      localStorage.setItem('today', dateToday)
-    },
-    updateLastVisit(cachedDate) {
-      localStorage.setItem('lastVisit', cachedDate)
-      const parsedLastVisit = new Date(cachedDate)
-      this.$store.dispatch('setLastVisit', cachedDate)
     },
   },
   computed: {
@@ -119,7 +106,6 @@ export default {
   },
   created() {
     this.setJWT()
-    this.setLastVisit()
   }
 }
 </script>

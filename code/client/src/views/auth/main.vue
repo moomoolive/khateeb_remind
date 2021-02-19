@@ -66,8 +66,7 @@ export default {
                 }
                 else if (authRes.token && authRes.msg === 'success') {
                     this.toApp(authRes.token)
-                    const userPackage = await this.$API.user.checkIn()
-                    this.$API.utils.assignUserPackage(userPackage)
+                    await this.$API.user.checkIn()
                 }
             } catch(err) {
                 if (err.status === 401)

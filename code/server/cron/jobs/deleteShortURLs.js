@@ -1,8 +1,7 @@
-const cron = () => {
-    const cronJob = require('cron').CronJob
-    const everyDayAt12AM = '0 0 0 * * *'
-    const time = everyDayAt12AM
-    const job = new cronJob(time, async() => {
+const cronWrapper = require('./cronWrapper.js')
+
+const options = {
+    job: async() => {
         try {
             const expired = new Date()
             expired.setDate(expired.getDate() - 7)
@@ -12,7 +11,9 @@ const cron = () => {
         } catch(err) {
             console.log(`Couldn't delete expired short urls!`)
         }
-    }).start()
+    },
+    time: '0 0 0 * * *', // everyday at 12AM
+    syncWithTimezone: true
 }
 
-module.exports = cron
+module.exports = cronWrapper(options)

@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "backend server for khateeb remind",
-  "main": "app.js",
+  "main": "App.js",
   "scripts": {
-    "dev": "nodemon app.js",
-    "app": "node app.js"
+    "dev": "nodemon App.js",
+    "app": "node App.js"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",

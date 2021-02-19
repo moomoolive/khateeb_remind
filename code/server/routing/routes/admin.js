@@ -407,13 +407,15 @@ router.post(routerGroup9URL,
 
 // test institution only
 
-const jummahNotifications = require($DIR + '/cron/jummahNotifications.js')
+// --- deal with this later ---
+
+//const jummahNotifications = require($DIR + '/cron/jummahNotifications.js')
 
 router.get('/send-notifications', async (req, res) => {
     try {
         const date = new Date()
         date.setSeconds(date.getSeconds() + 2)
-        await jummahNotifications(date, true)
+        //await jummahNotifications(date, true)
         res.json('Succesfully sent notifications')
     } catch(err) {
         console.log(err)
