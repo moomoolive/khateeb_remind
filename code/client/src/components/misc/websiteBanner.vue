@@ -17,7 +17,7 @@ export default {
             defaultDisplayMsgs: {
                 friday: [
                     "🎉 اليوم يوم الجمعة 🎉",
-                    "🤲🏽 صلو على نبي 🤲🏽",
+                    "🤲🏽 صلو على النبي 🤲🏽",
                     "🎉 Today is Friday 🎉",
                     "🤲🏽 Send Salams Upon the Prophet 🤲🏽"
                 ]

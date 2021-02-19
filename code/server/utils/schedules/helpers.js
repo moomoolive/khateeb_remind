@@ -165,5 +165,6 @@ module.exports = {
     findUpcomingFriday,
     findAllFridays,
     fridaysNextMonth,
-    createAssociatedJummahKeys
+    createAssociatedJummahKeys,
+    linkTimesAndLocations
 }

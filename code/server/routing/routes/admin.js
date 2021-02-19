@@ -1,5 +1,5 @@
 const express = require('express')
-const { save } = require('../../database/funcs')
+const validator = require('express-validator')
 
 const middleware = require($DIR + '/middleware/main.js')
 const requestTypeChecks = require('./adminTC.json')
@@ -325,31 +325,30 @@ const schedules = {
     }
 }
 
-router.get("/schedules" + "/:month/:year", async (req, res) => {
-    try {
-        let jummahs = await funcs.query(req, 'jummahs').exec()
-        if (jummahs.length < 1 && schedules.previousMonth(req.params.month, req.params.year))
-            res.json(`nobuild-previous`)
-        else if (jummahs.length < 1 && schedules.twoMonthsAhead(req.params.month, req.params.year))
-            res.json(`nobuild-future`)
-        else {
-            if (jummahs.length < 1) {
+router.get(
+    "/schedules" + "/:month/:year",
+    middleware.validateRequest(
+        [
+            validator.param("month").toInt().isInt({ min: 0, max: 11 }),
+            validator.param("year").toInt().isInt({ min: 2021 })
+        ],
+        'params'
+    ),
+    async (req, res) => {
+        try {
+            console.log(req.params)
+            let jummahs = await $db.models.jummahs.find().monthlyEntries(req.params.year, req.params.month)
+            if (jummahs.length < 1 && schedules.previousMonth(req.params.month, req.params.year))
+                return res.json(`nobuild-previous`)
+            else if (jummahs.length < 1 && schedules.twoMonthsAhead(req.params.month, req.params.year))
+                return res.json(`nobuild-future`)
+            if (jummahs.length < 1)
                 jummahs = await _.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
-            }
-            const locations = await $db.models.locations.find({ institutionID: req.headers.institutionid }).exec()
-            const timings = await $db.models.timings.find({ institutionID: req.headers.institutionid }).exec()
-            const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()
-            const data = {
-                jummahs,
-                locations,
-                timings,
-                khateebs
-            }
-            res.json(data)
+            let data = await jummahs[0].gatherScheduleComponents()
+            return res.json({ jummahs, ...data })
+        } catch(err) {
+            res.json(errors.getReq('schedules', err))
         }
-    } catch(err) {
-        res.json(errors.getReq('schedules', err))
-    }
 })
 
 const routerGroup10 = 'settings'
@@ -358,6 +357,7 @@ const routerGroup10URL = `/${routerGroup10}`
 router.get(routerGroup10URL, async (req, res) => {
     try {
         const settings = await $db.models.settings.findOne({ institutionID: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
+        // use created method
         settings.twilioUser = $db.funcs.decrypt(settings.twilioUser)
         settings.twilioKey = $db.funcs.decrypt(settings.twilioKey)
         res.json(settings)
