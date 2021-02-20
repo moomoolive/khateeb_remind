@@ -4,29 +4,15 @@ const validator = require('express-validator')
 const helpers = require('./helpers.js')
 
 const noEmptyBody = (request, response, next) => {
-    if (Object.keys(request.body).length === 0 && request.path !== '/text/hub') {
-        response.status(_.hCodes.notAcceptable)
-        response.json(`You cannot send an empty request body to this route!`)
-    } else next()
+    if (Object.keys(request.body).length === 0)
+        return response.status(_.hCodes.notAcceptable).json(`You cannot send an empty request body to this route!`)
+    else 
+        next()
 }
 
 const generalError = (err, request, response, next) => {
     console.log(err)
-    response.status(_.hCodes.serverError)
-    response.json("Server isn't responding right now, try later...")
-}
-
-const allowedFields = (fields={}) => {
-    return (request, response, next) => {
-        let failed = helpers.typeCheckRequest(fields, request.body)
-        if (failed.length < 1)
-            next()
-        else {
-            console.log(failed)
-            response.status(_.hCodes.notAcceptable)
-            response.json(failed)
-        }
-    }
+    return response.status(_.hCodes.serverError).json("Server isn't responding right now, try later...")
 }
 
 const auth = (authLevel) => {
@@ -78,4 +64,10 @@ const validateRequest = (validators=[], section="body") => {
     ]
 }
 
-module.exports = { allowedFields, userExists, auth, noEmptyBody, generalError, validateRequest }
+module.exports = { 
+    userExists, 
+    auth, 
+    noEmptyBody, 
+    generalError, 
+    validateRequest 
+}

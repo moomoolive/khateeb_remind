@@ -1,5 +1,8 @@
 node_modules/
 
+# any mock users, example database entries, etc.
+dummyInfo/
+
 **/__pycache__
 
 scraper_env/

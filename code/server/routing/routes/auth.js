@@ -1,12 +1,28 @@
 const express = require('express')
+const validator = require('express-validator')
 
-const requestTypeChecks = require("./authTC.json")
 const middleware = require($DIR + '/middleware/main.js')
 
 const router = express.Router()
 
-router.post('/create/institution',
-    middleware.allowedFields(requestTypeChecks.createInstitution), 
+router.post(
+    '/create/institution',
+    middleware.validateRequest(
+        [
+            validator.body("institution.name").isLength({ min: 1 }),
+            validator.body("institution.abbreviatedName").isLength({ min: 1 }),
+            validator.body("institution.timezone").isLength({ min: 1 }),
+            validator.body("institution.country").isLength({ min: 1 }),
+            validator.body("institution.state").isLength({ min: 1 }).optional(),
+            validator.body("institutionID").isLength(24),
+            validator.body("institutionAdmin.password").isLength({ min: 6 }),
+            validator.body("institutionAdmin.username").isLength({ min: 6 }),
+            validator.body("institutionAdmin.handle").isLength({ min: 1 }),
+            validator.body("institutionAdmin.firstName").isLength({ min: 1 }),
+            validator.body("institutionAdmin.lastName").isLength({ min: 1 }),
+            validator.body("institutionAdmin.phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
+        ]
+    ), 
     async (req, res) => {
     try {
         if (req.body.institution.name === '__TEST__')
@@ -14,7 +30,7 @@ router.post('/create/institution',
         const institutionEntry = await $db.funcs.save('institutions', req.body.institution)
         req.body.institutionAdmin.institutionID = institutionEntry._id.toString()
         const rootInstitutionAdminEntry = await $db.funcs.save('rootInstitutionAdmins', req.body.institutionAdmin)
-        res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
+        return res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
     } catch(err) {
         console.log(err)
         res.status(_.hCodes.serverError)
@@ -33,9 +49,21 @@ router.get('/institution-selection', async (req, res) => {
     }
 })
 
-// deprecated route
-router.post('/create/khateeb',
-    middleware.allowedFields(requestTypeChecks.createKhateeb),
+
+router.post(
+    '/create/khateeb',
+    middleware.validateRequest(
+        [
+            validator.body("institutionID").isLength(20),
+            validator.body("password").isLength({ min: 6 }),
+            validator.body("username").isLength({ min: 6 }),
+            validator.body("handle").isLength({ min: 1 }),
+            validator.body("firstName").isLength({ min: 1 }),
+            validator.body("lastName").isLength({ min: 1 }),
+            validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
+            validator.body("title").isLength({ min: 1 })
+        ]
+    ),
     async (req, res) => {
     try {
         const institution = req.body.institutionID
@@ -62,16 +90,15 @@ router.post('/create/khateeb',
     }
 })
 
-// root --> user: "moomoo123" password: "password123"
-// institutionAdmin ---> user: "moomoolive" password: "123456" institution: "Al-Salam Centre"
-// khateeb ---> user: "gandgand" password: "123456" institution: "Al-Salam Centre"
-// sysAdmin ---> user: "sysAdmin1" password: "123456"
-
-router.post('/',
-    [
-        middleware.allowedFields(requestTypeChecks.login),
-        middleware.userExists
-    ],
+router.post(
+    '/',
+    middleware.validateRequest(
+        [
+            validator.body("password").isLength({ min: 1 }),
+            validator.body("username").isLength({ min: 1 }),
+        ]
+    ),
+    middleware.userExists,
     async (req, res) => {
     try {
         let response
@@ -98,58 +125,74 @@ router.post('/',
     }
 })
 
-router.post('/forgot/:type', async (req, res) => {
-    try {
-        if (req.params.type !== 'username' && req.params.type !== 'password')
-            return res.json(`Invalid Recovery Option`)
-        let khateebRemindTextInfo = await $db.models.settings.findOne({ institutionID: "__ROOT__" }).exec()
-        if (!khateebRemindTextInfo.textAllowed)
-            return res.json({ msg:`Account recovery service is offline right now`, status: 'error' })
-        khateebRemindTextInfo = khateebRemindTextInfo.decrypt()
-        const twilio = require('twilio')(khateebRemindTextInfo.twilioUser, khateebRemindTextInfo.twilioKey)
-        let apiMsg
-        let textMsg
-        let to
-        if (req.params.type === 'username') {
-            to = `+1${req.body.data}`
-            const results = await $db.models.users.find({ phoneNumber: req.body.data }).exec()
-            textMsg = 'Accounts under this phone number:\n'
-            results.forEach(account => { textMsg += `\n- ${account.username}` })
-            apiMsg = `Your username(s) were sent to your recovery phone via text!`
+router.post(
+    '/forgot/:type', 
+    middleware.validateRequest(
+        [
+            validator.body("data").isLength({ min: 1 }),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            if (req.params.type !== 'username' && req.params.type !== 'password')
+                return res.json(`Invalid Recovery Option`)
+            let khateebRemindTextInfo = await $db.models.settings.findOne({ institutionID: "__ROOT__" }).exec()
+            if (!khateebRemindTextInfo.textAllowed)
+                return res.json({ msg:`Account recovery service is offline right now`, status: 'error' })
+            khateebRemindTextInfo = khateebRemindTextInfo.decrypt()
+            const twilio = require('twilio')(khateebRemindTextInfo.twilioUser, khateebRemindTextInfo.twilioKey)
+            let apiMsg
+            let textMsg
+            let to
+            if (req.params.type === 'username') {
+                to = `+1${req.body.data}`
+                const results = await $db.models.users.find({ phoneNumber: req.body.data }).exec()
+                textMsg = 'Accounts under this phone number:\n'
+                results.forEach(account => { textMsg += `\n- ${account.username}` })
+                apiMsg = `Your username(s) were sent to your recovery phone via text!`
+            }
+            else if (req.params.type === 'password') {
+                const account = await $db.models.users.findOne({ username: req.body.data }).exec()
+                if (!account)
+                    return res.json({ msg: `That account doesn't exist`, status: "error" }) // security risk??
+                to = `+1${account.phoneNumber}`
+                const verificationCode = await new $db.models.verificationCodes({ userID: account._id.toString() }).save()
+                textMsg = `You requested a password recovery code from Khateeb Remind. This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
+                apiMsg = { msg: `A verification code was sent to your phone via text!`, status: "code", userID: account._id.toString()}
+            }
+            textMsg += `\n\nYou recieved this message because you requested help recovering your ${req.params.type}.\n\n🤖 Sent from Khateeb Remind Bot`
+            await twilio.messages.create({
+                to,
+                from: khateebRemindTextInfo.twilioPhoneNumber,
+                body: textMsg 
+            })
+            res.json(apiMsg)
+        } catch(err) {
+            console.log(err)
+            res.json({msg: `Couldn't send verification method`, status: "error"})
         }
-        else if (req.params.type === 'password') {
-            const account = await $db.models.users.findOne({ username: req.body.data }).exec()
-            if (!account)
-                return res.json({ msg: `That account doesn't exist`, status: "error" }) // security risk??
-            to = `+1${account.phoneNumber}`
-            const verificationCode = await new $db.models.verificationCodes({ userID: account._id.toString() }).save()
-            textMsg = `You requested a password recovery code from Khateeb Remind. This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
-            apiMsg = { msg: `A verification code was sent to your phone via text!`, status: "code", userID: account._id.toString()}
-        }
-        textMsg += `\n\nYou recieved this message because you requested help recovering your ${req.params.type}.\n\n🤖 Sent from Khateeb Remind Bot`
-        await twilio.messages.create({
-            to,
-            from: khateebRemindTextInfo.twilioPhoneNumber,
-            body: textMsg 
-        })
-        res.json(apiMsg)
-    } catch(err) {
-        console.log(err)
-        res.json({msg: `Couldn't send verification method`, status: "error"})
-    }
 })
 
-router.post('/verification-code', async (req, res) => {
-    try {
-        const verificationCode = await $db.models.verificationCodes.findOne({ code: req.body.code }).exec()
-        if (!verificationCode || verificationCode.userID !== req.body.userID)
-            return res.json({ msg: "Incorrect code", status: "error" })
-        const updated = await $db.models.users.updateOne({ _id: req.body.userID }, { password: req.body.password })
-        res.json({ msg: "Password successfully updated", status: "success" })
-    } catch(err) {
-        console.log(err)
-        res.json({ msg: `Couldn't verify code`, status: "error" })
-    }
+router.post(
+    '/verification-code', 
+    middleware.validateRequest(
+        [
+            validator.body("code").isLength({ min: 1 }),
+            validator.body("userID").isLength(20),
+            validator.body("password").isLength({ min: 6 }),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            const verificationCode = await $db.models.verificationCodes.findOne({ code: req.body.code }).exec()
+            if (!verificationCode || verificationCode.userID !== req.body.userID)
+                return res.json({ msg: "Incorrect code", status: "error" })
+            const updated = await $db.models.users.updateOne({ _id: req.body.userID }, { password: req.body.password })
+            res.json({ msg: "Password successfully updated", status: "success" })
+        } catch(err) {
+            console.log(err)
+            res.json({ msg: `Couldn't verify code`, status: "error" })
+        }
 })
 
 module.exports = router

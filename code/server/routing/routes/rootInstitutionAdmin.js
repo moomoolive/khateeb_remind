@@ -1,7 +1,7 @@
 const express = require('express')
+const validator = require('express-validator')
 
 const middleware = require($DIR + '/middleware/main.js')
-const typeChecks = require('./rootInstitutionAdminTC.json')
 
 const router = express.Router()
 
@@ -21,7 +21,16 @@ router.get(routerGroup1URL, async (req, res) => {
 })
 
 router.post(routerGroup1URL, 
-    middleware.allowedFields(typeChecks.institutionAdmin),
+    middleware.validateRequest(
+        [
+            validator.body("password").isLength({ min: 6 }),
+            validator.body("username").isLength({ min: 6 }),
+            validator.body("handle").isLength({ min: 1 }),
+            validator.body("firstName").isLength({ min: 1 }),
+            validator.body("lastName").isLength({ min: 1 }),
+            validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
+        ]
+    ),
     async (req, res) => {
     try {
         req.body.institutionID = req.headers.institutionid

@@ -1,20 +1,16 @@
 const express = require('express')
+const validator = require('express-validator')
 
 const middleware = require($DIR + '/middleware/main.js')
 
 const router = express.Router()
 
-const typeCheck = {
-    uniqueUser: {
-        username: {
-            __type__: 'str',
-            required: true
-        }
-    }
-}
-
 router.post('/unique-username',
-    middleware.allowedFields(typeCheck.uniqueUser),
+    middleware.validateRequest(
+        [
+            validator.body("username").isLength({ min: 1 }),
+        ]
+    ),
     async (req, res) =>
     {
         try {

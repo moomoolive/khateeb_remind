@@ -2,7 +2,6 @@ const express = require('express')
 const validator = require('express-validator')
 
 const middleware = require($DIR + '/middleware/main.js')
-const requestTypeChecks = require('./adminTC.json')
 
 const router = express.Router()
 
@@ -71,7 +70,15 @@ router.delete(routerGroup1URL, async (req, res) => {
 })
 
 router.post(routerGroup1URL,
-    middleware.allowedFields(requestTypeChecks.announcements),
+    middleware.validateRequest(
+        [
+            validator.body("_id").isLength(24).optional(),
+            validator.body("headline").isLength({ min: 1 }),
+            validator.body("content").isLength({ min: 1 }),
+            validator.body("important").isBoolean(),
+            validator.body("urgent").isBoolean(),
+        ]
+    ),
     async (req, res) => {
     console.log(req.body)
     try {
@@ -104,8 +111,15 @@ router.delete(routerGroup2URL, async (req, res) => {
     }
 })
 
-router.post(routerGroup2URL,
-    middleware.allowedFields(requestTypeChecks.existingKhateeb),
+// ONE ROUTE
+router.post(
+    routerGroup2URL,
+    middleware.validateRequest(
+        [
+            validator.body("_id").isLength(24).optional(),
+            validator.body("active").isBoolean(),
+        ]
+    ),
     async (req, res) => {
     try {
         const updated = await $db.models[routerGroup2].updateOne({ _id: req.body._id }, req.body)
@@ -115,32 +129,26 @@ router.post(routerGroup2URL,
     }
 })
 
-router.post(routerGroup2URL + "/create", 
-    middleware.allowedFields(requestTypeChecks.newKhateeb),
-    async(req, res) => {
-    try {
-        req.body.institutionID = req.headers.institutionid
-        req.body.confirmed = true
-        const khateebEntry = await $db.funcs.save(routerGroup2, req.body)
-        res.json(`You've successfully made ${khateebEntry.firstName} ${khateebEntry.lastName} a khateeb (username: ${khateebEntry.username}).`)
-    } catch(err) {
-        res.json(errors.db(routerGroup2.slice(0, 1), 'creating', err))
-    }
+router.post(
+    routerGroup2URL + "/confirm", 
+    middleware.validateRequest(
+        [
+            validator.body("_id").isLength(24).optional()
+        ]
+    ),
+    async (req, res) => {
+        try {
+            const khateeb = await $db.models[routerGroup2].findOne(req.body).exec()
+            const updated = await $db.models[routerGroup2].updateOne(req.body, { confirmed: true }).exec()
+            const welcomeMsg = new _.notifications.welcome(khateeb)
+            const saved = await welcomeMsg.create()
+            res.json(`Successfully confirmed`)
+        } catch(err) {
+            res.json(errors.db(`khateebs`, `confirming`, err ))
+        }
 })
 
-router.post(routerGroup2URL + "/confirm", 
-    middleware.allowedFields(requestTypeChecks.confirmKhateebs),
-    async (req, res) => {
-    try {
-        const khateeb = await $db.models[routerGroup2].findOne(req.body).exec()
-        const updated = await $db.models[routerGroup2].updateOne(req.body, { confirmed: true }).exec()
-        const welcomeMsg = new _.notifications.welcome(khateeb)
-        const saved = await welcomeMsg.create()
-        res.json(`Successfully confirmed`)
-    } catch(err) {
-        res.json(errors.db(`khateebs`, `confirming`, err ))
-    }
-})
+// ENDS HERE
 
 const routerGroup6 = "locations"
 const routerGroup6URL = `/${routerGroup6}`
@@ -182,7 +190,12 @@ router.get(routerGroup6URL + "/:_id", async (req, res) => {
 })
 
 router.post(routerGroup6URL,
-    middleware.allowedFields(requestTypeChecks.locations),
+    middleware.validateRequest(
+        [
+            validator.body("locations").isArray(),
+            validator.body("new").isBoolean().optional(),
+        ]
+    ),
     async (req, res) => {
     try {
         for (let i = 0; i < req.body.locations.length; i++) {
@@ -240,7 +253,11 @@ router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
 
 
 router.post(routerGroup7URL, 
-    middleware.allowedFields(requestTypeChecks.timings),
+    middleware.validateRequest(
+        [
+            validator.body("times").isArray()
+        ]
+    ),
     async (req, res) => {
     try {
         for (let i = 0; i < req.body.times.length; i++) {
@@ -290,7 +307,11 @@ router.get(routerGroup8URL + "/:_id/:year/:month/:weekOf/:locationID/:timingID",
 
 router.post(
     routerGroup8URL,
-    middleware.allowedFields(requestTypeChecks.jummahs), 
+    middleware.validateRequest(
+        [
+            validator.body("jummahs").isArray()
+        ]
+    ), 
     async (req, res) => {
     try {
         for (let i = 0; i < req.body.jummahs.length; i++) {
@@ -364,17 +385,28 @@ router.get(routerGroup10URL, async (req, res) => {
     }
 })
 
-router.post(routerGroup10URL, async(req, res) => {
-    try {
-        console.log(req.body)
-        req.body.institutionID = req.headers.institutionid
-        const saved = await $db.funcs.save('settings', req.body)
-        res.json(`Successfully saved settings!`)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't save settings`)
-    }
-    //no type checking yet, don't know exactly what's going into this
+router.post(
+    routerGroup10URL,
+    middleware.validateRequest(
+        [
+            validator.body("_id").isLength(24),
+            validator.body("twilioUser").isLength({ min: 1 }).optional(),
+            validator.body("twilioKey").isLength({ min: 1 }).optional(),
+            validator.body("twilioPhoneNumber").isLength({ min: 12, max: 13 }).optional(),
+            validator.body("textAllowed").isBoolean().optional(),
+            validator.body("autoConfirmRegistration").isBoolean().optional(),
+        ]
+    ),
+    async(req, res) => {
+        try {
+            console.log(req.body)
+            req.body.institutionID = req.headers.institutionid
+            const saved = await $db.funcs.save('settings', req.body)
+            res.json(`Successfully saved settings!`)
+        } catch(err) {
+            console.log(err)
+            res.json(`Couldn't save settings`)
+        }
 })
 
 const routerGroup9 = 'institution'
@@ -393,7 +425,16 @@ router.get(routerGroup9URL,
 )
 
 router.post(routerGroup9URL,
-    middleware.allowedFields(requestTypeChecks.institutionDetails),
+    middleware.validateRequest(
+        [
+            validator.body("_id").isLength(24),
+            validator.body("name").isLength({ min: 1 }).optional(),
+            validator.body("abbreviatedName").isLength({ min: 1 }).optional(),
+            validator.body("timezone").isLength({ min: 1 }).optional(),
+            validator.body("country").isLength({ min: 1 }).optional(),
+            validator.body("state").isLength({ min: 1 }).optional(),
+        ]
+    ),
     async (req, res) => {
         try {
             const updated = await $db.models.institutions.updateOne({ _id: req.body._id }, req.body)
