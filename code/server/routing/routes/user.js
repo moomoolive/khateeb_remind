@@ -51,7 +51,7 @@ router.get('/check-in', async(req, res) => {
     }
 })
 
-router.post('/mark-notification-as-seen', async (req, res) => {
+router.put('/mark-notification-as-seen', async (req, res) => {
     try {
         await $db.models.notifications.updateOne(req.body, { seen: true, seenAt: new Date() })
         const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
@@ -62,12 +62,11 @@ router.post('/mark-notification-as-seen', async (req, res) => {
     }
 })
 
-router.delete('/account', async (req, res) => {
+router.delete('/', async (req, res) => {
     try {
-        const user = req.headers.userid
-        const deletedUser = await $db.models.users.deleteOne({ _id: user })
+        const deletedUser = await $db.models.users.deleteOne({ _id: req.headers.userid })
         const deletedNotifications = await $db.models.notifications.deleteMany({ userID: user })
-        res.json('hi')
+        res.json({ msg: 'Successfully deleted account', notifications: deletedNotifications, user: deletedUser })
     } catch(err) {
         console.log(err)
         res.json(`Couldn't delete account`)

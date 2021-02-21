@@ -19,7 +19,7 @@ global._ = require($DIR + '/utils/index.js')
 global.$db = require($DIR + '/database/index.js')
 
 // some configurations for the app 
-global.APP_CONFIG = require('./app.config.js')
+global.APP_CONFIG = require('./server.config.js')
 
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
 
@@ -28,6 +28,7 @@ mongoose.connect(DATABASE, dbSettings)
 const db = mongoose.connection
 
 const middleware = require($DIR + '/middleware/main.js')
+const validator = require('express-validator')
 
 app.use(cors())
 app.use(express.json())
@@ -35,6 +36,13 @@ app.use(middleware.generalError)
 app.options('*', cors())
 app.post('*', middleware.noEmptyBody)
 app.put('*', middleware.noEmptyBody)
+app.delete(
+    '*', 
+    middleware.validateRequest(
+        [validator.param("_id").isLength(24).optional()],
+         "param"
+    )
+)
 
 const routes = require($DIR + '/routing/index.js')
 

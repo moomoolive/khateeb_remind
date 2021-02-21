@@ -153,11 +153,13 @@ export default {
         async deleteAccount() {
             try {
                 const confirm = await this._.confirm(`Are you sure you want to permenantly delete your account?`)
+                if (!confirm)
+                    return
                 const res = await this.$API.user.deleteAccount()
+                console.log(res)
                 this.$store.dispatch('logout')
                 this._.toHomePage()
                 this._.alert(`Successfully delete account`, 'success')
-                console.log(res)
             } catch(err) {
                 console.log(err)
             }

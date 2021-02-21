@@ -33,7 +33,6 @@ router.post(
         return res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
     } catch(err) {
         console.log(err)
-        res.status(_.hCodes.serverError)
         res.json(`Couldn't create Institution and Administrator - this is probably a server issue. Please try again later.`)
     }
     }
@@ -85,7 +84,6 @@ router.post(
         res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
         console.log(err)
-        res.status(_.hCodes.serverError)
         res.json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)
     }
 })
@@ -98,31 +96,25 @@ router.post(
             validator.body("username").isLength({ min: 1 }),
         ]
     ),
-    middleware.userExists,
     async (req, res) => {
-    try {
-        let response
-        const user = req.__USER__
-        validPassword = await user.comparePassword(req.body.password)
-        if (!validPassword) {
-            res.status(_.hCodes.unauthorized)
-            response = {  msg: 'unauthorized', token: null }
-        }
-        else {
-            if (!user.confirmed && user.__t !== 'root') {
-                response = { msg: `un-confirmed-${user.__t}`, token: null }
-            } else {
+        try {
+            const user = await $db.models.users.findOne({ username: req.body.username }).select(["-__v"]).exec()
+            if (!user)
+                return response.status(401).json({  msg: 'unauthorized', token: null })
+            validPassword = await user.comparePassword(req.body.password)
+            if (!validPassword)
+                return res.status(401).json({  msg: 'unauthorized', token: null })
+            else if (!user.confirmed && user.__t !== 'root')
+                return res.json({ msg: `un-confirmed-${user.__t}`, token: null })
+            else {
+                delete user.password
                 const tokenInfo = _.deepCopy(user)
-                delete tokenInfo.password; delete tokenInfo.confirmed; delete tokenInfo.__v;
-                response = { msg: 'success', token: _.auth.createToken(tokenInfo) }
+                return res.json({ msg: 'success', token: _.auth.createToken(tokenInfo) }) 
             }
+        } catch(err) {
+            console.log(err)
+            res.json(`Couldn't sign in user - this probably a problem with the server. Please try again later`)
         }
-        res.json(response)
-    } catch(err) {
-        console.log(err)
-        res.status(_.hCodes.serverError)
-        res.json(`Couldn't sign in user - this probably a problem with the server. Please try again later`)
-    }
 })
 
 router.post(

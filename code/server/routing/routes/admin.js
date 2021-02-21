@@ -50,6 +50,7 @@ const errors = {
 
 const routerGroup1 = 'announcements'
 const routerGroup1URL = `/${routerGroup1}`
+
 router.get(routerGroup1URL, async (req, res) => {
     try {
         const mostRecent = -1
@@ -60,10 +61,10 @@ router.get(routerGroup1URL, async (req, res) => {
     }
 })
 
-router.delete(routerGroup1URL, async (req, res) => {
+router.delete(routerGroup1URL + '/:_id', async (req, res) => {
     try {
-        const deleted = await $db.models[routerGroup1].deleteOne(req.body)
-        res.json(`successfullly deleted announcement: ${req.body._id}`)
+        const deleted = await $db.models[routerGroup1].deleteOne(req.params)
+        return res.json(deleted)
     } catch(err) {
         res.json(errors.db(routerGroup1.slice(0, -1), 'deleting', err))
     }
@@ -102,72 +103,39 @@ router.get(routerGroup2URL, async (req, res) => {
     }
 })
 
-router.delete(routerGroup2URL, async (req, res) => {
+router.delete(routerGroup2URL + "/:_id", async (req, res) => {
     try {
-        const deleted = await $db.models[routerGroup2].deleteOne(req.body)
-        res.json(`successfullly deleted khateeb: ${req.body._id}`)
+        const deleted = await $db.models[routerGroup2].deleteOne(req.params)
+        return res.json(deleted)
     } catch(err) {
         res.json(errors.db(routerGroup2.slice(0, -1), 'deleting', err))
     }
 })
 
-// ONE ROUTE
-router.post(
+router.put(
     routerGroup2URL,
     middleware.validateRequest(
         [
-            validator.body("_id").isLength(24).optional(),
-            validator.body("active").isBoolean(),
-        ]
-    ),
-    async (req, res) => {
-    try {
-        const updated = await $db.models[routerGroup2].updateOne({ _id: req.body._id }, req.body)
-        res.json(`successfully updated khateeb: ${req.body._id}`)
-    } catch(err) {
-        res.json(errors.db(routerGroup2.slice(0, -1), 'updating', err))
-    }
-})
-
-router.post(
-    routerGroup2URL + "/confirm", 
-    middleware.validateRequest(
-        [
-            validator.body("_id").isLength(24).optional()
+            validator.body("_id").isLength(24),
+            validator.body("active").isBoolean().optional(),
+            validator.body("confirmed").isBoolean().optional
         ]
     ),
     async (req, res) => {
         try {
-            const khateeb = await $db.models[routerGroup2].findOne(req.body).exec()
-            const updated = await $db.models[routerGroup2].updateOne(req.body, { confirmed: true }).exec()
-            const welcomeMsg = new _.notifications.welcome(khateeb)
-            const saved = await welcomeMsg.create()
-            res.json(`Successfully confirmed`)
+            const updated = await $db.models[routerGroup2].findOneAndUpdate({ _id: req.body._id }, req.body, { new: true }).select(["-password", "-username"])
+            if (req.body.confirmed)
+                await new _.notifications.welcome(updated).create()
+            return res.json(updated)
         } catch(err) {
-            res.json(errors.db(`khateebs`, `confirming`, err ))
+            res.json(errors.db(routerGroup2.slice(0, -1), 'updating', err))
         }
 })
-
-// ENDS HERE
 
 const routerGroup6 = "locations"
 const routerGroup6URL = `/${routerGroup6}`
 
 const locations = {
-    async build(institutionID) {
-        const location = await this.firstLocation(institutionID)
-        const timing = await this.firstTiming(institutionID, location._id.toString())
-        return [location]
-    },
-    async firstLocation(institutionID) {
-        const location = {
-            institutionID,
-            name: 'Unknown Location 1',
-            address: "Unknown Address 1"
-        }
-        const saved = await new $db.models.locations(location).save()
-        return saved
-    },
     async firstTiming(institutionID, locationID) {
         const timing = {
             institutionID,
@@ -212,14 +180,14 @@ router.post(routerGroup6URL,
     }
 })
 
-router.delete(routerGroup6URL, async (req, res) => {
+router.delete(routerGroup6URL + "/:_id", async (req, res) => {
     try {
-        const deleted = await $db.models[routerGroup6].updateOne({ ...req.body }, { active: false })
-        const associatedJummahs = await _.schedule.futureJummahsAssociated({ locationID: req.body._id, institutionID: req.headers.institutionid })
+        const deleted = await $db.models[routerGroup6].updateOne(req.params, { active: false })
+        const associatedJummahs = await _.schedule.futureJummahsAssociated({ locationID: req.params._id, institutionID: req.headers.institutionid })
         for (let i = 0; i < associatedJummahs.length; i++) {
             const deleted = await $db.models.jummahs.deleteMany(associatedJummahs[i])
         }
-        const associatedTimings = await $db.models.timings.find({ locationID: req.body._id, institutionID: req.headers.institutionid }).exec()
+        const associatedTimings = await $db.models.timings.find({ locationID: req.params._id, institutionID: req.headers.institutionid }).exec()
         const timingsObject = {}
         for (let i = 0; i < associatedTimings.length; i++) {
             const updatedTiming = _.deepCopy(associatedTimings[i])
@@ -232,7 +200,7 @@ router.delete(routerGroup6URL, async (req, res) => {
             newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => !timingsObject[timing])
             const updated = await $db.models.khateebs.updateOne({ _id: newKhateeb._id }, newKhateeb)
         }
-        res.json(`Successfully deleted location: ${req.body._id} and it's associated jummahs and timings`)
+        return res.json(`Successfully deleted location: ${req.params._id} and it's associated jummahs and timings`)
     } catch(err) {
         res.json(errors.db(`${routerGroup6.slice(0, -1)} and associated jummahs and timings.`, 'deleting', err))
     }
@@ -249,8 +217,6 @@ router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
         res.json(errors.getReq(routerGroup7, err))
     }
 })
-
-
 
 router.post(routerGroup7URL, 
     middleware.validateRequest(
@@ -275,20 +241,20 @@ router.post(routerGroup7URL,
     }
 })
 
-router.delete(routerGroup7URL, async (req, res) => {
+router.delete(routerGroup7URL + '/:_id', async (req, res) => {
     try {
-        const deleted = await $db.models[routerGroup7].updateOne({ ...req.body }, { active: false })
-        const associatedJummahs = await _.schedule.futureJummahsAssociated({ timingID: req.body._id, institutionID: req.headers.institutionid })
+        const deleted = await $db.models[routerGroup7].updateOne(req.params, { active: false })
+        const associatedJummahs = await _.schedule.futureJummahsAssociated({ timingID: req.params._id, institutionID: req.headers.institutionid })
         for (let i = 0; i < associatedJummahs.length; i++) {
             const deleted = await $db.models.jummahs.deleteMany(associatedJummahs[i])
         }
         const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).exec()
         for (let i = 0; i < khateebs.length; i++) {
             const newKhateeb = _.deepCopy(khateebs[i])
-            newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => timing !== req.body._id)
+            newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => timing !== req.params._id)
             const updated = await $db.models.khateebs.updateOne({ _id: newKhateeb._id }, newKhateeb)
         }
-        res.json(`Successfully deleted timing: ${req.body._id} and it's associated jummahs`)
+        res.json(`Successfully deleted timing: ${req.params._id} and it's associated jummahs`)
     } catch(err) {
         res.json(errors.db(`${routerGroup7.slice(0, -1)} and associated jummahs.`, 'deleting', err))
     }
@@ -305,7 +271,7 @@ router.get(routerGroup8URL + "/:_id/:year/:month/:weekOf/:locationID/:timingID",
     }
 })
 
-router.post(
+router.put(
     routerGroup8URL,
     middleware.validateRequest(
         [
@@ -385,7 +351,7 @@ router.get(routerGroup10URL, async (req, res) => {
     }
 })
 
-router.post(
+router.put(
     routerGroup10URL,
     middleware.validateRequest(
         [
@@ -424,7 +390,7 @@ router.get(routerGroup9URL,
     }
 )
 
-router.post(routerGroup9URL,
+router.put(routerGroup9URL,
     middleware.validateRequest(
         [
             validator.body("_id").isLength(24),
@@ -464,7 +430,7 @@ router.get('/send-notifications', async (req, res) => {
     }
 })
 
-router.post('/clear-jummah', async (req, res) => {
+router.put('/clear-jummah', async (req, res) => {
     try {
         const updated = await $db.models.jummahs.updateOne({ _id: req.body._id }, req.body)
         res.json('hi')

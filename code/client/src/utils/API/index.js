@@ -102,10 +102,10 @@ const rootInstitutionAdmin = {
         return axios.post(rootInstitutionAdminExt + '/institutionAdmin', updatedAdmin)
     },
     deleteAdmin(adminId) {
-        return axios.delete(rootInstitutionAdminExt + '/institutionAdmin', { data: adminId })
+        return axios.delete(rootInstitutionAdminExt + `/institutionAdmin/${adminId}`)
     },
-    deleteInstitution(rootAdminId) {
-        return axios.delete(rootInstitutionAdminExt + '/delete-institution', { data: rootAdminId })
+    deleteInstitution() {
+        return axios.delete(rootInstitutionAdminExt + '/institution')
     }
 }
 
@@ -118,7 +118,7 @@ const institutionAdmin = {
         return axios.post(institutionAdminExt + '/announcements', announcement)
     },
     deleteAnnouncement(id) {
-        return axios.delete(institutionAdminExt + '/announcements', { data: id })
+        return axios.delete(institutionAdminExt + `/announcements/${id}`)
     },
     getLocations(location) {
         return axios.get(institutionAdminExt + `/locations/${location}`)
@@ -127,7 +127,7 @@ const institutionAdmin = {
         return axios.post(institutionAdminExt + '/locations', locationsArray)
     },
     deleteLocation(id) {
-        return axios.delete(institutionAdminExt + '/locations', { data: id })
+        return axios.delete(institutionAdminExt + `/locations/${id}`)
     },
     getTimings(timing, associatedLocation) {
         return axios.get(institutionAdminExt + `/timings/${timing}/${associatedLocation}`)
@@ -136,43 +136,40 @@ const institutionAdmin = {
         return axios.post(institutionAdminExt + '/timings', timingsArray)
     },
     deleteTiming(id) {
-        return axios.delete(institutionAdminExt + '/timings', { data: id })
+        return axios.delete(institutionAdminExt + `/timings/${id}`)
     },
     getSettings() {
         return axios.get(institutionAdminExt + '/settings')
     },
     updateSettings(settings) {
-        return axios.post(institutionAdminExt + '/settings', settings)
+        return axios.put(institutionAdminExt + '/settings', settings)
     },
     getSchedule(month, year) {
         return axios.get(institutionAdminExt + `/schedules/${month}/${year}`)
     },
     saveJummahs(jummahsArray) {
-        return axios.post(institutionAdminExt + '/jummahs', jummahsArray)
+        return axios.put(institutionAdminExt + '/jummahs', jummahsArray)
     },
     getKhateebs() {
         return axios.get(institutionAdminExt + '/khateebs')
     },
     updateExistingKhateeb(updatedKhateebInfo) {
-        return axios.post(institutionAdminExt + '/khateebs', updatedKhateebInfo)
+        return axios.put(institutionAdminExt + '/khateebs', updatedKhateebInfo)
     },
     deleteKhateeb(id) {
-        return axios.delete(institutionAdminExt + '/khateebs', { data: id })
-    },
-    confirmKhateeb(id) {
-        return axios.post(institutionAdminExt + '/khateebs/confirm', id)
+        return axios.delete(institutionAdminExt + `/khateebs/${id}`)
     },
     getInstitution() {
         return axios.get(institutionAdminExt + '/institution')
     },
     updateInstitution(updatedInstitution) {
-        return axios.post(institutionAdminExt + '/institution', updatedInstitution)
+        return axios.put(institutionAdminExt + '/institution', updatedInstitution)
     },
     sendNotifications() {
         return axios.get(institutionAdminExt + '/send-notifications')
     },
     clearJummah(clearedJummah) {
-        return axios.post(institutionAdminExt + '/clear-jummah', clearedJummah)
+        return axios.put(institutionAdminExt + '/clear-jummah', clearedJummah)
     }
 }
 
@@ -198,10 +195,10 @@ const user = {
         }
     },
     markNotificationAsSeen(notificationId) {
-        return axios.post(userExt + '/mark-notification-as-seen', notificationId)
+        return axios.put(userExt + '/mark-notification-as-seen', notificationId)
     },
     deleteAccount() {
-        return axios.delete(userExt + '/account', { data: { _id: 'myAccount' } })
+        return axios.delete(userExt + '/')
     }
 }
 

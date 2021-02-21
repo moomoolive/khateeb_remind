@@ -181,7 +181,8 @@ export default {
             const confirm = await this._.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
             if (confirm) {
                 try {
-                    const deleted = await this.$API.rootInstitutionAdmin.deleteInstitution({ _id: "rootAdmin" })
+                    const res = await this.$API.rootInstitutionAdmin.deleteInstitution()
+                    console.log(res)
                     this._.alert(`You've successfully deleted your institution`, 'success')
                     this.$router.push('/')
                     this.$store.dispatch('logout')

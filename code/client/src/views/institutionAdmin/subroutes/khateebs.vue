@@ -74,7 +74,7 @@
                                     <p v-if="khateeb.confirmed">Delete {{ khateeb.firstName }} from System</p>
                                     <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Application</p>
                                 </button>
-                                <button v-if="!khateeb.confirmed" @click="confirmKhateeb(khateeb._id)">
+                                <button v-if="!khateeb.confirmed" @click="confirmKhateeb(khateeb)">
                                     <p>Confirm {{ khateeb.firstName }}'s Application</p>
                                 </button>
                                 <form-main
@@ -265,9 +265,9 @@ export default {
             arrayOfTwos.push(chopped)
             return arrayOfTwos
         },
-        async confirmKhateeb(id) {
+        async confirmKhateeb(khateeb) {
             try {
-                const res = await this.$API.institutionAdmin.confirmKhateeb({ _id: id })
+                const res = await this.$API.institutionAdmin.updateExistingKhateeb({ _id: khateeb._id, confirmed: true })
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)

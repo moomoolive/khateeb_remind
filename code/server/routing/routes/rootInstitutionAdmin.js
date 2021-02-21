@@ -36,38 +36,37 @@ router.post(routerGroup1URL,
         req.body.institutionID = req.headers.institutionid
         req.body.confirmed = true
         const updated = await $db.funcs.save('institutionAdmins', req.body)
-        if (!req.body._id) {
-            const welcomeMsg = new _.notifications.welcome(updated)
-            const saved = await welcomeMsg.create()
-        }
+        const welcomeMsg = new _.notifications.welcome(updated)
+        const saved = await welcomeMsg.create()
         res.json(`Successfully made ${updated.firstName} ${updated.lastName} an institutional admin!`)
     } catch(err) {
         console.log(err)
-        res.json(`There was a problem updated institutional admins`)
+        res.json(`There was a creating institutional admin`)
     }
 })
 
-router.delete(routerGroup1URL, async (req, res) => {
+router.delete(routerGroup1URL + "/:_id", async (req, res) => {
     try {
-        const deleted = await $db.models.institutionAdmins.deleteOne(req.body)
-        res.json('Successfully deleted')
+        const deleted = await $db.models.institutionAdmins.deleteOne(req.params)
+        res.json(deleted)
     } catch(err) {
         console.log(err)
-        res.json(`Couldn't delete institution admin ${req.body._id}`)
+        res.json(`Couldn't delete institution admin ${req.params._id}`)
     }
 })
 
-router.delete('/delete-institution', async (req, res) => {
+router.delete('/institution', async (req, res) => {
     try {
         const models = Object.keys($db.models)
-        const deletedInstitution = await $db.models.institutions.deleteOne({ _id: req.headers.institutionid })
+        const deleteRes = {}
+        deleteRes.institution = await $db.models.institutions.deleteOne({ _id: req.headers.institutionid })
         for (let i = 0; i < models.length; i++) {
             const model = models[i]
             if (model === 'institutions')
                 continue
-            const deleted = await $db.models[model].deleteMany({ institutionID: req.headers.institutionid })
+            deleteRes[model] = await $db.models[model].deleteMany({ institutionID: req.headers.institutionid })
         }
-        res.json('Successfully deleted institution')
+        res.json({ msg: "Successfully deleted institution", ...deleteRes })
     } catch(err) {
         console.log(err)
         res.json(`Couldn't delete institution`)
