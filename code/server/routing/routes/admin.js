@@ -118,7 +118,7 @@ router.put(
         [
             validator.body("_id").isLength(24),
             validator.body("active").isBoolean().optional(),
-            validator.body("confirmed").isBoolean().optional
+            validator.body("confirmed").isBoolean().optional()
         ]
     ),
     async (req, res) => {
@@ -323,15 +323,14 @@ router.get(
     ),
     async (req, res) => {
         try {
-            console.log(req.params)
-            let jummahs = await $db.models.jummahs.find().monthlyEntries(req.params.year, req.params.month)
+            let jummahs = await $db.models.jummahs.find({ institutionID: req.headers.institutionid }).monthlyEntries(req.params.year, req.params.month)
             if (jummahs.length < 1 && schedules.previousMonth(req.params.month, req.params.year))
                 return res.json(`nobuild-previous`)
             else if (jummahs.length < 1 && schedules.twoMonthsAhead(req.params.month, req.params.year))
                 return res.json(`nobuild-future`)
             if (jummahs.length < 1)
                 jummahs = await _.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
-            let data = await jummahs[0].gatherScheduleComponents()
+            const data = await jummahs[0].gatherScheduleComponents()
             return res.json({ jummahs, ...data })
         } catch(err) {
             res.json(errors.getReq('schedules', err))

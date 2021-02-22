@@ -8,7 +8,7 @@ const router = express.Router()
 router.post('/unique-username',
     middleware.validateRequest(
         [
-            validator.body("username").isLength({ min: 1 }),
+            validator.body("username").exists(),
         ]
     ),
     async (req, res) =>

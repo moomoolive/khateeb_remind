@@ -9,26 +9,13 @@ router.use(middleware.auth(1))
 router.get('/', async (req, res) => {
     try {
         const date = new Date()
-        const params = {
-            month: date.getMonth(),
-            year: date.getFullYear(), 
-            institutionID: req.headers.institutionid 
-        }
-        const currentSchedule = await $db.models.jummahs.find(params).exec()
-        if (!currentSchedule)
-            res.json("non-existent") 
-        else {
-            const locations = await $db.models.locations.find({ institutionID: req.headers.institutionid }).exec()
-            const timings = await $db.models.timings.find({ institutionID: req.headers.institutionid }).exec()
-            const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()
-            const data = {
-                jummahs: currentSchedule,
-                locations,
-                timings,
-                khateebs
-            }
-            res.json(data)
-        }
+        const month = date.getMonth()
+        const year = date.getFullYear()
+        const jummahs = await $db.models.jummahs.find({ institutionID: req.headers.institutionid }).monthlyEntries(year, month)
+        if (!jummahs || jummahs.length < 1)
+            return res.json("non-existent") 
+        const data = await jummahs[0].gatherScheduleComponents()
+        return res.json({ jummahs, ...data })
     } catch(err) {
         console.log(err)
         res.json(`Couldn't retrieve current schedule. This is probably a server error. Try again later.`)
