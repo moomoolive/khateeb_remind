@@ -106,6 +106,12 @@ export default {
   },
   created() {
     this.setJWT()
+  },
+  mounted() {
+    if (this.$store.getters.decodedJWT.__t === 'khateeb' && !localStorage.getItem('seenGettingStarted')) {
+      this._.tutorial("khateebs", 1)
+      localStorage.setItem('seenGettingStarted', true)
+    }
   }
 }
 </script>

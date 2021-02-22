@@ -52,7 +52,6 @@ export default {
             return [
                 {
                     key: 'today',
-                    highlight: 'red',
                     dot: true,
                     dates: new Date()
                 },
@@ -66,7 +65,7 @@ export default {
     },
     watch: {
         dates(newVal) {
-            this.$emit('changed', newVal)
+            this.$emit('changed', { unavailableDates: newVal })
         }
     },
     created() {

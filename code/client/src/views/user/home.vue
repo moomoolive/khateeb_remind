@@ -46,7 +46,7 @@
                 v-if="khateebs.struct"
                 :options="khateebs.struct"
                 :currentlySelected="khateebs.availableTimings"
-                @changed="modifyAvailableTimings($event)"
+                @changed="updateInfo({ availableTimings: $event }, false)"
             />
         </collapsable-box>
         <collapsable-box
@@ -56,7 +56,7 @@
         >
             <calendar
                 :originalVal="$store.getters.decodedJWT.unavailableDates" 
-                @changed="updateInfo($event)"
+                @changed="updateInfo($event, false)"
             />
         </collapsable-box>
         <collapsable-box
@@ -135,12 +135,14 @@ export default {
         }
     },
     methods: {
-        async updateInfo($event) {
+        async updateInfo($event, withMsgAndPush=true) {
             try {
                 const res = await this.$API.user.updateInfo($event)
                 this.storeToken(res.token)
-                this._.alert(`Successfully updated!`, 'success')
-                this._.toHomePage()
+                if (withMsgAndPush) {
+                    this._.alert(`Successfully updated!`, 'success')
+                    this._.toHomePage()
+                }
             } catch(err) {
                 console.log(err)
             }

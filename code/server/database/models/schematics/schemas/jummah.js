@@ -82,7 +82,6 @@ jummah.query.monthlyEntries = function (year, month) {
     // all jummahs date hours are set to 12PM UTC >> see jummah utils for
     // more info
     greaterThanOrEqual.setUTCHours(12, 0, 0, 0)
-    console.log(greaterThanOrEqual.toISOString())
     const lesserThan = new Date(greaterThanOrEqual)
     lesserThan.setMonth(lesserThan.getMonth() + 1)
     return this.where({ date: { $gte: greaterThanOrEqual, $lt: lesserThan } })

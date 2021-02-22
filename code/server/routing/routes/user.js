@@ -27,7 +27,7 @@ router.put(
             const mongooseRes = await $db.models[userType].updateOne({ _id: req.headers.userid }, req.body)
             // JWT token carries important information needed on the client side
             // so whenever user information is updated, it should be refreshed
-            const token = await _.auth.refreshToken(userId)(req.headers.userid)
+            const token = await _.auth.refreshToken(req.headers.userid)
             return res.json({ token, msg: `Successfully updated`, mongooseRes })
         } catch(err) {
             console.log(err)
@@ -44,7 +44,7 @@ router.get('/check-in', async(req, res) => {
         const userBeforeUpdate = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
         const institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
         const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        res.json({ notifications, lastVisit: userBeforeUpdate.lastLogin, institution })
+        return res.json({ notifications, lastVisit: userBeforeUpdate.lastLogin, institution })
     } catch(err) {
         console.log(err)
         res.json(`Check-in failed`)

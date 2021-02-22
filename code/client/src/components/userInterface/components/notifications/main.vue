@@ -5,12 +5,12 @@
                 <span>{{ this.notificationInfo.type === 'confirm' ? 'Cancel' : 'Close' }}</span>
             </div>
         </div>
-        <div :class="`content ${notificationInfo.options.color || 'yellow'}`">
-            <component
-                :is="notificationInfo.type"
-                :options="notificationInfo.options"
-            />
-        </div>
+            <div :class="`content ${notificationInfo.options.color || 'yellow'}`">
+                <component
+                    :is="notificationInfo.type"
+                    :options="notificationInfo.options"
+                />
+            </div>
     </div>
 </template>
 
@@ -22,7 +22,7 @@ export default {
         'redirect': () => import('./types/redirect.vue'),
         'confirm': () => import('./types/confirm.vue'),
         'notificationScroller': () => import('./types/notification-scroller.vue'),
-        "tutorial": () => import('./types/tutorial.vue')
+        "tutorial": () => import('./types/tutorial.vue'),
     },
     methods: {
         close() {

@@ -178,12 +178,6 @@ const user = {
     updateInfo(updates) {
         return axios.put(userExt + '/', updates)
     },
-    changeUsername(newUsername) {
-        return axios.post(userExt + '/username', newUsername)
-    },
-    changeProfile(updatedProfile) {
-        return axios.post(userExt + '/profile', updatedProfile)
-    },
     async checkIn() {
         try {
             const userPackage = await axios.get(userExt + '/check-in')
