@@ -36,7 +36,6 @@ location.methods.deleteDependants = async function () {
     let res = {}
     try {
         const timings = await this.findTimings()
-        console.log(timings)
         for (let i = 0; i < timings.length; i++)
             res = await timings[i].deleteDependants()
     } catch(err) {
