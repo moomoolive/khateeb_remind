@@ -129,7 +129,7 @@ export default {
         if (!seenTutorial) {
             const oneSecond = 1_000
             window.setTimeout(() => { 
-                this._.tutorial("general", 1)
+                this._.tutorial("general", 1, true)
                 localStorage.setItem("tutorialGeneral1", true)
              }, oneSecond)
         }

@@ -295,9 +295,11 @@ export default {
             const locations = Object.keys(this.locationsIndex)
             locations.forEach(location => { struct[location] = {} })
             jummahs.forEach(jummah => {
-                if (!struct[jummah.locationID][jummah.weekOf])
-                    struct[jummah.locationID][jummah.weekOf] = []
-                struct[jummah.locationID][jummah.weekOf].push(jummah)
+                const CompleteJummahDate = new Date(jummah.date)
+                const jummahDate = CompleteJummahDate.getDate()
+                if (!struct[jummah.locationID][jummahDate])
+                    struct[jummah.locationID][jummahDate] = []
+                struct[jummah.locationID][jummahDate].push(jummah)
             })
             return struct
         },

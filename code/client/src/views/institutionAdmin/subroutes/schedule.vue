@@ -42,9 +42,7 @@ export default {
     methods: {
         async getSchedule(date) {
             try {
-                const month = date.getMonth()
-                const year = date.getFullYear()
-                const res = await this.$API.institutionAdmin.getSchedule(month, year)
+                const res = await this.$API.institutionAdmin.getSchedule(date.getMonth(), date.getFullYear())
                 if (typeof res !== 'string' && res)
                     this.APIData = res
                 else if (res === 'nobuild-previous')

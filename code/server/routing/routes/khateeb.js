@@ -1,7 +1,6 @@
 const express = require('express')
 
 const middleware = require($DIR + '/middleware/main.js')
-const requestTypeChecks = require('./khateebsTC.json')
 
 const router = express.Router()
 
@@ -10,29 +9,15 @@ router.use(middleware.auth(1))
 router.get('/', async (req, res) => {
     try {
         const date = new Date()
-        const params = {
-            month: date.getMonth(),
-            year: date.getFullYear(), 
-            institutionID: req.headers.institutionid 
-        }
-        const currentSchedule = await $db.models.jummahs.find(params).exec()
-        if (!currentSchedule)
-            res.json("non-existent") 
-        else {
-            const locations = await $db.models.locations.find({ institutionID: req.headers.institutionid }).exec()
-            const timings = await $db.models.timings.find({ institutionID: req.headers.institutionid }).exec()
-            const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()
-            const data = {
-                jummahs: currentSchedule,
-                locations,
-                timings,
-                khateebs
-            }
-            res.json(data)
-        }
+        const month = date.getMonth()
+        const year = date.getFullYear()
+        const jummahs = await $db.models.jummahs.find({ institutionID: req.headers.institutionid }).monthlyEntries(year, month)
+        if (!jummahs || jummahs.length < 1)
+            return res.json("non-existent") 
+        const data = await jummahs[0].gatherScheduleComponents()
+        return res.json({ jummahs, ...data })
     } catch(err) {
         console.log(err)
-        res.status(_.hCodes.serverError)
         res.json(`Couldn't retrieve current schedule. This is probably a server error. Try again later.`)
     }
 })
@@ -43,7 +28,6 @@ router.get('/announcements', async (req, res) => {
         res.json(announcements)
     } catch(err) {
         console.log(err)
-        res.status(_.hCodes.serverError)
         res.json(`Couldn't retrieve announcements. This is probably a server error. Try again later.`)
     }
 })
@@ -66,21 +50,29 @@ router.get('/jummah-confirm/:jummahID/:notificationID', async (req, res) => {
     }
 })
 
-router.post('/jummah-confirm', async (req, res) => {
-    try {
-        const savedJummah = await $db.models.jummahs.updateOne({ _id: req.body.jummah._id }, req.body.jummah)
-        const savedNotification = await $db.models.actionNotifications.updateOne({ _id: req.body.notification._id }, req.body.notification)
-        if (req.body.preferenceIndicator === 0 && !req.body.jummah.confirmed) {
-            const addDropout = await $db.models.khateebs.findOneAndUpdate({ _id: req.headers.userid }, { $inc: { dropouts: 1 } })
-            const note = new _.notifications.jummahDropout(addDropout)
-            await note.setRecipentsToAdmins(req.body.institutionid)
-            const msgs = await note.create()
+router.post(
+    '/jummah-confirm', 
+    async (req, res) => {
+        try {
+            const savedJummah = await $db.models.jummahs.findOneAndUpdate({ _id: req.body.jummah._id }, req.body.jummah, { new: true })
+            const savedNotification = await $db.models.actionNotifications.updateOne({ _id: req.body.notification._id }, req.body.notification)
+            if (req.body.preferenceIndicator === 0 && !req.body.jummah.confirmed) {
+                const addDropout = await $db.models.khateebs.findOneAndUpdate({ _id: req.headers.userid }, { $inc: { dropouts: 1 } })
+                const note = new _.notifications.jummahDropout(addDropout)
+                await note.setRecipentsToAdmins(req.body.institutionid)
+                const msgs = await note.create(true, true)
+            }
+            else if (req.body.jummah.khateebPreference[req.body.preferenceIndicator].confirmed && req.body.jummah.confirmed) {
+                const khateeb = await $db.models.khateebs.findOne({ _id: req.headers.userid }).exec()
+                const note = new _.notifications.jummahDropout(khateeb, savedJummah)
+                await note.setRecipentsToAdmins(req.body.institutionid)
+                const msgs = await note.create(true, true)
+            }
+            return res.json('Updated Notification and Associated Jummah')
+        } catch(err) {
+            console.log(err)
+            res.json(`Couldn't update notification status!`)
         }
-        res.json('Updated Notification and Associated Jummah')
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't update notification status!`)
-    }
 })
 
 router.get('/available-timings', async (req, res) => {

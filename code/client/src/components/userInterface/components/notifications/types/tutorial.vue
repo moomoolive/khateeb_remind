@@ -11,17 +11,13 @@
                 </option>
             </select>
             <select v-model="tutorialNumber">
-                <template
-                    v-for="tutorialsInCategory in tutorials"
-                >
                     <option
-                        v-for="(tutorial, index) in tutorialsInCategory"
-                        :key="index" 
+                        v-for="(tutorial, index) in tutorials[tutorialCategory]"
+                        :key="tutorial" 
                         :value="index + 1"
                     >
                         {{ tutorial }}
                     </option>
-                </template>
             </select>
         </div>
         <div class="tutorial-scroll-divider"></div>
@@ -38,7 +34,8 @@
 export default {
     name: "tutorialNotification",
     components: {
-        "general1": () => import("@/components/staticHTML/tutorials/general/1.vue")
+        "general1": () => import("@/components/staticHTML/tutorials/general/1.vue"),
+        "khateebs1": () => import("@/components/staticHTML/tutorials/khateebs/1.vue")
     },
     props: {
         options: {
@@ -53,6 +50,9 @@ export default {
             tutorials: {
                 general: [
                     "Multiple Selector"
+                ],
+                khateebs: [
+                    "Getting Started"
                 ]
             }
         }

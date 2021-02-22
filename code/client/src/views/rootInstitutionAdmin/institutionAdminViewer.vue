@@ -130,7 +130,8 @@ export default {
             try {
                 const confirm = await this._.confirm(`Do you really want to permenantly delete this administrator?`)
                 if (confirm) {
-                    const deleted = await this.$API.rootInstitutionAdmin.deleteAdmin({ _id: id })
+                    const deleted = await this.$API.rootInstitutionAdmin.deleteAdmin(id)
+                    console.log(deleted)
                     this.$store.dispatch('adminSavedChangesScreen', true)
                 }
             } catch(err) {

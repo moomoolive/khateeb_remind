@@ -9,9 +9,6 @@ export default {
         delete axios.defaults.headers.common['authorization']
         commit('removeToken')
     },
-    setLastVisit({ commit }, date) {
-        commit('lastVisit', date)
-    },
     adminSavedChangesScreen({ commit }, state) {
         commit('adminSavedChangesScreen', state)
     },
@@ -47,5 +44,8 @@ export default {
     },
     hideSiteBanner({ commit }) {
         commit('hideSiteBanner')
+    },
+    storeUserPackage({ commit }, userPackage) {
+        commit('storeUserPackage', userPackage)
     }
 }

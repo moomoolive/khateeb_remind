@@ -13,7 +13,7 @@ export default {
     isNumeric(value) {
         return /^\d+$/.test(value)
     },
-    tutorial(category, number) {
+    tutorial(category, number, fromSystem=false) {
         const info = {
             type: "tutorial",
             options: {
@@ -22,6 +22,8 @@ export default {
                 color: "grey"
             }
         }
+        if (fromSystem)
+            info.options.notificationOrigin = 'web-app'
         store.dispatch('createNotification', info)
     },
     alert(msg, type="caution", options) {

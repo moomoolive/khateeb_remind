@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="showForm">
         <div :class="`${backgroundColor} ${ backgroundColor === 'none' ? '' : 'box-shadow'} formContainer`" v-if="data">
             <div v-if="formTitle" class="formTitle">
                 {{ formTitle }}
@@ -173,7 +173,8 @@ export default {
             extsList,
             validations: {},
             structureCopy: null,
-            initalDisplay: true
+            initalDisplay: true,
+            showForm: true
         }
     },
     methods: {
@@ -286,6 +287,13 @@ export default {
         },
         validSubmission() {
             return !this.sameAsOriginal && this.allFieldsValid
+        }
+    },
+    watch: {
+        basedOn() {
+            // rerender form
+            this.showForm = false
+            this.$nextTick(() => { this.showForm = true })
         }
     },
     created() {

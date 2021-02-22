@@ -10,7 +10,7 @@ module.exports = {
     },
     pages: {
         index: {
-            entry: 'src/app.js'
+            entry: 'src/App.js'
         }
     },
     pwa: {

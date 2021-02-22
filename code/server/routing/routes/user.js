@@ -1,104 +1,75 @@
 const express = require('express')
+const validator = require('express-validator')
 
 const middleware = require($DIR + '/middleware/main.js')
 
 const router = express.Router()
-
 router.use(middleware.auth(1))
 
-const typeChecks = {
-    "userPassword": {
-        "password": {
-            "__type__": "str",
-            "required": true
-        }
-    },
-    "userUsername": {
-        "username": {
-            "__type__": "str",
-            "required": true
-        }
-    },
-}
-
-const funcs = {
-    modelNames(userType) {
-        return userType === 'root' ? userType : userType + 's'
-    },
-    async getNewToken(userId, updateType) {
-        const newToken = await _.auth.refreshToken(userId)
-        return {
-            token: newToken,
-            msg: `Successfully updated ${updateType}`
-        }
-    }
-}
-
-router.post('/profile', async (req, res) => {
-    try {
-        const updated = await $db.models[funcs.modelNames(req.headers.usertype)].updateOne({ _id: req.headers.userid }, req.body)
-        const response = await funcs.getNewToken(req.headers.userid, 'user profile')
-        res.json(response)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't update user profile`)
-    }
-})
-
-router.post('/username', 
-    middleware.allowedFields(typeChecks.userUsername),
+router.put(
+    '/', 
+    middleware.validateRequest(
+        [
+            validator.body("password").isLength({ min: 6 }).optional(),
+            validator.body("username").isLength({ min: 6 }).optional(),
+            validator.body("handle").isLength({ min: 1 }).optional(),
+            validator.body("firstName").isLength({ min: 1 }).optional(),
+            validator.body("lastName").isLength({ min: 1 }).optional(),
+            validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }).optional(),
+            validator.body("availableTimings").isArray().optional(),
+            validator.body("unavailableDates").isArray().optional(),
+            validator.body("title").isLength({ min: 1 }).optional()
+        ]
+    ),
     async (req, res) => {
-    try {
-        const userEntry = await $db.models[funcs.modelNames(req.headers.usertype)].updateOne({ _id: req.headers.userid }, req.body)
-        const response = await funcs.getNewToken(req.headers.userid, 'username')
-        res.json(response)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't update username`)
+        try {
+            const userType = `${req.headers.usertype}${req.headers.usertype === 'root' ? '' : 's'}`
+            const mongooseRes = await $db.models[userType].updateOne({ _id: req.headers.userid }, req.body)
+            // JWT token carries important information needed on the client side
+            // so whenever user information is updated, it should be refreshed
+            const token = await _.auth.refreshToken(req.headers.userid)
+            return res.json({ token, msg: `Successfully updated`, mongooseRes })
+        } catch(err) {
+            console.log(err)
+            const msg = `Couldn't edit user information`
+            console.log(msg)
+            res.json(msg)
+        }
     }
-})
-
-router.post('/password',
-    middleware.allowedFields(typeChecks.userPassword),
-    async (req, res) => {
-    console.log(req.body)
-    try {
-        const userEntry = await $db.models[funcs.modelNames(req.headers.usertype)].updateOne({ _id: req.headers.userid }, req.body)
-        res.json(`Successfully username information!`)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't update user info`)
-    }
-})
+)
 
 router.get('/check-in', async(req, res) => {
     try {
-        const lastLogin = await $db.models.users.updateOne({ _id: req.headers.userid }, { lastLogin: new Date() })
-        const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        res.json(notifications)
+        // log login time
+        const userPackage = {}
+        userPackage.lastVisit = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
+        userPackage.notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
+        if (req.headers.usertype === 'root' || req.headers.usertype === 'sysAdmin')
+            return userPackage
+        userPackage.institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
+        return res.json(userPackage)
     } catch(err) {
         console.log(err)
         res.json(`Check-in failed`)
     }
 })
 
-router.post('/mark-notification-as-seen', async (req, res) => {
+router.put('/mark-notification-as-seen', async (req, res) => {
     try {
-        const updated = await $db.models.notifications.updateOne(req.body, { seen: true, seenAt: new Date() })
-        res.json(`Successfully updated notification ${req.body._id}`)
+        await $db.models.notifications.updateOne(req.body, { seen: true, seenAt: new Date() })
+        const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
+        res.json(notifications)
     } catch(err) {
         console.log(err)
         res.json(`Couldn't update notification status`)
     }
 })
 
-router.delete('/account', async (req, res) => {
+router.delete('/', async (req, res) => {
     try {
-        const user = req.headers.userid
-        const deletedUser = await $db.models.users.deleteOne({ _id: user })
+        const deletedUser = await $db.models.users.deleteOne({ _id: req.headers.userid })
         const deletedNotifications = await $db.models.notifications.deleteMany({ userID: user })
-        // if khateeb delete jummahs too
-        res.json('hi')
+        res.json({ msg: 'Successfully deleted account', notifications: deletedNotifications, user: deletedUser })
     } catch(err) {
         console.log(err)
         res.json(`Couldn't delete account`)

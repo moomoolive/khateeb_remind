@@ -143,11 +143,11 @@ export default {
         },
         async deleteInfo($event) {
             try {
-                if ($event.type === 'location') {
-                     const deleted = await this.$API.institutionAdmin.deleteLocation({ _id: $event.id })
-                }
+                if ($event.type === 'location')
+                     await this.$API.institutionAdmin.deleteLocation($event.id)
                 else {
-                    const deleted = await this.$API.institutionAdmin.deleteTiming({ _id: $event.id })
+                    const res = await this.$API.institutionAdmin.deleteTiming($event.id)
+                    console.log(res)
                 }
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
@@ -163,7 +163,7 @@ export default {
         },
         async saveSettings($event) {
             try {
-                const saved = await this.$API.institutionAdmin.updateSettings($event)
+                this.settings = await this.$API.institutionAdmin.updateSettings($event)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)
@@ -171,7 +171,7 @@ export default {
         },
         async saveInstitutionDetails($event) {
             try {
-                const saved = await this.$API.institutionAdmin.updateInstitution($event)
+                this.institution = await this.$API.institutionAdmin.updateInstitution($event)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)
@@ -181,7 +181,8 @@ export default {
             const confirm = await this._.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
             if (confirm) {
                 try {
-                    const deleted = await this.$API.rootInstitutionAdmin.deleteInstitution({ _id: "rootAdmin" })
+                    const res = await this.$API.rootInstitutionAdmin.deleteInstitution()
+                    console.log(res)
                     this._.alert(`You've successfully deleted your institution`, 'success')
                     this.$router.push('/')
                     this.$store.dispatch('logout')

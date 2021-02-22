@@ -1,10 +1,15 @@
 import state from './state.js'
 
 export default {
-    updateToken(state, token) { state.JWT_TOKEN = token },
-    removeToken(state) { state.JWT_TOKEN = null },
-    lastVisit(state, date) { state.lastVisit = date },
-    adminSavedChangesScreen(state, onOrOff) { state.admin.savedChanges = onOrOff },
+    updateToken(state, token) { 
+        state.JWT_TOKEN = token 
+    },
+    removeToken(state) { 
+        state.JWT_TOKEN = null 
+    },
+    adminSavedChangesScreen(state, onOrOff) { 
+        state.admin.savedChanges = onOrOff 
+    },
     closeNotification(state) { 
         state.notifications.show = false
         state.notificationsQueue.shift()
@@ -20,7 +25,9 @@ export default {
         } else
             state.notificationsQueue.push(notificationsInfo) 
     },
-    changeWallpaper(state, newWallpaperName) { state.wallpaper = newWallpaperName },
+    changeWallpaper(state, newWallpaperName) { 
+        state.wallpaper = newWallpaperName 
+    },
     displayNotification(state, notificationsInfo) { 
         state.notifications.show = true
         state.notifications.type = notificationsInfo.type
@@ -45,5 +52,10 @@ export default {
     },
     showSiteBanner(state) {
         state.siteBanner.show = true
+    },
+    storeUserPackage(state, userPackage) {
+        state.notificationsFromServer = userPackage.notifications
+        state.lastVisit = new Date(userPackage.lastVisit)
+        state.institutionInfo = userPackage.institution
     }
 }

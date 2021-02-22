@@ -1,7 +1,6 @@
 const express = require('express')
 
 const middleware = require($DIR + "/middleware/main.js")
-const requestTypeChecks = require('./sysAdminTC.json')
 
 const router = express.Router()
 
@@ -359,8 +358,15 @@ const cli = {
     }
 }
 
-router.post('/cli',
-    middleware.allowedFields(requestTypeChecks.cli),
+const validator = require('express-validator')
+
+router.post(
+    '/cli',
+    middleware.validateRequest(
+        [
+            validator.body("command").isArray(),
+        ]
+    ),
     async (req, res) => {
         try {
             if (req.body.command[0] === '__PING__') {

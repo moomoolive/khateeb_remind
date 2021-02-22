@@ -74,7 +74,7 @@
                                     <p v-if="khateeb.confirmed">Delete {{ khateeb.firstName }} from System</p>
                                     <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Application</p>
                                 </button>
-                                <button v-if="!khateeb.confirmed" @click="confirmKhateeb(khateeb._id)">
+                                <button v-if="!khateeb.confirmed" @click="confirmKhateeb(khateeb)">
                                     <p>Confirm {{ khateeb.firstName }}'s Application</p>
                                 </button>
                                 <form-main
@@ -265,9 +265,9 @@ export default {
             arrayOfTwos.push(chopped)
             return arrayOfTwos
         },
-        async confirmKhateeb(id) {
+        async confirmKhateeb(khateeb) {
             try {
-                const res = await this.$API.institutionAdmin.confirmKhateeb({ _id: id })
+                const res = await this.$API.institutionAdmin.updateExistingKhateeb({ _id: khateeb._id, confirmed: true })
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)
@@ -275,13 +275,7 @@ export default {
         },
         async editKhateeb($event) {
             try {
-                const preppedData = {
-                    _id: $event._id,
-                    phoneNumber: $event.phoneNumber,
-                    active: $event.active,
-                    availableTimings: [] // not applicable yet
-                }
-                const res = await this.$API.institutionAdmin.updateExistingKhateeb(preppedData)
+                const res = await this.$API.institutionAdmin.updateExistingKhateeb($event)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)
@@ -292,7 +286,7 @@ export default {
                 const confirm = await this._.confirm(`Are you sure you want to permenantly delete this khateeb?`)
                 if (!confirm)
                     return
-                const deleted = await this.$API.institutionAdmin.deleteKhateeb({ _id: id })
+                const res = await this.$API.institutionAdmin.deleteKhateeb(id)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)

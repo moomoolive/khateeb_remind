@@ -66,7 +66,7 @@ export default {
                 }
                 else if (authRes.token && authRes.msg === 'success') {
                     this.toApp(authRes.token)
-                    this.$API.utils.assignUserPackage(authRes.notifications)
+                    await this.$API.user.checkIn()
                 }
             } catch(err) {
                 if (err.status === 401)

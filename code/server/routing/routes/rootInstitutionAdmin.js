@@ -1,7 +1,7 @@
 const express = require('express')
+const validator = require('express-validator')
 
 const middleware = require($DIR + '/middleware/main.js')
-const typeChecks = require('./rootInstitutionAdminTC.json')
 
 const router = express.Router()
 
@@ -21,44 +21,52 @@ router.get(routerGroup1URL, async (req, res) => {
 })
 
 router.post(routerGroup1URL, 
-    middleware.allowedFields(typeChecks.institutionAdmin),
+    middleware.validateRequest(
+        [
+            validator.body("password").isLength({ min: 6 }),
+            validator.body("username").isLength({ min: 6 }),
+            validator.body("handle").isLength({ min: 1 }),
+            validator.body("firstName").isLength({ min: 1 }),
+            validator.body("lastName").isLength({ min: 1 }),
+            validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
+        ]
+    ),
     async (req, res) => {
     try {
         req.body.institutionID = req.headers.institutionid
         req.body.confirmed = true
         const updated = await $db.funcs.save('institutionAdmins', req.body)
-        if (!req.body._id) {
-            const welcomeMsg = new _.notifications.welcome(updated)
-            const saved = await welcomeMsg.create()
-        }
-        res.json(`Successfully made ${updated.firstName} ${updated.lastName} an institutional admin!`)
+        const welcomeMsg = new _.notifications.welcome(updated)
+        await welcomeMsg.create()
+        return res.json(updated)
     } catch(err) {
         console.log(err)
-        res.json(`There was a problem updated institutional admins`)
+        res.json(`There was a creating institutional admin`)
     }
 })
 
-router.delete(routerGroup1URL, async (req, res) => {
+router.delete(routerGroup1URL + "/:_id", async (req, res) => {
     try {
-        const deleted = await $db.models.institutionAdmins.deleteOne(req.body)
-        res.json('Successfully deleted')
+        const deleted = await $db.models.institutionAdmins.deleteOne(req.params)
+        res.json(deleted)
     } catch(err) {
         console.log(err)
-        res.json(`Couldn't delete institution admin ${req.body._id}`)
+        res.json(`Couldn't delete institution admin ${req.params._id}`)
     }
 })
 
-router.delete('/delete-institution', async (req, res) => {
+router.delete('/institution', async (req, res) => {
     try {
         const models = Object.keys($db.models)
-        const deletedInstitution = await $db.models.institutions.deleteOne({ _id: req.headers.institutionid })
+        const deleteRes = {}
+        deleteRes.institution = await $db.models.institutions.deleteOne({ _id: req.headers.institutionid })
         for (let i = 0; i < models.length; i++) {
             const model = models[i]
             if (model === 'institutions')
                 continue
-            const deleted = await $db.models[model].deleteMany({ institutionID: req.headers.institutionid })
+            deleteRes[model] = await $db.models[model].deleteMany({ institutionID: req.headers.institutionid })
         }
-        res.json('Successfully deleted institution')
+        res.json({ msg: "Successfully deleted institution", ...deleteRes })
     } catch(err) {
         console.log(err)
         res.json(`Couldn't delete institution`)

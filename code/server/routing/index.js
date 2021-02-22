@@ -1,5 +1,5 @@
 const  misc  = require('./routes/misc.js')
-const  khateeb  = require('./routes/khateebs.js')
+const  khateeb  = require('./routes/khateeb.js')
 const  admin  = require('./routes/admin.js')
 const auth = require('./routes/auth.js')
 const sysAdmin = require('./routes/sysAdmin.js')
@@ -13,7 +13,7 @@ const routesList = {
     auth,
     sysAdmin,
     user,
-    rootInstitutionAdmin
+    rootInstitutionAdmin,
 }
 
 module.exports = routesList

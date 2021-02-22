@@ -4,44 +4,47 @@ const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const path = require('path')
 
+// set enviromental variable from a .env file at project root
+// look at the README for required enviromental factors
+if (process.env.NODE_ENV === 'production')
+    dotenv.config()
+const dbSettings = require('./db.config.js')
+
+// across the app: 
+// "_" stands for the app's utility library
+// "$db" stands for database models
+// $DIR stands for root folder
 global.$DIR = path.resolve(__dirname)
 global._ = require($DIR + '/utils/index.js')
 global.$db = require($DIR + '/database/index.js')
 
-if (process.env.NODE_ENV === 'production')
-    dotenv.config()
+// some configurations for the app 
+global.APP_CONFIG = require('./server.config.js')
 
-const middleware = require($DIR + '/middleware/main.js')
-const routes = require($DIR + '/routing/index.js')
-const dbSettings =  require($DIR + '/database/settings.js')
-
-const createRootUserScript = require('./cron/createRootUser.js')
-const jummahNotifications = require('./cron/jummahNotifications.js')
-const deleteVerificationCodes = require('./cron/deleteVerificationCodes.js')
-const createTestInstitution = require('./cron/createTestInstitution.js')
-
-const PORT = 80
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
-const dbType = DATABASE.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
 
 const app = express()
-mongoose.connect(DATABASE, { ...dbSettings })
+mongoose.connect(DATABASE, dbSettings)
 const db = mongoose.connection
+
+const middleware = require($DIR + '/middleware/main.js')
+const validator = require('express-validator')
 
 app.use(cors())
 app.use(express.json())
 app.use(middleware.generalError)
-
 app.options('*', cors())
-
 app.post('*', middleware.noEmptyBody)
-const deleteRequestParams = {
-    _id: {
-        __type__: "str",
-        required: true
-    }
-}
-app.delete('*', [middleware.noEmptyBody, middleware.allowedFields(deleteRequestParams)])
+app.put('*', middleware.noEmptyBody)
+app.delete(
+    '*', 
+    middleware.validateRequest(
+        [validator.param("_id").isLength(24).optional()],
+         "param"
+    )
+)
+
+const routes = require($DIR + '/routing/index.js')
 
 app.use('/khateeb', routes.khateeb)
 app.use('/institutionAdmin', routes.admin)
@@ -51,13 +54,12 @@ app.use('/sysAdmin', routes.sysAdmin)
 app.use('/user', routes.user)
 app.use('/rootInstitutionAdmin', routes.rootInstitutionAdmin)
 
-db.once('open', () => { console.log(`${dbType} Mongo is listening`) })
+db.once('open', () => { 
+    const dbType = DATABASE.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
+    console.log(`${dbType} Mongo is listening`)
+    const cronJobs = require('./cron/jobPipeline.js')
+    cronJobs.start() 
+})
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
-app.listen(PORT, () => { console.log(`App is listening on port ${PORT}`) })
 
-if (process.env.NODE_ENV === 'production') {
-    createRootUserScript(() => { console.log(`Root User Creation Script Initiated`) })
-    jummahNotifications()
-    deleteVerificationCodes(() => { console.log(`Expired Verification Codes Deleted`) })
-    createTestInstitution(() => { console.log(`Created test institution`) })
-}
+app.listen(APP_CONFIG.network.port, () => { console.log(`App is listening on port ${APP_CONFIG.network.port}`) })
