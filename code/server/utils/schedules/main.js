@@ -7,8 +7,8 @@ const futureJummahsAssociated = async (associatedWith) => {
     return helpers.createAssociatedJummahKeys(remainingFridaysDayJs, upcomingMonthFridaysDayJs, associatedWith)
 }
 
-const createAssociatedJummahs =  async (locationID, timingID, institutionID) => {
-    const upcomingFriday = helpers.findUpcomingFriday()
+const createAssociatedJummahs =  async (locationID, timingID, institutionID, startingDate=helpers.createDayJs()) => {
+    const upcomingFriday = helpers.findUpcomingFriday(startingDate)
     const remainingFridaysDayJs = helpers.findAllFridays(upcomingFriday, false)
     const prayerSlot = {
         notified: false,
@@ -68,12 +68,14 @@ const build = async (month, year, institutionID) => {
         const prayerInfo = await helpers.getActiveLocationsAndTimings(institutionID)
         const linkedTimesAndLocations = helpers.linkTimesAndLocations(prayerInfo)
         let jummahEntries = []
+        const startingDate = helpers.createDayJs({ date: 1, month, year })
         for (const [locationID, timingIDs] of Object.entries(linkedTimesAndLocations)) {
             for (let i = 0; i < timingIDs.length; i++) {
-                const jummahs = await createAssociatedJummahs(locationID, timingIDs[i], institutionID)
+                const jummahs = await createAssociatedJummahs(locationID, timingIDs[i], institutionID, startingDate)
                 jummahEntries = [...jummahEntries, ...jummahs]
             }
         }
+        //console.log(jummahEntries)
         return jummahEntries
     } catch(err) {
         console.log(`Could not build schedule for ${month} ${year}`)

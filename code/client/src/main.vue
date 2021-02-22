@@ -11,7 +11,6 @@
         <notifications 
           v-if="showNotificationDisplay" 
           class="notifications notifications-size-position"
-          ref="note" 
         />
       </transition>
     </div>
@@ -52,14 +51,26 @@ export default {
     async setJWT() {
       let token = localStorage.getItem('token')
       if (!token)
-        return
+        return false
       axios.defaults.headers.common['authorization'] = token
+      return true
+    },
+    async checkIn() {
       try {
         await this.$API.user.checkIn()
+        return 'checked-in'
       } catch(err) {
         console.log(err)
+        console.log(`There was a problem retrieving user package`)
       }
     },
+    gettingStartedGuide() {
+      const khateebFirstTime = this.$store.getters.tokenExists && this.$store.getters.decodedJWT.__t === 'khateeb' && !localStorage.getItem('seenGettingStartedKhateeb')
+      if (khateebFirstTime) {
+        this._.tutorial("khateebs", 1, true)
+        localStorage.setItem('seenGettingStartedKhateeb', true)
+      }
+    }
   },
   computed: {
     showNotification() {
@@ -104,14 +115,13 @@ export default {
       )
     }
   },
-  created() {
-    this.setJWT()
-  },
-  mounted() {
-    if (this.$store.getters.decodedJWT.__t === 'khateeb' && !localStorage.getItem('seenGettingStarted')) {
-      this._.tutorial("khateebs", 1)
-      localStorage.setItem('seenGettingStarted', true)
-    }
+  async created() {
+    const jwtWasSet = this.setJWT()
+    if (!jwtWasSet)
+      return
+    await this.checkIn()
+    this.gettingStartedGuide()
+
   }
 }
 </script>
@@ -193,6 +203,7 @@ h2 {
 .notifications-layer {
   z-index: 9;
   position: fixed;
+  background: themeRGBA('grey', 0.3);
   display: flex;
   align-items: center;
   justify-content: center;

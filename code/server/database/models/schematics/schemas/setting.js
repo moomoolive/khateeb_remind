@@ -41,18 +41,17 @@ setting.methods.decrypt = function() {
             this.twilioKey = $db.funcs.decrypt(this.twilioKey)
         if (this.twilioUser)
             this.twilioUser = $db.funcs.decrypt(this.twilioUser)
-        return this
     } catch(err) {
         console.log(err)
         console.log(`Couldn't unencrypt settings`)
     }
+    return this
 }
 
 setting.pre('save', function(next) {
     try {
-        const setting = this
-        setting.twilioKey = $db.funcs.encrypt(setting.twilioKey)
-        setting.twilioUser = $db.funcs.encrypt(setting.twilioUser)
+        this.twilioKey = $db.funcs.encrypt(this.twilioKey)
+        this.twilioUser = $db.funcs.encrypt(this.twilioUser)
         next()
     } catch(err) {
         console.log('There was a problem encrypting settings')
@@ -73,7 +72,7 @@ setting.pre('updateOne', function(next) {
         if (data.twilioKey)
             data.twilioKey = $db.funcs.encrypt(data.twilioKey)
         this.update({}, data).exec()
-        next()
+        return next()
     } catch(err) {
         console.log(err)
         next(err)

@@ -106,6 +106,16 @@ const findFirstFriday = (month, year) => {
     return findUpcomingFriday(date)
 }
 
+const createDayJs = (options={}) => {
+    const date = new Date()
+    let dayJsOptions = {
+        month: options.month || date.getMonth(),
+        year: options.year || date.getFullYear(),
+        date: options.date || date.getDate()
+    }
+    return dayjs().month(dayJsOptions.month).year(dayJsOptions.year).date(dayJsOptions.date)
+}
+
 const findNextMonth = () => {
     let date = dayjs()
     return dayjs(date).month(date.month() + 1)
@@ -166,5 +176,6 @@ module.exports = {
     findAllFridays,
     fridaysNextMonth,
     createAssociatedJummahKeys,
-    linkTimesAndLocations
+    linkTimesAndLocations,
+    createDayJs
 }

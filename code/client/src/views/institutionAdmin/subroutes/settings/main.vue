@@ -163,7 +163,7 @@ export default {
         },
         async saveSettings($event) {
             try {
-                const saved = await this.$API.institutionAdmin.updateSettings($event)
+                this.settings = await this.$API.institutionAdmin.updateSettings($event)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)
@@ -171,7 +171,7 @@ export default {
         },
         async saveInstitutionDetails($event) {
             try {
-                const saved = await this.$API.institutionAdmin.updateInstitution($event)
+                this.institution = await this.$API.institutionAdmin.updateInstitution($event)
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {
                 console.log(err)

@@ -37,8 +37,8 @@ router.post(routerGroup1URL,
         req.body.confirmed = true
         const updated = await $db.funcs.save('institutionAdmins', req.body)
         const welcomeMsg = new _.notifications.welcome(updated)
-        const saved = await welcomeMsg.create()
-        res.json(`Successfully made ${updated.firstName} ${updated.lastName} an institutional admin!`)
+        await welcomeMsg.create()
+        return res.json(updated)
     } catch(err) {
         console.log(err)
         res.json(`There was a creating institutional admin`)

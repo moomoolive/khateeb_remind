@@ -81,14 +81,13 @@ router.post(routerGroup1URL,
         ]
     ),
     async (req, res) => {
-    console.log(req.body)
-    try {
-        req.body.institutionID = req.headers.institutionid
-        const announcementEntry = await $db.funcs.save(routerGroup1, req.body)
-        res.json(`successfully saved announcement: '${req.body.headline}'`)
-    } catch(err) {
-        res.json(errors.db(routerGroup1.slice(0, -1), 'saving', err))
-    }
+        try {
+            req.body.institutionID = req.headers.institutionid
+            const announcementEntry = await $db.funcs.save(routerGroup1, req.body)
+            return res.json(announcementEntry)
+        } catch(err) {
+            return res.json(errors.db(routerGroup1.slice(0, -1), 'saving', err))
+        }
 })
 
 const routerGroup2 = 'khateebs'
@@ -331,6 +330,7 @@ router.get(
             if (jummahs.length < 1)
                 jummahs = await _.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
             const data = await jummahs[0].gatherScheduleComponents()
+            console.log(jummahs.length)
             return res.json({ jummahs, ...data })
         } catch(err) {
             res.json(errors.getReq('schedules', err))
@@ -364,10 +364,14 @@ router.put(
     ),
     async(req, res) => {
         try {
-            console.log(req.body)
             req.body.institutionID = req.headers.institutionid
-            const saved = await $db.funcs.save('settings', req.body)
-            res.json(`Successfully saved settings!`)
+            // I chose to update and find seperate instead of mongoose's 
+            // 'findOneAndUpdate' because update hooks don't apply to them
+            // and I need to encrypt certain settings on update
+            const identifier = { _id: req.body._id }
+            await $db.models.settings.updateOne(identifier, req.body)
+            const updated = await $db.models.settings.findOne(identifier).exec()
+            return res.json(updated)
         } catch(err) {
             console.log(err)
             res.json(`Couldn't save settings`)
@@ -379,13 +383,13 @@ const routerGroup9URL = `/${routerGroup9}`
 
 router.get(routerGroup9URL, 
     async (req, res) => {
-    try {
-        const institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
-        res.json(institution)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't get institution details`)
-    }
+        try {
+            const institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
+            return res.json(institution)
+        } catch(err) {
+            console.log(err)
+            res.json(`Couldn't get institution details`)
+        }
     }
 )
 
@@ -402,8 +406,8 @@ router.put(routerGroup9URL,
     ),
     async (req, res) => {
         try {
-            const updated = await $db.models.institutions.updateOne({ _id: req.body._id }, req.body)
-            res.json(`Successfully updated institution`)
+            const updated = await $db.models.institutions.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            res.json(updated)
         } catch(err) {
             console.log(err)
             res.json(`Couldn't update institution details`)

@@ -41,10 +41,13 @@ router.put(
 router.get('/check-in', async(req, res) => {
     try {
         // log login time
-        const userBeforeUpdate = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
-        const institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
-        const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        return res.json({ notifications, lastVisit: userBeforeUpdate.lastLogin, institution })
+        const userPackage = {}
+        userPackage.lastVisit = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
+        userPackage.notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
+        if (req.headers.usertype === 'root' || req.headers.usertype === 'sysAdmin')
+            return userPackage
+        userPackage.institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
+        return res.json(userPackage)
     } catch(err) {
         console.log(err)
         res.json(`Check-in failed`)

@@ -14,7 +14,6 @@ router.post(
             validator.body("institution.timezone").isLength({ min: 1 }),
             validator.body("institution.country").isLength({ min: 1 }),
             validator.body("institution.state").isLength({ min: 1 }).optional(),
-            validator.body("institutionID").isLength(24),
             validator.body("institutionAdmin.password").isLength({ min: 6 }),
             validator.body("institutionAdmin.username").isLength({ min: 6 }),
             validator.body("institutionAdmin.handle").isLength({ min: 1 }),
@@ -64,24 +63,24 @@ router.post(
         ]
     ),
     async (req, res) => {
-    try {
-        const institution = req.body.institutionID
-        const settings = await $db.models.settings.findOne({ institutionID: institution }).exec()
-        if (!settings)
-            return res.json(`That institution doesn't exist!`)
-        if (settings.autoConfirmRegistration)
-            req.body.confirmed = true
-        else
-            req.body.confirmed = false
-        const khateebEntry = await $db.funcs.save('khateebs', req.body)
-        if (settings.autoConfirmRegistration) {
-            const welcomeMsg = new _.notifications.welcome(khateebEntry)
-            const saved = await welcomeMsg.create()
-        }
-        const note = new _.notifications.khateebSignup(khateebEntry, settings.autoConfirmRegistration)
-        await note.setRecipentsToAdmins(institution)
-        const msgs = await note.create()
-        res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
+        try {
+            const institution = req.body.institutionID
+            const settings = await $db.models.settings.findOne({ institutionID: institution }).exec()
+            if (!settings)
+                return res.json(`That institution doesn't exist!`)
+            if (settings.autoConfirmRegistration)
+                req.body.confirmed = true
+            else
+                req.body.confirmed = false
+            const khateebEntry = await $db.funcs.save('khateebs', req.body)
+            if (settings.autoConfirmRegistration) {
+                const welcomeMsg = new _.notifications.welcome(khateebEntry)
+                const saved = await welcomeMsg.create()
+            }
+            const note = new _.notifications.khateebSignup(khateebEntry, settings.autoConfirmRegistration)
+            await note.setRecipentsToAdmins(institution)
+            const msgs = await note.create()
+            return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
         console.log(err)
         res.json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)
@@ -100,7 +99,7 @@ router.post(
         try {
             const user = await $db.models.users.findOne({ username: req.body.username }).select(["-__v"]).exec()
             if (!user)
-                return response.status(401).json({  msg: 'unauthorized', token: null })
+                return res.status(401).json({  msg: 'unauthorized', token: null })
             validPassword = await user.comparePassword(req.body.password)
             if (!validPassword)
                 return res.status(401).json({  msg: 'unauthorized', token: null })
