@@ -1,4 +1,4 @@
-const cronWrapper = require('./cronWrapper.js')
+const cronWrapper = require($DIR + '/cron/cronWrapper.js')
 
 const options = {
     job: async () => {

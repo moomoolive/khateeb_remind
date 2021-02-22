@@ -58,8 +58,7 @@ db.once('open', () => {
     const dbType = DATABASE.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
     console.log(`${dbType} Mongo is listening`)
     const cronJobs = require('./cron/jobPipeline.js')
-    if (process.env.NODE_ENV === 'production')
-        cronJobs.start() 
+    cronJobs.start() 
 })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
 

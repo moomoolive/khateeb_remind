@@ -1,8 +1,7 @@
-const cronWrapper = require('./cronWrapper.js')
+const cronWrapper = require($DIR + '/cron/cronWrapper.js')
 
 const options = {
     job: async () => {
-        callback()
         try {
             const root = await $db.models.users.findOne({ institutionID: "__ROOT__" }).exec()
             if (!!root) {

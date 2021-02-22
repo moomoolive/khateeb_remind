@@ -36,7 +36,7 @@ const job = async () => {
     }
 }
 
-const cronWrapper = require('./cronWrapper.js')
+const cronWrapper = require($DIR + '/cron/cronWrapper.js')
 
 // every wednesday and thursday 6AM
 const cron = (time='00 00 6 * * 3-4', syncWithTimezone=true) => {
