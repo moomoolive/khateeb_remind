@@ -54,15 +54,21 @@ router.post(
     '/jummah-confirm', 
     async (req, res) => {
         try {
-            const savedJummah = await $db.models.jummahs.updateOne({ _id: req.body.jummah._id }, req.body.jummah)
+            const savedJummah = await $db.models.jummahs.findOneAndUpdate({ _id: req.body.jummah._id }, req.body.jummah, { new: true })
             const savedNotification = await $db.models.actionNotifications.updateOne({ _id: req.body.notification._id }, req.body.notification)
             if (req.body.preferenceIndicator === 0 && !req.body.jummah.confirmed) {
                 const addDropout = await $db.models.khateebs.findOneAndUpdate({ _id: req.headers.userid }, { $inc: { dropouts: 1 } })
                 const note = new _.notifications.jummahDropout(addDropout)
                 await note.setRecipentsToAdmins(req.body.institutionid)
-                const msgs = await note.create()
+                const msgs = await note.create(true, true)
             }
-            res.json('Updated Notification and Associated Jummah')
+            else if (req.body.jummah.khateebPreference[req.body.preferenceIndicator].confirmed && req.body.jummah.confirmed) {
+                const khateeb = await $db.models.khateebs.findOne({ _id: req.headers.userid }).exec()
+                const note = new _.notifications.jummahDropout(khateeb, savedJummah)
+                await note.setRecipentsToAdmins(req.body.institutionid)
+                const msgs = await note.create(true, true)
+            }
+            return res.json('Updated Notification and Associated Jummah')
         } catch(err) {
             console.log(err)
             res.json(`Couldn't update notification status!`)
