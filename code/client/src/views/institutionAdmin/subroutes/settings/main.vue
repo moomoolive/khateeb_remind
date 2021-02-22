@@ -143,11 +143,11 @@ export default {
         },
         async deleteInfo($event) {
             try {
-                if ($event.type === 'location') {
-                     const deleted = await this.$API.institutionAdmin.deleteLocation({ _id: $event.id })
-                }
+                if ($event.type === 'location')
+                     await this.$API.institutionAdmin.deleteLocation($event.id)
                 else {
-                    const deleted = await this.$API.institutionAdmin.deleteTiming({ _id: $event.id })
+                    const res = await this.$API.institutionAdmin.deleteTiming($event.id)
+                    console.log(res)
                 }
                 this.$store.dispatch('adminSavedChangesScreen', true)
             } catch(err) {

@@ -32,4 +32,18 @@ location.methods.findTimings = async function(options) {
     }
 }
 
+location.methods.deleteDependants = async function () {
+    let res = {}
+    try {
+        const timings = await this.findTimings()
+        console.log(timings)
+        for (let i = 0; i < timings.length; i++)
+            res = await timings[i].deleteDependants()
+    } catch(err) {
+        console.log(err)
+        console.log(`Couldn't delete location dependants`)
+    }
+    return res
+}
+
 module.exports = location

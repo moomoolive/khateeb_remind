@@ -87,4 +87,9 @@ jummah.query.monthlyEntries = function (year, month) {
     return this.where({ date: { $gte: greaterThanOrEqual, $lt: lesserThan } })
 }
 
+jummah.query.futureEntries = function() {
+    const upcomingFriday = _.schedule.findUpcomingFriday()
+    return this.where({ date: { $gte: `${upcomingFriday.year()}-${upcomingFriday.month() + 1}-${upcomingFriday.date()}` } })
+}
+
 module.exports = jummah

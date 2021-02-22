@@ -150,7 +150,7 @@ const locations = {
 router.get(routerGroup6URL + "/:_id", async (req, res) => {
     try {
         let data = await funcs.query(req, routerGroup6, { active: true }).exec()
-        res.json(data)
+        return res.json(data)
     } catch(err) {
         res.json(errors.getReq(routerGroup6, err))
     }
@@ -170,10 +170,10 @@ router.post(routerGroup6URL,
             const saved = await $db.funcs.save(routerGroup6, req.body.locations[i])
             if (req.body.new && !req.body.locations[i]._id) {
                 const newTiming = await locations.firstTiming(req.headers.institutionid, saved._id.toString())
-                const associatedJummahs = await _.schedule.createAssociatedJummahs(saved._id.toString(), newTiming._id.toString(), req.headers.institutionid)
+                const associatedJummahs = await _.schedule.createJummahsForTiming(saved._id.toString(), newTiming._id.toString(), req.headers.institutionid)
             }
         }
-        res.json(`successfully saved locations!`)
+        return res.json(`successfully saved locations!`)
     } catch(err) {
         res.json(errors.db(routerGroup6.slice(0, -1), 'saving', err))
     }
@@ -181,27 +181,11 @@ router.post(routerGroup6URL,
 
 router.delete(routerGroup6URL + "/:_id", async (req, res) => {
     try {
-        const deleted = await $db.models[routerGroup6].updateOne(req.params, { active: false })
-        const associatedJummahs = await _.schedule.futureJummahsAssociated({ locationID: req.params._id, institutionID: req.headers.institutionid })
-        for (let i = 0; i < associatedJummahs.length; i++) {
-            const deleted = await $db.models.jummahs.deleteMany(associatedJummahs[i])
-        }
-        const associatedTimings = await $db.models.timings.find({ locationID: req.params._id, institutionID: req.headers.institutionid }).exec()
-        const timingsObject = {}
-        for (let i = 0; i < associatedTimings.length; i++) {
-            const updatedTiming = _.deepCopy(associatedTimings[i])
-            timingsObject[updatedTiming._id] = _.deepCopy(updatedTiming)
-            const updated = await $db.models.timings.updateOne({ _id: updatedTiming._id }, { active: false })
-        }
-        const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).exec()
-        for (let i = 0; i < khateebs.length; i++) {
-            const newKhateeb = _.deepCopy(khateebs[i])
-            newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => !timingsObject[timing])
-            const updated = await $db.models.khateebs.updateOne({ _id: newKhateeb._id }, newKhateeb)
-        }
-        return res.json(`Successfully deleted location: ${req.params._id} and it's associated jummahs and timings`)
+        const deletedLocation = await $db.models[routerGroup6].findOneAndUpdate(req.params, { active: false }, { new: true })
+        const dependantRes = await deletedLocation.deleteDependants()
+        return res.json({ msg: `Successfully deleted location ${req.params._id}`, dependantRes })
     } catch(err) {
-        res.json(errors.db(`${routerGroup6.slice(0, -1)} and associated jummahs and timings.`, 'deleting', err))
+        return res.json(errors.db(`${routerGroup6.slice(0, -1)} and associated jummahs and timings.`, 'deleting', err))
     }
 })
 
@@ -211,7 +195,7 @@ const routerGroup7URL = `/${routerGroup7}`
 router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
     try {
         const data = await funcs.query(req, routerGroup7, { active: true }).exec()
-        res.json(data)
+        return res.json(data)
     } catch(err) {
         res.json(errors.getReq(routerGroup7, err))
     }
@@ -227,14 +211,12 @@ router.post(routerGroup7URL,
     try {
         for (let i = 0; i < req.body.times.length; i++) {
             req.body.times[i]["institutionID"] = req.headers.institutionid
-            console.log(req.body.times[i]._id, req.body.times[i].locationID)
             const saved = await $db.funcs.save(routerGroup7, req.body.times[i])
-            console.log(saved._id)
             if (!req.body.times[i]._id) {
-                const associatedJummahs = await _.schedule.createAssociatedJummahs(saved.locationID, saved._id.toString(), req.headers.institutionid)
+                const associatedJummahs = await _.schedule.createJummahsForTiming(saved.locationID, saved._id.toString(), req.headers.institutionid)
             }
         }
-        res.json('timings successfully saved')
+        return res.json('timings successfully saved')
     } catch(err) {
         res.json(errors.db(routerGroup7, "saving", err))
     }
@@ -242,18 +224,9 @@ router.post(routerGroup7URL,
 
 router.delete(routerGroup7URL + '/:_id', async (req, res) => {
     try {
-        const deleted = await $db.models[routerGroup7].updateOne(req.params, { active: false })
-        const associatedJummahs = await _.schedule.futureJummahsAssociated({ timingID: req.params._id, institutionID: req.headers.institutionid })
-        for (let i = 0; i < associatedJummahs.length; i++) {
-            const deleted = await $db.models.jummahs.deleteMany(associatedJummahs[i])
-        }
-        const khateebs = await $db.models.khateebs.find({ institutionID: req.headers.institutionid }).exec()
-        for (let i = 0; i < khateebs.length; i++) {
-            const newKhateeb = _.deepCopy(khateebs[i])
-            newKhateeb.availableTimings = newKhateeb.availableTimings.filter(timing => timing !== req.params._id)
-            const updated = await $db.models.khateebs.updateOne({ _id: newKhateeb._id }, newKhateeb)
-        }
-        res.json(`Successfully deleted timing: ${req.params._id} and it's associated jummahs`)
+        const deletedTiming = await $db.models[routerGroup7].findOneAndUpdate(req.params, { active: false }, { new: true })
+        const dependantsRes = await deletedTiming.deleteDependants()
+        return res.json({ msg: `Successfully deleted timing ${req.params._id}`, dependantsRes })
     } catch(err) {
         res.json(errors.db(`${routerGroup7.slice(0, -1)} and associated jummahs.`, 'deleting', err))
     }
@@ -330,7 +303,6 @@ router.get(
             if (jummahs.length < 1)
                 jummahs = await _.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
             const data = await jummahs[0].gatherScheduleComponents()
-            console.log(jummahs.length)
             return res.json({ jummahs, ...data })
         } catch(err) {
             res.json(errors.getReq('schedules', err))
