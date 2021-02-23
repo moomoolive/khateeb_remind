@@ -14,6 +14,10 @@ module.exports = {
         }
     },
     pwa: {
-        name: 'Khateeb Remind'
+        name: 'Khateeb Remind',
+        workboxOptions: {
+            skipWaiting: true,
+            clientsClaim: true
+        }
     }
 }

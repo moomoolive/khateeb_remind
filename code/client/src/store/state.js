@@ -17,5 +17,6 @@ export default {
     siteBanner: {
         show: false
     },
-    institutionInfo: null
+    institutionInfo: null,
+    isPWA: window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches
 }

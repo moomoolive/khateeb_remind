@@ -76,7 +76,11 @@
                 <div class="menu-item" @click="redirect('/user')">
                   <p>My Profile</p>
                 </div>
-                <div class="menu-item get-the-app" @click="downloadApp()">
+                <div
+                  v-if="!$store.state.isPWA" 
+                  class="menu-item get-the-app" 
+                  @click="downloadApp()"
+                >
                   <p class="get-the-app-text">
                     Download the App
                   </p>
@@ -93,16 +97,19 @@
 
 <script>
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+import { VuePwaInstallMixin, BeforeInstallPromptEvent   } from 'vue-pwa-install'
 
 export default {
     name: 'Header',
+    mixins: [VuePwaInstallMixin],
     components: {
       CollapseTransition
     },
     data() {
       return {
         activeMenu: false,
-        alertAboutUrgent: false
+        alertAboutUrgent: false,
+        deferredPrompt: BeforeInstallPromptEvent || null
       }
     },
     methods: {
@@ -112,9 +119,31 @@ export default {
         this.activeMenu = !this.activeMenu
         
       },
-      downloadApp() {
-        this._.alert(`This feature is coming soon insha'Allah!`)
+      async downloadApp() {
         this.activeMenu = false
+        const options = {
+          picture: 'downloadApp',
+          rejectButtonText: 'Later',
+          confirmButtonText: 'Install'
+        }
+        const confirm = await this._.confirm(`Install the free Khateeb Remind app:\n- Looks and feels better\n- Reminds you about khutbahs`, 'blue', options)
+        if (confirm)
+          this.promptPwaInstall()
+      },
+      async promptPwaInstall() {
+        if (!this.deferredPrompt) {
+          window.open("https://mobilesyrup.com/2020/05/24/how-install-progressive-web-app-pwa-android-ios-pc-mac/", "_blank")
+          return this._.alert(`It looks like you've already declined or missed the prompt to download the app. We've redirected you to link which shows how to manually download.`)
+        }
+        this.deferredPrompt.prompt()
+        const choice = await this.deferredPrompt.userChoice
+        if (choice.outcome === 'accepted')
+          this._.alert(`The app has finished downloading!`, 'success')
+        this.deferredPrompt = null
+      },
+      stashPwaPrompt(event) {
+        event.preventDefault()
+        this.deferredPrompt = event
       },
       redirect(path) {
         if (path !== this.$router.currentRoute.fullPath)
@@ -193,6 +222,7 @@ export default {
       }
     },
     created() {
+      this.$on('canInstall', this.stashPwaPrompt)
       const fiveSeconds = 5_000
       window.setTimeout(() => { this.alertAboutUrgent = true }, fiveSeconds)
     }
