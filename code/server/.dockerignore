@@ -3,6 +3,9 @@ node_modules/
 py_scraper/
 timezones/
 
+# scripts for complex database updates
+oneTimeJobs/
+
 IANNA-TZs.js
 
 .git
