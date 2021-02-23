@@ -39,13 +39,14 @@ export default {
         }
         store.dispatch('createNotification', notificationInfo)
     },
-    confirm(msg) {
+    confirm(msg, color="yellow", options) {
         return new Promise((resolve) => {
             const info = {
                 type: 'confirm',
                 options: { 
                     msg,
-                    color: 'yellow',
+                    color,
+                    ...options,
                     resolve,
                     reject: resolve 
                 }

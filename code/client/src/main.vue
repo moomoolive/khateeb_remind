@@ -70,7 +70,7 @@ export default {
         this._.tutorial("khateebs", 1, true)
         localStorage.setItem('seenGettingStartedKhateeb', true)
       }
-    }
+    },
   },
   computed: {
     showNotification() {
@@ -121,7 +121,6 @@ export default {
       return
     await this.checkIn()
     this.gettingStartedGuide()
-
   }
 }
 </script>

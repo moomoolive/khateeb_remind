@@ -74,7 +74,7 @@ export default {
 }
 
 .content {
-  max-height: 100000px;
+    max-height: 500px;
 }
 
 .green {

@@ -1,11 +1,22 @@
 <template>
-    <div>
-        <img :src="require(`@/assets/notifications/exclamation.png`)">
-        <p>
-            {{ options.msg }}
-        </p>
-        <button @click="confirm()">Yes</button>
-        <button class="red" @click="reject()">No</button>
+    <div class="confirm-container">
+        <img 
+            :src="require(`@/assets/notifications/${options.picture || 'exclamation'}.png`)"
+        >
+        <div class="msg-spacing">
+            <p 
+                v-for="msg in options.msg.split('\n')" :key="msg"
+                :style="`text-align: left;`"
+            >
+                {{ msg }}
+            </p>
+        </div>
+        <button @click="confirm()">
+            {{ options.confirmButtonText || "Yes" }}
+        </button>
+        <button class="red" @click="reject()">
+            {{ options.rejectButtonText || "No" }}
+        </button>
     </div>
 </template>
 
@@ -49,8 +60,14 @@ p {
     width: 85%;
     margin-left: auto;
     margin-right: auto;
+    padding-bottom: 0px;
+    margin-bottom: 5px;
     font-size: 16px;
     font-weight: bold;
+}
+
+.msg-spacing {
+    margin-bottom: 15px;
 }
 
 @media screen and (max-width: $phoneWidth) {
