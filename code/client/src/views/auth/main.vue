@@ -76,8 +76,7 @@ export default {
         toApp(token) {
             if (this.rememberMe)
                 localStorage.setItem('token', token)
-            axios.defaults.headers.common['authorization'] = token
-            this.$store.dispatch('JWT_TOKEN', token)
+            this.$store.dispatch('user/updateToken', token)
             this.$nextTick(() => {
                 const landingPage = this.$store.state.landingPage
                 if (landingPage !== this.$router.currentRoute.fullPath)
@@ -109,13 +108,13 @@ export default {
     watch: {
         rememberMe(newVal) {
             if (newVal) 
-                localStorage.setItem('rememberMe', 'yes')
+                localStorage.setItem('rememberMe', true)
             else
                 localStorage.removeItem('rememberMe')
         }
     },
     created() {
-        if (this.$store.getters.isJWTValid)
+        if (this.$store.getters['user/isLoggedIn'])
             this._.toHomePage()
     }
 }

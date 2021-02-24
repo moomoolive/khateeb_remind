@@ -56,44 +56,18 @@ export default {
             store.dispatch('createNotification', info)
         })
     },
-    authRequirementsSatisfied(requiredAuthLevel) {
-        const authLevels = {
-            "khateeb": 1,
-            "institutionAdmin": 2,
-            "rootInstitutionAdmin": 3,
-            "sysAdmin": 4,
-            "root": 5
-        }
-        if (!store.getters.tokenExists)
-            return false
-        const currentUserType = store.getters.decodedJWT.__t
-        const userAuthLevel = authLevels[currentUserType]
-        return userAuthLevel >= requiredAuthLevel
-    },
     toHomePage() {
-        return router.push(routerHelpers.homepageURL(store.getters.userType))
+        return router.push(routerHelpers.homepageURL(store.getters["user/type"]))
     },
     dynamicDisplayDate(date) {
-        date = new Date(date)
-        const amOrPm = date.getHours() > 11 ? 'PM' : 'AM'
-        const hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours()
-        const mins = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
-        let base = `${hours}:${mins} ${amOrPm}`
-        const yesterday = new Date()
-        yesterday.setHours(0, 0, 0, 0)
-        if (date.getTime() > yesterday.getTime())
+        const displayDate = new Date(date)
+        const base = displayDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        if (displayDate.getTime() > helpers.daysInThePast(0).getTime())
             return base
-        const twoDaysAgo = new Date()
-        twoDaysAgo.setDate(twoDaysAgo.getDate() - 1)
-        twoDaysAgo.setHours(0, 0, 0, 0)
-        if (date.getTime() > twoDaysAgo.getTime())
+        if (displayDate.getTime() > helpers.daysInThePast(1).getTime())
             return `Yesterday ${base}`
-        const lastWeek = new Date()
-        lastWeek.setDate(lastWeek.getDate() - 5)
-        lastWeek.setDate(0, 0, 0, 0)
-        if (date.getTime() > lastWeek.getTime())
-            return `${date.toLocaleString('default', { weekday: 'short' })} ${base}`
-        const locale = date.toLocaleString().split(',')[0]
-        return `${locale} ${base}`
+        if (displayDate.getTime() > helpers.daysInThePast(5).getTime())
+            return `${displayDate.toLocaleString('default', { weekday: 'short' })} ${base}`
+        return `${displayDate.toLocaleDateString('en-US')} ${base}`
     }
 }

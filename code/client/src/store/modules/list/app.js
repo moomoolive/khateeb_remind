@@ -1,7 +1,8 @@
 export default {
     namespaced: true,
     state: () => ({
-        wallpaper: 'main'
+        wallpaper: 'main',
+        usingOffline: false
     }),
     mutations: {
         changeWallpaper(state, targetWallpaper) {

@@ -22,5 +22,12 @@ export default {
         if (raw)
             return modifiedArray
         else return subHelpers.arrayToString(modifiedArray)
+    },
+    // inputting 0 equates to the beginning of today
+    daysInThePast(numberOfDays=0) {
+        const date = new Date()
+        date.setHours(0, 0, 0, 0)
+        date.setDate(date.getDate() - numberOfDays)
+        return date
     }
 }

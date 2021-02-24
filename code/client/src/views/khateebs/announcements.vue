@@ -38,7 +38,7 @@ export default {
             announcementsExists: true,
             announcements: null,
             announcementsArraysOfTwo: null,
-            lastVisit: this.$store.state.lastVisit
+            lastVisit: this.$store.state.userInfo.lastVisit
         }
     },
     methods: {

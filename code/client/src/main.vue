@@ -65,7 +65,7 @@ export default {
       }
     },
     gettingStartedGuide() {
-      const khateebFirstTime = this.$store.getters.tokenExists && this.$store.getters.decodedJWT.__t === 'khateeb' && !localStorage.getItem('seenGettingStartedKhateeb')
+      const khateebFirstTime = this.$store.getters['user/isLoggedIn'] && this.$store.getters['user/type'] === 'khateeb' && !localStorage.getItem('seenGettingStartedKhateeb')
       if (khateebFirstTime) {
         this._.tutorial("khateebs", 1, true)
         localStorage.setItem('seenGettingStartedKhateeb', true)
@@ -77,7 +77,7 @@ export default {
       return this.$store.state.notifications.show
     },
     wallpaper() {
-      return this.$store.state.appAppearance.wallpaper
+      return this.$store.state.app.wallpaper
     },
     notificationsQueue() {
       return this.$store.state.notificationsQueue

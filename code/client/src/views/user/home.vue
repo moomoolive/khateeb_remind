@@ -7,7 +7,7 @@
             <form-main 
                 :structure="structure.username"
                 :backgroundColor="`none`"
-                :basedOn="{ username: $store.getters.decodedJWT.username }"
+                :basedOn="{ username: $store.getters['user/allInfo'].username }"
                 :buttonText="`Change Username`"
                 @submitted="updateInfo($event)"
             />
@@ -30,14 +30,14 @@
         >
             <form-main
                 :structure="structure.profile"
-                :basedOn="$store.getters.decodedJWT"
+                :basedOn="$store.getters['user/allInfo']"
                 :backgroundColor="`none`"
                 :buttonText="`Update Profile`"
                 @submitted="updateInfo($event)"
             />
         </collapsable-box>
         <collapsable-box
-            v-if="$store.getters.decodedJWT.__t === 'khateeb'"
+            v-if="$store.getters['user/authLevel'] === 3"
             class="user-setting"
             :headline="`Available Timings`"
             :tagDetails="availableTimingsTag"
@@ -50,17 +50,17 @@
             />
         </collapsable-box>
         <collapsable-box
-            v-if="$store.getters.decodedJWT.__t === 'khateeb'"
+            v-if="$store.getters['user/authLevel'] === 3"
             class="user-setting"
             :headline="`Unavailable Dates`"
         >
             <calendar
-                :originalVal="$store.getters.decodedJWT.unavailableDates" 
+                :originalVal="$store.getters['user/allInfo'].unavailableDates" 
                 @changed="updateInfo($event, false)"
             />
         </collapsable-box>
         <collapsable-box
-            v-if="showDelete"
+            v-if="$store.getters['user/authLevel'] < 3"
             class="user-setting"
             :headline="`Danger Zone`"
             :buttonColor="`red`"
@@ -126,7 +126,6 @@ export default {
                     selectOptions: ['none', 'Shiekh', 'Imam']
                 }
             },
-            showDelete: null,
             khateebs: {
                 struct: null,
                 availableTimings: null,
@@ -148,9 +147,7 @@ export default {
             }
         },
         storeToken(token) {
-            localStorage.setItem('token', token)
-            axios.defaults.headers.common['authorization'] = token
-            this.$store.dispatch('JWT_TOKEN', token)
+            this.$store.dispatch('user/updateToken', token)
         },
         async deleteAccount() {
             try {
@@ -159,7 +156,7 @@ export default {
                     return
                 const res = await this.$API.user.deleteAccount()
                 console.log(res)
-                this.$store.dispatch('logout')
+                this.$store.dispatch('user/logout')
                 this._.toHomePage()
                 this._.alert(`Successfully delete account`, 'success')
             } catch(err) {
@@ -217,9 +214,7 @@ export default {
         }
     },
     created() {
-        const accountType = this.$store.getters.decodedJWT.__t
-        this.showDelete = accountType !== 'rootInstitutionAdmin' && accountType !== 'root'
-        if (this.$store.getters.decodedJWT.__t == 'khateeb') {
+        if (this.$store.getters['user/authLevel']) {
             this.structure.profile = { ...this.structure.profile, ...this.khateebExtras }
             this.getAvailableTimings()
         }

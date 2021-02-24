@@ -6,7 +6,7 @@
             @click="_.toHomePage()"
         >
         <div>
-          <div v-if="!loggedIn">
+          <div v-if="!$store.getters['user/isLoggedIn']">
             <button class="blue" @click="toLogin()">Log In</button>
             <button class="green" @click="signUp()">Sign Up</button>
           </div>
@@ -46,22 +46,38 @@
             </svg>
             <collapse-transition :duration="600">
               <div v-show="activeMenu" class="menu-container">
-                <div v-show="_.authRequirementsSatisfied(1) && !_.authRequirementsSatisfied(4)" class="user-items">
+                <div 
+                  v-show="
+                    $store.getters['user/authLevel'] > 1 && 
+                    $store.getters['user/authLevel'] < 4
+                  " 
+                  class="user-items"
+                >
                   <div class="menu-item" @click="redirect('/khateeb/')">
                     <p class="top-item">
-                      {{ _.authRequirementsSatisfied(2) ? 'Khateeb Schedule' : 'Schedule' }}
+                      {{ $store.getters['user/type'] !== 'khateeb' ? 'Khateeb Schedule' : 'Schedule' }}
                     </p>
                   </div>
-                  <div class="menu-item" @click="redirect('/khateeb/announcements')">
+                  <div 
+                    class="menu-item" 
+                    @click="redirect('/khateeb/announcements')"
+                  >
                     <p>Announcements</p>
                   </div>
-                  <div v-if="_.authRequirementsSatisfied(2)" class="menu-item" @click="redirect('/institutionAdmin')">
+                  <div 
+                    v-if="$store.getters['user/authLevel'] > 1" 
+                    class="menu-item" 
+                    @click="redirect('/institutionAdmin')"
+                  >
                     <p>
                       Admin Central
                     </p>
                   </div>
                 </div>
-                <div v-if="_.authRequirementsSatisfied(4)" class="user-items">
+                <div 
+                  v-if="$store.getters['user/authLevel'] > 3" 
+                  class="user-items"
+                >
                   <div class="menu-item" @click="redirect('/sysAdmin')">
                     <p class="top-item">
                       Admin Central
@@ -77,7 +93,7 @@
                   <p>My Profile</p>
                 </div>
                 <div
-                  v-if="!$store.state.isPWA" 
+                  v-if="!$store.state.user.isBrowsingOnPWA" 
                   class="menu-item get-the-app" 
                   @click="downloadApp()"
                 >
@@ -85,7 +101,10 @@
                     Download the App
                   </p>
                 </div>
-                <div class="menu-item caution" @click="logout()">
+                <div 
+                  class="menu-item caution" 
+                  @click="logout()"
+                >
                   <p class="caution-text">Logout</p>
                 </div>
               </div>
@@ -97,7 +116,7 @@
 
 <script>
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
-import { VuePwaInstallMixin, BeforeInstallPromptEvent   } from 'vue-pwa-install'
+import { VuePwaInstallMixin, BeforeInstallPromptEvent } from 'vue-pwa-install'
 
 export default {
     name: 'Header',
@@ -169,20 +188,14 @@ export default {
         }
         this.$store.dispatch('createNotification', info)
       },
-      toHome() {
-        const to = this.$store.getters.decodedJWT ? `/${this.$store.getters.decodedJWT.__t}` : `/`
-        if (this.$router.currentRoute.fullPath !== to)
-          this.$router.push(to)
-      },
       toLogin() {
         if (this.$router.currentRoute.fullPath !== '/')
           this.$router.push('/')
       },
       logout() {
-        this.$store.dispatch('logout')
-        if (this.$router.currentRoute.fullPath !== '/')
-          this.$router.push('/')
+        this.$store.dispatch('user/logout')
         this.activeMenu = false 
+        this.$nextTick(() => { this._.toHomepage() })
       },
       openNotifications() {
         const options = {
@@ -199,12 +212,6 @@ export default {
       },
     },
     computed: {
-      loggedIn() {
-        return this.$store.getters.tokenExists
-      },
-      userInfo() {
-        return this.$store.getters.decodedJWT
-      },
       alertUserAboutUrgentNotifications() {
         return this.alertAboutUrgent && this.$store.getters.urgentNotifications.length > 0
       },

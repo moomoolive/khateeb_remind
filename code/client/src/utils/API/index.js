@@ -211,6 +211,7 @@ const misc = {
 
 const utils = {
     assignUserPackage(userPkg) {
+        store.commit('user/storeInfoFromAPI', userPkg)
         store.dispatch('storeUserPackage', userPkg)
         const urgentNotifications = userPkg.notifications.filter(note => !note.seen)
         urgentNotifications.forEach(note => {

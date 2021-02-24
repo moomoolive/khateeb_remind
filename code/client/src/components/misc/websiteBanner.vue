@@ -73,7 +73,7 @@ export default {
     },
     computed: {
         userIsLoggedIn() {
-            return this.$store.getters.isJWTValid
+            return this.$store.getters['user/isLoggedIn']
         }
     },
     watch: {

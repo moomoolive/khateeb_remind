@@ -6,7 +6,7 @@
             gif="personThrowingPlane"
         />
         <div class="button">
-            <button @click="toHome()">
+            <button @click="_.toHomePage()">
                 Go to Home
             </button>
         </div>
@@ -15,16 +15,7 @@
 
 <script>
 export default {
-    name: 'pageNotFound',
-    methods: {
-        toHome() {
-            if (this.$store.getters.decodedJWT)
-                this.$router.push(`/${this.$store.getters.decodedJWT.__t}/`)
-            else {
-                this.$router.push('/')
-            }
-        }
-    }
+    name: 'pageNotFound'
 }
 </script>
 

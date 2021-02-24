@@ -1,12 +1,6 @@
 import state from './state.js'
 
 export default {
-    updateToken(state, token) { 
-        state.JWT_TOKEN = token 
-    },
-    removeToken(state) { 
-        state.JWT_TOKEN = null 
-    },
     adminSavedChangesScreen(state, onOrOff) { 
         state.admin.savedChanges = onOrOff 
     },
@@ -25,9 +19,6 @@ export default {
         } else
             state.notificationsQueue.push(notificationsInfo) 
     },
-    changeWallpaper(state, newWallpaperName) { 
-        state.wallpaper = newWallpaperName 
-    },
     displayNotification(state, notificationsInfo) { 
         state.notifications.show = true
         state.notifications.type = notificationsInfo.type
@@ -44,9 +35,6 @@ export default {
         const found = state.notificationsFromServer.find(note => note._id === notificationId)
         found.actionPerformed = true
     },
-    registerLandingPage(state, landingPageFullPath) {
-        state.landingPage = landingPageFullPath
-    },
     hideSiteBanner(state) {
         state.siteBanner.show = false
     },
@@ -55,7 +43,5 @@ export default {
     },
     storeUserPackage(state, userPackage) {
         state.notificationsFromServer = userPackage.notifications
-        state.lastVisit = new Date(userPackage.lastVisit)
-        state.institutionInfo = userPackage.institution
     }
 }

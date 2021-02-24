@@ -169,7 +169,7 @@ export default {
                 week: null,
                 location: 'all'
             },
-            testInstitution: this.$store.getters.decodedJWT.handle === "testMaster"
+            testInstitution: this.$store.getters['user/allInfo'].handle === "testMaster"
         }
     },
     methods: {

@@ -43,7 +43,7 @@ export default {
             outputQueue: [],
             commandHistory: [],
             historySelector: -1,
-            name: this.$store.getters.decodedJWT.firstName,
+            name: this.$store.getters.user.allInfo.firstName,
             outputMutator: window.setInterval(() => {
                 if (this.outputQueue.length > 0) {
                     const output = this.outputQueue.shift()

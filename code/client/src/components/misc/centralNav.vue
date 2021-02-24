@@ -5,7 +5,7 @@
                 v-for="(link, index) in outboundLinks" :key="index"
             >
                 <button
-                    v-if="!link.authLevel || _.authRequirementsSatisfied(link.authLevel)"
+                    v-if="authRequirements(link.auth)"
                     class="admin-nav silver"
                     @click="outbound(link.route)"
                 >
@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import auth from '@/utils/auth.js'
+
 export default {
     name: 'centralNav',
     props: {
@@ -53,6 +55,9 @@ export default {
             this.$router.push(`/${this.baseLink}`)
             this.$emit('to-central')
         },
+        authRequirements(authOptions) {
+            return auth.validUserAuthentication(this.$store.getters['user/type'], authOptions || {})
+        }
     },
     computed: {
         navMode() {

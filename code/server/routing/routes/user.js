@@ -42,7 +42,7 @@ router.get('/check-in', async(req, res) => {
     try {
         // log login time
         const userPackage = {}
-        userPackage.lastVisit = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
+        userPackage.lastVisit = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["lastLogin"])
         userPackage.notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
         if (req.headers.usertype === 'root' || req.headers.usertype === 'sysAdmin')
             return userPackage
@@ -58,7 +58,7 @@ router.put('/mark-notification-as-seen', async (req, res) => {
     try {
         await $db.models.notifications.updateOne(req.body, { seen: true, seenAt: new Date() })
         const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        res.json(notifications)
+        return res.json(notifications)
     } catch(err) {
         console.log(err)
         res.json(`Couldn't update notification status`)
@@ -69,7 +69,7 @@ router.delete('/', async (req, res) => {
     try {
         const deletedUser = await $db.models.users.deleteOne({ _id: req.headers.userid })
         const deletedNotifications = await $db.models.notifications.deleteMany({ userID: user })
-        res.json({ msg: 'Successfully deleted account', notifications: deletedNotifications, user: deletedUser })
+        return res.json({ msg: 'Successfully deleted account', notifications: deletedNotifications, user: deletedUser })
     } catch(err) {
         console.log(err)
         res.json(`Couldn't delete account`)

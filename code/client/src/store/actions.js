@@ -1,14 +1,4 @@
-import axios from 'axios'
-
 export default {
-    JWT_TOKEN({ commit }, token) {
-        commit('updateToken', token)
-    },
-    logout({ commit }) {
-        localStorage.removeItem('token')
-        delete axios.defaults.headers.common['authorization']
-        commit('removeToken')
-    },
     adminSavedChangesScreen({ commit }, state) {
         commit('adminSavedChangesScreen', state)
     },
@@ -17,9 +7,6 @@ export default {
     },
     createNotification({ commit }, notificationsInfo) {
         commit('createNotification', notificationsInfo)
-    },
-    changeWallpaper({ commit }, newWallpaperName) {
-        commit('changeWallpaper', newWallpaperName)
     },
     removeNotificationFromQueue({ commit }) {
         commit('removeNotificationFromQueue')
@@ -35,9 +22,6 @@ export default {
     },
     markNotificationActionAsComplete({ commit }, notificationId) {
         commit('markNotificationActionAsComplete', notificationId)
-    },
-    registerLandingPage({ commit }, landingPageFullPath) {
-        commit("registerLandingPage", landingPageFullPath)
     },
     showSiteBanner({ commit }) {
         commit('showSiteBanner')

@@ -65,7 +65,7 @@
                 />
             </collapsable-box>
         </div>
-        <div class="two-settings-container" v-if="_.authRequirementsSatisfied(3)">
+        <div class="two-settings-container" v-if="$store.getters['user/authLevel'] === 3">
             <collapsable-box
                 class="setting-container"
                 :headline="`Danger Zone`"

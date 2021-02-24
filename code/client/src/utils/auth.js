@@ -23,13 +23,16 @@ const authenticate = (authLevel, options={}) => {
         throw TypeError(`You didn't provide a valid authentication option!`)
 }
 
-const validUserAuthentication = (userType, routeAuthOptions) => {
-    if (routeAuthOptions === undefined)
-        throw TypeError(`You must provide route authentication options`)
+const validUserAuthentication = (userType, authOptions={}) => {
+    if (!authOptions || typeof authOptions !== 'object')
+        throw TypeError(`You must provide valid authentication options`)
+    else if (Object.keys(authOptions).length < 1)
+        return true
     else
-        return authenticate(userTypeToAuthLevel(userType), routeAuthOptions)
+        return authenticate(userTypeToAuthLevel(userType), authOptions)
 }
 
 export default {
-    validUserAuthentication
+    validUserAuthentication,
+    userTypeToAuthLevel
 }

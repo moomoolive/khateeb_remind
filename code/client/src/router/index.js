@@ -44,7 +44,7 @@ router.beforeEach((to, from, next) => {
   const baseURL = helpers.baseURL(to)
   const targetWallpaper = helpers.beforeNavigationGuards.targetWallpaper(baseURL)
   if (store.state.wallpaper !== targetWallpaper)
-    store.commit('appAppearance/changeWallpaper', targetWallpaper)
+    store.commit('app/changeWallpaper', targetWallpaper)
   if (to.matched.some(record => record.meta.noSiteBanner)) {
     if (store.state.siteBanner.show)
       store.dispatch("hideSiteBanner")
@@ -52,14 +52,14 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => helpers.beforeNavigationGuards.authRequired(record))) {
     const origin = { notificationOrigin: "web-app" }
     const threeTenthsOfASecond = 300
-    if (!store.getters.tokenExists) {
+    if (!store.getters['user/isLoggedIn']) {
       next('/')
       window.setTimeout(() => { 
         utils.alert('Please login to view this page', "caution", origin) 
         }, threeTenthsOfASecond)
       return
     }
-    else if (!store.getters.isJWTValid) {
+    else if (!store.getters['user/validAuthentication']) {
       next('/')
       window.setTimeout(() => {
         utils.alert('Your login has expired. Please sign-in again', "caution", origin)
@@ -67,7 +67,7 @@ router.beforeEach((to, from, next) => {
       store.dispatch('logout')
       return
     }
-    else if (!authHelpers.validUserAuthentication(store.getters.userType, to.meta.auth)) {
+    else if (!authHelpers.validUserAuthentication(store.getters['user/type'], to.meta.auth)) {
       const options = {
         color: "red",
         icon: "locked",

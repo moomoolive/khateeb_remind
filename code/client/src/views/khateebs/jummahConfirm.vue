@@ -118,7 +118,7 @@ export default {
             this.updateJummahStatus(true)
         },
         updateJummahStatus(confirm) {
-            const user = this.$store.getters.decodedJWT
+            const user = this.$store.getters['user/allInfo']
             const found = this.requestPackage.jummah.khateebPreference.find(preference => preference.khateebID === user._id)
             const index = this.requestPackage.jummah.khateebPreference.map(preference => preference.khateebID).indexOf(user._id)
             found.confirmed = confirm

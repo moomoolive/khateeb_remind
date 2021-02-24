@@ -106,8 +106,8 @@ router.post(
             else if (!user.confirmed && user.__t !== 'root')
                 return res.json({ msg: `un-confirmed-${user.__t}`, token: null })
             else {
-                delete user.password
                 const tokenInfo = _.deepCopy(user)
+                delete tokenInfo.password
                 return res.json({ msg: 'success', token: _.auth.createToken(tokenInfo) }) 
             }
         } catch(err) {
