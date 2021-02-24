@@ -7,8 +7,7 @@ export default [
         name: 'khateeb-home',
         component: home,
         meta: {
-            requireAuthorization: true,
-            authLevel: 1
+            auth: { min: 1, max: 3 }
         }
     },
     {
@@ -16,16 +15,14 @@ export default [
         name: 'announcements',
         component: () => import ('@/views/khateebs/announcements.vue'),
         meta: {
-            requireAuthorization: true,
-            authLevel: 1
+            auth: { min: 1, max: 3 }
         }
     }, 
     {
         path: '/jummah/confirm/:jummahID/:notificationID',
         component: confirm,
         meta: {
-            requireAuthorization: true,
-            authLevel: 1
+            auth: { min: 1, max: 3 }
         }
     }
 ]

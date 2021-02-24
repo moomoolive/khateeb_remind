@@ -77,7 +77,7 @@ export default {
       return this.$store.state.notifications.show
     },
     wallpaper() {
-      return this.$store.state.wallpaper
+      return this.$store.state.appAppearance.wallpaper
     },
     notificationsQueue() {
       return this.$store.state.notificationsQueue

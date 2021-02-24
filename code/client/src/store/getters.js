@@ -24,5 +24,8 @@ export default {
     },
     urgentNotifications() {
         return state.notificationsFromServer.filter(note => !note.seen || note.actionPerformed === false) //should be actions performed
+    },
+    userType(state, getters) {
+        return getters.decodedJWT.__t
     }
 }

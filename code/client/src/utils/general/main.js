@@ -2,6 +2,8 @@ import helpers from './helpers.js'
 import store from '@/store/index.js'
 import router from '@/router/index.js'
 
+import routerHelpers from '@/utils/router.js'
+
 export default {
     deepCopy(item) {
         return JSON.parse(JSON.stringify(item))
@@ -69,21 +71,7 @@ export default {
         return userAuthLevel >= requiredAuthLevel
     },
     toHomePage() {
-        const token = store.getters.decodedJWT
-        if (!token) {
-            router.push('/')
-            return
-        }
-        let destintation
-        const user = token.__t
-        if (user === 'root')
-            destintation = '/sysAdmin'
-        else if (user === 'rootInstitutionAdmin')
-            destintation = '/institutionAdmin'
-        else
-            destintation = `/${user}`
-        if (router.currentRoute.fullPath !== destintation)
-            router.push(destintation)
+        return router.push(routerHelpers.homepageURL(store.getters.userType))
     },
     dynamicDisplayDate(date) {
         date = new Date(date)

@@ -9,6 +9,8 @@ import user from './routes/user.js'
 import sysAdmin from './routes/sysAdmin.js'
 
 import utils from '@/utils/general/main.js'
+import helpers from '@/utils/router.js'
+import authHelpers from '@/utils/auth.js'
 
 Vue.use(VueRouter)
 
@@ -36,40 +38,19 @@ const router = new VueRouter({
   routes
 })
 
-let firstPage = true
 router.beforeEach((to, from, next) => {
-  if (firstPage) {
-    const landingPage = to.fullPath
-    store.dispatch('registerLandingPage', landingPage)
-    firstPage = false
-  }
-  const baseURL = to.fullPath.split('/')[1]
-  let targetWallpaper
-  switch(baseURL) {
-    case 'user':
-      targetWallpaper = 'user'
-      break
-    case 'root':
-    case 'sysAdmin':
-      targetWallpaper = 'sysAdmin'
-      break
-    case 'institutionAdmin':
-      targetWallpaper = 'institutionAdmin'
-      break
-    default:
-      targetWallpaper = 'main'
-      break
-  }
+  if (store.state.router.firstPage)
+    store.dispatch('router/registerLandingPage', helpers.fullPath(to))
+  const baseURL = helpers.baseURL(to)
+  const targetWallpaper = helpers.beforeNavigationGuards.targetWallpaper(baseURL)
   if (store.state.wallpaper !== targetWallpaper)
-    store.dispatch('changeWallpaper', targetWallpaper)
-
+    store.commit('appAppearance/changeWallpaper', targetWallpaper)
   if (to.matched.some(record => record.meta.noSiteBanner)) {
     if (store.state.siteBanner.show)
       store.dispatch("hideSiteBanner")
   }
-
-  if (to.matched.some(record => record.meta.requireAuthorization)) {
-    const origin = { notificationOrigin: "Khateeb Remind Client" }
+  if (to.matched.some(record => helpers.beforeNavigationGuards.authRequired(record))) {
+    const origin = { notificationOrigin: "web-app" }
     const threeTenthsOfASecond = 300
     if (!store.getters.tokenExists) {
       next('/')
@@ -86,7 +67,7 @@ router.beforeEach((to, from, next) => {
       store.dispatch('logout')
       return
     }
-    else if (!utils.authRequirementsSatisfied(to.meta.authLevel)) {
+    else if (!authHelpers.validUserAuthentication(store.getters.userType, to.meta.auth)) {
       const options = {
         color: "red",
         icon: "locked",
@@ -96,15 +77,7 @@ router.beforeEach((to, from, next) => {
       window.setTimeout(() => {
         store.dispatch('createNotification', { type: 'alert', options})
       }, threeTenthsOfASecond)
-      let destination
-      const user = store.getters.decodedJWT.__t
-      if (user === 'root')
-        destination = '/sysAdmin'
-      else if (user === 'rootInstitutionAdmin')
-        destination = '/institutionAdmin'
-      else
-        destination = `/${user}`
-      next(`${destination}`)
+      next(helpers.homepageURL(store.getters.userType))
     }
     next() 
   } else {
