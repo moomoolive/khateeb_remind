@@ -14,8 +14,13 @@
 </template>
 
 <script>
+import msgWithPic from '@/components/general/msgWithPic.vue'
+
 export default {
-    name: 'pageNotFound'
+    name: 'pageNotFound',
+    components: {
+        msgWithPic
+    }
 }
 </script>
 

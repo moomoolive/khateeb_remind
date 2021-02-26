@@ -31,14 +31,18 @@
 </template>
 
 <script>
+import msgWithPic from '@/components/general/msgWithPic.vue'
+
 export default {
     name: 'announcements',
+    components: {
+        msgWithPic
+    },
     data() {
         return {
             announcementsExists: true,
             announcements: null,
-            announcementsArraysOfTwo: null,
-            lastVisit: this.$store.state.userInfo.lastVisit
+            announcementsArraysOfTwo: null
         }
     },
     methods: {
@@ -57,7 +61,7 @@ export default {
         },
         isNew(announcementDate) {
             const date = new Date(announcementDate)
-            return date > this.lastVisit
+            return date > this.$store.state.user.lastLogin
         },
         announcementsToArraysOfTwo(announcements) {
             const arraysOfTwo = []

@@ -37,7 +37,7 @@
             />
         </collapsable-box>
         <collapsable-box
-            v-if="$store.getters['user/authLevel'] === 3"
+            v-if="_.validAuthentication(1)"
             class="user-setting"
             :headline="`Available Timings`"
             :tagDetails="availableTimingsTag"
@@ -50,7 +50,7 @@
             />
         </collapsable-box>
         <collapsable-box
-            v-if="$store.getters['user/authLevel'] === 3"
+            v-if="_.validAuthentication(1)"
             class="user-setting"
             :headline="`Unavailable Dates`"
         >
@@ -60,7 +60,7 @@
             />
         </collapsable-box>
         <collapsable-box
-            v-if="$store.getters['user/authLevel'] < 3"
+            v-if="_.validAuthentication({ max: 2 })"
             class="user-setting"
             :headline="`Danger Zone`"
             :buttonColor="`red`"
@@ -72,12 +72,10 @@
 </template>
 
 <script>
-import collapsableBox from '@/components/userInterface/components/collapsableBox.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
-import selectionPicker from '@/components/userInterface/components/selectionPicker.vue'
+import selectionPicker from '@/components/general/selectionPicker.vue'
 import calendar from './subviews/calendar.vue'
-
-import axios from 'axios'
 
 export default {
     name: 'userHome',
@@ -214,7 +212,7 @@ export default {
         }
     },
     created() {
-        if (this.$store.getters['user/authLevel']) {
+        if (this._.validAuthentication({ level: 1 })) {
             this.structure.profile = { ...this.structure.profile, ...this.khateebExtras }
             this.getAvailableTimings()
         }

@@ -51,16 +51,18 @@
 </template>
 
 <script>
-import collapsableBox from '@/components/userInterface/components/collapsableBox.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
-import loading from '@/components/userInterface/components/loadingScreen.vue'
+import loading from '@/components/general/loadingScreen.vue'
+import msgWithPic from '@/components/general/msgWithPic.vue'
 
 export default {
     name: 'createOtherInstitutionAdmins',
     components: {
         collapsableBox,
         formMain,
-        loading
+        loading,
+        msgWithPic
     },
     data() {
         return {
@@ -120,7 +122,7 @@ export default {
         async submitAdmin($event) {
             try {
                 const updated = await this.$API.rootInstitutionAdmin.updateAdmin($event)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
                 this._.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
             } catch(err) {
                 console.log(err)
@@ -132,7 +134,7 @@ export default {
                 if (confirm) {
                     const deleted = await this.$API.rootInstitutionAdmin.deleteAdmin(id)
                     console.log(deleted)
-                    this.$store.dispatch('adminSavedChangesScreen', true)
+                    this.$store.commit('admin/showSavedChangesScreen')
                 }
             } catch(err) {
                 console.log(err)

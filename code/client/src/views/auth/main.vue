@@ -24,8 +24,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 import formMain from '@/components/forms/main.vue'
 
 export default {
@@ -49,21 +47,19 @@ export default {
         }
     },
     methods: {
+        unconfirmedMsg(msg) {
+            this._.alert(msg, 'caution', { icon: 'locked' })
+
+        },
         async login($event) {
             try {
-                if (this.$store.getters.tokenExists) {
-                    this._.alert(`You're already logged in! Log out if you want to login with another account.`)
-                    return
-                }
+                if (this.$store.getters.tokenExists)
+                    return this._.alert(`You're already logged in! Logout if you want to login with another account.`)
                 const authRes = await this.$API.auth.getToken($event)
-                if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin')) {
-                    const notification = { color: 'yellow', icon: "locked", msg: `Your administrator hasn't confirmed your account yet. Try again later!`, textSize: 'small' }
-                    this.$store.dispatch('createNotification', { type: 'alert', options: notification })
-                }
-                else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin') {
-                    const notification = { color: 'yellow', icon: "locked", msg: `Khateeb Remind hasn't confirmed your institution yet. Try again later!`, textSize: 'small' }
-                    this.$store.dispatch('createNotification', { type: 'alert', options: notification })
-                }
+                if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
+                    this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
+                else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
+                    this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
                 else if (authRes.token && authRes.msg === 'success') {
                     this.toApp(authRes.token)
                     await this.$API.user.checkIn()
@@ -73,17 +69,20 @@ export default {
                     this.errorMsg = 'Incorrect Username or Password'
             }
         },
+        loginRedirect() {
+            const landingPage = this.$store.state.landingPage
+            if (!this.$store.state.app.hasLoggedInViaLoginPage && landingPage !== this.$router.currentRoute.fullPath) {
+                this.$router.push(landingPage)
+                this.$store.commit('app/loggedInViaLoginPage')
+            }
+            else
+                this._.toHomePage()
+        },
         toApp(token) {
             if (this.rememberMe)
                 localStorage.setItem('token', token)
             this.$store.dispatch('user/updateToken', token)
-            this.$nextTick(() => {
-                const landingPage = this.$store.state.landingPage
-                if (landingPage !== this.$router.currentRoute.fullPath)
-                    this.$router.push(landingPage)
-                else
-                    this._.toHomePage()
-            })
+            this.$nextTick(() => { this.loginRedirect() })
         },
         forgotCredentials() {
             const info = {
@@ -102,7 +101,7 @@ export default {
                     ]
                 }
             }
-            this.$store.dispatch('createNotification', info)
+            this.$store.dispatch('notifications/create', info)
         }
     },
     watch: {

@@ -67,14 +67,16 @@
 </template>
 
 <script>
-import timingMutator from '@/components/userInterface/components/timingMutator.vue'
+import timingMutator from '@/components/general/timingMutator.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
 
 import equal from 'fast-deep-equal'
 
 export default {
     name: "locationAndTimingsSetting",
     components: {
-        timingMutator
+        timingMutator,
+        collapsableBox
     },
     props: {
         timings: {
@@ -166,7 +168,7 @@ export default {
             if (hasNotBeenLoggedToSystemYet) {
                 const position = this.updatedTimings.map(time => time._id).indexOf(timing._id)
                 this.updatedTimings.splice(position, 1)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             }
             else if (location.timings.length > 1 && confirm)
                 this.$emit('delete', { type: 'timing', id: timing._id })

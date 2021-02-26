@@ -65,7 +65,7 @@
                 />
             </collapsable-box>
         </div>
-        <div class="two-settings-container" v-if="$store.getters['user/authLevel'] === 3">
+        <div class="two-settings-container" v-if="_.validAuthentication(3)">
             <collapsable-box
                 class="setting-container"
                 :headline="`Danger Zone`"
@@ -84,6 +84,7 @@ import locationsAndTimings from './subviews/locationsAndTimings.vue'
 import textSettings from './subviews/textSettings.vue'
 import institutionDetails from './subviews/institutionDetails.vue'
 import registrationSettings from './subviews/registrationSettings'
+import collapsableBox from '@/components/general/collapsableBox.vue'
 
 export default {
     name: "settings",
@@ -91,7 +92,8 @@ export default {
         locationsAndTimings,
         textSettings,
         institutionDetails,
-        registrationSettings
+        registrationSettings,
+        collapsableBox
     },
     data() {
         return {
@@ -128,7 +130,7 @@ export default {
                     }
                 })
                 const timings = await this.$API.institutionAdmin.saveTimings({ times: $event.times })
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }
@@ -149,7 +151,7 @@ export default {
                     const res = await this.$API.institutionAdmin.deleteTiming($event.id)
                     console.log(res)
                 }
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }
@@ -164,7 +166,7 @@ export default {
         async saveSettings($event) {
             try {
                 this.settings = await this.$API.institutionAdmin.updateSettings($event)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }
@@ -172,7 +174,7 @@ export default {
         async saveInstitutionDetails($event) {
             try {
                 this.institution = await this.$API.institutionAdmin.updateInstitution($event)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }

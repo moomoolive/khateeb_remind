@@ -1,4 +1,4 @@
-import utils from '@/utils/general/main.js'
+import utils from '@/utils/globalHelpers.js'
 import $API from '@/utils/API/index.js'
 
 const compoundValidations = {

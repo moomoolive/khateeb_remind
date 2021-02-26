@@ -163,8 +163,8 @@ export default {
         "textAreaExt": () => import('./extensions/primitives/textArea.vue'),
         "checkboxExt": () => import('./extensions/free/checkbox.vue'),
         "readOnlyExt": () => import('./extensions/primitives/readOnly.vue'),
-        "tagBox": () => import('@/components/userInterface/components/tagBox.vue'),
-        defaultExtension,
+        "tagBox": () => import('@/components/general/tagBox.vue'),
+        defaultExtension
     },
     data() {
         return {

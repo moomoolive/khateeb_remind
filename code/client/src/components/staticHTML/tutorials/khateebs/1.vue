@@ -28,7 +28,7 @@ export default {
     methods: {
         toMyProfile() {
             this.$router.push('/user')
-            this.$store.dispatch('closeNotification')
+            this.$emit('close')
         }
     }
 }

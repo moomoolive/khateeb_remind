@@ -17,7 +17,7 @@
 
 <script>
 import formMain from '@/components/forms/main.vue'
-import loading from '@/components/userInterface/components/loadingScreen.vue'
+import loading from '@/components/general/loadingScreen.vue'
 
 export default {
     name: "khateebSignup",

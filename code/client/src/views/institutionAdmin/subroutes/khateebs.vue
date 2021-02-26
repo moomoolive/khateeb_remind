@@ -95,16 +95,18 @@
 </template>
 
 <script>
-import loading from '@/components/userInterface/components/loadingScreen.vue'
-import collapsableBox from '@/components/userInterface/components/collapsableBox.vue'
+import loading from '@/components/general/loadingScreen.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
+import msgWithPic from '@/components/general/msgWithPic.vue'
 
 export default {
     name: 'khateebs',
     components: {
         loading,
         collapsableBox,
-        formMain
+        formMain,
+        msgWithPic
     },
     data() {
         return {
@@ -268,7 +270,7 @@ export default {
         async confirmKhateeb(khateeb) {
             try {
                 const res = await this.$API.institutionAdmin.updateExistingKhateeb({ _id: khateeb._id, confirmed: true })
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }
@@ -276,7 +278,7 @@ export default {
         async editKhateeb($event) {
             try {
                 const res = await this.$API.institutionAdmin.updateExistingKhateeb($event)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }
@@ -287,7 +289,7 @@ export default {
                 if (!confirm)
                     return
                 const res = await this.$API.institutionAdmin.deleteKhateeb(id)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }

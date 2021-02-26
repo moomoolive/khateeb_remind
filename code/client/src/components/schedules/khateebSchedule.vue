@@ -118,7 +118,7 @@
 <script>
 import datetime from '@/utils/dateTime/main.js'
 
-import tagCircle from '@/components/userInterface/components/tagCircle.vue'
+import tagCircle from '@/components/general/tagCircle.vue'
 
 import equal from 'fast-deep-equal'
 

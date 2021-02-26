@@ -53,12 +53,14 @@
 </template>
 
 <script>
-import loading from '@/components/userInterface/components/loadingScreen.vue'
+import loading from '@/components/general/loadingScreen.vue'
+import msgWithPic from '@/components/general/msgWithPic.vue'
 
 export default {
     name: 'jummahConfirm',
     components: {
-        loading
+        loading,
+        msgWithPic
     },
     data() {
         return {

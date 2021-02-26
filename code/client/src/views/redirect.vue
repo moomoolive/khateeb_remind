@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import loading from '@/components/userInterface/components/loadingScreen.vue'
+import loading from '@/components/general/loadingScreen.vue'
 
 export default {
     name: 'redirect',

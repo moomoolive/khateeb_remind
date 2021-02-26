@@ -61,7 +61,7 @@ export default {
         async saveSchedule($event) {
             try {
                 const res = await this.$API.institutionAdmin.saveJummahs({ jummahs: $event })
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }

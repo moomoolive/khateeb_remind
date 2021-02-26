@@ -2,11 +2,17 @@
   <div id="app">
     <div class="header">
       <collapse-transition>
-        <website-banner v-show="siteBanner.show" />
+        <website-banner v-show="$store.state.websiteBanner.show" />
       </collapse-transition>
-      <Header />
+      <header-navigation />
     </div>
-    <div class="notifications-layer" v-if="showNotification">
+    <notifications-manager 
+      @toggle-notification-display="toggleNotificationDisplay()"
+    />
+    <div
+      v-show="$store.state.notifications.display.show"
+      class="notifications-layer"
+    >
       <transition name="dropdown">
         <notifications 
           v-if="showNotificationDisplay" 
@@ -18,51 +24,42 @@
       name="fade"
       mode="out-in"
     >
-      <router-view :class="`displayed-page page-padding ${wallpaper}`"/>
+      <router-view 
+        :class="`displayed-page page-padding ${$store.state.app.wallpaper}`"
+      />
     </transition>
     <Footer />
   </div>
 </template>
 
 <script>
-import Header from '@/components/misc/Header.vue'
-import notifications from '@/components/userInterface/components/notifications/main.vue'
-import Footer from '@/components/misc/Footer.vue'
-import websiteBanner from '@/components/misc/websiteBanner.vue'
-import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+import notifications from '@/components/notifications/main.vue'
+import Footer from '@/components/footer/main.vue'
+import websiteBanner from '@/components/header/websiteBanner.vue'
+import notificationsManager from '@/components/notifications/notificationsManger.vue'
+import headerNavigation from '@/components/header/navigation/main.vue'
 
-import axios from 'axios'
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 export default {
   components: {
-    Header,
     notifications,
     Footer,
     websiteBanner,
-    CollapseTransition
+    CollapseTransition,
+    notificationsManager,
+    headerNavigation
   },
   data() {
     return {
-      firstNotification: true,
       showNotificationDisplay: false
     }
   },
   methods: {
     async setJWT() {
       let token = localStorage.getItem('token')
-      if (!token)
-        return false
-      axios.defaults.headers.common['authorization'] = token
-      return true
-    },
-    async checkIn() {
-      try {
-        await this.$API.user.checkIn()
-        return 'checked-in'
-      } catch(err) {
-        console.log(err)
-        console.log(`There was a problem retrieving user package`)
-      }
+      if (token)
+        this.$store.dispatch('user/updateToken', token)
     },
     gettingStartedGuide() {
       const khateebFirstTime = this.$store.getters['user/isLoggedIn'] && this.$store.getters['user/type'] === 'khateeb' && !localStorage.getItem('seenGettingStartedKhateeb')
@@ -71,56 +68,19 @@ export default {
         localStorage.setItem('seenGettingStartedKhateeb', true)
       }
     },
-  },
-  computed: {
-    showNotification() {
-      return this.$store.state.notifications.show
-    },
-    wallpaper() {
-      return this.$store.state.app.wallpaper
-    },
-    notificationsQueue() {
-      return this.$store.state.notificationsQueue
-    },
-    userPromptedNotifications() {
-      return this.$store.state.userPromptedNotifications
-    },
-    siteBanner() {
-      return this.$store.state.siteBanner
+    toggleNotificationDisplay() {
+      this.showNotificationDisplay = !this.showNotificationDisplay
     }
   },
-  watch: {
-    showNotification(newVal) {
-      const time = 50
-      if (newVal)
-        window.setTimeout(() => { this.showNotificationDisplay = true }, time)
-      else
-        window.setTimeout(() => { this.showNotificationDisplay = false }, time)
-    },
-    notificationsQueue(newVal) {
-      if (newVal.length < 1) {
-        this.firstNotification = true
-        return
-      }
-      else if (newVal[0] === '__USER__') {
-        newVal[0] = this.userPromptedNotifications[0]
-      }
-      const milliseconds = this.firstNotification ? 100 : 2_500
-      if (this.firstNotification)
-        this.firstNotification = false
-      const upcomingNotification = newVal[0]
-      window.setTimeout(() => 
-        { this.$store.dispatch('displayNotification', upcomingNotification) }
-        , milliseconds
-      )
-    }
+  mounted() {
+    this.$nextTick(async () => {
+      if (this.$store.getters['user/isLoggedIn'])
+        await this.$API.user.checkIn()
+      this.gettingStartedGuide()
+    })
   },
-  async created() {
-    const jwtWasSet = this.setJWT()
-    if (!jwtWasSet)
-      return
-    await this.checkIn()
-    this.gettingStartedGuide()
+  created() {
+    this.setJWT()
   }
 }
 </script>

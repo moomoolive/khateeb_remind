@@ -37,8 +37,8 @@
 
 <script>
 import formMain from '@/components/forms/main.vue'
-import progressTracker from '@/components/userInterface/components/progressTracker.vue'
-import loading from '@/components/userInterface/components/loadingScreen.vue'
+import progressTracker from '@/components/general/progressTracker.vue'
+import loading from '@/components/general/loadingScreen.vue'
 
 export default {
     name: "institutionSignUp",

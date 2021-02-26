@@ -10,11 +10,11 @@
         mode="out-in"
         >
             <router-view
-                v-if="!savedChanges" 
+                v-if="!showSavedChangesScreen" 
                 class="pages"
             ></router-view>
         </transition>
-        <div v-if="savedChanges">
+        <div v-if="showSavedChangesScreen">
             <msg-with-pic
                 title="Alhamdillah!"
                 gif="flyingPlanesAllOver"
@@ -32,11 +32,13 @@
 
 <script>
 import centralNav from '@/components/misc/centralNav.vue'
+import msgWithPic from '@/components/general/msgWithPic.vue'
 
 export default {
     name: 'adminParentRoute',
     components: {
-        centralNav
+        centralNav,
+        msgWithPic
     },
     data() {
         return {
@@ -69,9 +71,8 @@ export default {
     },
     methods: {
         closeSuccessScreen() {
-            const successScreenOpen = this.$store.state.admin.savedChanges
-            if (successScreenOpen)
-                this.$store.dispatch('adminSavedChangesScreen', false)
+            if (this.showSavedChangesScreen)
+                this.$store.commit('admin/hideSavedChangesScreen')
         },
         async verifyPending() {
             try {
@@ -83,7 +84,7 @@ export default {
         },
     },
     computed: {
-        savedChanges() {
+        showSavedChangesScreen() {
             return this.$store.state.admin.savedChanges
         }
     },

@@ -68,7 +68,7 @@ export default {
         async submit($event) {
             try {
                 const msg = await this.$API.institutionAdmin.updateAnnouncements($event)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }
@@ -92,7 +92,7 @@ export default {
                     return
                 const res = await this.$API.institutionAdmin.deleteAnnouncement(this.currentlyEditingData._id)
                 console.log(res)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }

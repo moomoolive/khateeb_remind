@@ -8,7 +8,12 @@
 </template>
 
 <script>
+import msgWithPic from '@/components/general/msgWithPic.vue'
+
 export default {
-    name: 'loading'
+    name: 'loading',
+    components: {
+        msgWithPic
+    }
 }
 </script>

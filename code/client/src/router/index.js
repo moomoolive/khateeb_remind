@@ -8,9 +8,9 @@ import auth from './routes/auth.js'
 import user from './routes/user.js'
 import sysAdmin from './routes/sysAdmin.js'
 
-import utils from '@/utils/general/main.js'
-import helpers from '@/utils/router.js'
-import authHelpers from '@/utils/auth.js'
+import utils from '@/utils/globalHelpers.js'
+import helpers from '@/utils/router/main.js'
+import beforeNavHooks from '@/utils/router/beforeNavigationHooks.js'
 
 Vue.use(VueRouter)
 
@@ -42,14 +42,14 @@ router.beforeEach((to, from, next) => {
   if (store.state.router.firstPage)
     store.dispatch('router/registerLandingPage', helpers.fullPath(to))
   const baseURL = helpers.baseURL(to)
-  const targetWallpaper = helpers.beforeNavigationGuards.targetWallpaper(baseURL)
+  const targetWallpaper = beforeNavHooks.targetWallpaper(baseURL)
   if (store.state.wallpaper !== targetWallpaper)
     store.commit('app/changeWallpaper', targetWallpaper)
   if (to.matched.some(record => record.meta.noSiteBanner)) {
     if (store.state.siteBanner.show)
-      store.dispatch("hideSiteBanner")
+      store.commit("websiteBanner/show")
   }
-  if (to.matched.some(record => helpers.beforeNavigationGuards.authRequired(record))) {
+  if (to.matched.some(record => beforeNavHooks.authRequired(record))) {
     const origin = { notificationOrigin: "web-app" }
     const threeTenthsOfASecond = 300
     if (!store.getters['user/isLoggedIn']) {
@@ -67,7 +67,7 @@ router.beforeEach((to, from, next) => {
       store.dispatch('logout')
       return
     }
-    else if (!authHelpers.validUserAuthentication(store.getters['user/type'], to.meta.auth)) {
+    else if (!utils.validAuthentication(to.meta.auth)) {
       const options = {
         color: "red",
         icon: "locked",
@@ -75,7 +75,7 @@ router.beforeEach((to, from, next) => {
         ...origin
       }
       window.setTimeout(() => {
-        store.dispatch('createNotification', { type: 'alert', options})
+        store.dispatch('notifications/create', { type: 'alert', options})
       }, threeTenthsOfASecond)
       next(helpers.homepageURL(store.getters.userType))
     }

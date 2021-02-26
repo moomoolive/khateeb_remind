@@ -7,8 +7,13 @@
 </template>
 
 <script>
+import tagBox from '@/components/general/tagBox.vue'
+
 export default {
     name: 'khateebKhateebCells',
+    components: {
+        tagBox
+    },
     props: {
         timing: {
             type: Object,
@@ -50,7 +55,7 @@ export default {
     },
     computed: {
         updated() {
-            const user = new Date(this.$store.state.lastVisit)
+            const user = new Date(this.$store.state.user.lastLogin)
             const update = new Date(this.timing.updatedAt)
             return user.getTime() < update.getTime()
         },

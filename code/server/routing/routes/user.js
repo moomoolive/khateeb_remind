@@ -42,7 +42,8 @@ router.get('/check-in', async(req, res) => {
     try {
         // log login time
         const userPackage = {}
-        userPackage.lastVisit = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["lastLogin"])
+        const user = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
+        userPackage.lastLogin = user.lastLogin
         userPackage.notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
         if (req.headers.usertype === 'root' || req.headers.usertype === 'sysAdmin')
             return userPackage
@@ -53,6 +54,30 @@ router.get('/check-in', async(req, res) => {
         res.json(`Check-in failed`)
     }
 })
+
+router.put(
+    '/notification',
+    middleware.validateRequest(
+        [
+            validator.body("_id").isLength(24),
+            validator.body("seen").isBoolean().optional(),
+            validator.body("actionPerformed").isBoolean().optional(),
+            validator.body("meta").optional()
+        ]
+    ),
+    async (req, res) => {
+        try {
+            const notification = await $db.models.notifications.findOne({ _id: req.body._id }).exec()
+            if (notification.userID !== req.headers.userid)
+                return res.status(403).json(`You're not allowed to edit this notification (id: ${req.body._id})`)
+            const updated = await $db.models.notifications.findOneAndUpdate(req.body._id, req.body, { new: true })
+            return res.json(updated)
+        } catch(err) {
+            console.log(err)
+            return res.json(`Couldn't update notification`)
+        }
+    }
+)
 
 router.put('/mark-notification-as-seen', async (req, res) => {
     try {

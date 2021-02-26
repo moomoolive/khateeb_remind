@@ -16,7 +16,7 @@ const errorResponse = err => {
     const errOrigin = err.response.request.responseURL
     const splitOrigin = errOrigin.split('/')
     if (!err.response) {
-        store.dispatch('createNotification', { type: 'alert', options: serverErrorTag })
+        store.dispatch('notifications/create', { type: 'alert', options: serverErrorTag })
         return Promise.reject(err)
     }
     const fromCheckin = splitOrigin[3] === 'user' && splitOrigin[4] === 'check-in'
@@ -33,12 +33,12 @@ const errorResponse = err => {
                 icon: "locked",
                 msg: "Unauthorized"
             }
-            store.dispatch('createNotification', { type: 'alert', options })
+            store.dispatch('notifications/create', { type: 'alert', options })
             return Promise.reject(err)
         }
     }
     else {
-        store.dispatch('createNotification', { type: 'alert', options: serverErrorTag })
+        store.dispatch('notifications/create', { type: 'alert', options: serverErrorTag })
         return Promise.reject(err)
     }
 }
@@ -181,18 +181,17 @@ const user = {
     async checkIn() {
         try {
             const userPackage = await axios.get(userExt + '/check-in')
-            utils.assignUserPackage(userPackage)
-            console.log(`Successfully assigned user package`)
+            store.dispatch('storeUserPackage', userPackage)
         } catch(err) {
             console.log(err)
             console.log(`Couldn't assign user package`)
         }
     },
-    markNotificationAsSeen(notificationId) {
-        return axios.put(userExt + '/mark-notification-as-seen', notificationId)
-    },
     deleteAccount() {
         return axios.delete(userExt + '/')
+    },
+    updateNotification(updatedNotification) {
+        return axios.put(userExt + '/notification', updatedNotification)
     }
 }
 
@@ -209,82 +208,6 @@ const misc = {
     }
 }
 
-const utils = {
-    assignUserPackage(userPkg) {
-        store.commit('user/storeInfoFromAPI', userPkg)
-        store.dispatch('storeUserPackage', userPkg)
-        const urgentNotifications = userPkg.notifications.filter(note => !note.seen)
-        urgentNotifications.forEach(note => {
-            const notification = this.prepNotification(note)
-            store.dispatch('createNotification', notification)
-        })
-    },
-    prepNotification(notification) {
-        const options = {
-            textSize: 'small',
-            icon: 'asalam',
-            msg: notification.msg,
-            _id: notification._id,
-            notificationOrigin: 'server',
-            color: 'green'
-        }
-        let type = 'alert'
-        switch(notification.tag) {
-            case 'welcome':
-                options.icon = 'asalam'
-                options.graphicType = 'gif'
-                break
-            case 'khateebs':
-                options.icon = 'khateebs'
-                if (notification.meta && notification.meta.dropout)
-                    options.color = 'yellow'
-                break
-            case 'jummah':
-                type = 'redirect'
-                options.redirections = [
-                    {
-                        to: notification.actionLink.replace("__ID__", notification._id),
-                        text: 'confirm'
-                    }
-                ]
-                break
-        }
-        return { type, options }
-    }
-}
-
-
-const crud = {
-    get(targetCollection, queryOptions='', queryFilters='') {
-        return axios.get(this.targetURL(targetCollection) + `${queryOptions}$${queryFilters}`)
-    },
-    delete(targetCollection, options={}) {
-        const query = {
-            options: options.queryOptions || '',
-            filter: options.queryFilters || null
-        }
-        if (!query.filter)
-            throw TypeError(`Query filter cannot be empty`)
-        else
-            return axios.delete(this.targetURL(targetCollection)  + `${query.options}$${query.filter}`)
-    },
-    post(targetCollection, info) {
-        if (typeof info === 'undefined')
-            throw TypeError(`Information must be present`)
-        else
-            return axios.post(this.targetURL(targetCollection), info)
-    },
-    put(targetCollection, info) {
-        if (typeof info === 'undefined')
-            throw TypeError(`Information must be present`)
-        else
-            return axios.put(this.targetURL(targetCollection), info)
-    },
-    targetURL(targetCollection) {
-        return API_URL + `/${targetCollection}/`
-    }
-}
-
 export default {
     auth,
     sysAdmin,
@@ -292,7 +215,5 @@ export default {
     institutionAdmin,
     user,
     misc,
-    rootInstitutionAdmin,
-    utils,
-    crud
+    rootInstitutionAdmin
 }
