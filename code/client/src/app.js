@@ -4,8 +4,8 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 
-import API from '@/utils/API/index.js'
-import funcs from '@/utils/globalHelpers.js'
+import API from '@/libraries/requests/index.js'
+import funcs from '@/libraries/globallyImportedUtilLibrary.js'
 import VCalendar from 'v-calendar'
 
 Vue.use(VCalendar)

@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import datetime from '@/utils/dateTime/main.js'
+import datetime from '@/libraries/dateTime/main.js'
 
 export default {
     name: "adminKhateebCells",

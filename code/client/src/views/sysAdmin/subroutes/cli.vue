@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import docs from '@/components/staticHTML/docs.vue' // temp for now
+import docs from '@/staticHTMLPages/docs.vue' // temp for now
 
 export default {
     name: "cloudCLI",

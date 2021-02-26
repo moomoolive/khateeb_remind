@@ -1,5 +1,5 @@
-import auth from '@/utils/auth/main.js'
-import userIdentification from '@/utils/userIdentification.js'
+import auth from '@/libraries/auth/main.js'
+import userIdentification from '@/libraries/userIdentification.js'
 
 import axios from 'axios'
 import DeviceDetector from 'device-detector-js'

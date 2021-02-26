@@ -1,5 +1,5 @@
-import utils from '@/utils/globalHelpers.js'
-import $API from '@/utils/API/index.js'
+import utils from '@/libraries/globallyImportedUtilLibrary.js'
+import $API from '@/libraries/requests/index.js'
 
 const compoundValidations = {
     handle: {

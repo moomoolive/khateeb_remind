@@ -1,10 +1,10 @@
 import store from '@/store/index.js'
 import router from '@/router/index.js'
 
-import routerHelpers from '@/utils/router/main.js'
-import authHelpers from '@/utils/auth/main.js'
-import stringHelpers from '@/utils/stringOperations/main.js'
-import dateTimeHelpers from '@/utils/dateTime/main.js'
+import routerHelpers from '@/libraries/router/main.js'
+import authHelpers from '@/libraries/auth/main.js'
+import stringHelpers from '@/libraries/stringOperations/main.js'
+import dateTimeHelpers from '@/libraries/dateTime/main.js'
 
 export default {
     deepCopy(item) {
@@ -69,7 +69,7 @@ export default {
         if (displayDate.getTime() > dateTimeHelpers.daysInThePast(1).getTime())
             return `Yesterday ${base}`
         if (displayDate.getTime() > dateTimeHelpers.daysInThePast(5).getTime())
-            return `${displayDate.toLocaleString('default', { weekday: 'short' })} ${base}`
+            return `${displayDate.toLocaleString('en-US', { weekday: 'short' })} ${base}`
         return `${displayDate.toLocaleDateString('en-US')} ${base}`
     },
     validAuthentication(authOptions={}) {

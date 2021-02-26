@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import datetime from '@/utils/dateTime/main.js'
+import datetime from '@/libraries/dateTime/main.js'
 
 import tagCircle from '@/components/general/tagCircle.vue'
 

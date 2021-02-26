@@ -25,9 +25,6 @@ export default new Vuex.Store({
   actions: {
     // need to change into one action and move to approriate vuex module
     /*
-    storeNotificationsFromAPI({ commit }, notificationsArray) {
-        commit('storeNotificationsFromAPI', notificationsArray)
-    },
     markNotificationActionAsComplete({ commit }, notificationId) {
         commit('markNotificationActionAsComplete', notificationId)
     },
