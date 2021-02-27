@@ -177,12 +177,14 @@ router.put(
     '/locations',
     middleware.validateRequest(
         [
+            validator.body("institutionID").isLength(24),
             validator.body("name").isLength({ min: 1 }),
             validator.body("address").isLength({ min: 1 }),
         ]
     ),
     async (req, res) => {
         try {
+            console.log(req.body)
             if (req.headers.institutionid !== req.body.institutionID)
                 return res.status(403).json(`You're not allowed to create this resource`)
             const updated = await $db.models.locations.findOneAndUpdate(req.body._id, req.body, { new: true })

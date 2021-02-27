@@ -29,7 +29,7 @@ const authenticate = (authLevel, options={}) => {
         throw TypeError(`You didn't provide a valid authentication option!`)
 }
 
-const validAuthOptionTypes = (options) => {
+const validInt = (options) => {
     return typeof options === 'number' && validAuthLevel(options)
 }
 
@@ -39,7 +39,7 @@ const emptyAuthOptionObject = (options) => {
 
 export default {
     emptyAuthOptionObject,
-    validAuthOptionTypes,
+    validInt,
     authenticate,
     levelOption,
     validAuthLevel,

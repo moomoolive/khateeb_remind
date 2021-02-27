@@ -25,28 +25,20 @@
                         type="text" 
                         v-model="location.name"
                         minlength="1"
-                        @input="_.delayedRequest(
-                            'institutionAdmin',
-                            'updateLocation',
-                            { arguments: [location] }
-                        )" 
+                        @input="updateLocation(location, locationIndex)" 
                     ><br>
                     <p>Location Address</p>
                     <input 
                         type="text"
                         minlength="1" 
                         v-model="location.address"
-                        @input="_.delayedRequest(
-                            'institutionAdmin',
-                            'updateLocation',
-                            { arguments: [location] }
-                        )"
+                        @input="updateLocation(location, locationIndex)"
                     ><br>
 
                     <!-- Timing -->
                     <div 
-                        v-for="(timing, index) in timings" 
-                        :key="index"
+                        v-for="(timing, timingIndex) in timings" 
+                        :key="timingIndex"
                     >
                         <div
                             class="prayer-timing"
@@ -57,11 +49,11 @@
                             </p>
                             <timing-mutator
                                 :timing="timing"
-                                @changed="incrementTime($event, index)"
+                                @changed="incrementTime($event, timingIndex)"
                             />
                             <button 
                                 class="red timing-btns extra-margin"
-                                @click="deleteTiming(timing, index)"
+                                @click="deleteTiming(timing, timingIndex)"
                             >
                                 🗑️
                             </button>
@@ -150,6 +142,16 @@ export default {
                 console.log(err)
             }
         },
+        async updateLocation(location, index) {
+            await this._.delayedRequest(
+                'institutionAdmin',
+                'updateLocation',
+                { 
+                    arguments: [location],
+                    additionalIdentifiers: [index.toString()]
+                }
+            )
+        },
         prayerNumber(location, timing) {
             const index = this.timingsForEachLocation[location._id].findIndex(time => time._id === timing._id)
             return  index + 1
@@ -203,9 +205,7 @@ export default {
             newLocation.name = `Unknown Location ${length}`
             newLocation.address = `Unknown Address ${length}`
             try {
-                // make request to server
                 const { location, timing } = await this.$API.institutionAdmin.createNewLocation(newLocation)
-                // ENDS HERE
                 this.locations.push(location)
                 this.timings.push(timing)
             } catch(err) {

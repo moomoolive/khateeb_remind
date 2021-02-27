@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import helpers from '@/libraries/requests/requestManager.js'
+import helpers from '@/libraries/requests/requestManager/main.js'
 
 export default {
     name: 'requestManager',
@@ -18,8 +18,8 @@ export default {
             const targetFunction = this.$API[requestInfo.extension][requestInfo.function]
             const args = requestInfo.arguments
             const millisecondsInASecond = 1_000
-            const time = requestInfo.requestAfterSeconds * millisecondsInASecond
-            const fiveSeconds = 5_000
+            const timeInMilliseconds = requestInfo.requestAfterSeconds * millisecondsInASecond
+            const tenSecondsInMilliseconds = 10_000
             const resolve = this.$store.state.requests.responses[key].resolve
             const reject = this.$store.state.requests.responses[key].reject
             const fullfilledResponseCallback = {
@@ -35,7 +35,7 @@ export default {
                     console.log(err)
                     reject(err)
                 }
-            }, time || fiveSeconds)
+            }, timeInMilliseconds || tenSecondsInMilliseconds)
             this.activeRequests[key] = { func, clearCount: 0 }
             requestInfo.responsePromiseIsReady(true)
         },
@@ -60,6 +60,7 @@ export default {
             const request = { ...newVal[0] }
             this.$store.commit('requests/shiftQueue')
             const requestKey = helpers.requestId(request)
+            console.log(requestKey)
             if (this.activeRequests[requestKey] !== undefined)
                 this.clearRequest(requestKey)
             this.createActiveRequest(requestKey, request)

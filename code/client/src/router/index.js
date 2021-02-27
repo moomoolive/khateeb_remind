@@ -46,7 +46,7 @@ router.beforeEach((to, from, next) => {
   if (store.state.wallpaper !== targetWallpaper)
     store.commit('app/changeWallpaper', targetWallpaper)
   if (to.matched.some(record => record.meta.noSiteBanner)) {
-    if (store.state.siteBanner.show)
+    if (store.state.websiteBanner.show)
       store.commit("websiteBanner/show")
   }
   if (to.matched.some(record => beforeNavHooks.authRequired(record))) {

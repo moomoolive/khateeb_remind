@@ -5,7 +5,7 @@ import routerHelpers from '@/libraries/router/main.js'
 import authHelpers from '@/libraries/auth/main.js'
 import stringHelpers from '@/libraries/stringOperations/main.js'
 import dateTimeHelpers from '@/libraries/dateTime/main.js'
-import requestManagerHelpers from '@/libraries/requests/requestManager.js'
+import requestManagerHelpers from '@/libraries/requests/requestManager/main.js'
 
 export default {
     deepCopy(item) {
@@ -81,7 +81,8 @@ export default {
             extension: routeModuleName,
             function: functionName,
             arguments: options.arguments || [],
-            requestAfterSeconds:  options.requestAfterSeconds || 5
+            requestAfterSeconds:  options.requestAfterSeconds || 10,
+            additionalIdentifiers: options.additionalIdentifiers || []
         }
         await store.dispatch('requests/addToQueue', requestInfo)
         const requestId = requestManagerHelpers.requestId(requestInfo)

@@ -1,5 +1,5 @@
 import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
-import requestManagerHelpers from '@/libraries/requests/requestManager.js'
+import requestManagerHelpers from '@/libraries/requests/requestManager/main.js'
 
 export default {
     namespaced: true,
