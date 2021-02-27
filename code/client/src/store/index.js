@@ -7,6 +7,7 @@ import user from './modules/user.js'
 import notifications from './modules/notifications.js'
 import websiteBanner from './modules/websiteBanner.js'
 import admin from './modules/admin.js'
+import requests from './modules/requests.js'
 
 Vue.use(Vuex)
 
@@ -43,6 +44,7 @@ export default new Vuex.Store({
     user,
     notifications,
     websiteBanner,
-    admin
+    admin,
+    requests
   }
 })

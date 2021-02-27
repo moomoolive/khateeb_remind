@@ -156,28 +156,42 @@ router.get(routerGroup6URL + "/:_id", async (req, res) => {
     }
 })
 
-router.post(routerGroup6URL,
-    middleware.validateRequest(
-        [
-            validator.body("locations").isArray(),
-            validator.body("new").isBoolean().optional(),
-        ]
-    ),
+router.post(
+    '/locations',
     async (req, res) => {
     try {
-        for (let i = 0; i < req.body.locations.length; i++) {
-            req.body["institutionID"] = req.headers.institutionid
-            const saved = await $db.funcs.save(routerGroup6, req.body.locations[i])
-            if (req.body.new && !req.body.locations[i]._id) {
-                const newTiming = await locations.firstTiming(req.headers.institutionid, saved._id.toString())
-                const associatedJummahs = await _.schedule.createJummahsForTiming(saved._id.toString(), newTiming._id.toString(), req.headers.institutionid)
-            }
-        }
-        return res.json(`successfully saved locations!`)
+        if (req.headers.institutionid !== req.body.institutionID)
+            return res.status(403).json(`You're not allowed to create this resource`)
+        const savedLocation = await new $db.models.locations(req.body).save()
+        // should be a mongoose method
+        const newTiming = await locations.firstTiming(req.headers.institutionid, savedLocation._id.toString())
+        await  _.schedule.createJummahsForTiming(savedLocation._id.toString(), newTiming._id.toString(), req.headers.institutionid)
+        // ENDS HERE
+        return res.json({ location: savedLocation, timing: newTiming })
     } catch(err) {
         res.json(errors.db(routerGroup6.slice(0, -1), 'saving', err))
     }
 })
+
+router.put(
+    '/locations',
+    middleware.validateRequest(
+        [
+            validator.body("name").isLength({ min: 1 }),
+            validator.body("address").isLength({ min: 1 }),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            if (req.headers.institutionid !== req.body.institutionID)
+                return res.status(403).json(`You're not allowed to create this resource`)
+            const updated = await $db.models.locations.findOneAndUpdate(req.body._id, req.body, { new: true })
+            return res.json(updated)
+        } catch(err) {
+            console.log(err)
+        }
+    }
+)
 
 router.delete(routerGroup6URL + "/:_id", async (req, res) => {
     try {
@@ -201,31 +215,46 @@ router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
     }
 })
 
-router.post(routerGroup7URL, 
-    middleware.validateRequest(
-        [
-            validator.body("times").isArray()
-        ]
-    ),
+router.post('/timings', 
     async (req, res) => {
-    try {
-        for (let i = 0; i < req.body.times.length; i++) {
-            req.body.times[i]["institutionID"] = req.headers.institutionid
-            const saved = await $db.funcs.save(routerGroup7, req.body.times[i])
-            if (!req.body.times[i]._id) {
-                const associatedJummahs = await _.schedule.createJummahsForTiming(saved.locationID, saved._id.toString(), req.headers.institutionid)
-            }
+        try {
+            // Make into middleware
+            if (req.headers.institutionid !== req.body.institutionID)
+                return res.status(403).json(`You're not allowed to create this resource`)
+            // ENDS HERE    
+            const saved = await new $db.models.timings(req.body).save()
+            // this should be a mongoose method
+            await _.schedule.createJummahsForTiming(saved.locationID, saved._id.toString(), req.headers.institutionid)
+            // ENDS HERE
+            return res.json(saved)
+        } catch(err) {
+            console.log(err)
+            return res.json(`Couldn't create timing`)
         }
-        return res.json('timings successfully saved')
-    } catch(err) {
-        res.json(errors.db(routerGroup7, "saving", err))
     }
-})
+)
+
+router.put(
+    '/timings',
+    async (req, res) => {
+        try {
+            if (req.headers.institutionid !== req.body.institutionID)
+                return res.status(403).json(`You're not allowed to create this resource`)
+            const updated = await $db.models.timings.findOneAndUpdate(req.body._id, req.body, { new: true })
+            return res.json(updated)
+        } catch(err) {
+            console.log(err)
+            return res.json(`Couldn't update timing`)
+        }
+    }
+)
 
 router.delete(routerGroup7URL + '/:_id', async (req, res) => {
     try {
-        const deletedTiming = await $db.models[routerGroup7].findOneAndUpdate(req.params, { active: false }, { new: true })
-        const dependantsRes = await deletedTiming.deleteDependants()
+        const toBeDeletedTiming = await $db.models[routerGroup7].findOneAndUpdate(req.params, { active: false }, { new: true })
+        if (req.headers.institutionid !== toBeDeletedTiming.institutionID)
+            return res.status(403).json(`You're not allowed to delete this resource`)
+        const dependantsRes = await toBeDeletedTiming.deleteDependants()
         return res.json({ msg: `Successfully deleted timing ${req.params._id}`, dependantsRes })
     } catch(err) {
         res.json(errors.db(`${routerGroup7.slice(0, -1)} and associated jummahs.`, 'deleting', err))

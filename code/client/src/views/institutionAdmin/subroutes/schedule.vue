@@ -1,5 +1,13 @@
 <template>
     <div>
+        <!-- to locations and timings -->
+        <div>
+            <button @click="$router.push('/institutionAdmin/locations-and-timings')">
+                Edit Locations and Timings
+            </button>
+        </div>
+        <!-- ENDS HERE -->
+
         <khateeb-schedule
             :data="APIData"
             :reciever="`institutionAdmin`"

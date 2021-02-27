@@ -28,6 +28,7 @@
         :class="`displayed-page page-padding ${$store.state.app.wallpaper}`"
       />
     </transition>
+    <request-manager />
     <Footer />
   </div>
 </template>
@@ -38,6 +39,7 @@ import Footer from '@/components/footer/main.vue'
 import websiteBanner from '@/components/header/websiteBanner.vue'
 import notificationsManager from '@/components/notifications/notificationsManger.vue'
 import headerNavigation from '@/components/header/navigation/main.vue'
+import requestManager from '@/components/misc/requestManager.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
@@ -48,7 +50,8 @@ export default {
     websiteBanner,
     CollapseTransition,
     notificationsManager,
-    headerNavigation
+    headerNavigation,
+    requestManager
   },
   data() {
     return {

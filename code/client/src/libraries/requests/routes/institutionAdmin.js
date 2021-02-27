@@ -17,8 +17,16 @@ const requests = {
     getLocations(location) {
         return axios.get(extension + `/locations/${location}`)
     },
+    updateLocation(location) {
+        return axios.put(extension + '/locations', location)
+    },
+    // deprecated
     saveLocations(locationsArray) {
         return axios.post(extension + '/locations', locationsArray)
+    },
+    // ENDS HERE
+    createNewLocation(location) {
+        return axios.post(extension + '/locations', location)
     },
     deleteLocation(id) {
         return axios.delete(extension + `/locations/${id}`)
@@ -26,8 +34,16 @@ const requests = {
     getTimings(timing, associatedLocation) {
         return axios.get(extension + `/timings/${timing}/${associatedLocation}`)
     },
+    // deprecated
     saveTimings(timingsArray) {
         return axios.post(extension + '/timings', timingsArray)
+    },
+    // ENDS HERE
+    createNewTiming(timing) {
+        return axios.post(extension + '/timings', timing)
+    },
+    updateTiming(timing) {
+        return axios.put(extension + '/timings', timing)
     },
     deleteTiming(id) {
         return axios.delete(extension + `/timings/${id}`)

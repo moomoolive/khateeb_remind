@@ -30,11 +30,7 @@ const authenticate = (authLevel, options={}) => {
 }
 
 const validAuthOptionTypes = (options) => {
-    return typeof options === 'object' || (typeof options === 'number' && validAuthLevel(options) ) 
-}
-
-const illegalObjectTypes = (options) => {
-    return options === undefined || Array.isArray(options)
+    return typeof options === 'number' && validAuthLevel(options)
 }
 
 const emptyAuthOptionObject = (options) => {
@@ -43,7 +39,6 @@ const emptyAuthOptionObject = (options) => {
 
 export default {
     emptyAuthOptionObject,
-    illegalObjectTypes,
     validAuthOptionTypes,
     authenticate,
     levelOption,

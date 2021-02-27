@@ -16,19 +16,6 @@
                     @submitted="saveInstitutionDetails($event)"
                 />
             </collapsable-box>
-            <collapsable-box
-                class="setting-container"
-                :headline="`Prayer Locations & Timings`"
-            >
-                <locations-and-timings
-                    v-if="locations && timings"
-                    :locations="locations"
-                    :timings="timings"
-                    @new-location="newLocation($event)"
-                    @delete="deleteInfo($event)"
-                    @submitted="saveLocationsAndTimings($event)" 
-                />
-            </collapsable-box>
         </div>
         <div class="two-settings-container">
             <collapsable-box
@@ -79,8 +66,6 @@
 </template>
 
 <script>
-import staticTags from './tags.json'
-import locationsAndTimings from './subviews/locationsAndTimings.vue' 
 import textSettings from './subviews/textSettings.vue'
 import institutionDetails from './subviews/institutionDetails.vue'
 import registrationSettings from './subviews/registrationSettings'
@@ -89,7 +74,6 @@ import collapsableBox from '@/components/general/collapsableBox.vue'
 export default {
     name: "settings",
     components: {
-        locationsAndTimings,
         textSettings,
         institutionDetails,
         registrationSettings,
@@ -97,61 +81,14 @@ export default {
     },
     data() {
         return {
-            staticTags,
-            locations: null,
-            timings: null,
             institution: null,
             settings: null
         }
     },
     methods: {
-        async getLocationsAndTimings() {
-            try {
-                this.locations = await this.$API.institutionAdmin.getLocations('all')
-                this.timings = await this.$API.institutionAdmin.getTimings('all', 'all')
-            } catch(err) {
-                console.log(err)
-            }
-        },
         async getInstitutionDetails() {
             try {
                 this.institution = await this.$API.institutionAdmin.getInstitution()
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async saveLocationsAndTimings($event) {
-            try {
-                const locations = await this.$API.institutionAdmin.saveLocations({ locations: $event.locations })
-                $event.times.forEach(time => {
-                    if (time.new) {
-                        delete time.new
-                        delete time._id
-                    }
-                })
-                const timings = await this.$API.institutionAdmin.saveTimings({ times: $event.times })
-                this.$store.commit('admin/showSavedChangesScreen')
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async newLocation($event) {
-            try {
-                const newest = await this.$API.institutionAdmin.saveLocations({ locations: $event, new: true })
-                this.getLocationsAndTimings()
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async deleteInfo($event) {
-            try {
-                if ($event.type === 'location')
-                     await this.$API.institutionAdmin.deleteLocation($event.id)
-                else {
-                    const res = await this.$API.institutionAdmin.deleteTiming($event.id)
-                    console.log(res)
-                }
-                this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
             }
@@ -195,7 +132,6 @@ export default {
         }
     },
     created() {
-        this.getLocationsAndTimings()
         this.getInstitutionDetails()
         this.getAllSettings()
     }

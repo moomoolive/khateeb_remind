@@ -5,6 +5,7 @@ import routerHelpers from '@/libraries/router/main.js'
 import authHelpers from '@/libraries/auth/main.js'
 import stringHelpers from '@/libraries/stringOperations/main.js'
 import dateTimeHelpers from '@/libraries/dateTime/main.js'
+import requestManagerHelpers from '@/libraries/requests/requestManager.js'
 
 export default {
     deepCopy(item) {
@@ -74,5 +75,16 @@ export default {
     },
     validAuthentication(authOptions={}) {
         return authHelpers.validUserAuthentication(store.getters['user/type'], authOptions)
+    },
+    async delayedRequest(routeModuleName, functionName, options={}) {
+        const requestInfo = { 
+            extension: routeModuleName,
+            function: functionName,
+            arguments: options.arguments || [],
+            requestAfterSeconds:  options.requestAfterSeconds || 5
+        }
+        await store.dispatch('requests/addToQueue', requestInfo)
+        const requestId = requestManagerHelpers.requestId(requestInfo)
+        return store.state.requests.responses[requestId].promise
     }
 }

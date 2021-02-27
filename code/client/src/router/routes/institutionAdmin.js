@@ -43,6 +43,11 @@ const adminRoutes = [
         meta: {
             auth: { min: 2, max: 3 }
         }
+    },
+    {
+      path: '/institutionAdmin/locations-and-timings',
+      name: 'locationsAndTimings',
+      component: () => import('@/views/institutionAdmin/locationsAndTimings.vue'),
     }
 ]
 
