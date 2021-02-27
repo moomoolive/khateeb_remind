@@ -66,7 +66,7 @@ export default {
             required: true
         },
         weekOf: {
-            type: String,
+            type: Date,
             required: true
         },
         viewingMonth: {

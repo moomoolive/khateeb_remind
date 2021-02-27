@@ -1,4 +1,4 @@
-import utils from '@/libraries/globallyImportedUtilLibrary.js'
+import utils from '@/libraries/globalUtilities.js'
 import $API from '@/libraries/requests/index.js'
 
 const compoundValidations = {

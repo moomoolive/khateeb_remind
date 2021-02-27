@@ -5,7 +5,7 @@ import router from './router'
 import store from './store'
 
 import API from '@/libraries/requests/index.js'
-import funcs from '@/libraries/globallyImportedUtilLibrary.js'
+import funcs from '@/libraries/globalUtilities.js'
 import VCalendar from 'v-calendar'
 
 Vue.use(VCalendar)

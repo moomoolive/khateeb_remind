@@ -38,6 +38,7 @@ import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 import notificationIcon from './components/notificationIcon.vue'
 import navigationOptions from './components/navigationOptions.vue'
+import notificationHelpers from '@/libraries/notifications/main.js'
 
 export default {
     name: 'headerNavigation',
@@ -66,28 +67,16 @@ export default {
         this.activeMenu = false
       },
       signUp() {
-        const info = {
-          type: 'redirect',
-          options: {
-            color: 'green',
-            redirections: [
-                  {
-                      text: 'Khateebs',
-                      to: '/create/khateebs'
-                  },
-                  {
-                      text: 'Institutions',
-                      to: '/create/institutions'
-                  }
+        const redirections = [
+                  { text: 'Khateebs', to: '/create/khateebs' },
+                  { text: 'Institutions', to: '/create/institutions' }
               ]
-          }
-        }
-        this.$store.dispatch('notifications/create', info)
+        notificationHelpers.redirectionOptions(redirections)
       },
       logout() {
         this.$store.dispatch('user/logout')
         this.activeMenu = false 
-        this.$nextTick(() => { this._.toHomepage() })
+        this.$nextTick(() => { this.$router.push('/') })
       },
     }
 }

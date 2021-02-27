@@ -25,6 +25,7 @@
 
 <script>
 import formMain from '@/components/forms/main.vue'
+import notificationHelpers from '@/libraries/notifications/main.js'
 
 export default {
     name: "login",
@@ -85,23 +86,11 @@ export default {
             this.$nextTick(() => { this.loginRedirect() })
         },
         forgotCredentials() {
-            const info = {
-            type: 'redirect',
-            options: {
-                    color: 'grey',
-                    redirections: [
-                        {
-                            text: 'Forgot Password?',
-                            to: '/forgot/password'
-                        },
-                        {
-                            text: 'Forgot Username?',
-                            to: '/forgot/username'
-                        }
+            const redirections = [
+                        { text: 'Forgot Password?', to: '/forgot/password' },
+                        { text: 'Forgot Username?', to: '/forgot/username' }
                     ]
-                }
-            }
-            this.$store.dispatch('notifications/create', info)
+            notificationHelpers.redirectionOptions(redirections)
         }
     },
     watch: {

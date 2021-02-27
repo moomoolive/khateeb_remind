@@ -8,7 +8,19 @@
         </div>
         <!-- ENDS HERE -->
 
-        <khateeb-schedule
+        <!-- schedule -->
+        <monthly-jummah-schedule 
+            :jummahs="jummahs"
+            :locations="locations"
+            :timings="timings"
+            :khateebs="khateebs"
+            :selectedWeek="selectedWeek"
+            :reciever="`institutionAdmin`"
+        />
+        <!-- SCHEDULE ENDS HERE -->
+        
+        <!--
+        <monthly-jummah-schedule
             :data="APIData"
             :reciever="`institutionAdmin`"
             :emitCopy="true"
@@ -24,30 +36,55 @@
                     @changed="props.changeViewingMonth($event)"
                 />
             </template>
-        </khateeb-schedule>
+        </monthly-jummah-schedule>
+        -->
     </div>
 </template>
 
 <script>
-import khateebSchedule from '@/components/schedules/khateebSchedule.vue'
-import changeMonthButtons from '@/components/schedules/extraControls/changeMonth.vue'
+//import khateebSchedule from '@/components/schedules/khateebSchedule.vue'
+import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule.vue'
+//import changeMonthButtons from '@/components/schedules/extraControls/changeMonth.vue'
+
+import datetime from '@/libraries/dateTime/main.js'
 
 export default {
     name: "scheduleSetter",
     components: {
-        khateebSchedule,
-        changeMonthButtons
+        //khateebSchedule,
+        //changeMonthButtons,
+        monthlyJummahSchedule
     },
     data() {
         return {
+            jummahs: [],
+            locations: [],
+            timings: [],
+            khateebs: [],
+            selectedWeek: datetime.upcomingFriday(true)
+            /*
             date: null,
             APIData: {
                 isThisADummyValue: true
             },
-            revertToPreviousMonth: false
+            revertToPreviousMonth: false,
+            */
         }
     },
     methods: {
+        async getSchedule() {
+            try {
+                const date = new Date()
+                const { jummahs, khateebs, timings, locations } = await this.$API.institutionAdmin.getSchedule(date.getMonth(), date.getFullYear())
+                this.locations = locations
+                this.jummahs = jummahs
+                this.timings = timings
+                this.khateebs = khateebs
+            } catch(err) {
+                console.log(err)
+            }
+        }
+        /*
         async getSchedule(date) {
             try {
                 const res = await this.$API.institutionAdmin.getSchedule(date.getMonth(), date.getFullYear())
@@ -74,8 +111,11 @@ export default {
                 console.log(err)
             }
         }
+        */
+    },
+    created() {
+        this.getSchedule()
     }
-    
 }
 </script>
 

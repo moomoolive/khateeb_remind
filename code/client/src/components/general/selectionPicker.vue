@@ -1,8 +1,13 @@
 <template>
     <div>
+        <div>
+            <tutorial-prompter
+                :tutorials="[{ category: 'general', number: 1 }]"
+            />
+        </div>
         <div class="tutorial-container">
             <button
-                @click="_.tutorial('general', 1)"
+                @click="tutorial()"
             >
                 How Does This Work?
             </button>
@@ -51,8 +56,14 @@
 </template>
 
 <script>
+import tutorialPrompter from '@/components/notifications/tutorialPrompter.vue'
+import notificationHelpers from '@/libraries/notifications/main.js'
+
 export default {
     name: "selectionPicker",
+    components: {
+        tutorialPrompter
+    },
     props: {
         options: {
             type: Array,
@@ -84,6 +95,9 @@ export default {
             this.moreInfo.show = true
             this.moreInfo.index = index
             this.moreInfo.categoryName = categoryName
+        },
+        tutorial() {
+            notificationHelpers.tutorial("general", 1)
         },
         showInfoHere(index, categoryName) {
             return this.moreInfo.show && index === this.moreInfo.index && categoryName === this.moreInfo.categoryName
@@ -125,14 +139,6 @@ export default {
     },
     created() {
         this.selected = this._.deepCopy(this.currentlySelected)
-        const seenTutorial = localStorage.getItem("tutorialGeneral1")
-        if (!seenTutorial) {
-            const oneSecond = 1_000
-            window.setTimeout(() => { 
-                this._.tutorial("general", 1, true)
-                localStorage.setItem("tutorialGeneral1", true)
-             }, oneSecond)
-        }
     }
 }
 </script>

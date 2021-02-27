@@ -23,9 +23,19 @@ const daysInThePast = (numberOfDays=0) => {
     return date
 }
 
+const monthsFromDate = (fixedDate, comparisonDate) => {
+    const fixedDateObj = new Date(fixedDate)
+    const comparisonDateObj = new Date(comparisonDate)
+    if (helpers.sameMonthAndYear(fixedDateObj, comparisonDateObj))
+        return 0
+    else
+        return 1
+}
+
 export default {
     upcomingFriday,
     allUpcomingFridays,
-    daysInThePast
+    daysInThePast,
+    monthsFromDate
 }
 

@@ -6,6 +6,7 @@ import authHelpers from '@/libraries/auth/main.js'
 import stringHelpers from '@/libraries/stringOperations/main.js'
 import dateTimeHelpers from '@/libraries/dateTime/main.js'
 import requestManagerHelpers from '@/libraries/requests/requestManager/main.js'
+import notificationHelpers from '@/libraries/notifications/main.js'
 
 export default {
     deepCopy(item) {
@@ -18,46 +19,16 @@ export default {
     isNumeric(value) {
         return /^\d+$/.test(value)
     },
-    tutorial(category, number, fromSystem=false) {
-        const info = {
-            type: "tutorial",
-            options: {
-                category,
-                number,
-                color: "grey"
-            }
-        }
-        if (fromSystem)
-            info.options.notificationOrigin = 'web-app'
-        store.dispatch('notifications/create', info)
-    },
     alert(msg, type="caution", options) {
-        const notificationInfo = {
-            type: 'alert',
-            options: {
-                textSize: "small",
-                icon: type === 'caution' ? "exclamation" : 'success',
-                color: type === 'caution' ? "yellow" : 'green',
-                msg,
-                ...options
-            }
+        const info = {
+            icon: type === 'caution' ? "exclamation" : 'success',
+            color: type === 'caution' ? "yellow" : 'green',
+            ...options
         }
-        store.dispatch('notifications/create', notificationInfo)
+        notificationHelpers.popMsg(msg, info)
     },
     confirm(msg, color="yellow", options) {
-        return new Promise((resolve) => {
-            const info = {
-                type: 'confirm',
-                options: { 
-                    msg,
-                    color,
-                    ...options,
-                    resolve,
-                    reject: resolve 
-                }
-            }
-            store.dispatch('notifications/create', info)
-        })
+        return notificationHelpers.confirmationPrompt(msg, { color, ...options })
     },
     toHomePage() {
         return router.push(routerHelpers.homepageURL(store.getters["user/type"]))
@@ -84,8 +55,7 @@ export default {
             requestAfterSeconds:  options.requestAfterSeconds || 10,
             additionalIdentifiers: options.additionalIdentifiers || []
         }
-        await store.dispatch('requests/addToQueue', requestInfo)
-        const requestId = requestManagerHelpers.requestId(requestInfo)
-        return store.state.requests.responses[requestId].promise
+        const res = await requestManagerHelpers.response(requestInfo)
+        return res
     }
 }

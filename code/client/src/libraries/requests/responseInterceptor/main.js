@@ -1,13 +1,12 @@
-import store from '@/store/index.js'
-
 import helpers from './helpers.js'
+import notificationHelpers from '@/libraries/notifications/main.js'
 
 const normalResponse = res => res.data
 
 const errorResponse = err => {
     const responseExtenstion = helpers.responseExtenstion(err.response)
     if (!err.response) {
-        store.dispatch('notifications/create', helpers.serverErrorNotificationTemplate())
+        notificationHelpers.generalServerError()
         return Promise.reject(err)
     }
     if (responseExtenstion === '/user/check-in')
@@ -16,14 +15,12 @@ const errorResponse = err => {
         if (responseExtenstion === 'auth/')
             return Promise.reject(err.response)
         else {
-            store.dispatch('notifications/create', helpers.unauthorizedNotificationTemplate())
+            notificationHelpers.unauthorizedMsg()
             return Promise.reject(err)
         }
     }
-    else {
-        store.dispatch('notifications/create', helpers.serverErrorNotificationTemplate())
-        return Promise.reject(err)
-    }
+    notificationHelpers.generalServerError()
+    return Promise.reject(err)
 }
 
 export default {

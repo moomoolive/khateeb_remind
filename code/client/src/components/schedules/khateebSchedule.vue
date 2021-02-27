@@ -1,7 +1,13 @@
 <template>
     <div>
         <div v-if="struct" class="schedule-container">
+            
+            <!-- schedule controls -->
+
+            <!-- controls that are found in all versions of schedule -->
             <div class="std-controls-container">
+                
+                <!-- location viewing controls -->
                 <div class="std-controls">
                     <div>
                         <button 
@@ -22,6 +28,9 @@
                         </button>
                     </div>
                 </div>
+                <!-- ENDS HERE -->
+
+                <!-- weekly viewing controls -->
                 <div class="std-controls">
                     <button
                         :class="selected.week === week ? 'active-controls' : ''" 
@@ -33,7 +42,11 @@
                         {{ date.toLocaleString('en-US', { month: 'short' }) }} {{ week }}
                     </button>
                 </div>
+                <!-- ENDS HERE -->
+
             </div>
+            <!-- ENDS HERE -->
+
             <div v-if="!!$scopedSlots.default" class="external-controls">
                 <slot
                     :date="date"
@@ -41,7 +54,11 @@
                     :changeViewingMonth="changeViewingMonth"
                 ></slot>
             </div>
+            <!-- ENDS HERE --> 
+
             <div class="locations-container">
+                
+                <!-- locations -->
                 <div 
                     v-for="(location, locationID) in shownLocations" 
                     :key="locationID"
@@ -54,10 +71,16 @@
                         Send Notifications for Current Week
                     </button>
                     <div class="location-container">
+
+                        <!-- location information -->
                         <p class="location-label">
                             {{ locationsIndex[locationID].name }}
                         </p>
+                        <!-- LOCATION INFORMATION ENDS HERE -->
+
                         <div v-if="weekHasData(location[selected.week])">
+
+                            <!-- jummahs for location -->
                             <div v-for="(timing, timingNo) in location[selected.week]" :key="timingNo">
                                 <div class="jummahContainer">
                                     <button 
@@ -66,6 +89,8 @@
                                     >
                                         Clear Jummah Status
                                     </button>
+
+                                    <!-- tags for jummah -->
                                     <div class="timing-container">
                                         <div 
                                             v-if="reciever === 'institutionAdmin'" 
@@ -79,6 +104,9 @@
                                             {{ timingDisplay(timing.timingID) }}
                                         </span>
                                     </div>
+                                    <!-- JUMMAH TAGS ENDS HERE -->
+
+                                    <!-- jummah preferences -->
                                     <div class="jummahPreferences">
                                         <component
                                             v-if="showCell"
@@ -91,16 +119,27 @@
                                             :viewingMonth="viewingMonth"
                                             :currentWeek="currentWeek"
                                         />
+
+                                        <!-- jummah updated date -->
                                         <div class="last-updated">
                                             <span class="timing">Last Updated:</span><br>
                                             {{ _.dynamicDisplayDate(timing.updatedAt) }}
                                         </div>
+                                        <!-- DATE DISPLAY 
+                                        ENDS HERE -->
+
                                     </div>
+                                    <!-- JUMMAH PREFERENCES ENDS HERE -->
+
                                 </div>
                             </div>
+                            <!-- JUMMAHS FOR LOCATIONS ENDS HERE --> 
+
                         </div>
                     </div>
                 </div>
+                <!-- LOCATIONS END HERE -->
+
                 <div v-if="emitCopy">
                     <button 
                         class="submit-schedule silver"

@@ -29,6 +29,9 @@
       />
     </transition>
     <request-manager />
+    <tutorial-prompter
+      :tutorials="gettingStartedGuide"
+    />
     <Footer />
   </div>
 </template>
@@ -40,6 +43,7 @@ import websiteBanner from '@/components/header/websiteBanner.vue'
 import notificationsManager from '@/components/notifications/notificationsManger.vue'
 import headerNavigation from '@/components/header/navigation/main.vue'
 import requestManager from '@/components/misc/requestManager.vue'
+import tutorialPrompter from '@/components/notifications/tutorialPrompter.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
@@ -51,7 +55,8 @@ export default {
     CollapseTransition,
     notificationsManager,
     headerNavigation,
-    requestManager
+    requestManager,
+    tutorialPrompter
   },
   data() {
     return {
@@ -64,22 +69,29 @@ export default {
       if (token)
         this.$store.dispatch('user/updateToken', token)
     },
-    gettingStartedGuide() {
-      const khateebFirstTime = this.$store.getters['user/isLoggedIn'] && this.$store.getters['user/type'] === 'khateeb' && !localStorage.getItem('seenGettingStartedKhateeb')
-      if (khateebFirstTime) {
-        this._.tutorial("khateebs", 1, true)
-        localStorage.setItem('seenGettingStartedKhateeb', true)
-      }
-    },
     toggleNotificationDisplay() {
       this.showNotificationDisplay = !this.showNotificationDisplay
+    }
+  },
+  computed: {
+    isLoggedIn() {
+      return this.$store.getters['user/isLoggedIn']
+    },
+    userType() {
+      return this.$store.getters['user/type'] 
+    },
+    gettingStartedGuide() {
+      if (this.isLoggedIn && this.userType === 'khateeb') {
+        return [{ category: 'khateebs', number: 1 }]
+      }
+      else 
+        return []
     }
   },
   mounted() {
     this.$nextTick(async () => {
       if (this.$store.getters['user/isLoggedIn'])
         await this.$API.user.checkIn()
-      this.gettingStartedGuide()
     })
   },
   created() {

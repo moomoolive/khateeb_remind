@@ -184,7 +184,6 @@ router.put(
     ),
     async (req, res) => {
         try {
-            console.log(req.body)
             if (req.headers.institutionid !== req.body.institutionID)
                 return res.status(403).json(`You're not allowed to create this resource`)
             const updated = await $db.models.locations.findOneAndUpdate(req.body._id, req.body, { new: true })

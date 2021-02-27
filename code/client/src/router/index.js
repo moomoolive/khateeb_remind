@@ -8,7 +8,7 @@ import auth from './routes/auth.js'
 import user from './routes/user.js'
 import sysAdmin from './routes/sysAdmin.js'
 
-import utils from '@/libraries/globallyImportedUtilLibrary.js'
+import utils from '@/libraries/globalUtilities.js'
 import helpers from '@/libraries/router/main.js'
 import beforeNavHooks from '@/libraries/router/beforeNavigationHooks.js'
 
