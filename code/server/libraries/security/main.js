@@ -1,12 +1,5 @@
 const crypto = require('crypto')
 
-const save = async (modelName, toBeSaved) => {
-    if (toBeSaved._id)
-        return $db.models[modelName].updateOne({ _id: toBeSaved._id }, toBeSaved)
-    else
-        return new $db.models[modelName](toBeSaved).save()
-}
-
 const encrypt = (value) => {
     const key =  crypto.createCipher('aes-128-cbc', process.env.ENCRYPTION_KEY || '1234')
     let val = key.update(value, 'utf8', 'hex')
@@ -20,4 +13,7 @@ const decrypt = (value) => {
     return val
 }
 
-module.exports = { decrypt, encrypt,  save}
+module.exports = { 
+    decrypt,
+    encrypt,
+}

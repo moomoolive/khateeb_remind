@@ -1,10 +1,12 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require($DIR + '/middleware/main.js')
-const authMiddleware = require($DIR + '/middleware/auth/main.js')
-const validationMiddleware = require($DIR + '/middleware/validation/main.js')
-const postRequestMiddleware = require($DIR + '/middleware/postRequests/main.js')
+const middleware = require(global.$dir + '/middleware/main.js')
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
+
+const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
 
 const router = express.Router()
 
@@ -14,7 +16,7 @@ router.get(
     "/", 
     async (req, res) => {
         try {
-            const data = await $db.models.institutionAdmins.find({ institutionID: req.headers.institutionid }).select(['-updatedAt', "-__v", "-password"]).exec()
+            const data = await $db.institutionAdmins.find({ institutionID: req.headers.institutionid }).select(['-updatedAt', "-__v", "-password"]).exec()
             return res.json(data)
         } catch(err) {
             console.log(err)
@@ -37,8 +39,8 @@ router.post("/",
     async (req, res) => {
         try {
             req.body.confirmed = true
-            const newInstitutionAdmin = new $db.models.institutionAdmins(req.body).save
-            await new _.notifications.welcome(newInstitutionAdmin).create()
+            const newInstitutionAdmin = new $db.institutionAdmins(req.body).save()
+            await new notificationConstructors.WelcomeNotificationConstructor(newInstitutionAdmin).create()
             return res.json(newInstitutionAdmin)
         } catch(err) {
             console.log(err)
@@ -54,7 +56,7 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "institutionAdmins"), 
     async (req, res) => {
         try {
-            const deleted = await $db.models.institutionAdmins.deleteOne(req.query)
+            const deleted = await $db.institutionAdmins.deleteOne(req.query)
             return res.json(deleted)
         } catch(err) {
             console.log(err)

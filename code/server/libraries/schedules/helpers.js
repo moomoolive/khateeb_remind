@@ -52,8 +52,8 @@ const findAllFridays = (startFridayDayJs, onlyDate=true) => {
 const getActiveLocationsAndTimings = async (institutionID) => {
     try {
         const query = { institutionID, active: true }
-        const locations = await $db.models.locations.find(query).exec()
-        const timings = await $db.models.timings.find(query).exec()
+        const locations = await $db.locations.find(query).exec()
+        const timings = await $db.timings.find(query).exec()
         return { locations, timings }
     } catch(err) {
         console.log(`Could not get locations and timings`)

@@ -3,7 +3,7 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require($DIR + '/middleware/main.js')
+const middleware = require(global.$dir + '/middleware/main.js')
 
 const router = express.Router()
 
@@ -32,7 +32,7 @@ const funcs = {
         let query = funcs.buildQueryFromParams(request.params)
         query.institutionID = request.headers.institutionid
         query = { ...query, ...options }
-        return $db.models[dataName].find(query)
+        return $db[dataName].find(query)
     }
 }
 const errors = {
@@ -56,7 +56,7 @@ const routerGroup1URL = `/${routerGroup1}`
 router.get(routerGroup1URL, async (req, res) => {
     try {
         const mostRecent = -1
-        const data = await $db.models[routerGroup1].find({ institutionID: req.headers.institutionid }).sort('-updatedAt').exec()
+        const data = await $db[routerGroup1].find({ institutionID: req.headers.institutionid }).sort('-updatedAt').exec()
         res.json(data)
     } catch(err) {
         res.json(errors.db(routerGroup1, 'retrieve', err))
@@ -65,13 +65,14 @@ router.get(routerGroup1URL, async (req, res) => {
 
 router.delete(routerGroup1URL + '/:_id', async (req, res) => {
     try {
-        const deleted = await $db.models[routerGroup1].deleteOne(req.params)
+        const deleted = await $db[routerGroup1].deleteOne(req.params)
         return res.json(deleted)
     } catch(err) {
         res.json(errors.db(routerGroup1.slice(0, -1), 'deleting', err))
     }
 })
 
+/*
 router.post(routerGroup1URL,
     middleware.validateRequest(
         [
@@ -91,13 +92,14 @@ router.post(routerGroup1URL,
             return res.json(errors.db(routerGroup1.slice(0, -1), 'saving', err))
         }
 })
+*/
 
 const routerGroup2 = 'khateebs'
 const routerGroup2URL = `/${routerGroup2}`
 
 router.get(routerGroup2URL, async (req, res) => {
     try {
-        const data = await $db.models[routerGroup2].find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()
+        const data = await $db[routerGroup2].find({ institutionID: req.headers.institutionid }).select(['-password', '-username']).exec()
         res.json(data)
     } catch(err) {
         res.json(errors.db(routerGroup2, 'retrieve', err))
@@ -106,13 +108,14 @@ router.get(routerGroup2URL, async (req, res) => {
 
 router.delete(routerGroup2URL + "/:_id", async (req, res) => {
     try {
-        const deleted = await $db.models[routerGroup2].deleteOne(req.params)
+        const deleted = await $db[routerGroup2].deleteOne(req.params)
         return res.json(deleted)
     } catch(err) {
         res.json(errors.db(routerGroup2.slice(0, -1), 'deleting', err))
     }
 })
 
+/*
 router.put(
     routerGroup2URL,
     middleware.validateRequest(
@@ -124,14 +127,15 @@ router.put(
     ),
     async (req, res) => {
         try {
-            const updated = await $db.models[routerGroup2].findOneAndUpdate({ _id: req.body._id }, req.body, { new: true }).select(["-password", "-username"])
+            const updated = await $db[routerGroup2].findOneAndUpdate({ _id: req.body._id }, req.body, { new: true }).select(["-password", "-username"])
             if (req.body.confirmed)
-                await new _.notifications.welcome(updated).create()
+                await new global.utils.notifications.welcome(updated).create()
             return res.json(updated)
         } catch(err) {
             res.json(errors.db(routerGroup2.slice(0, -1), 'updating', err))
         }
 })
+*/
 
 const routerGroup6 = "locations"
 const routerGroup6URL = `/${routerGroup6}`
@@ -144,7 +148,7 @@ const locations = {
             hour: 12,
             minute: 30
         }
-        const saved = await new $db.models.timings(timing).save()
+        const saved = await new $db.timings(timing).save()
         return saved
     }
 }
@@ -158,22 +162,24 @@ router.get(routerGroup6URL + "/:_id", async (req, res) => {
     }
 })
 
+/*
 router.post(
     '/locations',
     async (req, res) => {
     try {
         if (req.headers.institutionid !== req.body.institutionID)
             return res.status(403).json(`You're not allowed to create this resource`)
-        const savedLocation = await new $db.models.locations(req.body).save()
+        const savedLocation = await new $db.locations(req.body).save()
         // should be a mongoose method
         const newTiming = await locations.firstTiming(req.headers.institutionid, savedLocation._id.toString())
-        await  _.schedule.createJummahsForTiming(savedLocation._id.toString(), newTiming._id.toString(), req.headers.institutionid)
+        await  global.utils.schedule.createJummahsForTiming(savedLocation._id.toString(), newTiming._id.toString(), req.headers.institutionid)
         // ENDS HERE
         return res.json({ location: savedLocation, timing: newTiming })
     } catch(err) {
         res.json(errors.db(routerGroup6.slice(0, -1), 'saving', err))
     }
 })
+*/
 
 router.put(
     '/locations',
@@ -188,7 +194,7 @@ router.put(
         try {
             if (req.headers.institutionid !== req.body.institutionID)
                 return res.status(403).json(`You're not allowed to create this resource`)
-            const updated = await $db.models.locations.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.locations.findOneAndUpdate(req.body._id, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -198,7 +204,7 @@ router.put(
 
 router.delete(routerGroup6URL + "/:_id", async (req, res) => {
     try {
-        const deletedLocation = await $db.models[routerGroup6].findOneAndUpdate(req.params, { active: false }, { new: true })
+        const deletedLocation = await $db[routerGroup6].findOneAndUpdate(req.params, { active: false }, { new: true })
         const dependantRes = await deletedLocation.deleteDependants()
         return res.json({ msg: `Successfully deleted location ${req.params._id}`, dependantRes })
     } catch(err) {
@@ -218,6 +224,7 @@ router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
     }
 })
 
+/*
 router.post('/timings', 
     async (req, res) => {
         try {
@@ -225,9 +232,9 @@ router.post('/timings',
             if (req.headers.institutionid !== req.body.institutionID)
                 return res.status(403).json(`You're not allowed to create this resource`)
             // ENDS HERE    
-            const saved = await new $db.models.timings(req.body).save()
+            const saved = await new $db.timings(req.body).save()
             // this should be a mongoose method
-            await _.schedule.createJummahsForTiming(saved.locationID, saved._id.toString(), req.headers.institutionid)
+            await global.utils.schedule.createJummahsForTiming(saved.locationID, saved._id.toString(), req.headers.institutionid)
             // ENDS HERE
             return res.json(saved)
         } catch(err) {
@@ -236,6 +243,7 @@ router.post('/timings',
         }
     }
 )
+*/
 
 router.put(
     '/timings',
@@ -243,7 +251,7 @@ router.put(
         try {
             if (req.headers.institutionid !== req.body.institutionID)
                 return res.status(403).json(`You're not allowed to create this resource`)
-            const updated = await $db.models.timings.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.timings.findOneAndUpdate(req.body._id, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -254,7 +262,7 @@ router.put(
 
 router.delete(routerGroup7URL + '/:_id', async (req, res) => {
     try {
-        const toBeDeletedTiming = await $db.models[routerGroup7].findOneAndUpdate(req.params, { active: false }, { new: true })
+        const toBeDeletedTiming = await $db[routerGroup7].findOneAndUpdate(req.params, { active: false }, { new: true })
         if (req.headers.institutionid !== toBeDeletedTiming.institutionID)
             return res.status(403).json(`You're not allowed to delete this resource`)
         const dependantsRes = await toBeDeletedTiming.deleteDependants()
@@ -275,6 +283,7 @@ router.get(routerGroup8URL + "/:_id/:year/:month/:weekOf/:locationID/:timingID",
     }
 })
 
+/*
 router.put(
     routerGroup8URL,
     middleware.validateRequest(
@@ -293,6 +302,7 @@ router.put(
         res.json(errors.db(routerGroup8, "saving", err))
     }
 })
+*/
 
 const schedules = {
     createDateObjectFromRequest(month, year) {
@@ -316,6 +326,7 @@ const schedules = {
     }
 }
 
+/*
 router.get(
     "/schedules" + "/:month/:year",
     middleware.validateRequest(
@@ -327,26 +338,27 @@ router.get(
     ),
     async (req, res) => {
         try {
-            let jummahs = await $db.models.jummahs.find({ institutionID: req.headers.institutionid }).monthlyEntries(req.params.year, req.params.month)
+            let jummahs = await $db.jummahs.find({ institutionID: req.headers.institutionid }).monthlyEntries(req.params.year, req.params.month)
             if (jummahs.length < 1 && schedules.previousMonth(req.params.month, req.params.year))
                 return res.json(`nobuild-previous`)
             else if (jummahs.length < 1 && schedules.twoMonthsAhead(req.params.month, req.params.year))
                 return res.json(`nobuild-future`)
             if (jummahs.length < 1)
-                jummahs = await _.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
+                jummahs = await global.utils.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
             //const data = await jummahs[0].gatherScheduleComponents()
             return res.json(jummahs)
         } catch(err) {
             res.json(errors.getReq('schedules', err))
         }
 })
+*/
 
 const routerGroup10 = 'settings'
 const routerGroup10URL = `/${routerGroup10}`
 
 router.get(routerGroup10URL, async (req, res) => {
     try {
-        const settings = await $db.models.settings.findOne({ institutionID: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
+        const settings = await $db.settings.findOne({ institutionID: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
         return res.json(settings.decrypt())
     } catch(err) {
         console.log(err)
@@ -373,8 +385,8 @@ router.put(
             // 'findOneAndUpdate' because update hooks don't apply to them
             // and I need to encrypt certain settings on update
             const identifier = { _id: req.body._id }
-            await $db.models.settings.updateOne(identifier, req.body)
-            const updated = await $db.models.settings.findOne(identifier).exec()
+            await $db.settings.updateOne(identifier, req.body)
+            const updated = await $db.settings.findOne(identifier).exec()
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -388,7 +400,7 @@ const routerGroup9URL = `/${routerGroup9}`
 router.get(routerGroup9URL, 
     async (req, res) => {
         try {
-            const institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
+            const institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(['-updatedAt', '-createdAt', '-__v', '-confirmed']).exec()
             return res.json(institution)
         } catch(err) {
             console.log(err)
@@ -410,7 +422,7 @@ router.put(routerGroup9URL,
     ),
     async (req, res) => {
         try {
-            const updated = await $db.models.institutions.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            const updated = await $db.institutions.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
             res.json(updated)
         } catch(err) {
             console.log(err)
@@ -423,7 +435,7 @@ router.put(routerGroup9URL,
 
 // --- deal with this later ---
 
-//const jummahNotifications = require($DIR + '/cron/jummahNotifications.js')
+//const jummahNotifications = require(global.$dir + '/cron/jummahNotifications.js')
 
 router.get('/send-notifications', async (req, res) => {
     try {
@@ -439,7 +451,7 @@ router.get('/send-notifications', async (req, res) => {
 
 router.put('/clear-jummah', async (req, res) => {
     try {
-        const updated = await $db.models.jummahs.updateOne({ _id: req.body._id }, req.body)
+        const updated = await $db.jummahs.updateOne({ _id: req.body._id }, req.body)
         res.json('hi')
     } catch(err) {
         console.log(err)
@@ -447,4 +459,4 @@ router.put('/clear-jummah', async (req, res) => {
     }
 })
 
-module.exports = router
+//module.exports = router

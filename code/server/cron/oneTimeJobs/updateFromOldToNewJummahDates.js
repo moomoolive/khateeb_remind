@@ -1,4 +1,4 @@
-const cronWrapper = require($DIR + '/cron/cronWrapper.js')
+const cronWrapper = require(global.$dir + '/cron/cronWrapper.js')
 
 const time = new Date()
 time.setSeconds(time.getSeconds() + 5)
@@ -6,7 +6,7 @@ time.setSeconds(time.getSeconds() + 5)
 const options = {
     job: async () => {
         try {
-            const jummahs = await $db.models.jummahs.find({}).exec()
+            const jummahs = await $db.jummahs.find({}).exec()
             console.log(jummahs)
             for (let i = 0; i < jummahs.length; i++) {
                 const jummah = jummahs[i]
@@ -19,7 +19,7 @@ const options = {
                 date.setMonth(jummah.month)
                 date.setDate(jummah.weekOf)
                 date.setUTCHours(12, 0, 0, 0)
-                const updated = await $db.models.jummahs.findOneAndUpdate({ _id: jummah._id.toString() }, { date: new Date(date) })
+                const updated = await $db.jummahs.findOneAndUpdate({ _id: jummah._id.toString() }, { date: new Date(date) })
                 console.log(updated)
             }
             console.log('Successfully updated jummahs to new date system')

@@ -1,7 +1,9 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require($DIR + '/middleware/main.js')
+const middleware = require(global.$dir + '/middleware/main.js')
+
+const authHelpers = require(global.$dir + '/libraries/auth/main.js')
 
 const router = express.Router()
 router.use(middleware.auth(1))
@@ -24,10 +26,10 @@ router.put(
     async (req, res) => {
         try {
             const userType = `${req.headers.usertype}${req.headers.usertype === 'root' ? '' : 's'}`
-            const mongooseRes = await $db.models[userType].updateOne({ _id: req.headers.userid }, req.body)
+            const mongooseRes = await $db[userType].updateOne({ _id: req.headers.userid }, req.body)
             // JWT token carries important information needed on the client side
             // so whenever user information is updated, it should be refreshed
-            const token = await _.auth.refreshToken(req.headers.userid)
+            const token = await authHelpers.refreshToken(req.headers.userid)
             return res.json({ token, msg: `Successfully updated`, mongooseRes })
         } catch(err) {
             console.log(err)
@@ -42,12 +44,12 @@ router.get('/check-in', async(req, res) => {
     try {
         // log login time
         const userPackage = {}
-        const user = await $db.models.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
+        const user = await $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
         userPackage.lastLogin = user.lastLogin
-        userPackage.notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
+        userPackage.notifications = await $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
         if (req.headers.usertype === 'root' || req.headers.usertype === 'sysAdmin')
             return userPackage
-        userPackage.institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
+        userPackage.institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
         return res.json(userPackage)
     } catch(err) {
         console.log(err)
@@ -67,10 +69,10 @@ router.put(
     ),
     async (req, res) => {
         try {
-            const notification = await $db.models.notifications.findOne({ _id: req.body._id }).exec()
+            const notification = await $db.notifications.findOne({ _id: req.body._id }).exec()
             if (notification.userID !== req.headers.userid)
                 return res.status(403).json(`You're not allowed to edit this notification (id: ${req.body._id})`)
-            const updated = await $db.models.notifications.findOneAndUpdate({_id: req.body._id }, req.body, { new: true })
+            const updated = await $db.notifications.findOneAndUpdate({_id: req.body._id }, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -81,7 +83,7 @@ router.put(
 
 router.delete('/', async (req, res) => {
     try {
-        const user = await $db.models.users.findOne({ _id: req.headers.userid }).exec()
+        const user = await $db.users.findOne({ _id: req.headers.userid }).exec()
         const notificationRes = await user.deleteNotifications()
         await db.models.users.deleteOne({ _id: user._id.toString() })
         return res.json({ msg: 'Successfully deleted account', notificationRes })

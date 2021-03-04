@@ -1,4 +1,4 @@
-const cronWrapper = require($DIR + '/cron/cronWrapper.js')
+const cronWrapper = require(global.$dir + '/cron/cronWrapper.js')
 
 const options = {
     job: async () => {
@@ -8,7 +8,7 @@ const options = {
             const deletedQuery = {
                 createdAt: { $lte: expiration }
             }
-            const mongooseRes = await $db.models.verificationCodes.deleteMany(deletedQuery)
+            const mongooseRes = await $db.verificationCodes.deleteMany(deletedQuery)
             console.log(`Expired Verification Codes Deleted. Database response: ${mongooseRes}`)
         } catch(err) {
             console.log(`Couldn't delete verification codes`)

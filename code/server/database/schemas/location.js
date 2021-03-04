@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
+
 const location = new mongoose.Schema({
     institutionID: {
         type: String,
@@ -24,7 +26,7 @@ const location = new mongoose.Schema({
 
 location.methods.findTimings = async function(options) {
     try {
-        const timings = await $db.models.timings.find({ locationID: this._id.toString(), ...options }).exec()
+        const timings = await $db.timings.find({ locationID: this._id.toString(), ...options }).exec()
         return timings
     } catch(err) {
         console.log(err)
@@ -47,14 +49,14 @@ location.methods.deleteDependants = async function () {
 
 location.methods.createAssociatedTiming = async function() {
     try {
-        const saved = await $db.models.timings({
+        const saved = await $db.timings({
             institutionID: this.institutionID,
             locationID: this._id.toString(),
             // Randomly intiatized hour and minute, I just chose 12 30
             hour: 12,
             minute: 30
         }).save()
-        await  _.schedule.createJummahsForTiming(this._id.toString(), saved._id.toString(), this.institutionID)
+        await  scheduleHelpers.createJummahsForTiming(this._id.toString(), saved._id.toString(), this.institutionID)
         return saved
     } catch(err) {
         console.log(`${err}\nCouldn't create assoicated timing`)

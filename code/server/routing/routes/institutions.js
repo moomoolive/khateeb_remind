@@ -1,9 +1,9 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require($DIR + '/middleware/main.js')
-const authMiddleware = require($DIR + '/middleware/auth/main.js')
-const validationMiddleware = require($DIR + '/middleware/validation/main.js')
+const middleware = require(global.$dir + '/middleware/main.js')
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
@@ -13,7 +13,7 @@ router.get(
     async (req, res) => {
         let institution = {}
         try {
-            institution = await $db.models.institutions.findOne({ _id: req.headers.institutionid }).exec()
+            institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).exec()
             return res.json(institution)
         } catch(err) {
             console.log(err)
@@ -37,7 +37,7 @@ router.put(
     async (req, res) => {
         console.log(req.body)
         try {
-            const updated = await $db.models.institutions.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.institutions.findOneAndUpdate(req.body._id, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -52,9 +52,9 @@ router.delete(
     async (req, res) => {
         try {
             const query = { _id: req.headers.institutionid }
-            const targetInstitution = await $db.models.institutions.findOne(query).exec()
+            const targetInstitution = await $db.institutions.findOne(query).exec()
             const deletedDependants = await targetInstitution.deleteDependencies()
-            await $db.models.institutions.deleteOne(query)
+            await $db.institutions.deleteOne(query)
             return res.json({ msg: `Successfully deleted institution ${req.headers.institutionid}`, deletedDependants })
         } catch(err) {
             console.log(err)

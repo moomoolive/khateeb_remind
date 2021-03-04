@@ -10,15 +10,10 @@ if (process.env.NODE_ENV === 'production')
     dotenv.config()
 const dbSettings = require('./db.config.js')
 
-// across the app: 
-// "_" stands for the app's utility library
-// "$db" stands for database models
-// $DIR stands for root folder
-global.$DIR = path.resolve(__dirname)
-global._ = require($DIR + '/utils/index.js')
-global.$db = require($DIR + '/database/index.js')
-
-// some configurations for the app 
+// global.$dir stands for root folder
+global.$dir = path.resolve(__dirname)
+global.utils = require('./libraries/globalUtilities.js')
+global.$db = require('./database/main.js')
 global.APP_CONFIG = require('./server.config.js')
 
 const DATABASE = process.env.DATABASE || 'mongodb://localhost:27017/khateebRemind'
@@ -40,7 +35,7 @@ app.options('*', cors())
 app.post('*', globalMiddleWare.noEmptyBody)
 app.put('*', globalMiddleWare.noEmptyBody)
 
-const routes = require($DIR + '/routing/index.js')
+const routes = require(global.$dir + '/routing/index.js')
 
 app.use('/jummahs', routes.jummahs)
 app.use('/locations', routes.locations)
@@ -62,5 +57,4 @@ db.once('open', () => {
     cronJobs.start() 
 })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
-
-app.listen(APP_CONFIG.network.port, () => { console.log(`App is listening on port ${APP_CONFIG.network.port}`) })
+app.listen(global.APP_CONFIG.network.port, () => { console.log(`App is listening on port ${global.APP_CONFIG.network.port}`) })

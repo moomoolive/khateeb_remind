@@ -1,6 +1,6 @@
 const express = require('express')
 
-const middleware = require($DIR + '/middleware/main.js')
+const middleware = require(global.$dir + '/middleware/main.js')
 
 const router = express.Router()
 
@@ -11,7 +11,7 @@ router.get(
         console.log(req.query)
         let jummahs = []
         try {
-            jummahs = await $db.models.jummahs.find({ institutionID: req.headers.institutionid, ...req.query }).exec()
+            jummahs = await $db.jummahs.find({ institutionID: req.headers.institutionid, ...req.query }).exec()
             return res.json({ jummahs })
         } catch(err) {
             console.log(err)

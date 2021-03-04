@@ -1,9 +1,9 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require($DIR + '/middleware/main.js')
-const authMiddleware = require($DIR + '/middleware/auth/main.js')
-const validationMiddleware = require($DIR + '/middleware/validation/main.js')
+const middleware = require(global.$dir + '/middleware/main.js')
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
@@ -13,7 +13,7 @@ router.get(
     async (req, res) => {
         let locations = []
         try {
-            locations = await $db.models.locations.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
+            locations = await $db.locations.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
             return res.json(locations)
         } catch(err) {
             console.log(err)
@@ -33,7 +33,7 @@ router.post(
     authMiddleware.isAllowedToCreateResource(["institutionID"]),
     async (req, res) => {
         try {
-            const newLocation = await $db.models.locations(req.body).save()
+            const newLocation = await $db.locations(req.body).save()
             const newTiming = await newLocation.createAssociatedTiming()
             return res.json({ location: newLocation, timing: newTiming })
         } catch(err) {
@@ -54,7 +54,7 @@ router.put(
     async (req, res) => {
         console.log(req.body)
         try {
-            const updated = await $db.models.locations.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.locations.findOneAndUpdate(req.body._id, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -72,7 +72,7 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "locations"),
     async (req, res) => {
         try {
-            const deactivedLocation = await $db.models.locations.findOneAndUpdate(req.query, { active: false }, { new: true })
+            const deactivedLocation = await $db.locations.findOneAndUpdate(req.query, { active: false }, { new: true })
             const deletedDependants = await deactivedLocation.deleteDependants()
             return res.json({ msg: `Deactivated location ${req.query._id}`, deletedDependants })
         } catch(err) {

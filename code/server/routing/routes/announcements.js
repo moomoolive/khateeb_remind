@@ -1,10 +1,10 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require($DIR + '/middleware/main.js')
-const authMiddleware = require($DIR + '/middleware/auth/main.js')
-const validationMiddleware = require($DIR + '/middleware/validation/main.js')
-const postRequestMiddleware = require($DIR + '/middleware/postRequests/main.js')
+const middleware = require(global.$dir + '/middleware/main.js')
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
 
 const router = express.Router()
 
@@ -14,7 +14,7 @@ router.get(
     async (req, res) => {
         let announcements = []
         try {
-            announcements = await $db.models.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).limit(20).exec()
+            announcements = await $db.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).limit(20).exec()
             return res.json(announcements)
         } catch(err) {
             console.log(err)
@@ -37,7 +37,7 @@ router.post(
     async (req, res) => {
         console.log(req.body)
         try {
-            const newAnnouncement = await $db.models.announcements(req.body).save()
+            const newAnnouncement = await $db.announcements(req.body).save()
             return res.json(newAnnouncement)
         } catch(err) {
             console.log(err)
@@ -60,7 +60,7 @@ router.put(
     async (req, res) => {
         console.log(req.body)
         try {
-            const updated = await $db.models.announcements.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.announcements.findOneAndUpdate(req.body._id, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -78,7 +78,7 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "announcements"),
     async (req, res) => {
         try {
-            await $db.models.announcements.deleteOne(req.query)
+            await $db.announcements.deleteOne(req.query)
             return res.json({ msg: `Deleted Announcement ${req.query._id}` })
         } catch(err) {
             console.log(err)

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 
-const subDocs = require('./subDocs')
+const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
+
+const subDocs = require(global.$dir + '/database/subDocuments/main.js')
 
 const jummah = new mongoose.Schema({
     institutionID: {
@@ -28,8 +30,8 @@ const jummah = new mongoose.Schema({
 
 jummah.methods.gatherMeta = async function() {
     try {
-        const location = await $db.models.locations.findOne({ _id: this.locationID }).exec()
-        const timing = await $db.models.timings.findOne({ _id: this.timingID }).exec()
+        const location = await $db.locations.findOne({ _id: this.locationID }).exec()
+        const timing = await $db.timings.findOne({ _id: this.timingID }).exec()
         return {
             location,
             timing
@@ -44,9 +46,9 @@ jummah.methods.gatherScheduleComponents = async function () {
     try {
         const query = { institutionID: this.institutionID }
         const removedFields = ['-username', '-password', '-phoneNumber', '-lastLogin']
-        const locations = await $db.models.locations.find(query).exec()
-        const timings = await $db.models.timings.find(query).exec()
-        const khateebs = await $db.models.khateebs.find(query).select(removedFields).exec()
+        const locations = await $db.locations.find(query).exec()
+        const timings = await $db.timings.find(query).exec()
+        const khateebs = await $db.khateebs.find(query).select(removedFields).exec()
         return {
             locations,
             timings,
@@ -69,7 +71,7 @@ jummah.query.monthlyEntries = function (year, month) {
 }
 
 jummah.query.futureEntries = function() {
-    const upcomingFriday = _.schedule.findUpcomingFriday()
+    const upcomingFriday = scheduleHelpers.findUpcomingFriday()
     return this.where({ date: { $gte: `${upcomingFriday.year()}-${upcomingFriday.month() + 1}-${upcomingFriday.date()}` } })
 }
 

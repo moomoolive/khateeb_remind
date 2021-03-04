@@ -14,7 +14,7 @@ const isValidResourceModifier = async (request={}, keysToValidateAgainst=[], res
     try {
         if (helpers.noResourceIdentiferFound(request, resourceIdentfierFoundIn))
             throw TypeError(`No resource identifier found`)
-        const resource = await $db.models[resourceType].find({ _id: request[resourceIdentfierFoundIn]._id }).exec()
+        const resource = await $db[resourceType].find({ _id: request[resourceIdentfierFoundIn]._id }).exec()
         const validator = new resourceOwnerChecker({
             keysToValidateAgainst,
             checkRequestSection: 'header',

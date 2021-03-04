@@ -1,9 +1,9 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require($DIR + '/middleware/main.js')
-const authMiddleware = require($DIR + '/middleware/auth/main.js')
-const validationMiddleware = require($DIR + '/middleware/validation/main.js')
+const middleware = require(global.$dir + '/middleware/main.js')
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
@@ -13,8 +13,8 @@ router.get(
     async (req, res) => {
         let settings = {}
         try {
-            settings = await $db.models.settings.findOne({ institutionID: req.headers.institutionid, ...req.query}).exec()
-            return res.json(settings)
+            settings = await $db.settings.findOne({ institutionID: req.headers.institutionid, ...req.query}).exec()
+            return res.json(settings.decrypt())
         } catch(err) {
             console.log(err)
             return res.json({ settings, msg: { status: 'err', errorTrace: err } })
@@ -37,7 +37,12 @@ router.put(
     async (req, res) => {
         console.log(req.body)
         try {
-            const updated = await $db.models.settings.findOneAndUpdate(req.body._id, req.body, { new: true })
+            // I chose to update and find seperately instead of mongoose's 
+            // 'findOneAndUpdate' because update hooks don't apply to them
+            // and I need to encrypt certain settings on update
+            const identifier = { _id: req.body._id }
+            await $db.settings.updateOne(identifier, req.body)
+            const updated = await $db.settings.findOne(identifier).exec()
             return res.json(updated)
         } catch(err) {
             console.log(err)

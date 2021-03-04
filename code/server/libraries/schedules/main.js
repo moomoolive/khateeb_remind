@@ -45,7 +45,7 @@ const createAssociatedJummahs =  async (locationID, timingID, institutionID, sta
             jummah.khateebPreference.push(prayerSlot)
         }
         try {
-            const savedJummah = await new $db.models.jummahs(jummah).save()
+            const savedJummah = await new $db.jummahs(jummah).save()
             createdJummahs.push(savedJummah)
         } catch(err) {
             console.log(err)
@@ -63,7 +63,7 @@ const createJummahsForTiming = async (locationID, timingID, institutionID) => {
         nextMonth.setMonth(nextMonth.getMonth() + 1)
         nextMonth.setDate(1)
         nextMonth.setUTCHours(12, 0, 0, 0)
-        const jummahsNextMonth = await $db.models.jummahs.findOne({ date: { $gte: nextMonth } }).exec()
+        const jummahsNextMonth = await $db.jummahs.findOne({ date: { $gte: nextMonth } }).exec()
         if (!jummahsNextMonth)
             return
         const startingDate = helpers.createDayJs({ 

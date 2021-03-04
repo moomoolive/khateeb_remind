@@ -1,14 +1,17 @@
+const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
+
 const job = async () => {
     try {
         const institutionQuery = test ? { name: "__TEST__" } : { confirmed: true }
-        const institutions = await $db.models.institutions.find(institutionQuery).exec()
-        const upcomingFriday = _.schedule.findUpcomingFriday()
+        const institutions = await $db.institutions.find(institutionQuery).exec()
+        const upcomingFriday = scheduleHelpers.findUpcomingFriday()
         const query = { weekOf: upcomingFriday.date(), year: upcomingFriday.year(), month: upcomingFriday.month() }
         for (let i = 0; i < institutions.length; i++) {
             const institution = institutions[i]
-            let settings = await $db.models.settings.findOne({ institutionID: institution._id.toString() }).exec()
+            let settings = await $db.settings.findOne({ institutionID: institution._id.toString() }).exec()
             settings = settings.decrypt()
-            const jummahsThisWeek = await $db.models.jummahs.find({ institutionID: institution._id.toString(), ...query }).exec()
+            const jummahsThisWeek = await $db.jummahs.find({ institutionID: institution._id.toString(), ...query }).exec()
             for (let x = 0; x < jummahsThisWeek.length; x++) {
                 const jummah = jummahsThisWeek[x]
                 if (jummah.confirmed || jummah.khateebPreference[0].khateebID === 'TBD')
@@ -18,12 +21,12 @@ const job = async () => {
                     const preference = jummah.khateebPreference[y]
                     if (preference.notified || preference.khateebID === 'TBD')
                         continue
-                    const khateeb = await $db.models.khateebs.findOne({ _id: preference.khateebID.toString() }).exec()
-                    const note = new _.notifications.jummahReminder(khateeb, jummah, meta, y + 1)
+                    const khateeb = await $db.khateebs.findOne({ _id: preference.khateebID.toString() }).exec()
+                    const note = new notificationConstructors.JummahReminderNotificationConstructor(khateeb, jummah, meta, y + 1)
                     const msgs = await note.create(true, false, { text: settings })
                     console.log(msgs)
                     preference.notified = true
-                    await $db.models.jummahs.updateOne({ _id: jummah._id.toString() }, jummah)
+                    await $db.jummahs.updateOne({ _id: jummah._id.toString() }, jummah)
                     if (y === 0)
                         break 
                 }
@@ -36,7 +39,7 @@ const job = async () => {
     }
 }
 
-const cronWrapper = require($DIR + '/cron/cronWrapper.js')
+const cronWrapper = require(global.$dir + '/cron/cronWrapper.js')
 
 // every wednesday and thursday 6AM
 const cron = (time='00 00 6 * * 3-4', syncWithTimezone=true) => {

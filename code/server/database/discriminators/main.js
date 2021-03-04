@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const subDocs = require('./subDocs.js')
+const subDocs = require(global.$dir + '/database/subDocuments/main.js')
 
 const khateeb = new mongoose.Schema({
     title: {
