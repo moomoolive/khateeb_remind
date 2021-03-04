@@ -1,3 +1,5 @@
+// LEGACY ROUTES
+
 const express = require('express')
 const validator = require('express-validator')
 
@@ -332,8 +334,8 @@ router.get(
                 return res.json(`nobuild-future`)
             if (jummahs.length < 1)
                 jummahs = await _.schedule.build(req.params.month, req.params.year, req.headers.institutionid)
-            const data = await jummahs[0].gatherScheduleComponents()
-            return res.json({ jummahs, ...data })
+            //const data = await jummahs[0].gatherScheduleComponents()
+            return res.json(jummahs)
         } catch(err) {
             res.json(errors.getReq('schedules', err))
         }

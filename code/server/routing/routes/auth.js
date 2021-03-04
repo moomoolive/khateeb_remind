@@ -37,16 +37,6 @@ router.post(
     }
 )
 
-router.get('/institution-selection', async (req, res) => {
-    try {
-        const data = await $db.models.institutions.find({ confirmed: true }).select(["-createdAt", "-updatedAt"]).exec()
-        res.json(data)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't get institutions!`)
-    }
-})
-
 
 router.post(
     '/create/khateeb',

@@ -105,7 +105,7 @@ export default {
         logout() {
             this.$store.dispatch('user/logout')
             this.$emit('close-nav')
-            this.$nextTick(() => { this._.toHomepage() })
+            this.$nextTick(() => { this._.toHomePage() })
         },
     },
     created() {

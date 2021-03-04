@@ -27,32 +27,33 @@ const app = express()
 mongoose.connect(DATABASE, dbSettings)
 const db = mongoose.connection
 
-const middleware = require($DIR + '/middleware/main.js')
-const validator = require('express-validator')
+const globalMiddleWare = require('./middleware/globalMiddleware/main.js')
+const queryBoolParser = require('express-query-boolean')
 
 app.use(cors())
 app.use(express.json())
-app.use(middleware.generalError)
+app.use(globalMiddleWare.generalError)
+app.set('query parser', 'extended')
+app.use(queryBoolParser())
+
 app.options('*', cors())
-app.post('*', middleware.noEmptyBody)
-app.put('*', middleware.noEmptyBody)
-app.delete(
-    '*', 
-    middleware.validateRequest(
-        [validator.param("_id").isLength(24).optional()],
-         "param"
-    )
-)
+app.post('*', globalMiddleWare.noEmptyBody)
+app.put('*', globalMiddleWare.noEmptyBody)
 
 const routes = require($DIR + '/routing/index.js')
 
-app.use('/khateeb', routes.khateeb)
-app.use('/institutionAdmin', routes.admin)
+app.use('/jummahs', routes.jummahs)
+app.use('/locations', routes.locations)
+app.use('/timings', routes.timings)
+app.use('/khateebs', routes.khateebs)
+app.use('/announcements', routes.announcements)
+app.use('/settings', routes.settings)
+app.use('/institutions', routes.institutions)
+app.use('/institutionAdmins,', routes.institutionAdmins)
 app.use('/misc', routes.misc)
 app.use('/auth', routes.auth)
 app.use('/sysAdmin', routes.sysAdmin)
 app.use('/user', routes.user)
-app.use('/rootInstitutionAdmin', routes.rootInstitutionAdmin)
 
 db.once('open', () => { 
     const dbType = DATABASE.split(':')[0] === 'mongodb' ? 'Local' : 'Production'

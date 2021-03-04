@@ -94,7 +94,7 @@ export default {
         await this.$API.user.checkIn()
     })
   },
-  created() {
+  async created() {
     this.setJWT()
   }
 }

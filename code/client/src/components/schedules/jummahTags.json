@@ -1,0 +1,38 @@
+{
+    "pastTags": {
+        "missed": {
+            "words": "Missed",
+            "color": "red",
+            "icon": "❌"
+        },
+        "complete": {
+            "words": "Complete",
+            "color": "green",
+            "icon": "✔️"
+        }
+    },
+    "futureTags": {
+        "general": {
+            "words": "Future",
+            "color": "blue",
+            "icon": "📅"
+        }
+    },
+    "defaultTag": {
+        "words": "Pending",
+        "color": "purple",
+        "icon": "⏱️"
+    },
+    "currentWeekTags": {
+        "confirmed": {
+            "words": "Confirmed",
+            "color": "green",
+            "icon": "👍"
+        },
+        "notified": {
+            "words": "Notified",
+            "color": "purple",
+            "icon": "📱"
+        }
+    }
+}

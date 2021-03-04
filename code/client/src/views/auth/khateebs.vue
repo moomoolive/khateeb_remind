@@ -106,7 +106,7 @@ export default {
     async created() {
         window.addEventListener('keydown', this.keyBinds)
         window.addEventListener('keyup', this.keyBinds)
-        this.allInstitutions = await this.$API.auth.getAvailableInstitutions()
+        this.allInstitutions = await this.$API.misc.institutionSelection()
         this.structure.institutionID.selectOptions = this.allInstitutions.filter(inst => inst.name !== "__TEST__")
     },
     destroyed() {

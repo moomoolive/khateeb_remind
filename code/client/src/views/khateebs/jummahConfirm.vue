@@ -76,11 +76,13 @@ export default {
             try {
                 const jummahID = this.params.jummahID.split('=')[1]
                 const notificationID = this.params.notificationID.split('=')[1]
+                /*
                 const data = await this.$API.khateeb.confirmJummahPackage(jummahID, notificationID)
                 if (data === 'non-existent' || data.notification.actionPerformed)
                     this.exists = false
                 else
                     this.processNotificationPackage(data)
+                */
             } catch(err) {
                 console.log(err)
             }
@@ -137,9 +139,11 @@ export default {
                     notification: this.requestPackage.notification,
                     preferenceIndicator
                 }
+                /*
                 const res = await this.$API.khateeb.confirmJummah(confirmedPackage)
                 this._.toHomePage()
                 this._.alert(`Successfully updated your jummah status!`, 'success')
+                */
             } catch(err) {
                 console.log(err)
             }

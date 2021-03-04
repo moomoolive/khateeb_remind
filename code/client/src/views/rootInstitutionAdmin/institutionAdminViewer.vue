@@ -121,7 +121,7 @@ export default {
     methods: {
         async submitAdmin($event) {
             try {
-                const updated = await this.$API.rootInstitutionAdmin.updateAdmin($event)
+                const newAdmin = await this.$API.institutionAdmins.createNewAdmin($event)
                 this.$store.commit('admin/showSavedChangesScreen')
                 this._.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
             } catch(err) {
@@ -132,17 +132,24 @@ export default {
             try {
                 const confirm = await this._.confirm(`Do you really want to permenantly delete this administrator?`)
                 if (confirm) {
-                    const deleted = await this.$API.rootInstitutionAdmin.deleteAdmin(id)
+                    const deleted = await this.$API.institutionAdmins.deleteAdmin(id)
                     console.log(deleted)
                     this.$store.commit('admin/showSavedChangesScreen')
                 }
             } catch(err) {
                 console.log(err)
             }
+        },
+        async getOtherAdmins() {
+            try {
+                this.admin = await this.$API.institutionAdmins.getOtherAdmins()
+            } catch(err) {
+                console.log(err)
+            }
         }
     },
-    async created() {
-        this.admins = await this.$API.rootInstitutionAdmin.getOtherAdmins()
+    created() {
+        this.getOtherAdmins()
     }
 }
 </script>

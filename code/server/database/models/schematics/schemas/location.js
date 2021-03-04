@@ -45,4 +45,20 @@ location.methods.deleteDependants = async function () {
     return res
 }
 
+location.methods.createAssociatedTiming = async function() {
+    try {
+        const saved = await $db.models.timings({
+            institutionID: this.institutionID,
+            locationID: this._id.toString(),
+            // Randomly intiatized hour and minute, I just chose 12 30
+            hour: 12,
+            minute: 30
+        }).save()
+        await  _.schedule.createJummahsForTiming(this._id.toString(), saved._id.toString(), this.institutionID)
+        return saved
+    } catch(err) {
+        console.log(`${err}\nCouldn't create assoicated timing`)
+    }
+}
+
 module.exports = location

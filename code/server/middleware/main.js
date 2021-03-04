@@ -3,18 +3,6 @@ const validator = require('express-validator')
 
 const helpers = require('./helpers.js')
 
-const noEmptyBody = (request, response, next) => {
-    if (Object.keys(request.body).length === 0)
-        return response.status(422).json(`You cannot send an empty request body to this route!`)
-    else 
-        next()
-}
-
-const generalError = (err, request, response, next) => {
-    console.log(err)
-    return response.status(500).json("Server isn't responding right now, try later...")
-}
-
 const auth = (authLevel) => {
     return (request, response, next) => {
         if (authLevel === 0)
@@ -35,6 +23,8 @@ const auth = (authLevel) => {
     } 
 }
 
+// deprecated
+
 const validateRequest = (validators=[], section="body") => {
     return [
         ...validators,
@@ -53,7 +43,5 @@ const validateRequest = (validators=[], section="body") => {
 
 module.exports = { 
     auth, 
-    noEmptyBody, 
-    generalError, 
     validateRequest 
 }

@@ -1,3 +1,5 @@
+// LEGACY ROUTES
+
 const express = require('express')
 
 const middleware = require($DIR + '/middleware/main.js')

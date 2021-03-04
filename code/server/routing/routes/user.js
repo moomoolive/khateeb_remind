@@ -70,7 +70,7 @@ router.put(
             const notification = await $db.models.notifications.findOne({ _id: req.body._id }).exec()
             if (notification.userID !== req.headers.userid)
                 return res.status(403).json(`You're not allowed to edit this notification (id: ${req.body._id})`)
-            const updated = await $db.models.notifications.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.models.notifications.findOneAndUpdate({_id: req.body._id }, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -79,25 +79,15 @@ router.put(
     }
 )
 
-router.put('/mark-notification-as-seen', async (req, res) => {
-    try {
-        await $db.models.notifications.updateOne(req.body, { seen: true, seenAt: new Date() })
-        const notifications = await $db.models.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        return res.json(notifications)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't update notification status`)
-    }
-})
-
 router.delete('/', async (req, res) => {
     try {
-        const deletedUser = await $db.models.users.deleteOne({ _id: req.headers.userid })
-        const deletedNotifications = await $db.models.notifications.deleteMany({ userID: user })
-        return res.json({ msg: 'Successfully deleted account', notifications: deletedNotifications, user: deletedUser })
+        const user = await $db.models.users.findOne({ _id: req.headers.userid }).exec()
+        const notificationRes = await user.deleteNotifications()
+        await db.models.users.deleteOne({ _id: user._id.toString() })
+        return res.json({ msg: 'Successfully deleted account', notificationRes })
     } catch(err) {
         console.log(err)
-        res.json(`Couldn't delete account`)
+        return res.json(`Couldn't delete account`)
     }
 })
 

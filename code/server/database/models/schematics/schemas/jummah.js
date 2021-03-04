@@ -7,25 +7,6 @@ const jummah = new mongoose.Schema({
         type: String,
         required: true
     },
-    // deprecated, have not been removed for backward compatiblity
-    month: {
-        type: Number,
-        required: false,
-        min: 0,
-        max: 11
-    },
-    year: {
-        type: Number,
-        required: false,
-        min: 2021
-    },
-    weekOf: {
-        type: Number,
-        required: false,
-        min: 1,
-        max: 31
-    },
-    // ENDS HERE 
     date: {
         type: Date,
         required: true

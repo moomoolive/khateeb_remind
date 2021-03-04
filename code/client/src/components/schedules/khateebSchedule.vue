@@ -376,7 +376,8 @@ export default {
             this.showCell = false
             this.$nextTick(() => { this.showCell = true })
         },
-        // for test institution only
+        /*
+        TBD
         async sendNotification() {
             try {
                 const res = await this.$API.institutionAdmin.sendNotifications()
@@ -400,7 +401,7 @@ export default {
                 console.log(err)
             }
         }
-        // ends here
+        */
     },
     computed: {
         viewingMonth() {

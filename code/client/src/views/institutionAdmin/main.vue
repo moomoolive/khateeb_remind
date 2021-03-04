@@ -76,8 +76,9 @@ export default {
         },
         async verifyPending() {
             try {
-                const pendingCount = await this.$API.misc.pendingKhateebCount()
-                this.outboundLinks[2].indicator = pendingCount ? `${pendingCount} Pending` : pendingCount
+                const pendingKhateebs = await this.$API.khateebs.getKhateebs({ confirmed: false })
+                const pendingCount = pendingKhateebs.length
+                this.outboundLinks[2].indicator = pendingCount > 0 ? `${pendingCount} Pending` : pendingCount
             } catch(err) {
                 console.log(err)
             }

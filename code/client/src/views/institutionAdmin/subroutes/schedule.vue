@@ -14,45 +14,20 @@
             :locations="locations"
             :timings="timings"
             :khateebs="khateebs"
-            :selectedWeek="selectedWeek"
             :reciever="`institutionAdmin`"
+            @request-jummahs="requestJummahs($event)"
         />
         <!-- SCHEDULE ENDS HERE -->
-        
-        <!--
-        <monthly-jummah-schedule
-            :data="APIData"
-            :reciever="`institutionAdmin`"
-            :emitCopy="true"
-            :revertToPreviousMonth="revertToPreviousMonth"
-            @copy="saveSchedule($event)"
-            @schedule-date="getSchedule($event)"
-            @override="saveSchedule($event)"
-        >   
-            <template #default="props">
-                <change-month-buttons
-                    :originalDate="props.originalDate"
-                    :date="props.date"
-                    @changed="props.changeViewingMonth($event)"
-                />
-            </template>
-        </monthly-jummah-schedule>
-        -->
+
     </div>
 </template>
 
 <script>
-//import khateebSchedule from '@/components/schedules/khateebSchedule.vue'
 import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule.vue'
-//import changeMonthButtons from '@/components/schedules/extraControls/changeMonth.vue'
-
-import datetime from '@/libraries/dateTime/main.js'
 
 export default {
     name: "scheduleSetter",
     components: {
-        //khateebSchedule,
-        //changeMonthButtons,
         monthlyJummahSchedule
     },
     data() {
@@ -60,61 +35,32 @@ export default {
             jummahs: [],
             locations: [],
             timings: [],
-            khateebs: [],
-            selectedWeek: datetime.upcomingFriday(true)
-            /*
-            date: null,
-            APIData: {
-                isThisADummyValue: true
-            },
-            revertToPreviousMonth: false,
-            */
+            khateebs: []
         }
     },
     methods: {
-        async getSchedule() {
+        async getScheduleBuildingBlocks() {
             try {
-                const date = new Date()
-                const { jummahs, khateebs, timings, locations } = await this.$API.institutionAdmin.getSchedule(date.getMonth(), date.getFullYear())
+                const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
                 this.locations = locations
-                this.jummahs = jummahs
                 this.timings = timings
                 this.khateebs = khateebs
             } catch(err) {
                 console.log(err)
             }
-        }
-        /*
-        async getSchedule(date) {
-            try {
-                const res = await this.$API.institutionAdmin.getSchedule(date.getMonth(), date.getFullYear())
-                if (typeof res !== 'string' && res)
-                    this.APIData = res
-                else if (res === 'nobuild-previous')
-                    this.revertToPrevious(`Previous month schedule doesn't exist!`)
-                else if (res === 'nobuild-future')
-                    this.revertToPrevious(`You can't schedule more than one month ahead!`)
-            } catch(err) {
-                console.log(err)
-            }
         },
-        revertToPrevious(msg) {
-            this.revertToPreviousMonth = true
-            this._.alert(msg)
-            this.$nextTick(() => { this.revertToPreviousMonth = false })
-        },
-        async saveSchedule($event) {
+        async requestJummahs(jummahDateRange) {
             try {
-                const res = await this.$API.institutionAdmin.saveJummahs({ jummahs: $event })
-                this.$store.commit('admin/showSavedChangesScreen')
+                const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
+                this.jummahs = jummahs
             } catch(err) {
                 console.log(err)
             }
         }
-        */
+        
     },
     created() {
-        this.getSchedule()
+        this.getScheduleBuildingBlocks()
     }
 }
 </script>

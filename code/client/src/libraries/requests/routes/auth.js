@@ -11,9 +11,6 @@ const requests = {
     createInstitution(institutionAndAdminInfo) {
         return axios.post(extension + '/create/institution', institutionAndAdminInfo)
     },
-    getAvailableInstitutions() {
-        return axios.get(extension + '/institution-selection')
-    },
     createKhateeb(khateebInfo) {
         return axios.post(extension + "/create/khateeb", khateebInfo)
     },

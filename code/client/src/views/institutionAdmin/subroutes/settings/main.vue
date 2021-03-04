@@ -86,23 +86,21 @@ export default {
         }
     },
     methods: {
-        async getInstitutionDetails() {
+        async getSettingsAndInstitutionInfo() {
             try {
-                this.institution = await this.$API.institutionAdmin.getInstitution()
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async getAllSettings() {
-            try {
-                this.settings = await this.$API.institutionAdmin.getSettings()
+                const [settings, institution] = await Promise.all([
+                    this.$API.settings.getSettings(),
+                    this.$API.institutions.getInstitution()
+                ])
+                this.settings = settings
+                this.institution = institution
             } catch(err) {
                 console.log(err)
             }
         },
         async saveSettings($event) {
             try {
-                this.settings = await this.$API.institutionAdmin.updateSettings($event)
+                this.settings = await this.$API.settings.updateSettings($event)
                 this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
@@ -110,7 +108,7 @@ export default {
         },
         async saveInstitutionDetails($event) {
             try {
-                this.institution = await this.$API.institutionAdmin.updateInstitution($event)
+                this.institution = await this.$API.institutions.updateInstitution($event)
                 this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
@@ -120,8 +118,7 @@ export default {
             const confirm = await this._.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
             if (confirm) {
                 try {
-                    const res = await this.$API.rootInstitutionAdmin.deleteInstitution()
-                    console.log(res)
+                    await this.$API.institutions.deleteInstitution()
                     this._.alert(`You've successfully deleted your institution`, 'success')
                     this.$router.push('/')
                     this.$store.dispatch('logout')
@@ -131,9 +128,8 @@ export default {
             }
         }
     },
-    created() {
-        this.getInstitutionDetails()
-        this.getAllSettings()
+    async created() {
+        this.getSettingsAndInstitutionInfo()
     }
 }
 </script>

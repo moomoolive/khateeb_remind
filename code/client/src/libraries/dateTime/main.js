@@ -9,6 +9,13 @@ const upcomingFriday = (raw=false) => {
     }
     return upcomingFriday
 }
+const findUpcomingFriday = (date=new Date()) => {
+    const friday = 5
+    while (date.getDay() !== friday) {
+        date.setDate(date.getDate() + 1)
+    }
+    return date
+}
 
 const allUpcomingFridays = (input) => {
     const firstFriday = helpers.findFirstFridayOfMonth(input)
@@ -29,13 +36,24 @@ const monthsFromDate = (fixedDate, comparisonDate) => {
     if (helpers.sameMonthAndYear(fixedDateObj, comparisonDateObj))
         return 0
     else
-        return 1
+        return helpers.findMonthDifference(fixedDateObj, comparisonDateObj)
+}
+
+const dateFormatYM = (date, includeDate=false) => {
+    const format = new Date(date)
+    let base = `${format.getFullYear()}-${format.getMonth() + 1}`
+    if (includeDate)
+        base += `-${format.getDate()}`
+    return base
 }
 
 export default {
     upcomingFriday,
     allUpcomingFridays,
     daysInThePast,
-    monthsFromDate
+    monthsFromDate,
+    dateFormatYM,
+    findUpcomingFriday,
+    sameMonthSameYear: helpers.sameMonthAndYear
 }
 

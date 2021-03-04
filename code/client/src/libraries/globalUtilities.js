@@ -25,7 +25,7 @@ export default {
             color: type === 'caution' ? "yellow" : 'green',
             ...options
         }
-        notificationHelpers.popMsg(msg, info)
+        notificationHelpers.popupMsg(msg, info)
     },
     confirm(msg, color="yellow", options) {
         return notificationHelpers.confirmationPrompt(msg, { color, ...options })

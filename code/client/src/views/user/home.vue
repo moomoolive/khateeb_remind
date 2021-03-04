@@ -163,10 +163,10 @@ export default {
         },
         async getAvailableTimings() {
             try {
-                const data = await this.$API.khateeb.getAvailableTimings()
-                this.khateebs.locations = data.locations
-                this.khateebs.availableTimings = data.availableTimings
-                this.khateebs.struct = this.buildStructs(data.locations)
+                const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+                this.khateebs.locations = locations
+                this.khateebs.availableTimings = timings
+                this.khateebs.struct = this.buildStructs(locations)
             } catch(err) {
                 console.log(err)
             }

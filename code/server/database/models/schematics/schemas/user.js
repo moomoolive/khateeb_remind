@@ -103,4 +103,14 @@ user.methods.comparePassword = async function (submittedPassword) {
     }
 }
 
+user.methods.deleteNotifications = async function() {
+    const res = {}
+    try {
+        res.notifications = await $db.models.notifications.deleteMany({ userID: this._id.toString() }) 
+    } catch(err) {
+        console.log(err)
+    }
+    return res
+}
+
 module.exports = user

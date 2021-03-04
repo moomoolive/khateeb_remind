@@ -74,7 +74,7 @@
                                     <p v-if="khateeb.confirmed">Delete {{ khateeb.firstName }} from System</p>
                                     <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Application</p>
                                 </button>
-                                <button v-if="!khateeb.confirmed" @click="confirmKhateeb(khateeb)">
+                                <button v-if="!khateeb.confirmed" @click="editKhateeb({ _id: khateeb._id, confirmed: true }, true)">
                                     <p>Confirm {{ khateeb.firstName }}'s Application</p>
                                 </button>
                                 <form-main
@@ -171,7 +171,7 @@ export default {
     methods: {
         async getAllKhateebs() {
             try {
-                const data = await this.$API.institutionAdmin.getKhateebs()
+                const data = await this.$API.khateebs.getKhateebs()
                 this.khateebs = data
                 this.khateebsWithReadableAvailableTimings = await this.createReadableTimingsAndUnavailableDates(data)
                 this.khateebsInArraysOfTwos = this.toArraysOfTwo(data)
@@ -207,8 +207,9 @@ export default {
         },
         async substituteTimingIDsWithTimingInformation(khateebs) {
             try {
-                this.locations = await this.$API.institutionAdmin.getLocations('all')
-                this.timings = await this.$API.institutionAdmin.getTimings("all", "all")
+                const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+                this.locations = locations
+                this.timings = timings
                 khateebs.forEach(khateeb => {
                     if (khateeb.availableTimings.length < 1)
                         return khateeb.availableTimings = "👍 Available for\n   all timings"
@@ -267,17 +268,11 @@ export default {
             arrayOfTwos.push(chopped)
             return arrayOfTwos
         },
-        async confirmKhateeb(khateeb) {
+        async editKhateeb($event, confirm=false) {
             try {
-                const res = await this.$API.institutionAdmin.updateExistingKhateeb({ _id: khateeb._id, confirmed: true })
-                this.$store.commit('admin/showSavedChangesScreen')
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async editKhateeb($event) {
-            try {
-                const res = await this.$API.institutionAdmin.updateExistingKhateeb($event)
+                if (!confirm)
+                    delete $event.confirmed
+                const res = await this.$API.khateebs.updateExistingKhateeb($event)
                 this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
@@ -288,7 +283,7 @@ export default {
                 const confirm = await this._.confirm(`Are you sure you want to permenantly delete this khateeb?`)
                 if (!confirm)
                     return
-                const res = await this.$API.institutionAdmin.deleteKhateeb(id)
+                const res = await this.$API.khateebs.deleteKhateeb(id)
                 this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)

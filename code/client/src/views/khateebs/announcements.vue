@@ -1,12 +1,6 @@
 <template>
     <div>
-        <msg-with-pic
-            msg="There are currently no announcements"
-            gif="twirlingPlane"
-            title="Your administrator doesn't seem to be the talkative type..."
-            v-if="!announcementsExists"
-        />
-        <div v-if="announcementsExists">
+        <div v-if="announcements.length > 0">
             <div 
                 v-for="(twoAnnouncements, index) in announcementsArraysOfTwo"
                 :key="index"
@@ -27,22 +21,29 @@
                 </collapsable-box>
             </div>
         </div>
+        <msg-with-pic
+            v-else
+            msg="There are currently no announcements"
+            gif="twirlingPlane"
+            title="Your administrator doesn't seem to be the talkative type..."
+        />
     </div>
 </template>
 
 <script>
 import msgWithPic from '@/components/general/msgWithPic.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
 
 export default {
     name: 'announcements',
     components: {
-        msgWithPic
+        msgWithPic,
+        collapsableBox
     },
     data() {
         return {
             announcementsExists: true,
-            announcements: null,
-            announcementsArraysOfTwo: null
+            announcements: []
         }
     },
     methods: {
@@ -67,8 +68,7 @@ export default {
             const arraysOfTwo = []
             let chopped = []
             for (let i = 0; i < announcements.length; i++) {
-                const copy = this._.deepCopy(announcements[i])
-                chopped.push(copy)
+                chopped.push(announcements[i])
                 const even = i % 2
                 if (even) {
                     arraysOfTwo.push(chopped)
@@ -77,19 +77,24 @@ export default {
             }
             arraysOfTwo.push(chopped)
             return arraysOfTwo
+        },
+        async getAnnouncements() {
+            try {
+                const data = await this.$API.announcements.getAnnouncements()
+                console.log(data)
+                this.announcements = data || []
+            } catch(err) {
+                console.log(err)
+            }
         }
     },
-    async created() {
-        try{ 
-            this.announcements = await this.$API.khateeb.getAnnouncements()
-            if (this.announcements.length < 1) 
-                this.announcementsExists = false
-            else
-                this.announcementsArraysOfTwo = this.announcementsToArraysOfTwo(this.announcements)
-        } catch(err) {
-            console.log(err)
-            this.announcementsExists = false
+    computed: {
+        announcementsArraysOfTwo() {
+            return this.announcementsToArraysOfTwo(this.announcements)
         }
+    },
+    created() {
+        this.getAnnouncements()
     }
 }
 </script>

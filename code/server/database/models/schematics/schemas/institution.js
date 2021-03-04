@@ -34,4 +34,20 @@ const institution = new mongoose.Schema({
 },
 { timestamps: true })
 
+institution.methods.deleteDependencies = async function() {
+    const deleteRes = {}
+    try {
+        const models = Object.keys($db.models)
+        for (let i = 0; i < models.length; i++) {
+            const model = models[i]
+            if (model === 'institutions')
+                continue
+            deleteRes[model] = await $db.models[model].deleteMany({ institutionID: req.headers.institutionid })
+        }
+    } catch(err) {
+        console.log(err)
+    }
+    return deleteRes
+}
+
 module.exports = institution

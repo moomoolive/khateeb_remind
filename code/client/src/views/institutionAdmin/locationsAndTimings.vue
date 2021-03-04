@@ -130,21 +130,9 @@ export default {
         }
     },
     methods: {
-        async getLocationsAndTimings() {
-            try {
-                const locations = await this.$API.institutionAdmin.getLocations('all')
-                const timings = await this.$API.institutionAdmin.getTimings('all', 'all')
-                return {
-                    locations,
-                    timings
-                }
-            } catch(err) {
-                console.log(err)
-            }
-        },
         async updateLocation(location, index) {
             await this._.delayedRequest(
-                'institutionAdmin',
+                'locations',
                 'updateLocation',
                 { 
                     arguments: [location],
@@ -156,9 +144,16 @@ export default {
             const index = this.timingsForEachLocation[location._id].findIndex(time => time._id === timing._id)
             return  index + 1
         },
-        incrementTime($event, index) {
+        async incrementTime($event, index) {
             this.timings[index][$event.type] += $event.increment
-            this._.delayedRequest('institutionAdmin', 'updateTiming', { arguments: [this.timings[index]] })
+            await this._.delayedRequest(
+                'timings', 
+                'updateTiming', 
+                { 
+                    arguments: [this.timings[index]],
+                    additionalIdentifiers: [index.toString()]
+                }
+            )
         },
         async addTiming(location) {
             const target = this.timingsForEachLocation[location._id].slice(-1)[0]
@@ -171,7 +166,7 @@ export default {
                 lastTimingOfLocation.minute = 0
             }
             try {
-                const updated = await this.$API.institutionAdmin.createNewTiming(lastTimingOfLocation) 
+                const updated = await this.$API.timings.createNewTiming(lastTimingOfLocation) 
                 this.timings.push(updated)
             } catch(err) {
                 console.log(err)
@@ -182,7 +177,7 @@ export default {
                 return this._.alert(`You must have at least one timing per location!`)
             const confirm = await this._.confirm(`Are you sure you want delete this timing?`)
             if (confirm) {
-                await this.$API.institutionAdmin.deleteTiming(timing._id) 
+                await this.$API.timings.deleteTiming(timing._id) 
                 this.timings.splice(index, 1)
             }
         },
@@ -194,7 +189,7 @@ export default {
                 return this._.alert(`You must have at least one location`)
             const confirm = await this._.confirm(`Are you sure you want to delete this location?`)
             if (confirm) {
-                await this.$API.institutionAdmin.deleteLocation(location._id)
+                await this.$API.locations.deleteLocation(location._id)
                 this.locations.splice(index, 1)
             }
         },
@@ -205,7 +200,7 @@ export default {
             newLocation.name = `Unknown Location ${length}`
             newLocation.address = `Unknown Address ${length}`
             try {
-                const { location, timing } = await this.$API.institutionAdmin.createNewLocation(newLocation)
+                const { location, timing } = await this.$API.locations.createNewLocation(newLocation)
                 this.locations.push(location)
                 this.timings.push(timing)
             } catch(err) {
@@ -226,9 +221,9 @@ export default {
         }
     },
     async created() {
-        const info = await this.getLocationsAndTimings()
-        this.locations = info.locations
-        this.timings = info.timings
+        const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+        this.locations = locations
+        this.timings = timings
     }
 }
 </script>

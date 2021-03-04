@@ -24,7 +24,7 @@
             v-if="showForm"
             :basedOn="currentlyEditingData"
             :structure="structure"
-            @submitted="submit($event)"
+            @submitted="currentlyEditing === 'new' ? submit($event) : updateAnnouncement($event)"
             :formTitle="`Announcements`"
         />
     </div>
@@ -67,7 +67,18 @@ export default {
     methods: {
         async submit($event) {
             try {
-                const msg = await this.$API.institutionAdmin.updateAnnouncements($event)
+                const newAnnouncement = await this.$API.announcements.createNewAnnouncement($event)
+                this.announcements.push(newAnnouncement)
+                this.$store.commit('admin/showSavedChangesScreen')
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        async updateAnnouncement($event) {
+            try {
+                const updated = await this.$API.announcements.updateAnnouncement($event)
+                const index = this.announcements.findIndex(announcement => announcement._id === updated._id)
+                this.announcements.splice(index, 1, updated)
                 this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {
                 console.log(err)
@@ -75,7 +86,7 @@ export default {
         },
         async getAnnouncements() {
             try {
-                this.announcements = await this.$API.institutionAdmin.getAnnouncements()
+                this.announcements = await this.$API.announcements.getAnnouncements()
             } catch(err) {
                 console.log(err)
             }
@@ -90,7 +101,7 @@ export default {
                 const confirm = await this._.confirm(`Are you sure you want to permenantly delete this announcement?`)
                 if (!confirm)
                     return
-                const res = await this.$API.institutionAdmin.deleteAnnouncement(this.currentlyEditingData._id)
+                const res = await this.$API.announcements.deleteAnnouncement(this.currentlyEditingData._id)
                 console.log(res)
                 this.$store.commit('admin/showSavedChangesScreen')
             } catch(err) {

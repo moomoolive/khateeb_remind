@@ -11,6 +11,7 @@ import sysAdmin from './routes/sysAdmin.js'
 import utils from '@/libraries/globalUtilities.js'
 import helpers from '@/libraries/router/main.js'
 import beforeNavHooks from '@/libraries/router/beforeNavigationHooks.js'
+import requestQueryHelpers from '@/libraries/requests/queries/main.js'
 
 Vue.use(VueRouter)
 
@@ -35,7 +36,14 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  parseQuery(queryString) {
+    return requestQueryHelpers.parse(queryString)
+  },
+  stringifyQuery(query) {
+    const result = requestQueryHelpers.stringify(query)
+    return result ? "?" + result : ''
+  }
 })
 
 router.beforeEach((to, from, next) => {

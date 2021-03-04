@@ -22,19 +22,15 @@ router.post('/unique-username',
     }
 )
 
-router.get('/pending-khateebs', 
-    middleware.auth(2),
-    async (req, res) => {
-        try {
-            const pending = await $db.models.khateebs.find({ institutionID: req.headers.institutionid, confirmed: false }).exec()
-            const count = pending.length
-            res.json(count === 0 ? null : count)
-        } catch(err) {
-            console.log(err)
-            res.json(`Couldn't retrieve pending khateebs`)
-        }
+router.get('/institution-selection', async (req, res) => {
+    try {
+        const data = await $db.models.institutions.find({ confirmed: true }).select(["-createdAt", "-updatedAt"]).exec()
+        return res.json(data)
+    } catch(err) {
+        console.log(err)
+        res.json(`Couldn't get institutions!`)
     }
-)
+})
 
 router.get('/redirect/:shortCode', async (req, res) => {
     const homepage = 'https://app.khateebs.com'
