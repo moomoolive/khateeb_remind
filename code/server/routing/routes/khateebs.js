@@ -1,7 +1,6 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require(global.$dir + '/middleware/main.js')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
@@ -11,7 +10,7 @@ const router = express.Router()
 
 router.get(
     '/',
-    middleware.auth(1),
+    authMiddleware.authenticate({ min: 1, max: 3 }),
     async (req, res) => {
         let khateebs = []
         try {
@@ -26,7 +25,7 @@ router.get(
 
 router.put(
     '/',
-    middleware.auth(2),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength(24),
         validator.body("active").isBoolean().optional(),
@@ -34,12 +33,10 @@ router.put(
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "khateebs"),
     async (req, res) => {
-        console.log(req.body)
         try {
             const updated = await $db.khateebs.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
             if (req.body.confirmed)
                 await new notificationConstructors.WelcomeNotificationConstructor(updated).create()
-           console.log(updated)
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -50,7 +47,7 @@ router.put(
 
 router.delete(
     '/',
-    middleware.auth(2),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
         validator.query("_id").isLength(24)
     ], "query"),
@@ -59,9 +56,8 @@ router.delete(
         try {
             const khateeb = await $db.khateebs.findOne(req.query)
             const dependantsRes = await khateeb.deleteNotifications()
-            console.log(dependantsRes)
-            await $db.khateebs.deleteOne(req.query)
-            return res.json({ msg: `Deleted khateeb with id:${req.query._id}`, dependantsRes })
+            const deleted = await $db.khateebs.deleteOne(req.query)
+            return res.json({ khateeb: deleted, dependantsRes })
         } catch(err) {
             console.log(err)
             return res.json(`Couldn't delete location`)

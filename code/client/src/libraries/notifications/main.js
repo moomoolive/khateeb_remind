@@ -81,11 +81,22 @@ const popupMsg = (msg, options) => {
     helpers.createNotification(info)
 }
 
+const downloadAppPrompt = () => {
+    const options = {
+        picture: 'downloadApp',
+        rejectButtonText: 'Later',
+        confirmButtonText: 'Install',
+        color: 'blue'
+    }
+    return confirmationPrompt(`Install the free Khateeb Remind app:\n- Looks and feels better\n- Reminds you about khutbahs`, options)
+}
+
 export default {
     tutorial,
     unauthorizedMsg,
     generalServerError,
     redirectionOptions,
     confirmationPrompt,
-    popupMsg
+    popupMsg,
+    downloadAppPrompt
 }

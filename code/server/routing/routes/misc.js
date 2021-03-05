@@ -1,12 +1,12 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require(global.$dir + '/middleware/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
 router.post('/unique-username',
-    middleware.validateRequest(
+validationMiddleware.validateRequest(
         [
             validator.body("username").exists(),
         ]
@@ -40,7 +40,7 @@ router.get('/redirect/:shortCode', async (req, res) => {
         let msg = null
         if (!url)
             msg = `This link doesn't exist or is no longer active! Redirecting you to home.`
-        res.send({ status: 'all good', url: redirect, msg })
+        return res.json({ status: 'all good', url: redirect, msg })
     } catch(err) {
         console.log(err)
         res.json({ status: "err", url: homepage})

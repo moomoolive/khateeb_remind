@@ -1,16 +1,17 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require(global.$dir + '/middleware/main.js')
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const authHelpers = require(global.$dir + '/libraries/auth/main.js')
 
 const router = express.Router()
-router.use(middleware.auth(1))
+router.use(authMiddleware.authenticate({ min: 1 }))
 
 router.put(
     '/', 
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("password").isLength({ min: 6 }).optional(),
             validator.body("username").isLength({ min: 6 }).optional(),
@@ -35,20 +36,19 @@ router.put(
             console.log(err)
             const msg = `Couldn't edit user information`
             console.log(msg)
-            res.json(msg)
+            return res.json(msg)
         }
     }
 )
 
 router.get('/check-in', async(req, res) => {
     try {
-        // log login time
         const userPackage = {}
         const user = await $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
         userPackage.lastLogin = user.lastLogin
         userPackage.notifications = await $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        if (req.headers.usertype === 'root' || req.headers.usertype === 'sysAdmin')
-            return userPackage
+        if (req.headers.authLevel > 3)
+            return res.json(userPackage)
         userPackage.institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
         return res.json(userPackage)
     } catch(err) {
@@ -59,7 +59,7 @@ router.get('/check-in', async(req, res) => {
 
 router.put(
     '/notification',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("_id").isLength(24),
             validator.body("seen").isBoolean().optional(),

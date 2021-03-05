@@ -1,11 +1,11 @@
 <template>
     <div>
         <form-main
-            :structure="structure"
-            :bindedExts="['confirms']"
-            :backgroundColor="backgroundColor"
-            @submitted="$emit('changed', $event)"
-            :formTitle="formTitle ? formTitle : ''"
+            v-bind="{
+                ...formProps,
+                structure: formStructure
+            }"
+            @submitted="$emit('submitted', $event)"
         />
     </div>
 </template>
@@ -19,19 +19,34 @@ export default {
         formMain
     },
     props: {
-        formTitle: {
-            type: String,
-            required: false
-        },
-        backgroundColor: {
-            type: String,
+        includeVitals: {
+            type: Boolean,
             required: false,
-            default: 'yellow-offWhite'
+            default: false
+        },
+        includeIdAppender: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
+        userType: {
+            type: String,
+            required: true
+        },
+        formProps: {
+            type: Object,
+            required: false,
+            default: () => {}
+        },
+        institutionIDs: {
+            type: Array,
+            required: false,
+            default: () => []
         }
     },
     data() {
         return {
-            structure: {
+            userVitals: {
                 username: {
                     required: true,
                     minLength: 6
@@ -40,11 +55,20 @@ export default {
                     type: 'protected',
                     required: true,
                     minLength: 6
-                },
+                }
+            },
+            baseUser: {
                 handle: {
-                    type: 'handle',
+                    validators: 'handle',
                     required: true,
                 },
+                // khateebs only
+                title: {
+                    type: "dropdown",
+                    required: true,
+                    selectOptions: ['none', 'Shiekh', 'Imam']
+                },
+                // ends here
                 firstName: {
                     required: true
                 },
@@ -55,7 +79,31 @@ export default {
                     type: 'phoneNumber',
                     required: true
                 }
+            },
+            idAppender: {
+                institutionID: {
+                    type: 'dropdown',
+                    required: true,
+                    selectOptions: null,
+                    value: '_id',
+                    display: "name",
+                    alias: 'Institution'
+                }
             }
+        }
+    },
+    computed: {
+        formStructure() {
+            let form = { ...this.baseUser }
+            if (this.userType !== 'khateeb')
+                delete form.title
+            if (this.includeVitals)
+                form = { ...this.userVitals , ...form }
+            if (this.includeIdAppender) {
+                form = { ...this.idAppender, ...form }
+                form.institutionID.selectOptions = this.institutionIDs
+            }
+            return form
         }
     }
 }

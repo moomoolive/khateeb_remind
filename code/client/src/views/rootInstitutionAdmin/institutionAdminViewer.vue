@@ -14,39 +14,37 @@
             </collapsable-box>
         </div>
         <div class="new-existing-divider"></div>
-        <div v-if="admins">
-            <loading>
-                <div v-if="admins.length > 0" class="admin-container">
-                    <div v-for="(admin, index) in admins" :key="index">
-                        <collapsable-box
-                            :headline="`${admin.firstName} ${admin.lastName}`"
-                            :tagDetails="[{
-                                words: `Last Active: ${_.dynamicDisplayDate(admin.lastLogin)}`,
-                                color: `goodNews`,
-                                symbol: `☀️`
-                            }]"
-                        >
-                            <button class="red" @click="deleteAdmin(admin._id)">
-                                Delete {{ admin.firstName }} from System
-                            </button>
-                            <form-main
-                                :structure="structure.existing"
-                                :basedOn="admin"
-                                :buttonText="`Update ${admin.firstName}'s Info`"
-                                :backgroundColor="`none`"
-                                @submitted="submitAdmin($event)"
-                            />
-                        </collapsable-box>
-                    </div>
+        <loading>
+            <div v-if="admins.length > 0" class="admin-container">
+                <div v-for="(admin, index) in admins" :key="index">
+                    <collapsable-box
+                        :headline="`${admin.firstName} ${admin.lastName}`"
+                        :tagDetails="[{
+                            words: `Last Active: ${_.dynamicDisplayDate(admin.lastLogin)}`,
+                            color: `goodNews`,
+                            symbol: `☀️`
+                        }]"
+                    >
+                        <button class="red" @click="deleteAdmin(admin._id, index)">
+                            Delete {{ admin.firstName }} from System
+                        </button>
+                        <form-main
+                            :structure="structure.existing"
+                            :basedOn="admin"
+                            :buttonText="`Update ${admin.firstName}'s Info`"
+                            :backgroundColor="`none`"
+                            @submitted="submitAdmin($event)"
+                        />
+                    </collapsable-box>
                 </div>
-                <div v-else>
-                    <msg-with-pic 
-                        :msg="`You're currently the only administrator at this institution`"
-                        :gif="`sadCat`"
-                    />
-                </div>
-            </loading>
-        </div>
+            </div>
+            <div v-else>
+                <msg-with-pic 
+                    :msg="`You're currently the only administrator at this institution`"
+                    :gif="`sadCat`"
+                />
+            </div>
+        </loading>
     </div>
 </template>
 
@@ -66,7 +64,7 @@ export default {
     },
     data() {
         return {
-            admins: null,
+            admins: [],
             structure: {
                 new: {
                     username: {
@@ -122,19 +120,19 @@ export default {
         async submitAdmin($event) {
             try {
                 const newAdmin = await this.$API.institutionAdmins.createNewAdmin($event)
-                this.$store.commit('admin/showSavedChangesScreen')
+                this.admins.push(newAdmin)
                 this._.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
             } catch(err) {
                 console.log(err)
             }
         },
-        async deleteAdmin(id) {
+        async deleteAdmin(id, index) {
             try {
                 const confirm = await this._.confirm(`Do you really want to permenantly delete this administrator?`)
                 if (confirm) {
                     const deleted = await this.$API.institutionAdmins.deleteAdmin(id)
                     console.log(deleted)
-                    this.$store.commit('admin/showSavedChangesScreen')
+                    this.admins.splice(index, 1)
                 }
             } catch(err) {
                 console.log(err)
@@ -142,7 +140,8 @@ export default {
         },
         async getOtherAdmins() {
             try {
-                this.admin = await this.$API.institutionAdmins.getOtherAdmins()
+                const admins = await this.$API.institutionAdmins.getOtherAdmins()
+                this.admins = admins || []
             } catch(err) {
                 console.log(err)
             }

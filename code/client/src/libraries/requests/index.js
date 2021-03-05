@@ -22,7 +22,6 @@ axios.interceptors.response.use(responseInterceptors.normalResponse, responseInt
 axios.defaults.paramsSerializer = requestQueryHelpers.stringify
 
 export default {
-    // new timings
     jummahs,
     locations,
     timings,

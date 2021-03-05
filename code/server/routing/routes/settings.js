@@ -1,15 +1,15 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require(global.$dir + '/middleware/main.js')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
+router.use(authMiddleware.authenticate({ min: 2, max: 3 }))
+
 router.get(
     '/',
-    middleware.auth(2),
     async (req, res) => {
         let settings = {}
         try {
@@ -24,7 +24,6 @@ router.get(
 
 router.put(
     '/',
-    middleware.auth(2),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength(24),
         validator.body("twilioUser").isLength({ min: 1 }).optional(),
@@ -35,7 +34,6 @@ router.put(
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "settings"),
     async (req, res) => {
-        console.log(req.body)
         try {
             // I chose to update and find seperately instead of mongoose's 
             // 'findOneAndUpdate' because update hooks don't apply to them

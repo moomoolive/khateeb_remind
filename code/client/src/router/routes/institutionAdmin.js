@@ -34,7 +34,7 @@ const adminRoutes = [
               },
               {
                 path: 'settings',
-                component: () => import('@/views/institutionAdmin/subroutes/settings/main.vue'),
+                component: () => import('@/views/institutionAdmin/subroutes/settings.vue'),
                 meta: {
                   auth: { min: 2, max: 3 }
                 }

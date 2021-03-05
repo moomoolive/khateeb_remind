@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="showSettings">
         <div class="two-settings-container">
             <collapsable-box
                 class="setting-container"
@@ -10,9 +10,14 @@
                     symbol: '🌎' 
                 }] : null"
             >
-                <institution-details 
+                <institution-form-template 
                     v-if="institution"
-                    :institution="institution"
+                    :formProps="{
+                        basedOn: institution,
+                        bindedExts: ['states'],
+                        backgroundColor: 'none',
+                        buttonText: 'Update Institution'
+                    }"
                     @submitted="saveInstitutionDetails($event)"
                 />
             </collapsable-box>
@@ -27,9 +32,31 @@
                     symbol: settings.textAllowed ? `✔️` : `⚠️`
                 }] : null"
             >
-                <text-settings
-                    v-if="settings"
-                    :settings="settings" 
+                <img class="text-vendor-logo" src="~@/assets/logos/twillio.png">
+                <form-main
+                    v-if="settings" 
+                    :structure="{
+                        textAllowed: {
+                            type: 'checkbox',
+                            required: true
+                        },
+                        twilioUser: {
+                            required: true,
+                            tag: 'encrypted'
+                        },
+                        twilioKey: {
+                            type: 'protected',
+                            toggle: true,
+                            required: true,
+                            tag: 'encrypted'
+                        },
+                        twilioPhoneNumber: {
+                            required: true,
+                            minLength: 12
+                        },
+                    }"
+                    :backgroundColor="`none`"
+                    :basedOn="settings"
                     @submitted="saveSettings($event)"
                 />
             </collapsable-box>
@@ -42,12 +69,16 @@
                     symbol: settings.autoConfirmRegistration ? `🤖` : `📜`
                 }] : null"
             >
-                <registration-settings
+                <form-main
                     v-if="settings" 
-                    :settings="{
-                        autoConfirmRegistration: settings.autoConfirmRegistration,
-                        _id: settings._id
+                    :structure="{
+                        autoConfirmRegistration: {
+                            type: 'checkbox',
+                            required: true
+                        }
                     }"
+                    :backgroundColor="`none`"
+                    :basedOn="settings"
                     @submitted="saveSettings($event)"
                 />
             </collapsable-box>
@@ -66,23 +97,22 @@
 </template>
 
 <script>
-import textSettings from './subviews/textSettings.vue'
-import institutionDetails from './subviews/institutionDetails.vue'
-import registrationSettings from './subviews/registrationSettings'
 import collapsableBox from '@/components/general/collapsableBox.vue'
+import formMain from '@/components/forms/main.vue'
+import institutionFormTemplate from '@/components/forms/templates/institution.vue'
 
 export default {
     name: "settings",
     components: {
-        textSettings,
-        institutionDetails,
-        registrationSettings,
-        collapsableBox
+        collapsableBox,
+        formMain,
+        institutionFormTemplate
     },
     data() {
         return {
             institution: null,
-            settings: null
+            settings: null,
+            showSettings: true
         }
     },
     methods: {
@@ -100,16 +130,18 @@ export default {
         },
         async saveSettings($event) {
             try {
-                this.settings = await this.$API.settings.updateSettings($event)
-                this.$store.commit('admin/showSavedChangesScreen')
+                const updatedSettings = await this.$API.settings.updateSettings($event)
+                this.settings = updatedSettings || this.settings
+                this.rerenderSettings()
             } catch(err) {
                 console.log(err)
             }
         },
         async saveInstitutionDetails($event) {
             try {
-                this.institution = await this.$API.institutions.updateInstitution($event)
-                this.$store.commit('admin/showSavedChangesScreen')
+                const updatedInstitution = await this.$API.institutions.updateInstitution($event)
+                this.institution = updatedInstitution || this.institution
+                this.rerenderSettings()
             } catch(err) {
                 console.log(err)
             }
@@ -126,6 +158,10 @@ export default {
                     console.log(err)
                 }
             }
+        },
+        rerenderSettings() {
+            this.showSettings = false
+            this.$nextTick(() => { this.showSettings = true })
         }
     },
     async created() {
@@ -159,6 +195,10 @@ export default {
     max-height: 60px;
     font-size: 20px;
     color: red;
+}
+
+.text-vendor-logo {
+    width: 80%;
 }
 
 @media screen and (max-width: $phoneWidth) {

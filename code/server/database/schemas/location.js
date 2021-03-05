@@ -38,8 +38,11 @@ location.methods.deleteDependants = async function () {
     let res = {}
     try {
         const timings = await this.findTimings()
-        for (let i = 0; i < timings.length; i++)
-            res = await timings[i].deleteDependants()
+        for (let i = 0; i < timings.length; i++) {
+            const thisTimingRes = await timings[i].deleteDependants()
+            const deletedTiming = await $db.timings.update({ _id: timings[i]._id.toString() }, { active: false })
+            res[`timing-${timings[i]._id.toString()}`] = { ...thisTimingRes, timing: deletedTiming}
+        }
     } catch(err) {
         console.log(err)
         console.log(`Couldn't delete location dependants`)

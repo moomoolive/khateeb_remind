@@ -1,10 +1,11 @@
 const express = require('express')
 
-const middleware = require(global.$dir + "/middleware/main.js")
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
-router.use(middleware.auth(4))
+router.use(authMiddleware.authenticate({ min: 4, max: 5 }))
 
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
 const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
@@ -366,7 +367,7 @@ const validator = require('express-validator')
 
 router.post(
     '/cli',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("command").isArray(),
         ]

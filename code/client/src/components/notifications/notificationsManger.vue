@@ -106,7 +106,6 @@ export default {
     },
     watch: {
         notificationsQueue(newVal) {
-            console.log(newVal)
             if (newVal.length < 1)
                 return this.firstNotification = true
             let upcomingNotification = newVal[0]

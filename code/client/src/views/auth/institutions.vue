@@ -6,95 +6,56 @@
                 :currentStep="currentStep"
                 :stepNames="['Register\nInst', 'Register\nAdmin', 'Wait\nfor\nresponse']"
             />
-            <formMain
+            <institution-form-template 
                 v-show="showInstitutions"
-                :structure="formStructure.institution"
-                :bindedExts="['states']"
-                :backgroundColor="`yellow`"
-                :buttonText="`To Next Step`"
-                :confirmBeforeSubmit="false"
+                :formProps="{
+                    bindedExts: ['states'],
+                    backgroundColor: 'yellow',
+                    buttonText: 'To Next Step',
+                    confirmBeforeSubmit: false,
+                    formTitle: 'Institution Details'
+                }"
                 @submitted="toStepTwo('institution', $event)"
-                :formTitle="`Institution Details`"
             />
-            <formMain
+            <user-form-template 
                 v-show="showInstitutionAdmin"
-                :structure="formStructure.institutionAdmin"
-                :bindedExts="['confirms']"
-                :backgroundColor="`yellow`"
-                :buttonText="`Sign Up`"
+                :userType="`rootInstitutionAdmin`"
+                :includeVitals="true"
+                :formProps="{
+                    bindedExts: ['confirms'],
+                    backgroundColor: 'yellow',
+                    buttonText: 'Sign up',
+                    formTitle: 'Institution Admin'
+                }"
                 @submitted="toAPI('institutionAdmin', $event)"
-                :formTitle="`Institution Admin`"
             />
-            <button
-                :disabled="firstStep"
-                @click="changeStep(-1)"
-            >
-                To Previous Step
-            </button><br>
+            <transition name="dropdown">
+                <button v-show="currentStep !== 1" @click="changeStep(-1)">
+                    To Previous Step
+                </button>
+            </transition>
         </loading>
     </div>
 </template>
 
 <script>
-import formMain from '@/components/forms/main.vue'
 import progressTracker from '@/components/general/progressTracker.vue'
 import loading from '@/components/general/loadingScreen.vue'
+import institutionFormTemplate from '@/components/forms/templates/institution.vue'
+import userFormTemplate from '@/components/forms/templates/user.vue'
 
 export default {
     name: "institutionSignUp",
     components: {
-        formMain,
         progressTracker,
-        loading
+        loading,
+        institutionFormTemplate,
+        userFormTemplate
     },
     data() {
         return {
             showInstitutions: true,
             showInstitutionAdmin: false,
-            formStructure: {
-                institution: {
-                    name: {
-                        required: true
-                    },
-                    abbreviatedName: {
-                        required: true
-                    },
-                    timezone: {
-                        type: "dropdown",
-                        required: true,
-                        selectOptions: ["America/Edmonton", "America/Vancouver"]
-                    },
-                    country: {
-                        type: "dropdown",
-                        required: true,
-                        selectOptions: ["Canada", "United States", "Mexico"]
-                    }  
-                },
-                institutionAdmin: {
-                    username: {
-                        required: true,
-                        validators: 'username'
-                    },
-                    password: {
-                        required: true,
-                        minLength: 6
-                    },
-                    handle: {
-                        validators: 'handle',
-                        required: true,
-                    },
-                    firstName: {
-                        required: true
-                    },
-                    lastName: {
-                        required: true
-                    },
-                    phoneNumber: {
-                        type: 'phoneNumber',
-                        required: true
-                    }
-                }
-            },
             request: {
                 institution: null,
                 institutionAdmin: null

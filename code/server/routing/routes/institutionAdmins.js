@@ -1,7 +1,6 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require(global.$dir + '/middleware/main.js')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
@@ -10,7 +9,7 @@ const notificationConstructors = require(global.$dir + '/libraries/notifications
 
 const router = express.Router()
 
-router.use(middleware.auth(3))
+router.use(authMiddleware.authenticate(3))
 
 router.get(
     "/", 
@@ -28,6 +27,7 @@ router.post("/",
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest(
         [
+            validator.body("institutionID").isLength(24),
             validator.body("password").isLength({ min: 6 }),
             validator.body("username").isLength({ min: 6 }),
             validator.body("handle").isLength({ min: 1 }),
@@ -39,7 +39,7 @@ router.post("/",
     async (req, res) => {
         try {
             req.body.confirmed = true
-            const newInstitutionAdmin = new $db.institutionAdmins(req.body).save()
+            const newInstitutionAdmin = await new $db.institutionAdmins(req.body).save()
             await new notificationConstructors.WelcomeNotificationConstructor(newInstitutionAdmin).create()
             return res.json(newInstitutionAdmin)
         } catch(err) {
@@ -56,8 +56,10 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "institutionAdmins"), 
     async (req, res) => {
         try {
+            const institutionAdmin = await $db.institutionAdmins.findOne(req.query).exec()
+            const dependantsRes = await institutionAdmin.deleteNotifications()
             const deleted = await $db.institutionAdmins.deleteOne(req.query)
-            return res.json(deleted)
+            return res.json({ institutionAdmin: deleted, dependantsRes })
         } catch(err) {
             console.log(err)
             res.json(`Couldn't delete institution admin ${req.params._id}`)

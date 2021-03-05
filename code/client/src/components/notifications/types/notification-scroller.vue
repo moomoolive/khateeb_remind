@@ -7,7 +7,7 @@
             <div v-if="allNotifications.length > 0">
                 <div 
                     v-for="(notification, index) in allNotifications" :key="index"
-                    :class="`notification-container ${notificationPosition(index)}`"
+                    :class="`notification-container`"
                 >       
                     <div>
                         <tag-circle
@@ -104,15 +104,6 @@ export default {
             val.words = name
             return val
         },
-        notificationPosition(index) {
-            const notificationCount = this.allNotifications.length
-            let position = ''
-            if (index === 0)
-                position += 'first '
-            if (index === notificationCount - 1)
-                position += 'last'
-            return position
-        },
         pushToActionPage(notification) {
             const actionLink = notification.actionLink.replace("__ID__", notification._id)
             console.log(actionLink)
@@ -175,10 +166,10 @@ export default {
     box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
     display: flex;
     flex-direction: column;
-    &.first {
+    &:first-child {
         border-top: none;
     }
-    &.last {
+    &:last-child {
         border-bottom: none;
     }
 }

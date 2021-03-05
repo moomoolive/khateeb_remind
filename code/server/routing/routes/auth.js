@@ -1,7 +1,7 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require(global.$dir + '/middleware/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
 const authHelpers = require(global.$dir + '/libraries/auth/main.js')
@@ -10,7 +10,7 @@ const router = express.Router()
 
 router.post(
     '/create/institution',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("institution.name").isLength({ min: 1 }),
             validator.body("institution.abbreviatedName").isLength({ min: 1 }),
@@ -42,7 +42,7 @@ router.post(
 
 router.post(
     '/create/khateeb',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("institutionID").isLength(20),
             validator.body("password").isLength({ min: 6 }),
@@ -65,13 +65,11 @@ router.post(
             else
                 req.body.confirmed = false
             const khateebEntry = await new $db.khateebs(req.body).save()
-            if (settings.autoConfirmRegistration) {
-                const welcomeMsg = new notificationConstructors.WelcomeNotificationConstructor(khateebEntry)
-                const saved = await welcomeMsg.create()
-            }
+            if (settings.autoConfirmRegistration)
+                await new notificationConstructors.WelcomeNotificationConstructor(khateebEntry).create()
             const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, settings.autoConfirmRegistration)
             await note.setRecipentsToAdmins(institution)
-            const msgs = await note.create()
+            await note.create()
             return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
         console.log(err)
@@ -81,7 +79,7 @@ router.post(
 
 router.post(
     '/',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("password").isLength({ min: 1 }),
             validator.body("username").isLength({ min: 1 }),
@@ -110,7 +108,7 @@ router.post(
 
 router.post(
     '/forgot/:type', 
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("data").isLength({ min: 1 }),
         ]
@@ -158,7 +156,7 @@ router.post(
 
 router.post(
     '/verification-code', 
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("code").isLength({ min: 1 }),
             validator.body("userID").isLength(20),

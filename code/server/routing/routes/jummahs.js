@@ -1,12 +1,12 @@
 const express = require('express')
 
-const middleware = require(global.$dir + '/middleware/main.js')
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 
 const router = express.Router()
 
 router.get(
     '/',
-    middleware.auth(1), 
+    authMiddleware.authenticate({ min: 1, max: 3 }), 
     async (req, res) => {
         console.log(req.query)
         let jummahs = []

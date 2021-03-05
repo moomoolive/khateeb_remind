@@ -1,5 +1,5 @@
 // LEGACY ROUTES
-
+/*
 const express = require('express')
 const validator = require('express-validator')
 
@@ -72,7 +72,7 @@ router.delete(routerGroup1URL + '/:_id', async (req, res) => {
     }
 })
 
-/*
+
 router.post(routerGroup1URL,
     middleware.validateRequest(
         [
@@ -92,7 +92,7 @@ router.post(routerGroup1URL,
             return res.json(errors.db(routerGroup1.slice(0, -1), 'saving', err))
         }
 })
-*/
+
 
 const routerGroup2 = 'khateebs'
 const routerGroup2URL = `/${routerGroup2}`
@@ -115,7 +115,7 @@ router.delete(routerGroup2URL + "/:_id", async (req, res) => {
     }
 })
 
-/*
+
 router.put(
     routerGroup2URL,
     middleware.validateRequest(
@@ -135,7 +135,7 @@ router.put(
             res.json(errors.db(routerGroup2.slice(0, -1), 'updating', err))
         }
 })
-*/
+
 
 const routerGroup6 = "locations"
 const routerGroup6URL = `/${routerGroup6}`
@@ -162,7 +162,7 @@ router.get(routerGroup6URL + "/:_id", async (req, res) => {
     }
 })
 
-/*
+
 router.post(
     '/locations',
     async (req, res) => {
@@ -179,7 +179,7 @@ router.post(
         res.json(errors.db(routerGroup6.slice(0, -1), 'saving', err))
     }
 })
-*/
+
 
 router.put(
     '/locations',
@@ -224,7 +224,7 @@ router.get(routerGroup7URL + '/:_id' + "/:locationID", async (req, res) => {
     }
 })
 
-/*
+
 router.post('/timings', 
     async (req, res) => {
         try {
@@ -243,7 +243,7 @@ router.post('/timings',
         }
     }
 )
-*/
+
 
 router.put(
     '/timings',
@@ -283,7 +283,7 @@ router.get(routerGroup8URL + "/:_id/:year/:month/:weekOf/:locationID/:timingID",
     }
 })
 
-/*
+
 router.put(
     routerGroup8URL,
     middleware.validateRequest(
@@ -302,7 +302,7 @@ router.put(
         res.json(errors.db(routerGroup8, "saving", err))
     }
 })
-*/
+
 
 const schedules = {
     createDateObjectFromRequest(month, year) {
@@ -326,7 +326,7 @@ const schedules = {
     }
 }
 
-/*
+
 router.get(
     "/schedules" + "/:month/:year",
     middleware.validateRequest(
@@ -351,7 +351,7 @@ router.get(
             res.json(errors.getReq('schedules', err))
         }
 })
-*/
+
 
 const routerGroup10 = 'settings'
 const routerGroup10URL = `/${routerGroup10}`
@@ -460,3 +460,4 @@ router.put('/clear-jummah', async (req, res) => {
 })
 
 //module.exports = router
+*/

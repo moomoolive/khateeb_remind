@@ -1,72 +1,41 @@
 <template>
     <div>
         <loading>
-            <form-main
-                v-if="showForm"
-                :structure="structure"
-                :bindedExts="['confirms']"
-                :backgroundColor="`red`"
-                :buttonColor="`blue`"
-                :buttonText="`Sign Up`"
+            <user-form-template
+                v-if="showForm" 
+                :userType="`khateeb`"
+                :includeVitals="true"
+                :includeIdAppender="true"
+                :institutionIDs="filteredInstitutions"
+                :formProps="{
+                    bindedExts: ['confirms'],
+                    backgroundColor: 'red',
+                    buttonColor: 'blue',
+                    buttonText: 'Sign up',
+                    formTitle: 'Khateeb Sign Up'
+                }"
                 @submitted="signupKhateeb($event)"
-                :formTitle="`Khateeb Sign Up`"
             />
         </loading>
     </div>
 </template>
 
 <script>
-import formMain from '@/components/forms/main.vue'
 import loading from '@/components/general/loadingScreen.vue'
+import userFormTemplate from '@/components/forms/templates/user.vue'
 
 export default {
     name: "khateebSignup",
     components: {
-        formMain,
-        loading
+        loading,
+        userFormTemplate
     },
     data() {
         return {
-            structure: {
-                institutionID: {
-                    type: 'dropdown',
-                    required: true,
-                    selectOptions: null,
-                    value: '_id',
-                    display: "name",
-                    alias: 'Institution'
-                },
-                username: {
-                    required: true,
-                    validators: 'username'
-                },
-                password: {
-                    required: true,
-                    minLength: 6
-                },
-                handle: {
-                    required: true,
-                    validators: 'handle'
-                },
-                title: {
-                    type: "dropdown",
-                    required: true,
-                    selectOptions: ['none', 'Shiekh', 'Imam']
-                },
-                firstName: {
-                    required: true
-                },
-                lastName: {
-                    required: true
-                },
-                phoneNumber: {
-                    type: 'phoneNumber',
-                    required: true
-                }
-            },
             keyBinds__TEST__: {},
-            allInstitutions: null,
-            showForm: true
+            allInstitutions: [],
+            showForm: true,
+            testKeyBind: false
         }
     },
     methods: {
@@ -97,17 +66,21 @@ export default {
                     if (!pressed)
                         return
                 }
-                this.structure.institutionID.selectOptions = this._.deepCopy(this.allInstitutions)
+                this.testKeyBind = true
                 this.showForm = false
                 this.$nextTick(() => { this.showForm = true })
              })
+        }
+    },
+    computed: {
+        filteredInstitutions() {
+            return this.testKeyBind ? this.allInstitutions : this.allInstitutions.filter(inst => inst.name !== "__TEST__")
         }
     },
     async created() {
         window.addEventListener('keydown', this.keyBinds)
         window.addEventListener('keyup', this.keyBinds)
         this.allInstitutions = await this.$API.misc.institutionSelection()
-        this.structure.institutionID.selectOptions = this.allInstitutions.filter(inst => inst.name !== "__TEST__")
     },
     destroyed() {
         window.addEventListener('keydown', this.keyBinds)

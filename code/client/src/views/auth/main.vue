@@ -3,7 +3,15 @@
         <img :src="require('@/assets/logos/khateebRemindLogo.svg')">
         <div class="formContainer">
             <form-main
-                :structure="formStructure"
+                :structure="{
+                    username: {
+                        required: true
+                    },
+                    password: {
+                        type: 'protected',
+                        required:true
+                    }
+                }"
                 :errorMsg="errorMsg"
                 :showInvalidationMsgs="false"
                 :backgroundColor="`darkBlue`"
@@ -34,15 +42,6 @@ export default {
     },
     data() {
         return {
-            formStructure: {
-                username: {
-                    required: true
-                },
-                password: {
-                    type: "protected",
-                    required: true
-                }
-            },
             errorMsg: '',
             rememberMe: !!localStorage.getItem('rememberMe')
         }
@@ -71,8 +70,8 @@ export default {
             }
         },
         loginRedirect() {
-            const landingPage = this.$store.state.landingPage
-            if (!this.$store.state.app.hasLoggedInViaLoginPage && landingPage !== this.$router.currentRoute.fullPath) {
+            const landingPage = this.$store.state.router.landingPage
+            if (!this.$store.state.app.hasLoggedInViaLoginPage && landingPage !== this.$route.path) {
                 this.$router.push(landingPage)
                 this.$store.commit('app/loggedInViaLoginPage')
             }

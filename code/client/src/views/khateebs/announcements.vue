@@ -1,25 +1,19 @@
 <template>
     <div>
-        <div v-if="announcements.length > 0">
-            <div 
-                v-for="(twoAnnouncements, index) in announcementsArraysOfTwo"
+        <div v-if="announcements.length > 0" class="announcements-container">
+            <collapsable-box
+                v-for="(announcement, index) in announcements"
                 :key="index"
-                class="two-announcement-container"
+                class="announcement-container"
+                :headline="
+                    `${_.dynamicDisplayDate(announcement.updatedAt)} || ${announcement.headline}`
+                "
+                :tagDetails="tagLoader(announcement)"
             >
-                <collapsable-box
-                    v-for="(announcement, ID) in twoAnnouncements" 
-                    class="announcement-container"
-                    :key="ID"
-                    :headline="
-                        `${_.dynamicDisplayDate(announcement.updatedAt)} || ${announcement.headline}`
-                    "
-                    :tagDetails="tagLoader(announcement)"
-                >
-                    <div class="content" >
-                        <p>{{ announcement.content }}</p>
-                    </div>
-                </collapsable-box>
-            </div>
+                <div class="content" >
+                    <p>{{ announcement.content }}</p>
+                </div>
+            </collapsable-box>
         </div>
         <msg-with-pic
             v-else
@@ -42,7 +36,6 @@ export default {
     },
     data() {
         return {
-            announcementsExists: true,
             announcements: []
         }
     },
@@ -54,43 +47,16 @@ export default {
             if (this.isNew(announcement.savedOn)) tagArray.push('new')
             return tagArray
         },
-        dateLoader(stringDate) {
-            const date = new Date(stringDate)
-            const month = date.toLocaleString('default', {month: 'short'})
-            const day = date.getDate()
-            return `${month} ${day}`
-        },
         isNew(announcementDate) {
-            const date = new Date(announcementDate)
-            return date > this.$store.state.user.lastLogin
-        },
-        announcementsToArraysOfTwo(announcements) {
-            const arraysOfTwo = []
-            let chopped = []
-            for (let i = 0; i < announcements.length; i++) {
-                chopped.push(announcements[i])
-                const even = i % 2
-                if (even) {
-                    arraysOfTwo.push(chopped)
-                    chopped = []
-                }
-            }
-            arraysOfTwo.push(chopped)
-            return arraysOfTwo
+            return new Date(announcementDate).getTime() > this.$store.state.user.lastLogin.getTime()
         },
         async getAnnouncements() {
             try {
                 const data = await this.$API.announcements.getAnnouncements()
-                console.log(data)
                 this.announcements = data || []
             } catch(err) {
                 console.log(err)
             }
-        }
-    },
-    computed: {
-        announcementsArraysOfTwo() {
-            return this.announcementsToArraysOfTwo(this.announcements)
         }
     },
     created() {
@@ -100,9 +66,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.two-announcement-container {
+.announcements-container {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     width: 90%;
     max-height: 300px;
     margin-left: auto;
@@ -130,7 +97,7 @@ p {
 }
 
 @media screen and (max-width: $phoneWidth) {
-      .two-announcement-container {
+      .announcements-container {
             flex-direction: column;
         }
         .announcement-container {

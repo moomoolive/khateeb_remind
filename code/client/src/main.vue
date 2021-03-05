@@ -15,7 +15,7 @@
     >
       <transition name="dropdown">
         <notifications 
-          v-if="showNotificationDisplay" 
+          v-show="showNotificationDisplay" 
           class="notifications notifications-size-position"
         />
       </transition>

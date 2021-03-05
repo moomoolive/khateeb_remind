@@ -177,7 +177,8 @@ export default {
                 return this._.alert(`You must have at least one timing per location!`)
             const confirm = await this._.confirm(`Are you sure you want delete this timing?`)
             if (confirm) {
-                await this.$API.timings.deleteTiming(timing._id) 
+                const res = await this.$API.timings.deleteTiming(timing._id) 
+                console.log(res)
                 this.timings.splice(index, 1)
             }
         },
@@ -189,7 +190,8 @@ export default {
                 return this._.alert(`You must have at least one location`)
             const confirm = await this._.confirm(`Are you sure you want to delete this location?`)
             if (confirm) {
-                await this.$API.locations.deleteLocation(location._id)
+                const res = await this.$API.locations.deleteLocation(location._id)
+                console.log(res)
                 this.locations.splice(index, 1)
             }
         },

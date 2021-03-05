@@ -3,8 +3,13 @@ export default {
     state: () => ({
         display: {
             show: false,
-            type: 'none',
-            options: {} 
+            type: 'alert',
+            options: {
+                msg: 'none has been set yet',
+                textSize: 'small',
+                icon: 'exclamation',
+                color: 'yellow'
+            } 
         },
         queue: [],
         userPrompted: [],

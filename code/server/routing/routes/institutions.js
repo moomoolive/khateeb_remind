@@ -1,7 +1,6 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require(global.$dir + '/middleware/main.js')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
@@ -9,7 +8,7 @@ const router = express.Router()
 
 router.get(
     '/',
-    middleware.auth(2),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
     async (req, res) => {
         let institution = {}
         try {
@@ -24,7 +23,7 @@ router.get(
 
 router.put(
     '/',
-    middleware.auth(2),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength(24),
         validator.body("name").isLength({ min: 1 }).optional(),
@@ -35,9 +34,8 @@ router.put(
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "institutions"),
     async (req, res) => {
-        console.log(req.body)
         try {
-            const updated = await $db.institutions.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.institutions.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
@@ -48,7 +46,7 @@ router.put(
 
 router.delete(
     '/',
-    middleware.auth(3),
+    authMiddleware.authenticate(3),
     async (req, res) => {
         try {
             const query = { _id: req.headers.institutionid }

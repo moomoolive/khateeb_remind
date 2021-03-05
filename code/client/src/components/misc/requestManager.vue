@@ -60,7 +60,6 @@ export default {
             const request = { ...newVal[0] }
             this.$store.commit('requests/shiftQueue')
             const requestKey = helpers.requestId(request)
-            console.log(requestKey)
             if (this.activeRequests[requestKey] !== undefined)
                 this.clearRequest(requestKey)
             this.createActiveRequest(requestKey, request)

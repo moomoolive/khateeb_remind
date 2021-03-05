@@ -1,16 +1,16 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require(global.$dir + '/middleware/main.js')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
 
 const router = express.Router()
 
+
 router.get(
     '/',
-    middleware.auth(1),
+    authMiddleware.authenticate({ min: 1, max: 3 }),
     async (req, res) => {
         let announcements = []
         try {
@@ -25,7 +25,7 @@ router.get(
 
 router.post(
     '/',
-    middleware.auth(2),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
         validator.body("institutionID").isLength(24),
@@ -35,7 +35,6 @@ router.post(
         validator.body("urgent").isBoolean(),
     ]),
     async (req, res) => {
-        console.log(req.body)
         try {
             const newAnnouncement = await $db.announcements(req.body).save()
             return res.json(newAnnouncement)
@@ -48,7 +47,7 @@ router.post(
 
 router.put(
     '/',
-    middleware.auth(2),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength(24),
         validator.body("headline").isLength({ min: 1 }).optional(),
@@ -58,7 +57,6 @@ router.put(
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "announcements"),
     async (req, res) => {
-        console.log(req.body)
         try {
             const updated = await $db.announcements.findOneAndUpdate(req.body._id, req.body, { new: true })
             return res.json(updated)
@@ -71,7 +69,7 @@ router.put(
 
 router.delete(
     '/',
-    middleware.auth(2),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
         validator.query("_id").isLength(24)
     ], "query"),

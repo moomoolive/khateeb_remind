@@ -1,5 +1,5 @@
 // LEGACY ROUTES
-
+/*
 const express = require('express')
 
 const middleware = require(global.$dir + '/middleware/main.js')
@@ -52,7 +52,7 @@ router.get('/jummah-confirm/:jummahID/:notificationID', async (req, res) => {
     }
 })
 
-/*
+
 router.post(
     '/jummah-confirm', 
     async (req, res) => {
@@ -77,7 +77,6 @@ router.post(
             res.json(`Couldn't update notification status!`)
         }
 })
-*/
 
 router.get('/available-timings', async (req, res) => {
     try {
@@ -96,3 +95,4 @@ router.get('/available-timings', async (req, res) => {
 })
 
 module.exports = router
+*/

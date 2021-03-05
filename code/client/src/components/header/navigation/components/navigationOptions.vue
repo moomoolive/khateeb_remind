@@ -64,6 +64,8 @@
 <script>
 import { VuePwaInstallMixin, BeforeInstallPromptEvent } from 'vue-pwa-install'
 
+import notificationHelpers from '@/libraries/notifications/main.js'
+
 export default {
     name: "navigationOptions",
     mixins: [VuePwaInstallMixin],
@@ -75,19 +77,17 @@ export default {
     methods: {
         async downloadApp() {
             this.$emit('close-nav')
-            const options = {
-            picture: 'downloadApp',
-            rejectButtonText: 'Later',
-            confirmButtonText: 'Install'
-            }
-            const confirm = await this._.confirm(`Install the free Khateeb Remind app:\n- Looks and feels better\n- Reminds you about khutbahs`, 'blue', options)
+            const confirm = await notificationHelpers.downloadAppPrompt()
             if (confirm)
-            this.promptPwaInstall()
+                this.promptPwaInstall()
         },
         async promptPwaInstall() {
             if (!this.deferredPrompt) {
-            window.open("https://mobilesyrup.com/2020/05/24/how-install-progressive-web-app-pwa-android-ios-pc-mac/", "_blank")
-            return this._.alert(`It looks like you've already declined or missed the prompt to download the app. We've redirected you to link which shows how to manually download.`)
+                const sixSecondsInMilliseconds = 6_000
+                window.setTimeout(() => {
+                    window.open("https://mobilesyrup.com/2020/05/24/how-install-progressive-web-app-pwa-android-ios-pc-mac/", "_blank")
+                }, sixSecondsInMilliseconds)
+                return this._.alert(`It looks like you've missed the prompt to download the app or already declined to download it. In a moment, you'll be redirected to a link which shows you how to manually download the app.`)
             }
             this.deferredPrompt.prompt()
             const choice = await this.deferredPrompt.userChoice
