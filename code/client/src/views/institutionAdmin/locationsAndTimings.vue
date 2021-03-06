@@ -115,6 +115,8 @@ import collapsableBox from '@/components/general/collapsableBox.vue'
 import timingMutator from '@/components/general/timingMutator.vue'
 import msgWithPic from '@/components/general/msgWithPic.vue'
 
+import jummahHelpers from '@/libraries/jummahs/main.js'
+
 export default {
     name: 'editLocationAndTimings',
     components: {
@@ -168,6 +170,7 @@ export default {
             try {
                 const updated = await this.$API.timings.createNewTiming(lastTimingOfLocation) 
                 this.timings.push(updated)
+                await this.createAssociatedJummahs(location, updated)
             } catch(err) {
                 console.log(err)
             }
@@ -205,6 +208,33 @@ export default {
                 const { location, timing } = await this.$API.locations.createNewLocation(newLocation)
                 this.locations.push(location)
                 this.timings.push(timing)
+                await this.createAssociatedJummahs(location, timing)
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        async jummahsExistForMonth(date) {
+            date = new Date(date)
+            let jummahsExist = true
+            try {
+                const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahHelpers.createMonthlyRequestRange(date) })
+                if (jummahs.length < 1)
+                    jummahsExist = false
+            } catch(err) {
+                console.log(err)
+            }
+            return jummahsExist
+        },
+        async createAssociatedJummahs(location, timing) {
+            const date = new Date()
+            let newJummahs = jummahHelpers.buildMonthlySchedule(date, location, timing)
+            date.setMonth(date.getMonth() + 1)
+            const createJummahsForNextMonth = await this.jummahsExistForMonth(date)
+            if (createJummahsForNextMonth)
+                newJummahs = [...newJummahs, ...jummahHelpers.buildMonthlySchedule(date, location, timing, true) ]
+            try {
+                const res = await this.$API.jummahs.createNewJummahs(newJummahs)
+                return res
             } catch(err) {
                 console.log(err)
             }

@@ -38,7 +38,7 @@ export default {
     computed: {
         weeklyKeys() {
             const date = new Date(this.selectedDate)
-            return datetime.allUpcomingFridays(date)
+            return datetime.allUpcomingFridays(date, true)
         },
         buttonYear() {
             const currentWeek = datetime.findUpcomingFriday()

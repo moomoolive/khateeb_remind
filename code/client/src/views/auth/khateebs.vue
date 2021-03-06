@@ -1,5 +1,9 @@
 <template>
     <div>
+        <complex-key-binder 
+            :targetKeyBinds="['t', 'Control', 'Alt']"
+            @all-key-bindings-active="includeTestInstitutionInInstitutionsList()"
+        />
         <loading>
             <user-form-template
                 v-if="showForm" 
@@ -23,19 +27,20 @@
 <script>
 import loading from '@/components/general/loadingScreen.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
+import complexKeyBinder from '@/components/misc/complexKeyBinder.vue'
 
 export default {
     name: "khateebSignup",
     components: {
         loading,
-        userFormTemplate
+        userFormTemplate,
+        complexKeyBinder
     },
     data() {
         return {
-            keyBinds__TEST__: {},
             allInstitutions: [],
             showForm: true,
-            testKeyBind: false
+            showTestInstitution: false
         }
     },
     methods: {
@@ -48,43 +53,33 @@ export default {
                 console.log(err)
             }
         },
-        handleKeyboardEvents(target, type) {
-            if (type === "keydown")
-                this.keyBinds__TEST__[target] = true
-            else if (type === "keyup")
-                this.keyBinds__TEST__[target] = false
+        async getAllConfirmedInstitutions() {
+            try {
+                const data = await this.$API.misc.institutionSelection()
+                this.allInstitutions = data || []
+            } catch(err) {
+                console.log(err)
+            }
         },
-        keyBinds($event) {
-            const targetKeyBind = ["t", "Control", "Alt"]
-            const found = targetKeyBind.find(key => key === $event.key)
-            if (found)
-                this.handleKeyboardEvents(found, $event.type)
-            this.$nextTick(() => { 
-                if (Object.keys(this.keyBinds__TEST__).length !== 3)
-                    return
-                for (const [key, pressed] of Object.entries(this.keyBinds__TEST__)) {
-                    if (!pressed)
-                        return
-                }
-                this.testKeyBind = true
-                this.showForm = false
-                this.$nextTick(() => { this.showForm = true })
-             })
+        includeTestInstitutionInInstitutionsList() {
+            this.showTestInstitution = true
+            this.rerenderForm()
+        },
+        rerenderForm() {
+            this.showForm = false
+            this.$nextTick(() => this.showForm = true)
         }
     },
     computed: {
         filteredInstitutions() {
-            return this.testKeyBind ? this.allInstitutions : this.allInstitutions.filter(inst => inst.name !== "__TEST__")
+            if (this.showTestInstitution)
+                return this.allInstitutions
+            else
+                return this.allInstitutions.filter(inst => inst.name !== "__TEST__")
         }
     },
-    async created() {
-        window.addEventListener('keydown', this.keyBinds)
-        window.addEventListener('keyup', this.keyBinds)
-        this.allInstitutions = await this.$API.misc.institutionSelection()
-    },
-    destroyed() {
-        window.addEventListener('keydown', this.keyBinds)
-        window.addEventListener('keyup', this.keyBinds)
+    created() {
+        this.getAllConfirmedInstitutions()
     }
 }
 </script>

@@ -25,7 +25,8 @@ export default {
     },
     methods: {
         toDestination(ext) {
-            this.$router.push(ext)
+            if (this.$route.path !== ext)
+                this.$router.push(ext)
             this.$emit('close')
         }
     }

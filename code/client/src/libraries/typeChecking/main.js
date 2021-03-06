@@ -7,7 +7,15 @@ const isValidDate = (date) => {
     return date instanceof Date && !isNaN(date.getDate())
 }
 
+const castToArray = (data) => {
+    if (!Array.isArray(data))
+        return [data]
+    else
+        return data
+}
+
 export default {
     isAnObject,
-    isValidDate
+    isValidDate,
+    castToArray
 }

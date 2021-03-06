@@ -15,6 +15,12 @@ export default {
     name: 'noJummahsKhateeb',
     components:{
         msgWithPic
+    },
+    props: {
+        monthsFromCurrent: {
+            type: Number,
+            required: true
+        }
     }
 }
 </script>

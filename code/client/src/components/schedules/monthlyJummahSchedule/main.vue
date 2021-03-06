@@ -2,91 +2,43 @@
     <div class="schedule-container">
         <loading :loadingTime="800">   
             <div v-if="locations.length > 0">
-                <!-- control buttons -->
-                <div class="std-controls-container">
-
-                    <!-- location buttons -->
-                    <locations-button-group 
-                        class="std-controls"
-                        :locations="filteredLocations"
-                        :selectedLocation="selectedLocation"
-                        @change-location="changeViewingLocation($event)"
-                    />
-                    <!-- LOCATION BUTTONS END HERE -->
-
-                    <!-- date buttons -->
-                    <switch-weeks-button-group 
-                        class="std-controls"
-                        :selectedDate="selectedDate"
-                        @change-week="changeViewingWeek($event)"
-                    />
-                    <!-- DATE BUTTONS END HERE -->
-
-                </div>
-
-                <!-- switch month buttons -->
-                <switch-months-button-group 
-                    class="external-controls"
+                
+                <schedule-standard-controls 
+                    :locations="locationsWithDataThisMonth"
+                    :selectedLocation="selectedLocation"
+                    :selectedDate="selectedDate"
                     :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
+                    @change-location="changeViewingLocation($event)"
+                    @change-week="changeViewingWeek($event)"
                     @change-month="changeViewingMonth($event)"
-                    @back-to-current="backToCurrentMonth()"
+                    @back-to-current-month="backToCurrentMonth()"
                 />
-                <!-- SWITCH MONTH BUTTONS HERE -->
 
-                <div class="locations-container" v-if="locations.length > 0">
 
-                    <div v-if="jummahs.length > 0">
+                <locations-display 
+                    :locations="filteredLocations"
+                    :jummahs="jummahs"
+                    :selectedLocation="selectedLocation"
+                    :timings="timings"
+                    :reciever="reciever"
+                    :khateebs="khateebs"
+                    :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
+                    :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
+                    :selectedDate="selectedDate"
+                    :monthsFromCurrent="monthsFromCurrent"
+                    @build-schedule="$emit('build-schedule', selectedDate)"
+                />
 
-                        <!-- locations -->
-                        <div
-                            v-for="(location, locationIndex) in filteredLocations"
-                            :key="locationIndex"
-                            class="location-container"
-                        >
-                            <!-- location info -->
-                            <div>
-                                <p class="location-label">{{ location.name }}</p>
-                                <p class="location-label">{{ location.address }}</p>
-                            </div>
-                            <!-- LOCATION INFO ENDS HERE -->
-
-                            <!-- jummah -->
-                            <jummah-displayer
-                                v-for="(jummah, jummahIndex) in filteredJummahs.filter(jummah => jummah.locationID === location._id)"
-                                :key="jummahIndex"
-                                class="jummahContainer"
-                                :jummah="jummah"
-                                :filteredTimings="filteredTimings"
-                                :reciever="reciever"
-                                :khateebs="khateebs"
-                                :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
-                                :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
-                                :selectedDate="selectedDate"
-                            />
-                            <!-- JUMMAH ENDS HERE -->
-                        
-                        </div>
-                        <!-- LOCATIONS END HERE -->
-                    </div>
-
-                    <!-- if there aren't any jummahs for requested month -->
-                    <div v-else>
-                        <component :is="`${reciever}NoJummahs`"/>
-                    </div>
-                    <!-- NO JUMMAHS REQUESTED MONTH ENDS HERE -->
                 </div>
-            </div>
 
-            <!-- Error display -->
-            <div v-else>
-                <msg-with-pic
-                    class="empty-notifications-msg" 
-                    :gif="`sadCat`"
-                    :msg="`There was a problem retrieving the schedule`"
-                    :textColor="`white`"
-                />
-            </div>
-            <!-- ERROR DISPLAY ENDS HERE -->
+                <div v-else>
+                    <msg-with-pic
+                        class="empty-notifications-msg" 
+                        :gif="`sadCat`"
+                        :msg="`There was a problem retrieving the schedule`"
+                        :textColor="`white`"
+                    />
+                </div>
         </loading>
 
         <router-query-manager
@@ -103,13 +55,12 @@
 <script>
 import msgWithPic from '@/components/general/msgWithPic.vue'
 import loading from '@/components/general/loadingScreen.vue'
-import routerQueryManager from './routerQueryManager.vue'
-import locationsButtonGroup from './buttonGroups/locations.vue'
-import switchWeeksButtonGroup from './buttonGroups/weeks.vue'
-import switchMonthsButtonGroup from './buttonGroups/months.vue'
-import jummahDisplayer from './locationComponents/jummahDisplayer.vue'
+import routerQueryManager from './misc/routerQueryManager.vue'
+import scheduleStandardControls from './controls/main.vue'
+import locationsDisplay from './locationDisplay/locations-display.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
+import jummahHelpers from '@/libraries/jummahs/main.js'
 
 export default {
     name: "jummahScheduleDisplay",
@@ -117,14 +68,8 @@ export default {
         loading,
         msgWithPic,
         routerQueryManager,
-        locationsButtonGroup,
-        switchWeeksButtonGroup,
-        switchMonthsButtonGroup,
-        jummahDisplayer,
-        "institutionAdmin": () => import('@/components/schedules/adminCells.vue'),
-        "khateeb": () => import("./khateebCells.vue"),
-        "khateebNoJummahs": () => import('./noJummahsKhateeb.vue'),
-        "institutionAdminNoJummahs": () => import('./noJummahsInstitutionAdmin.vue')
+        scheduleStandardControls,
+        locationsDisplay
     },
     props:{
         jummahs: {
@@ -150,7 +95,7 @@ export default {
     },
     data() {
         return {
-            selectedDate: datetime.upcomingFriday(true),
+            selectedDate: datetime.findUpcomingFriday(),
             selectedLocation: 'all',
             upcomingFriday: datetime.findUpcomingFriday(),
             selectedDateQueryKey: 'date',
@@ -158,29 +103,6 @@ export default {
         }
     },
     methods: {
-        sortJummahByTime(jummahA, jummahB) {
-            let jummahATiming = this.jummahTimingDateObject(jummahA).getTime()
-            let jummahBTiming = this.jummahTimingDateObject(jummahB).getTime()
-            if (jummahATiming > jummahBTiming)
-                return -1
-            else if (jummahATiming < jummahBTiming)
-                return 1
-            return 0
-        },
-        findJummahTiming(jummah) {
-            return this.filteredTimings.find(timing => jummah.timingID === timing._id)
-        },
-        jummahTimingDateObject(jummah) {
-            const timing = this.findJummahTiming(jummah)
-            const dateObject = new Date()
-            dateObject.setHours(timing.hour)
-            dateObject.setMinutes(timing.minute)
-            return dateObject
-        },
-        jummahTiming(jummah) {
-            const timing = this.jummahTimingDateObject(jummah)
-            return timing.toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" })
-        },
         updateViewBasedOnQuery(info) {
             console.log(info)
             this.selectedLocation = info.location
@@ -215,30 +137,25 @@ export default {
             query[key] = value
             this.$router.replace({ query })
         },
-        createJummahRequestRange(date) {
-            const greaterThanEqual = new Date(date)
-            greaterThanEqual.setDate(1)
-            greaterThanEqual.setUTCHours(12, 0, 0, 0)
-            const lesserThan = new Date(greaterThanEqual)
-            lesserThan.setMonth(lesserThan.getMonth() + 1)
-            return {
-                $gte: greaterThanEqual.toISOString(),
-                $lt: lesserThan.toISOString()
-            }
-        },
         requestJummahs(date) {
-            const query = this.createJummahRequestRange(date)
+            const query = jummahHelpers.createMonthlyRequestRange(date)
             this.$emit('request-jummahs', query)
         },
     },
     computed: {
+        monthsFromCurrent() {
+            return datetime.monthsFromDate(
+                new Date(this.upcomingFriday),
+                new Date(this.selectedDate)
+            )
+        },
         viewingMonthIsCurrentPastOrFuture() {
-            if (datetime.sameMonthSameYear(this.upcomingFriday, this.selectedDate))
-                return 'current'
-            else if (this.upcomingFriday.getTime() < this.selectedDate.getTime())
+            if (this.monthsFromCurrent > 0)
                 return 'future'
-            else
+            else if (this.monthsFromCurrent < 0)
                 return 'past'
+            else
+                return 'current'
         },
         viewingWeekIsCurrentPastOrFuture() {
             if (this.viewingMonthIsCurrentPastOrFuture !== 'current')
@@ -249,17 +166,6 @@ export default {
                 return 'past'
             else
                 return 'current'
-        },
-        filteredJummahs() {
-            return this.jummahs
-                .filter(jummah => new Date(jummah.date).getDate() === this.selectedDate.getDate())
-                .sort(this.sortJummahByTime)
-        },
-        filteredTimings() {
-            return this.timings
-                .filter(timing => this.jummahs
-                    .filter(jummah => jummah.timingID === timing._id).length > 0
-                )
         },
         locationsWithDataThisMonth() {
             return this.locations.filter(location => 

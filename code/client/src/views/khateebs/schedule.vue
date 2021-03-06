@@ -18,7 +18,7 @@
 
 <script>
 import logoDisplay from '@/components/misc/logoDisplay.vue'
-import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule.vue'
+import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule/main.vue'
 
 export default {
   name: 'Home',

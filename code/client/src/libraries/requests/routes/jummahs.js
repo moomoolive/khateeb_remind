@@ -7,6 +7,11 @@ const extension = helpers.targetURL('jummahs')
 const requests = {
     getJummahs(params) {
         return axios.get(extension, { params })
+    },
+    createNewJummahs(newJummahs=[]) {
+        if (!Array.isArray(newJummahs))
+            throw TypeError(`New jummahs must be in array format`)
+        return axios.post(extension, { jummahs: newJummahs })
     }
 }
 

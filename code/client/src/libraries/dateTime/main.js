@@ -1,25 +1,24 @@
+import dayjs from 'dayjs'
+import utcDayJs from 'dayjs/plugin/utc.js'
+import timezonesDayJs from 'dayjs/plugin/timezone.js'
+import objectSupportDayJs from 'dayjs/plugin/objectSupport.js'
+dayjs.extend(utcDayJs)
+dayjs.extend(timezonesDayJs)
+dayjs.extend(objectSupportDayJs)
+
 import helpers from './helpers.js'
 
-const upcomingFriday = (raw=false) => {
-    const upcomingFriday = helpers.findUpcomingFriday()
-    if (!raw) return {
-        month: upcomingFriday.toLocaleString('default', { month: 'long' }),
-        date: upcomingFriday.getDate(),
-        year: upcomingFriday.getFullYear()
-    }
-    return upcomingFriday
-}
-const findUpcomingFriday = (date=new Date()) => {
-    const friday = 5
-    while (date.getDay() !== friday) {
-        date.setDate(date.getDate() + 1)
-    }
-    return date
+const localizeToTimezone = (timezone, date) => {
+    const localizeTime = dayjs(new Date(date)).tz(timezone, true)
+    return new Date(localizeTime.toISOString())
 }
 
-const allUpcomingFridays = (input) => {
-    const firstFriday = helpers.findFirstFridayOfMonth(input)
-    return helpers.findAllFridaysInMonth(firstFriday)
+const allUpcomingFridays = (input=new Date(), fromBeginningOfMonth=false, options={}) => {
+    let inputDate = new Date(input)
+    if (options && options.timezone)
+        inputDate = localizeToTimezone(input, options.timezone)
+    const friday = fromBeginningOfMonth ? helpers.findFirstFridayOfMonth(inputDate) :  helpers.findUpcomingFriday(inputDate)
+    return helpers.findAllFridaysInMonth(friday)
 }
 
 // inputting 0 equates to the beginning of today
@@ -32,11 +31,11 @@ const daysInThePast = (numberOfDays=0) => {
 
 const monthsFromDate = (fixedDate, comparisonDate) => {
     const fixedDateObj = new Date(fixedDate)
-    const comparisonDateObj = new Date(comparisonDate)
-    if (helpers.sameMonthAndYear(fixedDateObj, comparisonDateObj))
-        return 0
-    else
+    let comparisonDateObj = new Date(comparisonDate)
+    if (!helpers.sameMonthSameYear(fixedDateObj, comparisonDateObj))
         return helpers.findMonthDifference(fixedDateObj, comparisonDateObj)
+    else
+        return 0
 }
 
 const dateFormatYM = (date, includeDate=false) => {
@@ -48,12 +47,12 @@ const dateFormatYM = (date, includeDate=false) => {
 }
 
 export default {
-    upcomingFriday,
     allUpcomingFridays,
     daysInThePast,
     monthsFromDate,
     dateFormatYM,
-    findUpcomingFriday,
-    sameMonthSameYear: helpers.sameMonthAndYear
+    findUpcomingFriday: helpers.findUpcomingFriday,
+    sameMonthSameYear: helpers.sameMonthSameYear,
+    localizeToTimezone
 }
 

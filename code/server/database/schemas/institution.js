@@ -1,4 +1,11 @@
 const mongoose = require('mongoose')
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+const objectSupport = require('dayjs/plugin/objectSupport')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(objectSupport)
 
 const institution = new mongoose.Schema({
     name: {
@@ -58,6 +65,11 @@ institution.methods.createRootAdministrator = async function(administratorInfo) 
     } catch(err) {
         console.log(err)
     }
+}
+
+institution.methods.getLocalTime = function (date=new Date()) {
+    const timeNow = dayjs(date).tz(this.timezone)
+    return new Date(timeNow.toISOString())
 }
 
 module.exports = institution

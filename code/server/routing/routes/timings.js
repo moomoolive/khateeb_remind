@@ -36,7 +36,7 @@ router.post(
     async (req, res) => {
         try {
             const newTiming = await $db.timings(req.body).save()
-            await scheduleHelpers.createJummahsForTiming(newTiming.locationID, newTiming._id.toString(), newTiming.institutionID)
+            //await scheduleHelpers.createJummahsForTiming(newTiming.locationID, newTiming._id.toString(), newTiming.institutionID)
             return res.json(newTiming)
         } catch(err) {
             console.log(err)

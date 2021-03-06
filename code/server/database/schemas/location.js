@@ -50,7 +50,7 @@ location.methods.deleteDependants = async function () {
     return res
 }
 
-location.methods.createAssociatedTiming = async function() {
+location.methods.createAssociatedTiming = async function(withJummahs=false) {
     try {
         const saved = await $db.timings({
             institutionID: this.institutionID,
@@ -59,7 +59,8 @@ location.methods.createAssociatedTiming = async function() {
             hour: 12,
             minute: 30
         }).save()
-        await  scheduleHelpers.createJummahsForTiming(this._id.toString(), saved._id.toString(), this.institutionID)
+        if (withJummahs)
+            await scheduleHelpers.createJummahsForTiming(this._id.toString(), saved._id.toString(), this.institutionID)
         return saved
     } catch(err) {
         console.log(`${err}\nCouldn't create assoicated timing`)

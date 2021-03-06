@@ -67,17 +67,18 @@ export default {
         this.activeMenu = false
       },
       signUp() {
-        const redirections = [
-                  { text: 'Khateebs', to: '/create/khateebs' },
-                  { text: 'Institutions', to: '/create/institutions' }
-              ]
-        notificationHelpers.redirectionOptions(redirections)
+        notificationHelpers.redirectionOptions(
+          [
+              { text: 'Khateebs', to: '/create/khateebs' },
+              { text: 'Institutions', to: '/create/institutions' }
+          ]
+        )
       },
       logout() {
         this.$store.dispatch('user/logout')
         this.activeMenu = false 
         this.$nextTick(() => { this.$router.push('/') })
-      },
+      }
     }
 }
 </script>

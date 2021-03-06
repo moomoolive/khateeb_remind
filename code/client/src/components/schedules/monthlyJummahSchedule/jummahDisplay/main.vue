@@ -5,6 +5,7 @@
         <div class="timing-container">
             <div class="jummah-status-container">
                 <tag-circle
+                    class="jummah-tag"
                     :info="renderJummahTag(
                         viewingMonthIsCurrentPastOrFuture,
                         viewingWeekIsCurrentPastOrFuture,
@@ -42,15 +43,14 @@
 
 <script>
 import tagCircle from '@/components/general/tagCircle.vue'
-import jummahStaticTags from '@/components/schedules/jummahTags.json'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import jummahStaticTags from './jummahTags.json'
 
 export default {
     name: 'jummahDisplayer',
     components: {
         tagCircle,
-        "institutionAdmin": () => import('@/components/schedules/adminCells.vue'),
-        "khateeb": () => import("@/components/schedules/khateebCells.vue")
+        "institutionAdmin": () => import('./khateebInfoCells/adminCells.vue'),
+        "khateeb": () => import("./khateebInfoCells/khateebCells.vue")
     },
     props: {
         jummah: {
@@ -166,7 +166,6 @@ export default {
     padding-top: 10px;
     padding-bottom: 10px;
 }
-
 
 .last-updated {
     font-size: 16px;

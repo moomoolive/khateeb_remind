@@ -85,11 +85,12 @@ export default {
             this.$nextTick(() => { this.loginRedirect() })
         },
         forgotCredentials() {
-            const redirections = [
-                        { text: 'Forgot Password?', to: '/forgot/password' },
-                        { text: 'Forgot Username?', to: '/forgot/username' }
-                    ]
-            notificationHelpers.redirectionOptions(redirections)
+            notificationHelpers.redirectionOptions(
+                [
+                    { text: 'Forgot Password?', to: '/forgot/password' },
+                    { text: 'Forgot Username?', to: '/forgot/username' }
+                ]
+            )
         }
     },
     watch: {

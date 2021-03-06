@@ -142,7 +142,7 @@ export default {
             else if (this.viewingMonth === 'future')
                 return false
             else 
-                return datetime.upcomingFriday(true).getDate() > parseInt(this.weekOf)
+                return datetime.findUpcomingFriday().getDate() > parseInt(this.weekOf)
         },
         readOnly(preference) {
             return this.weekIsInPast() || this.timing.confirmed || preference.notified

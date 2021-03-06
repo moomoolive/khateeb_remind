@@ -16,6 +16,7 @@
             :khateebs="khateebs"
             :reciever="`institutionAdmin`"
             @request-jummahs="requestJummahs($event)"
+            @build-schedule="buildSchedule($event, locations, timings)"
         />
         <!-- SCHEDULE ENDS HERE -->
 
@@ -23,7 +24,9 @@
 </template>
 
 <script>
-import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule.vue'
+import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule/main.vue'
+
+import jummahHelpers from '@/libraries/jummahs/main.js'
 
 export default {
     name: "scheduleSetter",
@@ -53,6 +56,15 @@ export default {
             try {
                 const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
                 this.jummahs = jummahs
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        async buildSchedule(monthOfDateObj, locations, timings) {
+            const jummahs = jummahHelpers.buildMonthlySchedule(monthOfDateObj, locations, timings, true)
+            try {
+                const databaseLoggedJummahs = await this.$API.jummahs.createNewJummahs(jummahs)
+                this.jummahs = databaseLoggedJummahs || []
             } catch(err) {
                 console.log(err)
             }
