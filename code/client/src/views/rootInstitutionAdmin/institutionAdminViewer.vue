@@ -4,11 +4,14 @@
             <collapsable-box
                 :headline="`Create New Admin`"
             >
-                <form-main
-                    :structure="structure.new"
-                    :buttonText="`Create New Admin`"
-                    :bindedExts="['confirms']"
-                    :backgroundColor="`none`"
+                <user-form-template 
+                    :userType="`institutionAdmin`"
+                    :includeVitals="true"
+                    :formProps="{
+                        buttonText: 'Create New Admin',
+                        bindedExts: ['confirms'],
+                        backgroundColor: 'none'
+                    }"
                     @submitted="submitAdmin($event)"
                 />
             </collapsable-box>
@@ -28,12 +31,13 @@
                         <button class="red" @click="deleteAdmin(admin._id, index)">
                             Delete {{ admin.firstName }} from System
                         </button>
-                        <form-main
-                            :structure="structure.existing"
-                            :basedOn="admin"
-                            :buttonText="`Update ${admin.firstName}'s Info`"
-                            :backgroundColor="`none`"
-                            @submitted="submitAdmin($event)"
+                        <user-form-template 
+                            :userType="`institutionAdmin`"
+                            :formProps="{
+                                readOnly: true,
+                                basedOn: admin,
+                                backgroundColor: 'none'
+                            }"
                         />
                     </collapsable-box>
                 </div>
@@ -50,70 +54,21 @@
 
 <script>
 import collapsableBox from '@/components/general/collapsableBox.vue'
-import formMain from '@/components/forms/main.vue'
 import loading from '@/components/general/loadingScreen.vue'
 import msgWithPic from '@/components/general/msgWithPic.vue'
+import userFormTemplate from '@/components/forms/templates/user.vue'
 
 export default {
     name: 'createOtherInstitutionAdmins',
     components: {
         collapsableBox,
-        formMain,
         loading,
-        msgWithPic
+        msgWithPic,
+        userFormTemplate
     },
     data() {
         return {
-            admins: [],
-            structure: {
-                new: {
-                    username: {
-                        required: true,
-                        validators: 'username'
-                    },
-                    password: {
-                        required: true,
-                        minLength: 6
-                    },
-                    handle: {
-                        validators: 'handle',
-                        required: true,
-                    },
-                    firstName: {
-                        required: true
-                    },
-                    lastName: {
-                        required: true
-                    },
-                    phoneNumber: {
-                        type: 'phoneNumber',
-                        required: true
-                    }
-                },
-                existing: {
-                    username: {
-                        required: true,
-                        type: 'readOnly'
-                    },
-                    handle: {
-                        validators: 'handle',
-                        type: 'readOnly',
-                    },
-                    firstName: {
-                        required: true,
-                        type: 'readOnly',
-                    },
-                    lastName: {
-                        required: true,
-                        type: 'readOnly'
-                    },
-                    phoneNumber: {
-                        type: 'readOnly',
-                        format: 'phoneNumber',
-                        required: true
-                    }
-                }
-            }
+            admins: []
         }
     },
     methods: {

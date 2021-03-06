@@ -71,12 +71,15 @@
                                 >
                                     <p>Confirm {{ khateeb.firstName }}'s Application</p>
                                 </button>
-                                <form-main
+                                <user-form-template 
                                     v-if="khateeb.confirmed"
-                                    :basedOn="khateeb" 
-                                    :structure="structure"
-                                    :buttonText="`Edit ${khateeb.firstName}'s Info`"
-                                    :backgroundColor="`none`"
+                                    :userType="`khateeb`"
+                                    :editableKhateebFormat="true"
+                                    :formProps="{
+                                        basedOn: khateeb,
+                                        buttonText: `Edit ${khateeb.firstName}'s Info`,
+                                        backgroundColor: 'none'
+                                    }"
                                     @submitted="editKhateeb($event)"
                                 />
                             </div>
@@ -96,8 +99,8 @@
 <script>
 import loading from '@/components/general/loadingScreen.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
-import formMain from '@/components/forms/main.vue'
 import msgWithPic from '@/components/general/msgWithPic.vue'
+import userFormTemplate from '@/components/forms/templates/user.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
 
@@ -106,8 +109,8 @@ export default {
     components: {
         loading,
         collapsableBox,
-        formMain,
-        msgWithPic
+        msgWithPic,
+        userFormTemplate
     },
     data() {
         return {
@@ -116,51 +119,7 @@ export default {
             timings: [],
             showKhateebs: true,
             showSearchTools: false,
-            query: {},
-            structure: {
-                dropouts: {
-                    type: 'readOnly',
-                    required: true
-                },
-                handle: {
-                    type: 'readOnly',
-                    required: true,
-                },
-                confirmed: {
-                    type: 'readOnly',
-                    required: true
-                },
-                title: {
-                    type: "readOnly",
-                    required: true,
-                },
-                firstName: {
-                    type: "readOnly",
-                    required: true
-                },
-                lastName: {
-                    type: "readOnly",
-                    required: true
-                },
-                phoneNumber: {
-                    type: 'readOnly',
-                    format: 'phoneNumber',
-                    required: true
-                },
-                availableTimings: {
-                    type: 'readOnly',
-                    required: true
-                },
-                unavailableDates: {
-                    type: 'readOnly',
-                    required: true,
-                    alias: 'Unavailable Days this Month'
-                },
-                active: {
-                    type: 'checkbox',
-                    required: true
-                }
-            }
+            query: {}
         }
     },
     methods: {

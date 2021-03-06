@@ -17,9 +17,9 @@
                             symbol: '⚔️'
                     }"
                 />
-                <div v-if="extensibleType(fieldData.type)">
+                <div v-if="extensibleType(readOnly ? 'readOnly' : fieldData.type)">
                     <component 
-                        :is="fieldData.type + `Ext`"
+                        :is="readOnly ? 'readOnlyExt' : fieldData.type + `Ext`"
                         :name="fieldName"
                         :options="fieldData"
                         :defaultValidators="{
@@ -81,6 +81,7 @@
                 </div>
             </div>
             <button
+                v-if="!readOnly"
                 :style="`margin-top: ${showInvalidationMsgs ? 7 : 3}%;`" 
                 :class="buttonColor" 
                 :disabled="!validSubmission"
@@ -150,8 +151,14 @@ export default {
             default: true
         },
         confirmBeforeSubmit: {
+            type: Boolean,
             required: false,
             default: true
+        },
+        readOnly: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     components: {

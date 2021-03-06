@@ -42,6 +42,11 @@ export default {
             type: Array,
             required: false,
             default: () => []
+        },
+        editableKhateebFormat: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     data() {
@@ -89,12 +94,46 @@ export default {
                     display: "name",
                     alias: 'Institution'
                 }
+            },
+            editableKhateeb: {
+                confirmed: {
+                    type: 'readOnly',
+                    required: true
+                },
+                availableTimings: {
+                    type: 'readOnly',
+                    required: true
+                },
+                unavailableDates: {
+                    type: 'readOnly',
+                    required: true,
+                    alias: 'Unavailable Days this Month'
+                },
+                dropouts: {
+                    type: 'readOnly',
+                    required: true
+                },
+                active: {
+                    type: 'checkbox',
+                    required: true
+                }
             }
+        }
+    },
+    methods: {
+        editableKhateebBaseForm() {
+            const baseForm = { ...this.baseUser }
+            for (const [key, value] of Object.entries(baseForm)) {
+                value.type = 'readOnly'
+                if (key === 'phoneNumber')
+                    value.format = 'phoneNumber'
+            }
+            return baseForm
         }
     },
     computed: {
         formStructure() {
-            let form = { ...this.baseUser }
+            let form = this.editableKhateebFormat ? this.editableKhateebBaseForm() : { ...this.baseUser }
             if (this.userType !== 'khateeb')
                 delete form.title
             if (this.includeVitals)
@@ -103,6 +142,8 @@ export default {
                 form = { ...this.idAppender, ...form }
                 form.institutionID.selectOptions = this.institutionIDs
             }
+            if (this.editableKhateebFormat)
+                form = { ...form, ...this.editableKhateeb  }
             return form
         }
     }
