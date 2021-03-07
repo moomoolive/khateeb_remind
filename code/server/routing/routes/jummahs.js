@@ -28,7 +28,7 @@ router.post(
     validationMiddleware.validateRequest([
         validator.body("jummahs").isArray({ min: 1 })
     ]),
-    authMiddleware.authenticate({ min: 1, max: 3 }),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
     async (req, res) => {
         try {
             const createdJummahs = []
@@ -55,6 +55,26 @@ router.post(
             return res.json(`Couldn't save jummahs`)
         }
     } 
+)
+
+router.put(
+    '/',
+    authMiddleware.authenticate({ min: 2, max: 3 }),
+    validationMiddleware.validateRequest([
+        validator.body("_id").isLength(24),
+        validator.body("confirmed").isBoolean().optional(),
+        validator.body("khateebPreference").isArray({ min: 1, max: 3 }).optional()
+    ]),
+    authMiddleware.isAllowedToUpdateResource(["institutionID"], "jummahs"),
+    async (req, res) => {
+        try {
+            const updated = await $db.jummahs.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            return res.json(updated)
+        } catch(err) {
+            console.log(err)
+            return res.json(`Couldn't update jummah`)
+        }
+    }
 )
 
 module.exports = router

@@ -51,7 +51,7 @@ export default {
     },
     methods: {
         phoneNumber(input) {
-            return this._.isNumeric(this.removePhoneNumberHelpers(input)) && input.length === this.maxPhoneNumberLength
+            return this.utils.isNumeric(this.removePhoneNumberHelpers(input)) && input.length === this.maxPhoneNumberLength
         },
         usernameValidation(input) {
             return input.length > 0
@@ -63,14 +63,14 @@ export default {
                 const res = await this.$API.auth.forgot(submitType, { data })
                 if(typeof res.status !== 'undefined') {
                     if (res.status === 'error')
-                        return this._.alert(res.msg)
+                        return this.utils.alert(res.msg)
                     if (res.status === 'code') {
                         this.userID = res.userID
-                        this._.alert(res.msg, "success")
+                        this.utils.alert(res.msg, "success")
                         return this.codeSent = true
                     }
                 }
-                this._.alert(res, 'success')
+                this.utils.alert(res, 'success')
                 this.$router.push('/')
             } catch(err) {
                 console.log(err)
@@ -85,8 +85,8 @@ export default {
                 }
                 const res = await this.$API.auth.verificationCode(info)
                 if (res.status === 'error') 
-                    return this._.alert(res.msg)
-                this._.alert(res.msg, "success")
+                    return this.utils.alert(res.msg)
+                this.utils.alert(res.msg, "success")
                 this.$router.push('/')
             } catch(err) {
                 console.log(err)

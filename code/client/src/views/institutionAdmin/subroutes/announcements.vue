@@ -98,7 +98,7 @@ export default {
         },
         async deleteAnnouncement() {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to permenantly delete this announcement?`)
+                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this announcement?`)
                 if (!confirm)
                     return
                 const res = await this.$API.announcements.deleteAnnouncement(this.currentlyEditingData._id)
@@ -120,7 +120,7 @@ export default {
             if (this.currentlyEditing === 'new')
                 return null
             else {
-                const copy = this._.deepCopy(this.announcements[this.currentlyEditing])
+                const copy = this.utils.deepCopy(this.announcements[this.currentlyEditing])
                 delete copy.__v; delete copy.createdAt; delete copy.updatedAt;
                 return copy
             }

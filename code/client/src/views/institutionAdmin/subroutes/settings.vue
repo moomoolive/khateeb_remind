@@ -83,7 +83,7 @@
                 />
             </collapsable-box>
         </div>
-        <div class="two-settings-container" v-if="_.validAuthentication(3)">
+        <div class="two-settings-container" v-if="utils.validAuthentication(3)">
             <collapsable-box
                 class="setting-container"
                 :headline="`Danger Zone`"
@@ -147,11 +147,11 @@ export default {
             }
         },
         async deleteInstitution() {
-            const confirm = await this._.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
+            const confirm = await this.utils.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
             if (confirm) {
                 try {
                     await this.$API.institutions.deleteInstitution()
-                    this._.alert(`You've successfully deleted your institution`, 'success')
+                    this.utils.alert(`You've successfully deleted your institution`, 'success')
                     this.$router.push('/')
                     this.$store.dispatch('logout')
                 } catch(err) {

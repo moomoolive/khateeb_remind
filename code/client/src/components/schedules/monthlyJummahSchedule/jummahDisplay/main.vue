@@ -21,6 +21,13 @@
 
         <!-- schedule cell -->
         <div class="jummahPreferences">
+            <div class="settings-icon-container">
+                <img 
+                    src="~@/assets/misc/settingsCog.png"
+                    class="settings-icon"
+                    @click="$emit('open-settings', { jummah, timing: findJummahTiming(jummah) })"
+                >
+            </div>
             <component
                 :is="reciever"
                 :timing="jummah"
@@ -28,11 +35,13 @@
                 :viewingMonth="viewingMonthIsCurrentPastOrFuture"
                 :currentWeek="viewingWeekIsCurrentPastOrFuture"
                 :khateebs="khateebs"
+                @changed="$emit('jummah-update', $event)"
+                @changed-delay="$emit('jummah-update-delay', $event)"
             />
             <!-- updated date -->
             <div class="last-updated">
                 <span class="timing">Last Updated:</span><br>
-                {{ _.dynamicDisplayDate(jummah.updatedAt) }}
+                {{ utils.dynamicDisplayDate(jummah.updatedAt) }}
             </div>
             <!-- ENDS HERE -->
         </div>
@@ -149,6 +158,18 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.settings-icon {
+    width: 100%;
+}
+
+.settings-icon-container {
+    width: 15%;
+    height: 10px;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: 10px;
 }
 
 .jummah-status-container {

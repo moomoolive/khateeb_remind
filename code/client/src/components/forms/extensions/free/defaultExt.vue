@@ -42,7 +42,7 @@ export default {
             } catch(err) {
                 console.log(err)
                 this.$router.push('/')
-                this._.alert(`There was a problem with our servers, try signing up later`)
+                this.utils.alert(`There was a problem with our servers, try signing up later`)
             }
             this.$emit('changed', info)
         }

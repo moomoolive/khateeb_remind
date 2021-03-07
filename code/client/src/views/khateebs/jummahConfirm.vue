@@ -44,7 +44,7 @@
             </div>
             <button 
                 v-if="!exists || confirmed"
-                @click="_.toHomePage()"
+                @click="utils.toHomePage()"
             >
                 Back to Home
             </button>
@@ -113,7 +113,7 @@ export default {
             this.jummahMeta = meta
         },
         async cancel() {
-            const confirm = await this._.confirm(`Are you sure you cannot make it?`)
+            const confirm = await this.utils.confirm(`Are you sure you cannot make it?`)
             if (confirm)
                 this.updateJummahStatus(false)
         },
@@ -141,8 +141,8 @@ export default {
                 }
                 /*
                 const res = await this.$API.khateeb.confirmJummah(confirmedPackage)
-                this._.toHomePage()
-                this._.alert(`Successfully updated your jummah status!`, 'success')
+                this.utils.toHomePage()
+                this.utils.alert(`Successfully updated your jummah status!`, 'success')
                 */
             } catch(err) {
                 console.log(err)

@@ -1,54 +1,75 @@
 <template>
-    <div class="schedule-container">
-        <loading :loadingTime="800">   
-            <div v-if="locations.length > 0">
-                
-                <schedule-standard-controls 
-                    :locations="locationsWithDataThisMonth"
-                    :selectedLocation="selectedLocation"
-                    :selectedDate="selectedDate"
-                    :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
-                    @change-location="changeViewingLocation($event)"
-                    @change-week="changeViewingWeek($event)"
-                    @change-month="changeViewingMonth($event)"
-                    @back-to-current-month="backToCurrentMonth()"
-                />
-
-
-                <locations-display 
-                    :locations="filteredLocations"
-                    :jummahs="jummahs"
-                    :selectedLocation="selectedLocation"
-                    :timings="timings"
-                    :reciever="reciever"
-                    :khateebs="khateebs"
-                    :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
-                    :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
-                    :selectedDate="selectedDate"
-                    :monthsFromCurrent="monthsFromCurrent"
-                    @build-schedule="$emit('build-schedule', selectedDate)"
-                />
-
-                </div>
-
-                <div v-else>
-                    <msg-with-pic
-                        class="empty-notifications-msg" 
-                        :gif="`sadCat`"
-                        :msg="`There was a problem retrieving the schedule`"
-                        :textColor="`white`"
+    <div>
+        <general-popup-container
+            v-if="showJummahSettings"
+            @close="closeSettings()"
+        >
+            <jummah-settings-popup
+                :reciever="reciever"
+                :info="settingsInfo"
+                @run-notification-loop="$emit('run-notification-loop', $event)"
+                @override-jummah="$emit('jummah-update', $event)"
+                @close="closeSettings()"
+            />
+        </general-popup-container>
+        <div class="schedule-container">
+            <loading :loadingTime="800">   
+                <div v-if="locations.length > 0">
+                    
+                    <div class="above-controls-container">
+                        <slot name="above-controls"></slot>
+                    </div>
+                    
+                    <schedule-standard-controls 
+                        :locations="locationsWithDataThisMonth"
+                        :selectedLocation="selectedLocation"
+                        :selectedDate="selectedDate"
+                        :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
+                        @change-location="changeViewingLocation($event)"
+                        @change-week="changeViewingWeek($event)"
+                        @change-month="changeViewingMonth($event)"
+                        @back-to-current-month="backToCurrentMonth()"
                     />
-                </div>
-        </loading>
 
-        <router-query-manager
-            v-if="locations.length > 0"
-            :locations="locations"
-            :selectedLocationQueryKey="selectedLocationQueryKey"
-            :selectedDateQueryKey="selectedDateQueryKey"
-            @changed="updateViewBasedOnQuery($event)"
-        />
+                    <locations-display
+                        v-if="showLocations" 
+                        :locations="filteredLocations"
+                        :jummahs="jummahs"
+                        :selectedLocation="selectedLocation"
+                        :timings="timings"
+                        :reciever="reciever"
+                        :khateebs="khateebs"
+                        :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
+                        :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
+                        :selectedDate="selectedDate"
+                        :monthsFromCurrent="monthsFromCurrent"
+                        @build-schedule="$emit('build-schedule', selectedDate)"
+                        @jummah-update="$emit('jummah-update', $event)"
+                        @jummah-update-delay="$emit('jummah-update-delay', $event)"
+                        @open-settings="openJummahSettings($event)"
+                    />
 
+                    </div>
+
+                    <div v-else>
+                        <msg-with-pic
+                            class="empty-notifications-msg" 
+                            :gif="`sadCat`"
+                            :msg="`There was a problem retrieving the schedule`"
+                            :textColor="`white`"
+                        />
+                    </div>
+            </loading>
+
+            <router-query-manager
+                v-if="locations.length > 0"
+                :locations="locations"
+                :selectedLocationQueryKey="selectedLocationQueryKey"
+                :selectedDateQueryKey="selectedDateQueryKey"
+                @changed="updateViewBasedOnQuery($event)"
+            />
+
+        </div>
     </div>
 </template>
 
@@ -58,6 +79,8 @@ import loading from '@/components/general/loadingScreen.vue'
 import routerQueryManager from './misc/routerQueryManager.vue'
 import scheduleStandardControls from './controls/main.vue'
 import locationsDisplay from './locationDisplay/locations-display.vue'
+import generalPopupContainer from '@/components/notifications/generalPopup.vue'
+import jummahSettingsPopup from './jummahSettingsPopup/main.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
 import jummahHelpers from '@/libraries/jummahs/main.js'
@@ -69,7 +92,9 @@ export default {
         msgWithPic,
         routerQueryManager,
         scheduleStandardControls,
-        locationsDisplay
+        locationsDisplay,
+        generalPopupContainer,
+        jummahSettingsPopup
     },
     props:{
         jummahs: {
@@ -99,10 +124,20 @@ export default {
             selectedLocation: 'all',
             upcomingFriday: datetime.findUpcomingFriday(),
             selectedDateQueryKey: 'date',
-            selectedLocationQueryKey: 'location'
+            selectedLocationQueryKey: 'location',
+            showJummahSettings: false,
+            showLocations: true,
+            settingsInfo: {}
         }
     },
     methods: {
+        openJummahSettings(jummahAndAssoicatedInfo) {
+            this.settingsInfo = jummahAndAssoicatedInfo
+            this.showJummahSettings = true
+        },
+        closeSettings() {
+            this.showJummahSettings = false
+        },
         updateViewBasedOnQuery(info) {
             console.log(info)
             this.selectedLocation = info.location
@@ -141,6 +176,11 @@ export default {
             const query = jummahHelpers.createMonthlyRequestRange(date)
             this.$emit('request-jummahs', query)
         },
+        initializeSettingsInfo() {
+            this.settingsInfo.jummah = this.jummahs[0],
+            this.settingsInfo.location = this.locations[0],
+            this.settingsInfo.timing = this.timings[0]
+        }
     },
     computed: {
         monthsFromCurrent() {
@@ -178,14 +218,23 @@ export default {
                 filterFunc = (location) => location._id === this.selectedLocation
             return this.locationsWithDataThisMonth.filter(filterFunc)
         },
+    },
+    watch: {
+        jummahs() {
+            this.showLocations = false
+            this.$nextTick(() => this.showLocations = true)
+        }
+    },
+    created() {
+        this.initializeSettingsInfo()
     }
 }
 </script>
 
 <style lang="scss" scoped>
 .schedule-container {
-    padding-top: 30px;
-    padding-bottom: 30px;
+    padding-top: 15px;
+    padding-bottom: 15px;
     background: themeRGBA("darkBlue", 0.5);
     width: 70%;
     max-width: 850px;
@@ -198,6 +247,12 @@ export default {
 
 .locations-container {
     margin-top: 60px;
+}
+
+.above-controls-container {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .location-container {

@@ -123,7 +123,7 @@
                                         <!-- jummah updated date -->
                                         <div class="last-updated">
                                             <span class="timing">Last Updated:</span><br>
-                                            {{ _.dynamicDisplayDate(timing.updatedAt) }}
+                                            {{ utils.dynamicDisplayDate(timing.updatedAt) }}
                                         </div>
                                         <!-- DATE DISPLAY 
                                         ENDS HERE -->
@@ -311,7 +311,7 @@ export default {
             this.$emit('schedule-date', this.date)
         },
         changePreference(timing, $event) {
-            const targetPreference = this._.deepCopy(timing.khateebPreference[$event.number])
+            const targetPreference = this.utils.deepCopy(timing.khateebPreference[$event.number])
             targetPreference.khateebID = $event.val
             this.$set(timing.khateebPreference, $event.number, targetPreference)
         },
@@ -325,7 +325,7 @@ export default {
         ArrayToObject(keyAttribute, array) {
             const obj = {}
             array.forEach(elem => {
-                obj[elem[keyAttribute]] = this._.deepCopy(elem)
+                obj[elem[keyAttribute]] = this.utils.deepCopy(elem)
             })
             return obj
         },
@@ -343,7 +343,7 @@ export default {
             return struct
         },
         async emitSchedule() {
-            const confirm = await this._.confirm(`Are you sure you want make these changes?`)
+            const confirm = await this.utils.confirm(`Are you sure you want make these changes?`)
             if (!confirm)
                 return
             const diff = []
@@ -363,14 +363,14 @@ export default {
             return copy
         },
         init() {
-            this.jummahs = this._.deepCopy(this.data)
-            this.originalJummahs = this._.deepCopy(this.jummahs)
+            this.jummahs = this.utils.deepCopy(this.data)
+            this.originalJummahs = this.utils.deepCopy(this.jummahs)
             this.locationsIndex = this.ArrayToObject('_id', this.jummahs.locations)
             this.timingsIndex = this.ArrayToObject('_id' ,this.jummahs.timings)
-            this.khateebs = this._.deepCopy(this.jummahs.khateebs)
+            this.khateebs = this.utils.deepCopy(this.jummahs.khateebs)
             this.struct = this.buildStruct(this.jummahs.jummahs)
             this.struct = this.filterEmptyLocations(this.struct)
-            this.originalStruct = this._.deepCopy(this.struct)
+            this.originalStruct = this.utils.deepCopy(this.struct)
         },
         rerenderJummahCell() {
             this.showCell = false

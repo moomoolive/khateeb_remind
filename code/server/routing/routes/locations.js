@@ -53,7 +53,7 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "locations"),
     async (req, res) => {
         try {
-            const updated = await $db.locations.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.locations.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)

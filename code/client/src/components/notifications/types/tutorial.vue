@@ -7,7 +7,7 @@
                     :key="tutorialCategory"
                     :value="tutorialCategory"
                 >
-                    {{ _.stringFormat(tutorialCategory) }}
+                    {{ utils.stringFormat(tutorialCategory) }}
                 </option>
             </select>
             <select v-model="tutorialNumber">

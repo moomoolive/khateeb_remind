@@ -48,7 +48,7 @@
             />
         </collapsable-box>
         <collapsable-box
-            v-if="_.validAuthentication({ level: 1 })"
+            v-if="utils.validAuthentication({ level: 1 })"
             class="user-setting"
             :headline="`Available Timings`"
             :tagDetails="availableTimingsTag"
@@ -61,7 +61,7 @@
             />
         </collapsable-box>
         <collapsable-box
-            v-if="_.validAuthentication({ level: 1 })"
+            v-if="utils.validAuthentication({ level: 1 })"
             class="user-setting"
             :headline="`Unavailable Dates`"
         >
@@ -71,7 +71,7 @@
             />
         </collapsable-box>
         <collapsable-box
-            v-if="_.validAuthentication({ max: 2 })"
+            v-if="utils.validAuthentication({ max: 2 })"
             class="user-setting"
             :headline="`Danger Zone`"
             :buttonColor="`red`"
@@ -112,7 +112,7 @@ export default {
                 this.storeToken(res.token)
                 if (rerender) {
                     this.rerenderProfileSettings()
-                    this._.alert(`Successfully updated`, 'success')
+                    this.utils.alert(`Successfully updated`, 'success')
                 }
             } catch(err) {
                 console.log(err)
@@ -127,14 +127,14 @@ export default {
         },
         async deleteAccount() {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to permenantly delete your account?`)
+                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete your account?`)
                 if (!confirm)
                     return
                 const res = await this.$API.user.deleteAccount()
                 console.log(res)
                 this.$store.dispatch('user/logout')
-                this._.toHomePage()
-                this._.alert(`Successfully delete account`, 'success')
+                this.utils.toHomePage()
+                this.utils.alert(`Successfully delete account`, 'success')
             } catch(err) {
                 console.log(err)
             }
@@ -190,7 +190,7 @@ export default {
         }
     },
     created() {
-        if (this._.validAuthentication({ level: 1 }))
+        if (this.utils.validAuthentication({ level: 1 }))
             this.getAvailableTimings()
     }
 }

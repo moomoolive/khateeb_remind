@@ -6,7 +6,7 @@
                 :key="index"
                 class="announcement-container"
                 :headline="
-                    `${_.dynamicDisplayDate(announcement.updatedAt)} || ${announcement.headline}`
+                    `${utils.dynamicDisplayDate(announcement.updatedAt)} || ${announcement.headline}`
                 "
                 :tagDetails="tagLoader(announcement)"
             >

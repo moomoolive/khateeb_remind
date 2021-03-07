@@ -198,7 +198,7 @@ export default {
     async created() {
         this.outputMutator
         window.addEventListener('keyup', this.keyBindings)
-        this.addToOutput(`Asalam Alaikoum ${this._.stringFormat(this.name)} 😀`)
+        this.addToOutput(`Asalam Alaikoum ${this.utils.stringFormat(this.name)} 😀`)
         this.addToOutput(`System is ready for commands 👍`, 'success')
         const ping = await this.$API.sysAdmin.executeCommand({ command: ["__PING__"] })
         this.addToOutput(ping[0].msg, ping[0].status, ping[0].from)

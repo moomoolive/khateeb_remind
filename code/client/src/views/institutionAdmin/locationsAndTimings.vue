@@ -133,7 +133,7 @@ export default {
     },
     methods: {
         async updateLocation(location, index) {
-            await this._.delayedRequest(
+            await this.utils.delayedRequest(
                 'locations',
                 'updateLocation',
                 { 
@@ -148,7 +148,7 @@ export default {
         },
         async incrementTime($event, index) {
             this.timings[index][$event.type] += $event.increment
-            await this._.delayedRequest(
+            await this.utils.delayedRequest(
                 'timings', 
                 'updateTiming', 
                 { 
@@ -177,8 +177,8 @@ export default {
         },
         async deleteTiming(timing, index) {
             if (this.timingsForEachLocation[timing.locationID].length === 1)
-                return this._.alert(`You must have at least one timing per location!`)
-            const confirm = await this._.confirm(`Are you sure you want delete this timing?`)
+                return this.utils.alert(`You must have at least one timing per location!`)
+            const confirm = await this.utils.confirm(`Are you sure you want delete this timing?`)
             if (confirm) {
                 const res = await this.$API.timings.deleteTiming(timing._id) 
                 console.log(res)
@@ -190,8 +190,8 @@ export default {
         },
         async deleteLocation(location, index) {
             if (this.locations.length <= 1)
-                return this._.alert(`You must have at least one location`)
-            const confirm = await this._.confirm(`Are you sure you want to delete this location?`)
+                return this.utils.alert(`You must have at least one location`)
+            const confirm = await this.utils.confirm(`Are you sure you want to delete this location?`)
             if (confirm) {
                 const res = await this.$API.locations.deleteLocation(location._id)
                 console.log(res)

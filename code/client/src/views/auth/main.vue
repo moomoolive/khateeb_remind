@@ -48,13 +48,13 @@ export default {
     },
     methods: {
         unconfirmedMsg(msg) {
-            this._.alert(msg, 'caution', { icon: 'locked' })
+            this.utils.alert(msg, 'caution', { icon: 'locked' })
 
         },
         async login($event) {
             try {
                 if (this.$store.getters.tokenExists)
-                    return this._.alert(`You're already logged in! Logout if you want to login with another account.`)
+                    return this.utils.alert(`You're already logged in! Logout if you want to login with another account.`)
                 const authRes = await this.$API.auth.getToken($event)
                 if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
                     this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
@@ -76,7 +76,7 @@ export default {
                 this.$store.commit('app/loggedInViaLoginPage')
             }
             else
-                this._.toHomePage()
+                this.utils.toHomePage()
         },
         toApp(token) {
             if (this.rememberMe)
@@ -103,7 +103,7 @@ export default {
     },
     created() {
         if (this.$store.getters['user/isLoggedIn'])
-            this._.toHomePage()
+            this.utils.toHomePage()
     }
 }
 </script>

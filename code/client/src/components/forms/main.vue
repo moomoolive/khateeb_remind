@@ -6,7 +6,7 @@
             </div>
             <div v-for="(fieldData, fieldName) in structureCopy" :key="fieldName">
                 <div class="formLabel" :for="fieldName">
-                    {{  fieldData.alias || _.stringFormat(fieldName) }}
+                    {{  fieldData.alias || utils.stringFormat(fieldName) }}
                 </div>
                 <tag-box
                     v-if="fieldData.tag && fieldData.tag === 'encrypted'"
@@ -60,7 +60,7 @@
                         >
                             <template #default>
                                 <div class="formLabel">
-                                    {{ _.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
+                                    {{ utils.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
                                 </div>
                             </template>
                             <template #invalidMsgs>
@@ -232,15 +232,15 @@ export default {
             else if (this.validations[fieldName])
                 return this.validations[fieldName].msgs
             else
-                return `Invalid ${this._.stringFormat(fieldName)}`
+                return `Invalid ${this.utils.stringFormat(fieldName)}`
         },
         setData(inputData) {
-            this.data = this._.deepCopy(inputData)
-            this.originalData = this._.deepCopy(inputData)
+            this.data = this.utils.deepCopy(inputData)
+            this.originalData = this.utils.deepCopy(inputData)
         },
         async submit() {
             if (this.confirmBeforeSubmit) {
-                const confirm = await this._.confirm(`Are you sure you want to submit?`)
+                const confirm = await this.utils.confirm(`Are you sure you want to submit?`)
                 if (confirm)
                     this.$emit('submitted', this.data)
             } else
@@ -273,7 +273,7 @@ export default {
             return data.length >= min
         },
         fillDefaultsWithBasedOn(basedOn) {
-            const copy = this._.deepCopy(basedOn)
+            const copy = this.utils.deepCopy(basedOn)
             for (let [fieldName, currentVal] of Object.entries(this.structureCopy)) {
                 this.structureCopy[fieldName].default = copy[fieldName]
             }
@@ -304,7 +304,7 @@ export default {
         }
     },
     created() {
-        this.structureCopy = this._.deepCopy(this.structure)
+        this.structureCopy = this.utils.deepCopy(this.structure)
         if (this.basedOn) {
             this.fillDefaultsWithBasedOn(this.basedOn)
             this.setData(this.basedOn)

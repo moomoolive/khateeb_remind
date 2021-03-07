@@ -23,7 +23,7 @@
                     <collapsable-box
                         :headline="`${admin.firstName} ${admin.lastName}`"
                         :tagDetails="[{
-                            words: `Last Active: ${_.dynamicDisplayDate(admin.lastLogin)}`,
+                            words: `Last Active: ${utils.dynamicDisplayDate(admin.lastLogin)}`,
                             color: `goodNews`,
                             symbol: `☀️`
                         }]"
@@ -76,14 +76,14 @@ export default {
             try {
                 const newAdmin = await this.$API.institutionAdmins.createNewAdmin($event)
                 this.admins.push(newAdmin)
-                this._.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
+                this.utils.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
             } catch(err) {
                 console.log(err)
             }
         },
         async deleteAdmin(id, index) {
             try {
-                const confirm = await this._.confirm(`Do you really want to permenantly delete this administrator?`)
+                const confirm = await this.utils.confirm(`Do you really want to permenantly delete this administrator?`)
                 if (confirm) {
                     const deleted = await this.$API.institutionAdmins.deleteAdmin(id)
                     console.log(deleted)

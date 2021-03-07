@@ -52,7 +52,7 @@ export default {
             extension: routeModuleName,
             function: functionName,
             arguments: options.arguments || [],
-            requestAfterSeconds:  options.requestAfterSeconds || 10,
+            requestAfterSeconds:  options.requestAfterSeconds || 5,
             additionalIdentifiers: options.additionalIdentifiers || []
         }
         const res = await requestManagerHelpers.response(requestInfo)

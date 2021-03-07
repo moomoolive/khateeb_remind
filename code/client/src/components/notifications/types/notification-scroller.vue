@@ -19,7 +19,7 @@
                         </span>
                     </div>
                     <div class="notification-msg">
-                        <span class="notification-date">{{ _.dynamicDisplayDate(notification.createdAt) }}</span><br><br>
+                        <span class="notification-date">{{ utils.dynamicDisplayDate(notification.createdAt) }}</span><br><br>
                         {{ notification.msg }}
                     </div>
                     <div>
@@ -75,7 +75,7 @@ export default {
     methods: {
         tagLoader(notification) {
             const tag = notification.tag ? notification.tag : notification.__t
-            const name = this._.stringFormat(tag)
+            const name = this.utils.stringFormat(tag)
             let val = { color: 'blue' }
             switch(name) {
                 case 'Jummah':

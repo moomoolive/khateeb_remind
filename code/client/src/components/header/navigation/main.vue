@@ -3,7 +3,7 @@
         <img 
             class="logo" 
             :src="require('@/assets/logos/khateebRemindLogo.svg')"
-            @click="_.toHomePage()"
+            @click="utils.toHomePage()"
         >
         <div>
           <div v-if="!$store.getters['user/isLoggedIn']">

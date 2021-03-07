@@ -64,7 +64,7 @@ export default {
         },
         invalidMsgs(state) {
             if (!state) {
-                const msg = this.options.minLength ? `${this._.stringFormat(this.name)} cannot be less than ${this.options.minLength} characters` : `${this._.stringFormat(this.name)} cannot be empty`
+                const msg = this.options.minLength ? `${this.utils.stringFormat(this.name)} cannot be less than ${this.options.minLength} characters` : `${this.utils.stringFormat(this.name)} cannot be empty`
                 return [msg]
             } else
                 return []

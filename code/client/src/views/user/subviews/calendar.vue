@@ -69,7 +69,7 @@ export default {
         }
     },
     created() {
-        this.dates = this._.deepCopy(this.originalVal)
+        this.dates = this.utils.deepCopy(this.originalVal)
     }
 }
 </script>

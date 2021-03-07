@@ -1,7 +1,7 @@
 <template>
     <div>
         <div 
-            v-if="_.validAuthentication({ min: 1, max: 3 })" 
+            v-if="utils.validAuthentication({ min: 1, max: 3 })" 
             class="user-items"
         >
             <div class="menu-item" @click="redirect('/khateeb/')">
@@ -16,7 +16,7 @@
                 <p>Announcements</p>
             </div>
             <div 
-                v-if="_.validAuthentication({ min: 2 })" 
+                v-if="utils.validAuthentication({ min: 2 })" 
                 class="menu-item" 
                 @click="redirect('/institutionAdmin')"
             >
@@ -26,7 +26,7 @@
             </div>
         </div>
         <div 
-            v-if="_.validAuthentication({ min: 4 })" 
+            v-if="utils.validAuthentication({ min: 4 })" 
             class="user-items"
         >
             <div class="menu-item" @click="redirect('/sysAdmin')">
@@ -87,12 +87,12 @@ export default {
                 window.setTimeout(() => {
                     window.open("https://mobilesyrup.com/2020/05/24/how-install-progressive-web-app-pwa-android-ios-pc-mac/", "_blank")
                 }, sixSecondsInMilliseconds)
-                return this._.alert(`It looks like you've missed the prompt to download the app or already declined to download it. In a moment, you'll be redirected to a link which shows you how to manually download the app.`)
+                return this.utils.alert(`It looks like you've missed the prompt to download the app or already declined to download it. In a moment, you'll be redirected to a link which shows you how to manually download the app.`)
             }
             this.deferredPrompt.prompt()
             const choice = await this.deferredPrompt.userChoice
             if (choice.outcome === 'accepted')
-            this._.alert(`The app has finished downloading!`, 'success')
+            this.utils.alert(`The app has finished downloading!`, 'success')
             this.deferredPrompt = null
         },
         stashPwaPrompt(event) {
@@ -105,7 +105,7 @@ export default {
         logout() {
             this.$store.dispatch('user/logout')
             this.$emit('close-nav')
-            this.$nextTick(() => { this._.toHomePage() })
+            this.$nextTick(() => { this.utils.toHomePage() })
         },
     },
     created() {

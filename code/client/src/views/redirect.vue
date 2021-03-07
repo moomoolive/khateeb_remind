@@ -18,12 +18,12 @@ export default {
             try {
                 const res = await this.$API.misc.redirect(shortURLExtension)
                 if (res.msg)
-                    this._.alert(res.msg)
+                    this.utils.alert(res.msg)
                 console.log(res)
                 return res.url
             } catch(err) {
                 console.log(err)
-                this._.toHomepage()
+                this.utils.toHomepage()
             }
         }
     },

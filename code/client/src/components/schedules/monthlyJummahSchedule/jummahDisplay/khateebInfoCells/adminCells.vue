@@ -92,7 +92,7 @@ export default {
                 const isAvailableDate = this.isAvailableDate(khateebFullInfo)
                 if (notAvailableForAllTimings && (!this.isAvailableTiming(khateebFullInfo) || !isAvailableDate)) {
                     const violation = !isAvailableDate ? 'date' : 'timing'
-                    const confirm = await this._.confirm(`This is ${violation} is not one of ${khateebFullInfo.firstName} ${khateebFullInfo.lastName}'s available ${violation}s! Are you sure you want to schedule him for this jummah anyway?`)
+                    const confirm = await this.utils.confirm(`This is ${violation} is not one of ${khateebFullInfo.firstName} ${khateebFullInfo.lastName}'s available ${violation}s! Are you sure you want to schedule him for this jummah anyway?`)
                     if (!confirm) {
                         const originalKhateeb = this.cachedKhateebPreferences[number].khateebID
                         return this.data.khateebPreference[number].khateebID = originalKhateeb
@@ -100,18 +100,19 @@ export default {
                 }    
             }
             this.cachedKhateebPreferences[number].khateebID = $event
-            const info = {
-                val: $event,
-                number,
-                id
-            }
-            this.$emit('changed', info)
+            this.delayedUpdate(this.data)
         },
         khateebDisplay(khateeb) {
             let base = `${khateeb.firstName} ${khateeb.lastName}`
             if (khateeb.title !== 'none')
                 base = `${khateeb.title} ${base}`
             return base 
+        },
+        rapidUpdate(data) {
+            this.$emit('changed', data)
+        },
+        delayedUpdate(data) {
+            this.$emit('changed-delay', data)
         },
         isAvailableDate(khateebFullInfo) {
             const unavailableDatesThisMonth = khateebFullInfo.unavailableDates.filter(date => this.timing.month === new Date(date.date).getMonth())
@@ -160,14 +161,14 @@ export default {
             return notifications
         },
         async manualOverride() {
-            const confirm = await this._.confirm(`Manual Override will stop all notifications from reaching khateebs associated with this jummah, make this jummah uneditable, and set the first preference as scheduled khateeb. Are you sure you want to manually override?`)
+            const confirm = await this.utils.confirm(`Manual Override will stop all notifications from reaching khateebs associated with this jummah, make this jummah uneditable, and set the first preference as scheduled khateeb. Are you sure you want to manually override?`)
             if (confirm)
                 this.$emit('override')
         }
     },
     created() {
-        this.data = this._.deepCopy(this.timing)
-        this.cachedKhateebPreferences = this._.deepCopy(this.data.khateebPreference)
+        this.data = this.utils.deepCopy(this.timing)
+        this.cachedKhateebPreferences = this.utils.deepCopy(this.data.khateebPreference)
     }
 }
 </script>

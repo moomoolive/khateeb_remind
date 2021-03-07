@@ -12,6 +12,9 @@
                 :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                 :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
                 :selectedDate="selectedDate"
+                @jummah-update="$emit('jummah-update', $event)"
+                @jummah-update-delay="$emit('jummah-update-delay', $event)"
+                @open-settings="$emit('open-settings', $event)"
             />
       </div>
       <div v-else>

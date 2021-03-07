@@ -68,7 +68,7 @@ export default {
         fillBannerContent() {
             const todayIsFriday = new Date().getDay() === 5
             if (todayIsFriday)
-                this.displayMsgs = this._.deepCopy(this.defaultDisplayMsgs.friday)
+                this.displayMsgs = this.utils.deepCopy(this.defaultDisplayMsgs.friday)
         }
     },
     computed: {

@@ -47,7 +47,7 @@ export default {
         async signupKhateeb($event) {
             try {
                 const res = await this.$API.auth.createKhateeb($event)
-                this._.alert(res, 'success')
+                this.utils.alert(res, 'success')
                 this.$router.push('/')
             } catch(err) {
                 console.log(err)

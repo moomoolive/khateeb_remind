@@ -197,7 +197,7 @@ export default {
             else if (!khateeb.active)
                 return [{ words: 'Inactive', color: 'urgent', symbol: '📪' }]
             else
-                return [{ words: `Last Active ${this._.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
+                return [{ words: `Last Active ${this.utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
         },
         async editKhateeb($event,confirm=false) {
             try {
@@ -221,7 +221,7 @@ export default {
         },
         async deleteKhateeb(id) {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to permenantly delete this khateeb?`)
+                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this khateeb?`)
                 if (!confirm)
                     return
                 const res = await this.$API.khateebs.deleteKhateeb(id)

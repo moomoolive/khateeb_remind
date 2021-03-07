@@ -11,7 +11,7 @@ import VCalendar from 'v-calendar'
 Vue.use(VCalendar)
 
 Vue.prototype.$API = API
-Vue.prototype._ = funcs
+Vue.prototype.utils = funcs
 
 Vue.config.productionTip = false
 

@@ -19,7 +19,7 @@ export default {
             const args = requestInfo.arguments
             const millisecondsInASecond = 1_000
             const timeInMilliseconds = requestInfo.requestAfterSeconds * millisecondsInASecond
-            const tenSecondsInMilliseconds = 10_000
+            const fiveSecondsInMilliseconds = 5_000
             const resolve = this.$store.state.requests.responses[key].resolve
             const reject = this.$store.state.requests.responses[key].reject
             const fullfilledResponseCallback = {
@@ -35,7 +35,7 @@ export default {
                     console.log(err)
                     reject(err)
                 }
-            }, timeInMilliseconds || tenSecondsInMilliseconds)
+            }, timeInMilliseconds || fiveSecondsInMilliseconds)
             this.activeRequests[key] = { func, clearCount: 0 }
             requestInfo.responsePromiseIsReady(true)
         },

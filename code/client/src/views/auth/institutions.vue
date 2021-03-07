@@ -87,8 +87,8 @@ export default {
                 this.deposit(requestSection, $event)
                 const res = await this.$API.auth.createInstitution(this.request)
                 if (typeof res.status !== "undefined" && res.status === 'reserved')
-                    return this._.alert(res.msg)
-                this._.alert(res, 'success')
+                    return this.utils.alert(res.msg)
+                this.utils.alert(res, 'success')
                 this.$router.push('/')
             } catch(err) {
                 console.log(err)
