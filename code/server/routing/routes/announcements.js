@@ -14,7 +14,7 @@ router.get(
     async (req, res) => {
         let announcements = []
         try {
-            announcements = await $db.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).limit(20).exec()
+            announcements = await $db.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).sort("-updatedAt").limit(20).exec()
             return res.json(announcements)
         } catch(err) {
             console.log(err)
@@ -58,7 +58,7 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "announcements"),
     async (req, res) => {
         try {
-            const updated = await $db.announcements.findOneAndUpdate(req.body._id, req.body, { new: true })
+            const updated = await $db.announcements.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)

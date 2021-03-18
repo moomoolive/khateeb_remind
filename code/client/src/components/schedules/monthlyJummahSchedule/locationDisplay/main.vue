@@ -1,41 +1,38 @@
 <template>
     <div class="location-container">
-        <div v-if="jummahs.length > 0">
             
-            <div>
-                <p class="location-label">{{ location.name }}</p>
-                <p class="location-label address">{{ location.address }}</p>
-            </div>
-            
-            <div v-if="jummahs.filter(jummah => jummah.locationID === location._id).length > 0">
-                <span
-                    v-for="(jummah, jummahIndex) in jummahs"
-                    :key="jummahIndex"
-                >   
-                    <jummah-display
-                        v-if="jummah.locationID === location._id"
-                        class="jummah-container"
-                        :jummah="jummah"
-                        :filteredTimings="filteredTimings"
-                        :reciever="reciever"
-                        :khateebs="khateebs"
-                        :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
-                        :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
-                        :selectedDate="selectedDate"
-                        @jummah-update="$emit('jummah-update', $event)"
-                        @jummah-update-delay="$emit('jummah-update-delay', $event)"
-                        @open-settings="$emit('open-settings', { ...$event, location })"
-                    />
-                </span>
-            </div>
+        <div>
+            <p class="location-label">{{ location.name }}</p>
+            <p class="location-label address">{{ location.address }}</p>
+        </div>
+        
+        <span v-if="jummahContentAvailable()">
 
-            <div v-else>
-                <img src="~@/assets/misc/emptyCalendar.png" class="no-entries-picture" />
-                <div class="no-entries-text">
-                    No Entries for this Week
-                </div>
+            <jummah-display
+                v-for="(timing, timingIndex) in timings.filter(timing => timing.locationID === location._id)"
+                :key="timingIndex"
+                class="jummah-container"
+                :reciever="reciever"
+                :khateebs="khateebs"
+                :khateebPreferences="khateebPreferencesForTiming(timing._id)"
+                :location="location"
+                :timing="timing"
+                :selectedDate="selectedDate"
+                :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
+                @new-preference="$emit('new-preference', $event)"
+                @update-preference="$emit('update-preference', $event)"
+                @open-settings="$emit('open-settings', $event)"
+            />
+
+        </span> 
+
+        <div v-else>
+            <img src="~@/assets/misc/emptyCalendar.png" class="no-entries-picture" />
+            <div class="no-entries-text">
+                No Entries for this Week
             </div>
         </div>
+
     </div>
 </template>
 
@@ -64,21 +61,29 @@ export default {
             type: Array,
             required: true
         },
-        viewingMonthIsCurrentPastOrFuture: {
+        viewingWeekIsCurrentPastOrFuture: {
             type: String,
             required: true
         },
-        viewingWeekIsCurrentPastOrFuture: {
-            type: String,
+        timings: {
+            type: Array,
             required: true
         },
         selectedDate: {
             type: Date,
             required: true
         },
-        filteredTimings: {
-            type: Array,
-            required: true
+    },
+    methods: {
+        khateebPreferencesForTiming(timingId) {
+            const preferences = this.jummahs.filter(j => j.timingID === timingId && j.locationID === this.location._id)
+            const mainKhateeb = preferences.find(p => !p.isBackup) || {}
+            const backupKhateeb = preferences.find(p => p.isBackup) || {}
+            return [mainKhateeb, backupKhateeb]
+        },
+        jummahContentAvailable() {
+            const preferencesAvailable = this.jummahs.filter(j => j.locationID === this.location._id).length > 0
+            return preferencesAvailable || this.viewingWeekIsCurrentPastOrFuture !== 'past'
         }
     }
 }
@@ -103,7 +108,8 @@ export default {
     font-weight: bold;
     text-decoration: underline dotted;
     &.address {
-        font-size: 27px;
+        font-size: 25px;
+        text-decoration: none;
     }
 }
 
@@ -134,7 +140,7 @@ export default {
     .location-label {
         font-size: 3.6vh;
         &.address {
-            font-size: 2.8vh;
+            font-size: 2.6vh;
         }
     }
     .jummah-container {

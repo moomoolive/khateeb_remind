@@ -27,6 +27,11 @@ const notification = new mongoose.Schema({
         type: String,
         required: true
     },
+    urgent: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
     meta: {
         type: Object,
         required: true

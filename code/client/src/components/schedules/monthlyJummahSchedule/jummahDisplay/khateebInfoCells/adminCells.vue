@@ -1,174 +1,168 @@
 <template>
     <div>
-        <div v-if="data">
-            <button
-                v-if="viewingMonth !== 'past' && currentWeek && currentWeek !== 'past' && !data.confirmed" 
-                class="yellow"
-                @click="manualOverride()"
-            >
-                Manual Override
-            </button>
-            <div 
-                v-for="(preference, preferenceNo) in data.khateebPreference"
-                :key="preferenceNo"
-            >
-                <p>Preference {{ preferenceNo + 1 }}</p>
-                <div v-if="readOnly(preference)">
-                    <p>
-                        <span 
-                            v-if="preference.notified && preference.responded && preference.confirmed"
-                        >
-                            ⭐
-                        </span>
-                        {{ readOnlyKhateebDisplay(preference.khateebID) }} 
-                    </p>
-                </div>
-                <select
-                    v-else
-                    v-model="preference.khateebID" 
-                    @change="change($event.target.value, preferenceNo, preference._id)"
-                >
-                    <option value="TBD">TBD</option>
-                    <option
-                        v-for="(khateeb, khateebNo) in khateebs"
-                        :key="khateebNo"
-                        :value="khateeb._id"
-                    >
-                        {{ khateebDisplay(khateeb) }}
-                    </option>
-                </select>
-                <div v-if="currentWeek === 'current'">
-                    <div 
-                        v-for="(notifiction, index) in currentWeekNotifications(preference)" 
-                        :key="index"
-                        class="current-week-notification"
-                    >
-                        {{ notifiction }}
-                    </div>
-                </div>
+        <div v-for="(preference, preferenceIndex) in khateebPreferencesMirror" :key="preferenceIndex">
+            
+            <div class="preference-number">
+                {{ preferenceIndex === 0 ? 'Main Khateeb' : 'Backup' }}
             </div>
+
+            <div>
+                <div v-if="currentWeek === 'past'" class="preference-number">
+                    None
+                </div>
+
+                <span v-else>
+                    <select
+                        v-if="showDropdown" 
+                        v-model="preference.khateebID" 
+                        @change="khateebSelectionChanged($event, preferenceIndex)"
+                    >
+                        <option value="none">None</option>
+                        <option
+                            v-for="(khateeb, khateebIndex) in khateebs"
+                            :key="khateebIndex"
+                            :value="khateeb._id"
+                        >
+                            {{ khateebName(khateeb) }}
+                        </option>
+                    </select>
+                </span>
+
+            </div>
+
+            <div>
+
+                <div v-show="preference.isGivingKhutbah" class="current-week-notification">
+                    ⭐ Khateeb
+                </div>
+
+                <div v-show="preference.notified" class="current-week-notification">
+                    📦 Notified
+                </div>
+
+            </div>
+
         </div>
     </div>
 </template>
 
 <script>
-import datetime from '@/libraries/dateTime/main.js'
-
 export default {
     name: "adminKhateebCells",
     props: {
-        timing: {
-            type: Object,
-            required: true
-        },
         khateebs: {
             type: Array,
-            required: true
-        },
-        weekOf: {
-            type: Date,
-            required: true
-        },
-        viewingMonth: {
-            type: String,
             required: true
         },
         currentWeek: {
             required: true,
             type: String
+        },
+        khateebPreferences: {
+            type: Array,
+            required: true
+        },
+        location: {
+            type: Object,
+            required: true
+        },
+        timing: {
+            type: Object,
+            required: true
+        },
+        selectedDate: {
+            type: Date,
+            required: true
         }
     },
     data() {
         return {
-            data: null,
-            cachedKhateebPreferences: []
+            cachedKhateebPreferencesMirror: [{ khateebID: 'none' }, { khateebID: 'none' }],
+            khateebPreferencesMirror: [{ khateebID: 'none' }, { khateebID: 'none' }],
+            showDropdown: true
         }
     },
     methods: {
-        async change($event, number, id) {
-            if ($event !== 'TBD') {
-                const khateebFullInfo = this.khateebs.find(khateeb => khateeb._id === $event)
-                const notAvailableForAllTimings = khateebFullInfo.availableTimings.length > 0
-                const isAvailableDate = this.isAvailableDate(khateebFullInfo)
-                if (notAvailableForAllTimings && (!this.isAvailableTiming(khateebFullInfo) || !isAvailableDate)) {
-                    const violation = !isAvailableDate ? 'date' : 'timing'
-                    const confirm = await this.utils.confirm(`This is ${violation} is not one of ${khateebFullInfo.firstName} ${khateebFullInfo.lastName}'s available ${violation}s! Are you sure you want to schedule him for this jummah anyway?`)
-                    if (!confirm) {
-                        const originalKhateeb = this.cachedKhateebPreferences[number].khateebID
-                        return this.data.khateebPreference[number].khateebID = originalKhateeb
-                    } 
-                }    
+        khateebName(khateeb) {
+            let name = `${khateeb.firstName} ${khateeb.lastName}`
+            if (khateeb.title.toLowerCase() !== 'none')
+                name += khateeb.title + " "
+            return name
+        },
+        async khateebSelectionChanged(change, index) {
+            const khateebID = change.target.value
+            const confirm = await this.allowedToMutate(index)
+            if (!confirm)
+                return
+            if (this.noPreferenceIndicated(index)) {
+                const isBackup = index !== 0
+                this.$emit('new-preference', { 
+                    khateebID, 
+                    isBackup, 
+                    isGivingKhutbah: !isBackup,
+                    notified: false,
+                    notificationID: 'none',
+                    timingID: this.timing._id,
+                    institutionID: this.location.institutionID,
+                    locationID: this.location._id,
+                    date: this.preferenceDate().toISOString() 
+                })
             }
-            this.cachedKhateebPreferences[number].khateebID = $event
-            this.delayedUpdate(this.data)
-        },
-        khateebDisplay(khateeb) {
-            let base = `${khateeb.firstName} ${khateeb.lastName}`
-            if (khateeb.title !== 'none')
-                base = `${khateeb.title} ${base}`
-            return base 
-        },
-        rapidUpdate(data) {
-            this.$emit('changed', data)
-        },
-        delayedUpdate(data) {
-            this.$emit('changed-delay', data)
-        },
-        isAvailableDate(khateebFullInfo) {
-            const unavailableDatesThisMonth = khateebFullInfo.unavailableDates.filter(date => this.timing.month === new Date(date.date).getMonth())
-            if (unavailableDatesThisMonth.length < 1)
-                return true
-            const found = unavailableDatesThisMonth.find(date => date.date === new Date(this.timing.year, this.timing.month, this.timing.weekOf, 0, 0, 0, 0).toISOString())
-            if (found)
-                return false
-        },
-        isAvailableTiming(khateebFullInfo) {
-            let currentTimingIsOneOfAvailableTimings = false
-            khateebFullInfo.availableTimings.forEach(timing => {
-                if (timing === this.timing.timingID)
-                    currentTimingIsOneOfAvailableTimings = true
-            })
-            return currentTimingIsOneOfAvailableTimings
-        },
-        readOnlyKhateebDisplay(khateebID) {
-            const found = this.khateebs.find(khateeb => khateeb._id === khateebID)
-            if (found)
-                return this.khateebDisplay(found)
             else
-                return khateebID
+                this.$emit('update-preference', { 
+                    ...this.khateebPreferences[index], 
+                    khateebID,
+                    notified: false,
+                    notificationID: 'none' 
+                })
+            this.cachePreferences()
         },
-        weekIsInPast() {
-            if (this.viewingMonth === 'past')
-                return true
-            else if (this.viewingMonth === 'future')
-                return false
-            else 
-                return datetime.findUpcomingFriday().getDate() > parseInt(this.weekOf)
+        async allowedToMutate(index) {
+            if (this.khateebPreferencesMirror[0].khateebID === this.khateebPreferencesMirror[1].khateebID)
+                return this.reverseChangeAndAlert(index, `Main and backup khateeb cannot be the same`)
+            return true
         },
-        readOnly(preference) {
-            return this.weekIsInPast() || this.timing.confirmed || preference.notified
+        setInitialValue() {
+            this.khateebPreferences.forEach((preference, index) => {
+                if (this.noPreferenceIndicated(index))
+                    return
+                else
+                    this.khateebPreferencesMirror[index] = { ...preference }
+            })
+            this.cachePreferences()
         },
-        currentWeekNotifications(preference) {
-            const notifications = []
-            if (this.data.confirmed)
-                return notifications
-            if (preference.notified)
-                notifications.push('📦 Notified')
-            if (preference.notified && !preference.responded)
-                notifications.push('📞 No Response')
-            if (preference.notified && preference.responded && !preference.confirmed)
-                notifications.push('❌ Canceled')
-            return notifications
+        reverseChangeAndAlert(index, msg) {
+            this.utils.alert(msg)
+            this.reverseChanges(index)
+            return false
         },
-        async manualOverride() {
-            const confirm = await this.utils.confirm(`Manual Override will stop all notifications from reaching khateebs associated with this jummah, make this jummah uneditable, and set the first preference as scheduled khateeb. Are you sure you want to manually override?`)
-            if (confirm)
-                this.$emit('override')
-        }
+        noPreferenceIndicated(index) {
+            return Object.keys(this.khateebPreferences[index]).length < 1
+        },
+        cachePreferences() {
+            this.khateebPreferencesMirror.forEach((p, index) => {
+                this.cachedKhateebPreferencesMirror[index] = { ...p }
+            })
+        },
+        reverseChanges(index) {
+            this.khateebPreferencesMirror.splice(index, 1, { ...this.cachedKhateebPreferencesMirror[index] })
+            this.rerenderDropdown()
+        },
+        rerenderDropdown() {
+            this.showDropdown = false
+            this.$nextTick(() => this.showDropdown = true)
+        },
+        preferenceDate() {
+            const date = new Date()
+            date.setUTCFullYear(this.selectedDate.getFullYear())
+            date.setUTCMonth(this.selectedDate.getMonth())
+            date.setUTCDate(this.selectedDate.getDate())
+            date.setUTCHours(12, 0, 0, 0)
+            return date
+        },
     },
     created() {
-        this.data = this.utils.deepCopy(this.timing)
-        this.cachedKhateebPreferences = this.utils.deepCopy(this.data.khateebPreference)
+        this.setInitialValue()
     }
 }
 </script>
@@ -189,7 +183,7 @@ select {
     }
 }
 
-p { 
+.preference-number { 
     text-align: left;
     width: 80%;
     margin-left: auto;
@@ -216,16 +210,20 @@ button {
 }
 
 @media screen and (max-width: $phoneWidth) {
+    
     select {
         font-size: 2vh;
     }
-    p { 
+
+    .preference-number { 
         margin-top: 4vh;
         font-size: 2.5vh;
     }
+    
     .current-week-notification {
         font-size: 2.7vh;
     }
+
     button {
         font-size: 2.2vh;
     }

@@ -67,7 +67,7 @@
                                 </button>
                                 <button 
                                     v-if="!khateeb.confirmed" 
-                                    @click="editKhateeb({ _id: khateeb._id, confirmed: true }, true)"
+                                    @click="editKhateeb({ _id: khateeb._id, confirmed: true })"
                                 >
                                     <p>Confirm {{ khateeb.firstName }}'s Application</p>
                                 </button>
@@ -197,12 +197,10 @@ export default {
             else if (!khateeb.active)
                 return [{ words: 'Inactive', color: 'urgent', symbol: '📪' }]
             else
-                return [{ words: `Last Active ${this.utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
+                return [{ words: `Last Active: ${this.utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
         },
-        async editKhateeb($event,confirm=false) {
+        async editKhateeb($event) {
             try {
-                if (!confirm)
-                    delete $event.confirmed
                 const res = await this.$API.khateebs.updateExistingKhateeb($event)
                 if (!res)
                     return

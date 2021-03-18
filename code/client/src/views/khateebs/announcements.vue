@@ -5,9 +5,7 @@
                 v-for="(announcement, index) in announcements"
                 :key="index"
                 class="announcement-container"
-                :headline="
-                    `${utils.dynamicDisplayDate(announcement.updatedAt)} || ${announcement.headline}`
-                "
+                :headline="headline(announcement)"
                 :tagDetails="tagLoader(announcement)"
             >
                 <div class="content" >
@@ -28,6 +26,8 @@
 import msgWithPic from '@/components/general/msgWithPic.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
 
+import announcementHelpers from '@/libraries/announcements/main.js'
+
 export default {
     name: 'announcements',
     components: {
@@ -41,14 +41,10 @@ export default {
     },
     methods: {
         tagLoader(announcement) {
-            let tagArray = []
-            if (announcement.important) tagArray.push('important')
-            if (announcement.urgent) tagArray.push('urgent')
-            if (this.isNew(announcement.savedOn)) tagArray.push('new')
-            return tagArray
+            return announcementHelpers.tagLoader(announcement, this.$store.state.user.lastLogin)
         },
-        isNew(announcementDate) {
-            return new Date(announcementDate).getTime() > this.$store.state.user.lastLogin.getTime()
+        headline(announcement) {
+            return announcementHelpers.headlineText(announcement)
         },
         async getAnnouncements() {
             try {

@@ -1,98 +1,58 @@
 <template>
-    <div v-if="showSettings">
-        <div class="two-settings-container">
-            <collapsable-box
-                class="setting-container"
-                :headline="`Institution Details`"
-                :tagDetails="institution ? [{
-                    words: `${institution.timezone} Timezone`,
-                    color: 'goodNews',
-                    symbol: '🌎' 
-                }] : null"
-            >
-                <institution-form-template 
-                    v-if="institution"
-                    :formProps="{
-                        basedOn: institution,
-                        bindedExts: ['states'],
-                        backgroundColor: 'none',
-                        buttonText: 'Update Institution'
-                    }"
-                    @submitted="saveInstitutionDetails($event)"
-                />
-            </collapsable-box>
-        </div>
-        <div class="two-settings-container">
-            <collapsable-box
-                class="setting-container"
-                :headline="`Text Settings`"
-                :tagDetails="settings ? [{
-                    words: settings.textAllowed ? `Online` : `Offline`,
-                    color: settings.textAllowed ? `goodNews` : `urgent`,
-                    symbol: settings.textAllowed ? `✔️` : `⚠️`
-                }] : null"
-            >
-                <img class="text-vendor-logo" src="~@/assets/logos/twillio.png">
-                <form-main
-                    v-if="settings" 
-                    :structure="{
-                        textAllowed: {
-                            type: 'checkbox',
-                            required: true
-                        },
-                        twilioUser: {
-                            required: true,
-                            tag: 'encrypted'
-                        },
-                        twilioKey: {
-                            type: 'protected',
-                            toggle: true,
-                            required: true,
-                            tag: 'encrypted'
-                        },
-                        twilioPhoneNumber: {
-                            required: true,
-                            minLength: 12
-                        },
-                    }"
-                    :backgroundColor="`none`"
-                    :basedOn="settings"
-                    @submitted="saveSettings($event)"
-                />
-            </collapsable-box>
-            <collapsable-box
-                class="setting-container"
-                :headline="`Registration Settings`"
-                :tagDetails="settings ? [{
-                    words: settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
-                    color: 'default',
-                    symbol: settings.autoConfirmRegistration ? `🤖` : `📜`
-                }] : null"
-            >
-                <form-main
-                    v-if="settings" 
-                    :structure="{
-                        autoConfirmRegistration: {
-                            type: 'checkbox',
-                            required: true
-                        }
-                    }"
-                    :backgroundColor="`none`"
-                    :basedOn="settings"
-                    @submitted="saveSettings($event)"
-                />
-            </collapsable-box>
-        </div>
-        <div class="two-settings-container" v-if="utils.validAuthentication(3)">
-            <collapsable-box
-                class="setting-container"
-                :headline="`Danger Zone`"
-                :buttonColor="`red`"
-                :bodyColor="`silver`"
-            >
-                <button class="yellow delete-institution" @click="deleteInstitution()">Delete Institution</button>
-            </collapsable-box>
-        </div>
+    <div v-if="showSettings" class="settings-container">
+        <collapsable-box
+            class="setting-container"
+            :headline="`Institution Details`"
+            :tagDetails="institution ? [{
+                words: `${institution.timezone} Timezone`,
+                color: 'goodNews',
+                symbol: '🌎' 
+            }] : null"
+        >
+            <institution-form-template 
+                v-if="institution"
+                :formProps="{
+                    basedOn: institution,
+                    bindedExts: ['states'],
+                    backgroundColor: 'none',
+                    buttonText: 'Update Institution'
+                }"
+                @submitted="saveInstitutionDetails($event)"
+            />
+        </collapsable-box>
+        <collapsable-box
+            class="setting-container"
+            :headline="`Registration Settings`"
+            :tagDetails="settings ? [{
+                words: settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
+                color: 'default',
+                symbol: settings.autoConfirmRegistration ? `🤖` : `📜`
+            }] : null"
+        >
+            <form-main
+                v-if="settings" 
+                :structure="{
+                    autoConfirmRegistration: {
+                        type: 'checkbox',
+                        required: true
+                    }
+                }"
+                :backgroundColor="`none`"
+                :basedOn="settings"
+                @submitted="saveSettings($event)"
+            />
+        </collapsable-box>
+        <collapsable-box
+            v-if="utils.validAuthentication(3)"
+            class="setting-container"
+            :headline="`Danger Zone`"
+            :buttonColor="`red`"
+            :bodyColor="`silver`"
+        >
+            <button class="yellow delete-institution" @click="deleteInstitution()">
+                Delete Institution
+            </button>
+        </collapsable-box>
     </div>
 </template>
 
@@ -171,22 +131,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.two-settings-container {
+.settings-container {
     display: flex;
     flex-direction: row;
     width: 90%;
-    max-height: 300px;
     margin-left: auto;
     margin-right: auto;
-    max-width: 1200px;
-    max-height: 1500px;
-    height: auto;
     align-items: center;
     justify-content: center;
+    max-width: 1300px;
+    flex-wrap: wrap;
 }
 
 .setting-container {
-    width: 45%;
+    width: 40%;
+    max-height: 1500px;
 }
 
 .delete-institution {
@@ -197,17 +156,16 @@ export default {
     color: red;
 }
 
-.text-vendor-logo {
-    width: 80%;
-}
-
 @media screen and (max-width: $phoneWidth) {
-      .two-settings-container {
-            flex-direction: column;
-        }
+    
+    .settings-container {
+        flex-direction: column;
+    }
+
     .setting-container {
         width: 100%;
     }
+
     .delete-institution {
         font-size: 3vh;
     }

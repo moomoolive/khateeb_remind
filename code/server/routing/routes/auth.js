@@ -44,7 +44,7 @@ router.post(
     '/create/khateeb',
     validationMiddleware.validateRequest(
         [
-            validator.body("institutionID").isLength(20),
+            validator.body("institutionID").isLength(24),
             validator.body("password").isLength({ min: 6 }),
             validator.body("username").isLength({ min: 6 }),
             validator.body("handle").isLength({ min: 1 }),
@@ -56,19 +56,15 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const institution = req.body.institutionID
-            const settings = await $db.settings.findOne({ institutionID: institution }).exec()
+            const settings = await $db.settings.findOne({ institutionID: req.body.institutionID }).exec()
             if (!settings)
                 return res.json(`That institution doesn't exist!`)
             if (settings.autoConfirmRegistration)
                 req.body.confirmed = true
-            else
-                req.body.confirmed = false
             const khateebEntry = await new $db.khateebs(req.body).save()
-            if (settings.autoConfirmRegistration)
-                await new notificationConstructors.WelcomeNotificationConstructor(khateebEntry).create()
+            await new notificationConstructors.WelcomeNotificationConstructor(khateebEntry).create()
             const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, settings.autoConfirmRegistration)
-            await note.setRecipentsToAdmins(institution)
+            await note.setRecipentsToAdmins(req.body.institutionID)
             await note.create()
             return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
@@ -106,6 +102,7 @@ router.post(
         }
 })
 
+// needs work
 router.post(
     '/forgot/:type', 
     validationMiddleware.validateRequest(
@@ -175,5 +172,7 @@ router.post(
             res.json({ msg: `Couldn't verify code`, status: "error" })
         }
 })
+
+// NEEDS WORK Ends here
 
 module.exports = router

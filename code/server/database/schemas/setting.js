@@ -18,18 +18,19 @@ const setting = new mongoose.Schema({
     },
     twilioKey: {
         type: String,
-        required: true,
+        required: false,
         minlength: 1
     },
     twilioPhoneNumber: {
         type: String,
-        required: true,
+        required: false,
         minlength: phoneNumberWithOneDigitCountryCode,
         maxlength: phoneNumberWithOnlyTwoDigitCountryCode
     },
     textAllowed: {
         type: Boolean,
-        required: true,
+        required: false,
+        default: false
     },
     autoConfirmRegistration: {
         type: Boolean,

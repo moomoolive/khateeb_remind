@@ -16,9 +16,8 @@
             :khateebs="khateebs"
             :reciever="viewingMode"
             @request-jummahs="requestJummahs($event)"
-            @build-schedule="buildSchedule($event, locations, timings)"
-            @jummah-update="updateJummah($event)"
-            @jummah-update-delay="updateJummahDelayedRequest($event)"
+            @new-preference="createNewJummahPreference($event)"
+            @update-preference="updateJummahPreference($event)"
             @run-notification-loop="runNotificationLoop($event)"
         >
             <template #above-controls>
@@ -68,6 +67,26 @@ export default {
                 console.log(err)
             }
         },
+        async createNewJummahPreference(newPreference) {
+            await this.utils.delayedRequest(
+                'jummahs',
+                'createNewPreference',
+                {
+                    arguments: [newPreference],
+                    additionalIdentifiers: ['createNewPreference', newPreference.timingID, `backup:${newPreference.isBackup}`]
+                }
+            )
+        },
+        async updateJummahPreference(updatedPreference) {
+            await this.utils.delayedRequest(
+                'jummahs',
+                'updateJummahPreference',
+                {
+                    arguments: [updatedPreference],
+                    additionalIdentifiers: ['createNewPreference', updatedPreference.timingID, `backup:${updatedPreference.isBackup}`]
+                }
+            )
+        },
         async requestJummahs(jummahDateRange) {
             try {
                 const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
@@ -76,16 +95,7 @@ export default {
                 console.log(err)
             }
         },
-        async buildSchedule(monthOfDateObj, locations, timings) {
-            const jummahs = jummahHelpers.buildMonthlySchedule(monthOfDateObj, locations, timings, true)
-            try {
-                const databaseLoggedJummahs = await this.$API.jummahs.createNewJummahs(jummahs)
-                this.jummahs = databaseLoggedJummahs || []
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        findJummahById(id) {
+        findJummahIndexById(id) {
             return this.jummahs.findIndex(jummah => jummah._id === id)
         },
         async updateJummah(updatedJummah) {
@@ -93,25 +103,19 @@ export default {
                 const updated = await this.$API.jummahs.updateJummah(updatedJummah)
                 if (!updated)
                     return
-                this.jummahs.splice(this.findJummahById(updated._id), 1, updated)
+                this.jummahs.splice(this.findJummahIndexById(updated._id), 1, updated)
             } catch(err) {
                 console.log(err)
             }
         },
-        async runNotificationLoop(jummah) {
-            console.log(jummah)
+        async runNotificationLoop({ jummah, backup }) {
+            try {
+                const updatedJummah = await this.$API.jummahs.runNotificationLoop({ _id: jummah._id }, backup)
+                this.jummahs.splice(this.findJummahIndexById(updatedJummah._id), 1, updatedJummah)
+            } catch(err) {
+                console.log(err)
+            }
         },
-        async updateJummahDelayedRequest(updatedJummah) {
-            await this.utils.delayedRequest(
-                'jummahs',
-                'updateJummah',
-                {
-                    arguments: [updatedJummah],
-                    additionalIdentifiers: ['setSchedule', updatedJummah._id]
-                }
-            )
-        }
-        
     },
     created() {
         this.getScheduleBuildingBlocks()

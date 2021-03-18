@@ -1,14 +1,9 @@
 {
     "pastTags": {
-        "missed": {
-            "words": "Missed",
+        "general": {
+            "words": "Past",
             "color": "red",
-            "icon": "❌"
-        },
-        "complete": {
-            "words": "Complete",
-            "color": "green",
-            "icon": "✔️"
+            "icon": "📚"
         }
     },
     "futureTags": {
@@ -24,11 +19,6 @@
         "icon": "⏱️"
     },
     "currentWeekTags": {
-        "confirmed": {
-            "words": "Confirmed",
-            "color": "green",
-            "icon": "👍"
-        },
         "notified": {
             "words": "Notified",
             "color": "purple",

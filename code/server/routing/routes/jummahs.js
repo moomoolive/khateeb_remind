@@ -12,10 +12,9 @@ router.get(
     '/',
     authMiddleware.authenticate({ min: 1, max: 3 }), 
     async (req, res) => {
-        //console.log(req.query)
         let jummahs = []
         try {
-            jummahs = await $db.jummahs.find({ institutionID: req.headers.institutionid, ...req.query }).exec()
+            jummahs = await $db.jummahPreferences.find({ institutionID: req.headers.institutionid, ...req.query }).exec()
             return res.json({ jummahs })
         } catch(err) {
             console.log(err)
@@ -26,33 +25,26 @@ router.get(
 router.post(
     '/',
     validationMiddleware.validateRequest([
-        validator.body("jummahs").isArray({ min: 1 })
+        validator.body("institutionID").isLength(24),
+        validator.body("timingID").isLength(24),
+        validator.body("locationID").isLength(24),
+        validator.body("khateebID").isLength(24),
+        validator.body("notificationID").isLength({ min: 4 }),
+        validator.body("date").isLength({ min: 1 }),
+        validator.body("notified").isBoolean(),
+        validator.body("isBackup").isBoolean(),
+        validator.body("isGivingKhutbah").isBoolean(),
     ]),
     authMiddleware.authenticate({ min: 2, max: 3 }),
     async (req, res) => {
         try {
-            const createdJummahs = []
-            const requestingInstitution = await $db.institutions.findOne({ _id: req.headers.institutionid }).exec()
-            const localTime = requestingInstitution.getLocalTime()
-            const oneMonthInThePast = jummahHelpers.oneMonthInThePast(localTime)
-            const twoMonthsAhead = jummahHelpers.twoMonthsAhead(localTime)
-            console.log(req.body.jummahs)
-            for (let i = 0; i < req.body.jummahs.length; i++) {
-                const jummah = req.body.jummahs[i]
-                const createdForRequesterInstitution = req.headers.institutionid === jummah.institutionID
-                const jummahForDateExists = await $db.jummahs.findOne({ date: jummah.date, locationID: jummah.locationID, timingID: jummah.timingID }).exec()
-                const creatingEntryForThePast = new Date(jummah.date).getTime() <= oneMonthInThePast.getTime()
-                const creatingJummahToFarIntoFuture = new Date(jummah.date).getTime() >= twoMonthsAhead.getTime() 
-                if (!createdForRequesterInstitution || jummahForDateExists || creatingEntryForThePast || creatingJummahToFarIntoFuture )
-                    continue
-                console.log('hi')
-                const savedJummah = await new $db.jummahs(jummah).save()
-                createdJummahs.push(savedJummah)
-            }
-            return res.json(createdJummahs)
+            if (jummahHelpers.oneMonthInThePast().getTime() >= new Date(req.body.date).getTime())
+                return res.status(422).json({ msg: 'You cannot create entries for the past' })
+            const savedPreference = await new $db.jummahPreferences(req.body).save()
+            return res.json(savedPreference)
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't save jummahs`)
+            return res.json(`Couldn't save jummah preference`)
         }
     } 
 )
@@ -61,18 +53,39 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(24),
-        validator.body("confirmed").isBoolean().optional(),
-        validator.body("khateebPreference").isArray({ min: 1, max: 3 }).optional()
+        validator.body("_id").isLength(24).optional(),
+        validator.body("khateebID").isLength(24).optional(),
+        validator.body("notificationID").isLength({ min: 4 }).optional(),
+        validator.body("notified").isBoolean().optional(),
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "jummahs"),
     async (req, res) => {
+        console.log(req.body)
         try {
-            const updated = await $db.jummahs.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            const updated = await $db.jummahPreferences.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
             console.log(err)
             return res.json(`Couldn't update jummah`)
+        }
+    }
+)
+
+router.put(
+    '/run-loop/:backup',
+    validationMiddleware.validateRequest([
+        validator.body("_id").isLength(24)
+    ]),
+    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.isAllowedToUpdateResource(["institutionID"], "jummahs"),
+    async (req, res) => {
+        console.log(req.body)
+        try {
+            const jummah = await $db.jummahs.findOne(req.body).exec()
+            const updatedJummah = await jummahHelpers.runNotificationLoop(jummah, req.params.backup === 'true')
+            return res.json(updatedJummah)
+        } catch(err) {
+            console.log(err)
         }
     }
 )

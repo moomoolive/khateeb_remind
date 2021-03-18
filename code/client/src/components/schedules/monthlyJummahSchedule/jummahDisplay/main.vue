@@ -1,51 +1,46 @@
 <template>
-    <div v-if="showJummah">
+    <div>
         
-        <!-- timing display -->
         <div class="timing-container">
             <div class="jummah-status-container">
                 <tag-circle
                     class="jummah-tag"
-                    :info="renderJummahTag(
-                        viewingMonthIsCurrentPastOrFuture,
-                        viewingWeekIsCurrentPastOrFuture,
-                        jummah
-                    )"
+                    :info="renderJummahTag(viewingWeekIsCurrentPastOrFuture)"
                 />
             </div>
             <span class="timing-label">
-                {{ jummahTiming(jummah) }}
+                {{ jummahTiming() }}
             </span>
         </div>
-        <!-- TIMING DISPLAY ENDS HERE -->
 
-        <!-- schedule cell -->
         <div class="jummahPreferences">
+            
             <div class="settings-icon-container">
                 <img 
                     src="~@/assets/misc/settingsCog.png"
                     class="settings-icon"
-                    @click="$emit('open-settings', { jummah, timing: findJummahTiming(jummah) })"
+                    @click="$emit('open-settings', { khateebPreferences, timing, location })"
                 >
             </div>
+
             <component
                 :is="reciever"
-                :timing="jummah"
-                :weekOf="selectedDate"
-                :viewingMonth="viewingMonthIsCurrentPastOrFuture"
                 :currentWeek="viewingWeekIsCurrentPastOrFuture"
                 :khateebs="khateebs"
-                @changed="$emit('jummah-update', $event)"
-                @changed-delay="$emit('jummah-update-delay', $event)"
+                :khateebPreferences="khateebPreferences"
+                :location="location"
+                :timing="timing"
+                :selectedDate="selectedDate"
+                @new-preference="$emit('new-preference', $event)"
+                @update-preference="$emit('update-preference', $event)"
             />
-            <!-- updated date -->
+
             <div class="last-updated">
                 <span class="timing">Last Updated:</span><br>
-                {{ utils.dynamicDisplayDate(jummah.updatedAt) }}
+                {{ updateDisplay() }}
             </div>
-            <!-- ENDS HERE -->
+
         </div>
-        <!-- SCHEDULE CELL END HERE -->
 
     </div>
 </template>
@@ -62,10 +57,6 @@ export default {
         "khateeb": () => import("./khateebInfoCells/khateebCells.vue")
     },
     props: {
-        jummah: {
-            type: Object,
-            required: true
-        },
         reciever: {
             type: String,
             required: true
@@ -74,75 +65,69 @@ export default {
             type: Array,
             required: true
         },
-        viewingMonthIsCurrentPastOrFuture: {
+        viewingWeekIsCurrentPastOrFuture: {
             type: String,
             required: true
         },
-        viewingWeekIsCurrentPastOrFuture: {
-            type: String,
+        khateebPreferences: {
+            type: Array,
+            required: true
+        },
+        location: {
+            type: Object,
+            required: true
+        },
+        timing: {
+            type: Object,
             required: true
         },
         selectedDate: {
             type: Date,
             required: true
-        },
-        filteredTimings: {
-            type: Array,
-            required: true
         }
     },
     data() {
         return {
-            showJummah: true,
             jummahStaticTags
         }
     },
     methods: {
-        jummahTiming(jummah) {
-            const timing = this.jummahTimingDateObject(jummah)
+        jummahTiming() {
+            const timing = new Date()
+            timing.setHours(this.timing.hour, this.timing.minute, 0, 0)
             return timing.toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" })
         },
-        findJummahTiming(jummah) {
-            return this.filteredTimings.find(timing => jummah.timingID === timing._id)
-        },
-        jummahTimingDateObject(jummah) {
-            const timing = this.findJummahTiming(jummah)
-            const dateObject = new Date()
-            dateObject.setHours(timing.hour)
-            dateObject.setMinutes(timing.minute)
-            return dateObject
-        },
-        renderJummahTag(viewingMonth, viewingWeek, jummah) {
-            try {
-                return this[viewingMonth + 'MonthJummahTag'](viewingWeek, jummah)
-            } catch(err) {
-                return jummahStaticTags.defaultTag
-            }
-        },
-        currentMonthJummahTag(viewingWeek, jummah) {
-            if (viewingWeek !== 'current')
-                return this[viewingWeek + 'MonthJummahTag'](jummah)
-            if (jummah.confirmed)
-                return jummahStaticTags.currentWeekTags.confirmed
-            else if (jummah.khateebPreference[0].notified)
+        renderJummahTag(viewingWeek) {
+            if (viewingWeek === 'past')
+                return jummahStaticTags.pastTags.general
+            else if (viewingWeek === 'future')
+                return jummahStaticTags.futureTags.general
+            else if (viewingWeek === 'current' && this.reciever === 'institutionAdmin' && this.oneKhateebWasNotified())
                 return jummahStaticTags.currentWeekTags.notified
-            return jummahStaticTags.defaultTag
-        },
-        futureMonthJummahTag() {
-            return jummahStaticTags.futureTags.general
-        },
-        pastMonthJummahTag(jummah) {
-            if (jummah.confirmed)
-                return jummahStaticTags.pastTags.complete
             else
-                return jummahStaticTags.pastTags.missed
+                return jummahStaticTags.defaultTag
         },
+        updateDisplay() {
+            if (!this.preferenceEntryExists)
+                return 'No Entries'
+            const updates = this.khateebPreferences
+                .map(k => new Date(k.updatedAt).getTime())
+                .filter(x => !isNaN(x))
+            const mostRecentUpdate = new Date(Math.max(...updates))
+            return this.utils.dynamicDisplayDate(mostRecentUpdate)
+        },
+        oneKhateebWasNotified() {
+            return this.khateebPreferences.find(p => p.notified)
+        }
     },
-    watch: {
-        selectedDate() {
-            // rerender cell
-            this.showJummah = false
-            this.$nextTick(() => { this.showJummah = true })
+    computed: {
+        preferenceEntryExists() {
+            let exists = false
+            this.khateebPreferences.forEach(k => { 
+                if (k.createdAt)
+                    exists = true
+             })
+            return exists
         }
     }
 }

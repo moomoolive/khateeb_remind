@@ -1,22 +1,28 @@
 <template>
     <div>
-        <div class="admin-container">
-            <collapsable-box
-                :headline="`Create New Admin`"
+        <div>
+            <button 
+                class="add-new-admin-button blue"
+                @click="openAddNewAdminForm()"
             >
-                <user-form-template 
-                    :userType="`institutionAdmin`"
-                    :includeVitals="true"
-                    :formProps="{
-                        buttonText: 'Create New Admin',
-                        bindedExts: ['confirms'],
-                        backgroundColor: 'none'
-                    }"
-                    @submitted="submitAdmin($event)"
-                />
-            </collapsable-box>
+                +
+            </button>
         </div>
-        <div class="new-existing-divider"></div>
+        <general-popup-container
+            v-if="showAddNewAdminForm"
+            @close="closeAddNewAdminForm()"
+        >
+            <user-form-template 
+                :userType="`institutionAdmin`"
+                :includeVitals="true"
+                :formProps="{
+                    buttonText: 'Create New Admin',
+                    bindedExts: ['confirms'],
+                    backgroundColor: 'yellow'
+                }"
+                @submitted="submitAdmin($event)"
+            />
+        </general-popup-container>
         <loading>
             <div v-if="admins.length > 0" class="admin-container">
                 <div v-for="(admin, index) in admins" :key="index">
@@ -36,7 +42,8 @@
                             :formProps="{
                                 readOnly: true,
                                 basedOn: admin,
-                                backgroundColor: 'none'
+                                backgroundColor: 'none',
+                                buttonText: 'Update'
                             }"
                         />
                     </collapsable-box>
@@ -57,6 +64,7 @@ import collapsableBox from '@/components/general/collapsableBox.vue'
 import loading from '@/components/general/loadingScreen.vue'
 import msgWithPic from '@/components/general/msgWithPic.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
+import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 
 export default {
     name: 'createOtherInstitutionAdmins',
@@ -64,18 +72,27 @@ export default {
         collapsableBox,
         loading,
         msgWithPic,
-        userFormTemplate
+        userFormTemplate,
+        generalPopupContainer
     },
     data() {
         return {
-            admins: []
+            admins: [],
+            showAddNewAdminForm: false
         }
     },
     methods: {
+        openAddNewAdminForm() {
+            this.showAddNewAdminForm = true
+        },
+        closeAddNewAdminForm() {
+            this.showAddNewAdminForm = false
+        },
         async submitAdmin($event) {
             try {
                 const newAdmin = await this.$API.institutionAdmins.createNewAdmin($event)
                 this.admins.push(newAdmin)
+                this.closeAddNewAdminForm()
                 this.utils.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
             } catch(err) {
                 console.log(err)
@@ -125,6 +142,15 @@ export default {
     border-bottom: black solid 3px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.add-new-admin-button {
+    border-radius: 100px 100px 100px 100px;
+    width: 60px;
+    height: 35px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 button {

@@ -7,6 +7,8 @@
             <jummah-settings-popup
                 :reciever="reciever"
                 :info="settingsInfo"
+                :selectedDate="selectedDate"
+                :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                 @run-notification-loop="$emit('run-notification-loop', $event)"
                 @override-jummah="$emit('jummah-update', $event)"
                 @close="closeSettings()"
@@ -32,7 +34,7 @@
                     />
 
                     <locations-display
-                        v-if="showLocations" 
+                        v-if="showLocations"
                         :locations="filteredLocations"
                         :jummahs="jummahs"
                         :selectedLocation="selectedLocation"
@@ -43,9 +45,8 @@
                         :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
                         :selectedDate="selectedDate"
                         :monthsFromCurrent="monthsFromCurrent"
-                        @build-schedule="$emit('build-schedule', selectedDate)"
-                        @jummah-update="$emit('jummah-update', $event)"
-                        @jummah-update-delay="$emit('jummah-update-delay', $event)"
+                        @new-preference="$emit('new-preference', $event)"
+                        @update-preference="$emit('update-preference', $event)"
                         @open-settings="openJummahSettings($event)"
                     />
 
@@ -139,7 +140,7 @@ export default {
             this.showJummahSettings = false
         },
         updateViewBasedOnQuery(info) {
-            console.log(info)
+            //console.log(info)
             this.selectedLocation = info.location
             if (info.monthChanged)
                 this.requestJummahs(info.date)
@@ -180,14 +181,15 @@ export default {
             this.settingsInfo.jummah = this.jummahs[0],
             this.settingsInfo.location = this.locations[0],
             this.settingsInfo.timing = this.timings[0]
+        },
+        rerenderLocations() {
+            this.showLocations = false
+            this.$nextTick(() => this.showLocations = true)
         }
     },
     computed: {
         monthsFromCurrent() {
-            return datetime.monthsFromDate(
-                new Date(this.upcomingFriday),
-                new Date(this.selectedDate)
-            )
+            return datetime.monthsFromDate(new Date(this.upcomingFriday), new Date(this.selectedDate))
         },
         viewingMonthIsCurrentPastOrFuture() {
             if (this.monthsFromCurrent > 0)
@@ -200,15 +202,19 @@ export default {
         viewingWeekIsCurrentPastOrFuture() {
             if (this.viewingMonthIsCurrentPastOrFuture !== 'current')
                 return this.viewingMonthIsCurrentPastOrFuture
-            if (this.selectedDate.getTime() > this.upcomingFriday.getTime())
+            else if (this.selectedDate.getDate() === this.upcomingFriday.getDate())
+                return 'current'
+            else if (this.selectedDate.getTime() > this.upcomingFriday.getTime())
                 return 'future'
             else if (this.selectedDate.getTime() < this.upcomingFriday.getTime())
                 return 'past'
             else
                 return 'current'
+            
         },
         locationsWithDataThisMonth() {
-            return this.locations.filter(location => 
+            return this.locations.filter(location =>
+                location.active || 
                 this.jummahs.filter(jummah => jummah.locationID === location._id).length > 0
             )
         },
@@ -221,8 +227,10 @@ export default {
     },
     watch: {
         jummahs() {
-            this.showLocations = false
-            this.$nextTick(() => this.showLocations = true)
+            this.rerenderLocations()
+        },
+        selectedDate() {
+            this.rerenderLocations()
         }
     },
     created() {

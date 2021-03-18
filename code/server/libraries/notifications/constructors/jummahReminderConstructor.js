@@ -1,25 +1,18 @@
 const NotificationConstructor = require('./notificationConstructor.js')
 
 module.exports = class JummahReminderNotificationConstructor extends NotificationConstructor {
-    constructor(khateeb ,jummah, jummahMeta, preference) {
-        super(khateeb, 'actionNotifications', 'jummah', { jummah, ...jummahMeta })
-        this.preference = preference
-        this.additonalNotificationInfo = {
-            actionLink: `/jummah/confirm/jummah=${jummah._id.toString()}/note=__ID__`,
-            buttonText: 'Confirm'
-        }
+    
+    constructor(khateeb ,jummah, jummahMeta) {
+        super(khateeb, 'jummah', { msgInfo: { jummah, ...jummahMeta }, urgent: true })
     }
+    
     msg() {
-        const base = `to give the ${this.timing} khutbah at ${this.msgInfo.location.name} (${this.msgInfo.location.address}) this week${this.preference > 1 ? '?' : '.'} Click here to confirm your attendance, JAK!`
-        const prefix = this.preference > 1 ? 'Are you able ' : 'You are scheduled '
-        return prefix + base
+        return `Please don't forget that you are scheduled to give the ${this.timing} khutbah at ${this.msgInfo.location.name} (${this.msgInfo.location.address}) this week.`
     }
+
     get timing() {
-        let militaryhour = this.msgInfo.timing.hour
-        const hour = militaryhour > 12 ? militaryhour - 12 : militaryhour
-        let min = this.msgInfo.timing.minute
-        min = min < 10 ? `0${min}` : min
-        const amOrPm = militaryhour > 11 ? 'PM' : 'AM'
-        return `${hour}:${min} ${amOrPm}`
+        const date = new Date()
+        date.setHours(this.msgInfo.timing.hour, this.msgInfo.timing.minute, 0, 0)
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     }
 }

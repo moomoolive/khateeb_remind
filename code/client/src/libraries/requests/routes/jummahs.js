@@ -8,15 +8,16 @@ const requests = {
     getJummahs(params) {
         return axios.get(extension, { params })
     },
-    createNewJummahs(newJummahs=[]) {
-        if (!Array.isArray(newJummahs))
-            throw TypeError(`New jummahs must be in array format`)
-        return axios.post(extension, { jummahs: newJummahs })
+    createNewPreference(newPreference) {
+        return axios.post(extension, newPreference)
     },
-    updateJummah(updatedJummah={}) {
+    updateJummahPreference(updatedJummah={}) {
         if (updatedJummah._id === undefined)
             throw TypeError(`You must provide a valid id to update jummah`)
         return axios.put(extension, updatedJummah)
+    },
+    runNotificationLoop(jummah={}, backup=false) {
+        return axios.put(extension + `/run-loop/${backup}`, jummah)
     }
 }
 

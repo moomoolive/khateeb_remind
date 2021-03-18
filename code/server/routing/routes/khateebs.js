@@ -4,8 +4,6 @@ const validator = require('express-validator')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
-const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
-
 const router = express.Router()
 
 router.get(
@@ -35,8 +33,6 @@ router.put(
     async (req, res) => {
         try {
             const updated = await $db.khateebs.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
-            if (req.body.confirmed)
-                await new notificationConstructors.WelcomeNotificationConstructor(updated).create()
             return res.json(updated)
         } catch(err) {
             console.log(err)

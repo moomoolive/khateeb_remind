@@ -37,27 +37,20 @@ export default {
             }
         },
         adjustNotificationBasedOnTag(notification) {
-            let obj = {}
             switch(notification.tag) {
                 case 'welcome':
                     return {
                         icon: 'asalam',
                         graphicType: 'gif'
                     }
-                case 'khateebs':
-                    obj.icon = "khateebs"
-                    if (notification.meta && notification.meta.dropout)
-                        obj.color = 'yellow'
-                    return obj
+                case 'khateebs': 
+                    return {
+                        icon: 'khateebs'
+                    }
                 case 'jummah':
                     return {
-                        type: 'redirect',
-                        redirections: [
-                            {
-                                to: notification.actionLink.replace("__ID__", notification._id),
-                                text: 'confirm'
-                            }
-                        ]
+                        icon: 'personPraying',
+                        graphicType: 'gif'
                     }
                 default:
                     return {}
@@ -109,7 +102,7 @@ export default {
             if (newVal.length < 1)
                 return this.firstNotification = true
             let upcomingNotification = newVal[0]
-            if (newVal[0] === '__USER__')
+            if (upcomingNotification === '__USER__')
                 upcomingNotification = this.userPromptedNotifications[0]
             this.displayNotificationOnScreen(upcomingNotification)
             this.firstNotification = false

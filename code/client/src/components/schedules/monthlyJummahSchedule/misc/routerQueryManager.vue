@@ -91,8 +91,8 @@ export default {
         $route(newVal, oldVal) {
             const newDate = new Date(newVal.query[this.selectedDateQueryKey])
             const oldDate = new Date(oldVal.query[this.selectedDateQueryKey])
-            console.log('newDate', newDate)
-            console.log('oldDate', oldDate)
+            //console.log('newDate', newDate)
+            //console.log('oldDate', oldDate)
             const monthChanged = !datetime.sameMonthSameYear(newDate, oldDate)
             return this.emitQueryChanges(monthChanged)
         }

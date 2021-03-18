@@ -19,6 +19,7 @@ const user = new mongoose.Schema({
     },
     confirmed: {
         type: Boolean,
+        required: false,
         default: false
     },
     handle: {

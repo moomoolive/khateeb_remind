@@ -1,38 +1,30 @@
 <template>
   <div class="locations-container">
-      <div v-if="locations.length > 0">
+      
+      <div v-if="locations.length > 0 && !beforeInstitutionWasCreated">
           <location-display 
                 v-for="(location, locationIndex) in locations"
                 :key="locationIndex"
                 :location="location"
                 :jummahs="filteredJummahs"
-                :filteredTimings="filteredTimings"
+                :timings="filteredTimings"
                 :reciever="reciever"
                 :khateebs="khateebs"
-                :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
-                :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
                 :selectedDate="selectedDate"
-                @jummah-update="$emit('jummah-update', $event)"
-                @jummah-update-delay="$emit('jummah-update-delay', $event)"
+                :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
+                @new-preference="$emit('new-preference', $event)"
+                @update-preference="$emit('update-preference', $event)"
                 @open-settings="$emit('open-settings', $event)"
             />
       </div>
-      <div v-else>
-        <div v-if="viewingMonthIsCurrentPastOrFuture === 'past'">
-            <div class="button-label no-jummahs">
-                No jummahs were scheduled for this month
-            </div>
-            <div class="button-label icon">
-                🚫
-            </div>
-        </div>
 
-        <component
-            v-else 
-            :is="`${reciever}NoJummah`"
-            :monthsFromCurrent="monthsFromCurrent"
-            @build-schedule="$emit('build-schedule')"
-        />
+      <div v-else>
+        <div class="button-label no-jummahs">
+            No Entries
+        </div>
+        <div class="button-label icon">
+            🚫
+        </div>
       </div>
   </div>
 </template>
@@ -44,8 +36,6 @@ export default {
     name: 'locationsDisplay',
     components: {
         locationDisplay,
-        "khateebNoJummah": () => import('./noJummahDisplay/khateeb'),
-        "institutionAdminNoJummah": () => import('./noJummahDisplay/admin.vue')
     },
     props: {
         locations: {
@@ -110,8 +100,9 @@ export default {
     computed: {
         filteredTimings() {
             return this.timings
-                .filter(timing => this.jummahs
-                    .filter(jummah => jummah.timingID === timing._id).length > 0
+                .filter(timing => 
+                    timing.active ||
+                    this.jummahs.filter(jummah => jummah.timingID === timing._id).length > 0
                 )
         },
         filteredJummahs() {
@@ -119,6 +110,9 @@ export default {
                 .filter(jummah => new Date(jummah.date).getDate() === this.selectedDate.getDate())
                 .sort(this.sortJummahByTime)
         },
+        beforeInstitutionWasCreated() {
+            return this.jummahs.length < 1 && this.viewingMonthIsCurrentPastOrFuture === 'past'
+        }
     }
 }
 </script>

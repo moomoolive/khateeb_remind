@@ -10,34 +10,20 @@
                     :class="`notification-container`"
                 >       
                     <div>
-                        <tag-circle
-                            class="tag" 
-                            :info="tagLoader(notification)"
-                        />
-                        <span class="needs-attention" v-if="notification.actionLink && !notification.actionPerformed">
+                        <tag-circle class="tag" :info="tagLoader(notification)"/>
+                        <span class="needs-attention" v-if="notification.urgent">
                             ⚠️
                         </span>
                     </div>
                     <div class="notification-msg">
-                        <span class="notification-date">{{ utils.dynamicDisplayDate(notification.createdAt) }}</span><br><br>
+                        <span class="notification-date">
+                            {{ utils.dynamicDisplayDate(notification.createdAt) }}
+                        </span><br><br>
                         {{ notification.msg }}
-                    </div>
-                    <div>
-                        <button 
-                            v-if="!!notification.actionLink"
-                            :disabled="notification.actionPerformed"
-                            :class="`actions-btn ${notification.actionPerformed ? 'green' : 'darkRed'}`"
-                            @click="pushToActionPage(notification)"
-                        >
-                            {{  notification.actionPerformed ? notification.completedButtonText || 'Completed' : notification.buttonText }}
-                        </button>
                     </div>
                 </div>
             </div>
-            <div
-                v-else 
-                class="empty-notifications-container"
-            >
+            <div v-else class="empty-notifications-container">
                 <msg-with-pic
                     class="empty-notifications-msg" 
                     :gif="`sadCat`"
@@ -74,15 +60,11 @@ export default {
     },
     methods: {
         tagLoader(notification) {
-            const tag = notification.tag ? notification.tag : notification.__t
-            const name = this.utils.stringFormat(tag)
-            let val = { color: 'blue' }
-            switch(name) {
+            const words = this.utils.stringFormat(notification.tag)
+            let val = { color: 'blue', words, icon: '📭' }
+            switch(words) {
                 case 'Jummah':
-                    if (!notification.actionPerformed)
-                        val.color = "red"
-                    else
-                        val.color = "purple"
+                    val.color = "purple"
                     val.icon = '🤲'
                     break
                 case 'Welcome':
@@ -97,19 +79,8 @@ export default {
                     break
                 case 'Khateebs':
                     val.icon = "🕌"
-                    if (notification.meta && notification.meta.dropout)
-                        val.color = 'red'
-                    break
             }
-            val.words = name
             return val
-        },
-        pushToActionPage(notification) {
-            const actionLink = notification.actionLink.replace("__ID__", notification._id)
-            console.log(actionLink)
-            if (this.$router.currentRoute.fullPath !== actionLink)
-                this.$router.push(actionLink)
-            this.$emit('close')
         }
     },
     computed: {
@@ -124,7 +95,7 @@ export default {
 
 .needs-attention {
     float: right;
-    margin-right: 2%;
+    margin-right: 7%;
     font-size: 18px;
     position: relative;
 }
@@ -190,14 +161,6 @@ export default {
     color: getColor("purple");
 }
 
-.actions-btn {
-    width: 85%;
-    height: 7%;
-    border-radius: 0;
-    margin-bottom: 0;
-    font-size: 17px;
-}
-
 .tag {
     width: 40%;
     margin-left: 6%;
@@ -208,12 +171,11 @@ export default {
 }
 
 @media screen and (max-width: $phoneWidth) {
+    
     .scroller-container {
         max-height: 50vh;
     }
-    .actions-btn {
-        font-size: 2.4vh;
-    }
+
     .needs-attention {
         font-size: 2.4vh;
     }

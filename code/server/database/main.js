@@ -11,9 +11,12 @@ const setting = require('./schemas/setting.js')
 const notification = require('./schemas/notification.js')
 const shortenedURL = require('./schemas/shortenedURL.js')
 const verificationCode = require('./schemas/verificationCode.js')
+const jummahPreference = require('./schemas/jummahPreference.js')
 
 const models = {
+    // deprecated model
     jummahs: mongoose.model('jummah', jummah),
+    // ends here
     institutions: mongoose.model('institution', institution),
     timings: mongoose.model('timing', timing),
     locations: mongoose.model('location', location),
@@ -22,7 +25,8 @@ const models = {
     settings: mongoose.model('setting', setting),
     notifications: mongoose.model('notification', notification),
     shortenedURLs: mongoose.model('shortenedURL', shortenedURL),
-    verificationCodes: mongoose.model('verificationCode', verificationCode)
+    verificationCodes: mongoose.model('verificationCode', verificationCode),
+    jummahPreferences: mongoose.model('jummahPreference', jummahPreference)
 }
 
 const userTypes = {
@@ -33,13 +37,7 @@ const userTypes = {
     rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', discriminators.rootInstitutionAdmin)
 }
 
-const notificationTypes = {
-    generalNotifications: models.notifications.discriminator('generalNotification', discriminators.generalNotification),
-    actionNotifications: models.notifications.discriminator('actionNotification', discriminators.actionNotification)
-}
-
 module.exports = { 
     ...models, 
-    ...userTypes, 
-    ...notificationTypes 
+    ...userTypes
 }

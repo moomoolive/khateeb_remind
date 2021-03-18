@@ -1,28 +1,22 @@
 <template>
     <div>
-        <div 
-            v-if="utils.validAuthentication({ min: 1, max: 3 })" 
-            class="user-items"
-        >
+        <div v-if="utils.validAuthentication({ level: 1 })" class="user-items">
             <div class="menu-item" @click="redirect('/khateeb/')">
-                <p class="top-item">
-                    {{ $store.getters['user/type'] !== 'khateeb' ? 'Khateeb Schedule' : 'Schedule' }}
-                </p>
+                <p class="top-item">Schedule</p>
             </div>
-            <div 
-                class="menu-item" 
-                @click="redirect('/khateeb/announcements')"
-            >
+            <div class="menu-item" @click="redirect('/khateeb/announcements')">
                 <p>Announcements</p>
             </div>
-            <div 
-                v-if="utils.validAuthentication({ min: 2 })" 
-                class="menu-item" 
-                @click="redirect('/institutionAdmin')"
-            >
-                <p>
-                    Admin Central
-                </p>
+        </div>
+        <div v-if="utils.validAuthentication({ min: 2, max: 3 })" class="user-items">
+            <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
+                <p class="top-item">Set Schedule</p>
+            </div>
+            <div class="menu-item" @click="redirect('/institutionAdmin/announcements')">
+                <p>Announcements</p>
+            </div>
+            <div class="menu-item" @click="redirect('/institutionAdmin')">
+                <p>Admin Central</p>
             </div>
         </div>
         <div 
@@ -44,18 +38,13 @@
             <p>My Profile</p>
         </div>
         <div
-            v-if="!$store.state.user.isBrowsingOnPWA" 
+            v-if="!$store.state.user.isBrowsingOnPWA && deferredPrompt" 
             class="menu-item get-the-app" 
             @click="downloadApp()"
         >
-            <p class="get-the-app-text">
-                Download the App
-            </p>
+            <p class="get-the-app-text">Download the App</p>
         </div>
-        <div 
-            class="menu-item caution" 
-            @click="logout()"
-        >
+        <div class="menu-item caution" @click="logout()">
             <p class="caution-text">Logout</p>
         </div>
     </div>
@@ -87,7 +76,7 @@ export default {
                 window.setTimeout(() => {
                     window.open("https://mobilesyrup.com/2020/05/24/how-install-progressive-web-app-pwa-android-ios-pc-mac/", "_blank")
                 }, sixSecondsInMilliseconds)
-                return this.utils.alert(`It looks like you've missed the prompt to download the app or already declined to download it. In a moment, you'll be redirected to a link which shows you how to manually download the app.`)
+                return this.utils.alert(`It looks like you've missed the prompt to download the app, already declined to download the app, or your browser doesn't support web-applications. In a moment, you'll be redirected to a link which shows you how to manually download the app.`)
             }
             this.deferredPrompt.prompt()
             const choice = await this.deferredPrompt.userChoice

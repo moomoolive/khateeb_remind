@@ -26,31 +26,10 @@ const institutionAdmin = new mongoose.Schema({})
 const root = new mongoose.Schema({})
 const sysAdmin = new mongoose.Schema({})
 
-const actionNotification = new mongoose.Schema({
-    actionPerformed: {
-        type: Boolean,
-        required: true,
-        default: false
-    },
-    actionLink: {
-        type: String,
-        required: true,
-        default: 'TBD'
-    },
-    buttonText: {
-        type: String,
-        required: true
-    }
-})
-
-const generalNotification = new mongoose.Schema({})
-
 module.exports = {
     khateeb,  
     rootInstitutionAdmin,
     institutionAdmin,
     root,
-    sysAdmin,
-    generalNotification,
-    actionNotification
+    sysAdmin
 }

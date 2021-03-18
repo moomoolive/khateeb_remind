@@ -1,22 +1,39 @@
 <template>
-    <div>
-        <p v-if="handle"><span>@{{ handle }}</span></p>
-        <p>{{ display }}</p>
-        <tag-box v-if="updated && khateebData !== 'TBD'" :info="`new`" />
+    <div class="cell-container">
+        <div class="khateeb-role-label">
+            Main Khateeb
+        </div>
+        <div class="khateeb-name-label">
+            <span v-if="khateebPreferences[0].isGivingKhutbah">
+                ⭐ Khateeb<br>
+            </span>
+            {{ khateebDisplay(khateebPreferences[0]) }}
+        </div>
+        <div v-show="khateebPreferences[1].khateebID" class="khateeb-role-label" @click="toggleBackupDisplay()">
+           {{ showBackup ? '📖 Hide' : '📘 Show' }} Backup
+        </div>
+        <collapse-transition>
+            <div v-show="showBackup" class="khateeb-name-label">
+                <span v-if="khateebPreferences[1].isGivingKhutbah">
+                    ⭐ Khateeb
+                </span><br>
+                {{ khateebDisplay(khateebPreferences[1]) }}
+            </div>
+        </collapse-transition>
     </div>
 </template>
 
 <script>
-import tagBox from '@/components/general/tagBox.vue'
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 export default {
     name: 'khateebKhateebCells',
     components: {
-        tagBox
+        CollapseTransition,
     },
     props: {
-        timing: {
-            type: Object,
+        khateebPreferences: {
+            type: Array,
             required: true
         },
         khateebs: {
@@ -24,76 +41,62 @@ export default {
             required: true
         }
     },
+    data() {
+        return {
+            showBackup: false
+        }
+    },
     methods: {
-        findDisplay(khateebPreference) {
-            const first = khateebPreference[0]
-            if (first.khateebID === 'TBD' && !this.timing.confirmed)
-                return first.khateebID
-            else if (!first.notified)
-                return this.findKhateeb(first.khateebID)
-            else {
-                for (let i = 0; i < khateebPreference.length; i++) {
-                    const preference = khateebPreference[i]
-                    if (this.preferenceHasConfirmed(preference))
-                        return this.findKhateeb(preference.khateebID)
-                }
-                return 'TBD'
-            }
+        khateebDisplay(preference) {
+            if (Object.keys(preference).length < 1 || preference.khateebID === 'none')
+                return 'To Be Decided'
+            return this.khateebName(this.khateebs.find(k => k._id === preference.khateebID))
         },
-        preferenceHasConfirmed(preference) {
-            return preference.notified && preference.responded && preference.confirmed
+        khateebName(khateeb) {
+            let base = `${khateeb.firstName} ${khateeb.lastName}`
+            if (khateeb.title.toLowerCase() !== 'none')
+                base += khateeb.title + ' '
+            return base
         },
-        findKhateeb(khateebID) {
-            return this.khateebs.find(khateeb => khateeb._id === khateebID)
-        },
-        organizeDisplay(displayVal) {
-            if (displayVal === 'TBD')
-                return displayVal
-            else
-                return `${displayVal.title.toLowerCase() !== 'none' ? `${displayVal.title} ` : ''}${displayVal.firstName} ${displayVal.lastName}`
-        },
+        toggleBackupDisplay() {
+            this.showBackup = !this.showBackup
+        }
     },
     computed: {
-        updated() {
-            const user = new Date(this.$store.state.user.lastLogin)
-            const update = new Date(this.timing.updatedAt)
-            return user.getTime() < update.getTime()
-        },
-        khateebData() {
-            return this.findDisplay(this.timing.khateebPreference)
-        },
-        display() {
-            return this.organizeDisplay(this.khateebData)
-        },
-        handle() {
-            if (this.khateebData === 'TBD')
-                return null
-            else
-                return this.khateebData.handle
-        }
+        
     }
 }
 </script>
 
 <style lang="scss" scoped>
 
-p {
-    font-size: 19px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    width: 95%;
+div {
+    text-align: left;
+}
+
+.khateeb-role-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.khateeb-name-label {
+    margin-bottom: 15px;
+    font-size: 15px;
 }
 
 span {
-    color: getColor('blue');
+    font-size: 14px;
+}
+
+.cell-container {
+    margin-top: 20px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @media screen and (max-width: $phoneWidth) {
-    p {
-        font-size: 2.5vh;
-        padding-top: 1vh;
-        padding-bottom: 1vh;
-    }
 
 }
 

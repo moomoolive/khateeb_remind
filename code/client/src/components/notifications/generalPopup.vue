@@ -52,6 +52,7 @@ export default {
     padding-top: 10px;
     overflow-y: scroll;
     overflow-x: hidden;
+    max-height: 1500px;
 }
 
 .close-content {
