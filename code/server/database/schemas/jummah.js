@@ -1,3 +1,5 @@
+// DEPRECATED SCHEMA
+
 const mongoose = require('mongoose')
 
 const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')

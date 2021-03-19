@@ -81,7 +81,7 @@ router.put(
     async (req, res) => {
         console.log(req.body)
         try {
-            const jummah = await $db.jummahs.findOne(req.body).exec()
+            const jummah = await $db.jummahPreferences.findOne(req.body).exec()
             const updatedJummah = await jummahHelpers.runNotificationLoop(jummah, req.params.backup === 'true')
             return res.json(updatedJummah)
         } catch(err) {

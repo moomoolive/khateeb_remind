@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
 const discriminators = require('./discriminators/main.js')
-const jummah = require('./schemas/jummah.js')
 const location = require('./schemas/location.js')
 const institution = require('./schemas/institution.js')
 const timing = require('./schemas/timing.js')
@@ -14,9 +13,6 @@ const verificationCode = require('./schemas/verificationCode.js')
 const jummahPreference = require('./schemas/jummahPreference.js')
 
 const models = {
-    // deprecated model
-    jummahs: mongoose.model('jummah', jummah),
-    // ends here
     institutions: mongoose.model('institution', institution),
     timings: mongoose.model('timing', timing),
     locations: mongoose.model('location', location),

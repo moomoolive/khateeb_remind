@@ -31,7 +31,7 @@ const runNotificationLoop = async (jummah, backup=false) => {
     const msgs = await note.create()
     preference.notified = true
     console.log(msgs)
-    return $db.jummahs.findOneAndUpdate({ _id: jummah._id }, jummah, { new: true })
+    return $db.jummahPreferences.findOneAndUpdate({ _id: jummah._id }, jummah, { new: true })
 }
 
 
