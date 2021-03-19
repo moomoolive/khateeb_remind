@@ -4,8 +4,6 @@ const validator = require('express-validator')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
-const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
-
 const router = express.Router()
 
 router.get(
@@ -36,7 +34,6 @@ router.post(
     async (req, res) => {
         try {
             const newTiming = await $db.timings(req.body).save()
-            //await scheduleHelpers.createJummahsForTiming(newTiming.locationID, newTiming._id.toString(), newTiming.institutionID)
             return res.json(newTiming)
         } catch(err) {
             console.log(err)

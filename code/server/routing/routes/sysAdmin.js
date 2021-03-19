@@ -8,7 +8,6 @@ const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 4, max: 5 }))
 
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
-const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
 
 const inst = {
     async view(options) {
@@ -113,11 +112,6 @@ const inst = {
                             minute: 30
                         }
                         const savedTiming = await new $db.timings(timing).save()
-                        const associatedJummahs = await scheduleHelpers.createAssociatedJummahs(
-                            savedLocation._id.toString(), 
-                            savedTiming._id.toString(), 
-                            id
-                        )
                         msgs.push(
                             { 
                                 msg: `Created timing, location, first jummahs for institution ${id}`,

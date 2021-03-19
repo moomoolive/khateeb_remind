@@ -112,7 +112,7 @@ export default {
                 return 'No Entries'
             const updates = this.khateebPreferences
                 .map(k => new Date(k.updatedAt).getTime())
-                .filter(x => !isNaN(x))
+                .filter(unixTime => !isNaN(unixTime))
             const mostRecentUpdate = new Date(Math.max(...updates))
             return this.utils.dynamicDisplayDate(mostRecentUpdate)
         },

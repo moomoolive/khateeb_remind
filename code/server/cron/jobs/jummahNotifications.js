@@ -1,8 +1,8 @@
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
-const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
 
 const job = async () => {
     try {
+        /*
         const institutionQuery = test ? { name: "__TEST__" } : { confirmed: true }
         const institutions = await $db.institutions.find(institutionQuery).exec()
         const upcomingFriday = scheduleHelpers.findUpcomingFriday()
@@ -32,6 +32,7 @@ const job = async () => {
                 }
             }
         }
+        */
         console.log(`Set jummah notifications!`)
     } catch(err) {
         console.log(err)

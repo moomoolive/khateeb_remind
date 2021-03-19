@@ -40,8 +40,6 @@
 <script>
 import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule/main.vue'
 
-import jummahHelpers from '@/libraries/jummahs/main.js'
-
 export default {
     name: "scheduleSetter",
     components: {
