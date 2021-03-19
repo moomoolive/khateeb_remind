@@ -32,7 +32,7 @@ export default {
                 {
                     templateName: 'user',
                     alias: 'institutionAdmin',
-                    userType: "`rootInstitutionAdmin`",
+                    userType: "rootInstitutionAdmin",
                     includeVitals: true,
                     formProps: {
                         bindedExts: ['confirms'],

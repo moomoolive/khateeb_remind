@@ -21,6 +21,12 @@ const khateeb = new mongoose.Schema({
     unavailableDates: [subDocs.unavailableDate]
 })
 
+khateeb.query.safelyFindOne = function(_id='none') {
+    if (!_id || _id.toLocaleLowerCase() === 'none')
+        throw TypeError('Please provide a valid khateeb id')
+    return this.where({ _id })
+}
+
 const rootInstitutionAdmin = new mongoose.Schema({})
 const institutionAdmin = new mongoose.Schema({})
 const root = new mongoose.Schema({})

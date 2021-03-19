@@ -57,10 +57,10 @@ router.put(
         validator.body("khateebID").isLength(24).optional(),
         validator.body("notificationID").isLength({ min: 4 }).optional(),
         validator.body("notified").isBoolean().optional(),
+        validator.body("isGivingKhutbah").isBoolean().optional()
     ]),
-    authMiddleware.isAllowedToUpdateResource(["institutionID"], "jummahs"),
+    authMiddleware.isAllowedToUpdateResource(["institutionID"], "jummahPreferences"),
     async (req, res) => {
-        console.log(req.body)
         try {
             const updated = await $db.jummahPreferences.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
             return res.json(updated)
@@ -74,16 +74,25 @@ router.put(
 router.put(
     '/run-loop/:backup',
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(24)
+        validator.body("main._id").isLength({ min: 4 }),
+        validator.body("main.khateebID").isLength(24).optional(),
+        validator.body("main.isGivingKhutbah").isBoolean().optional(),
+        validator.body("main.notified").isBoolean().optional(),
+        validator.body("backup._id").isLength({ min: 4 }),
+        validator.body("backup.khateebID").isLength(24).optional(),
+        validator.body("backup.isGivingKhutbah").isBoolean().optional(),
+        validator.body("backup.notified").isBoolean().optional(),
     ]),
     authMiddleware.authenticate({ min: 2, max: 3 }),
-    authMiddleware.isAllowedToUpdateResource(["institutionID"], "jummahs"),
     async (req, res) => {
-        console.log(req.body)
         try {
-            const jummah = await $db.jummahPreferences.findOne(req.body).exec()
-            const updatedJummah = await jummahHelpers.runNotificationLoop(jummah, req.params.backup === 'true')
-            return res.json(updatedJummah)
+            const targetPreference = await $db.jummahPreferences.findOne({ _id: req.body[req.params.backup === 'true' ? 'backup' : 'main']._id }).exec()
+            if (!targetPreference)
+                return res.status(422).json({ msg: `Target preference does not exist` })
+            else if (targetPreference.institutionID !== req.headers.institutionid)
+                return res.status(403).json({ msg: 'forbidden resource' })
+            const updatedPreferences = await jummahHelpers.runNotificationLoop(targetPreference, req.body[!(req.params.backup === 'true') ? 'backup' : 'main'])
+            return res.json(updatedPreferences)
         } catch(err) {
             console.log(err)
         }

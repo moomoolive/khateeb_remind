@@ -39,4 +39,18 @@ const jummahPreference = new mongoose.Schema({
     }
 }, { timestamps: true })
 
+jummahPreference.methods.gatherMeta = async function() {
+    try {
+        const location = await $db.locations.findOne({ _id: this.locationID }).exec()
+        const timing = await $db.timings.findOne({ _id: this.timingID }).exec()
+        return {
+            location,
+            timing
+        } 
+    } catch(err) {
+        console.log(err)
+        console.log(`Couldn't gather jummah meta`)
+    }
+}
+
 module.exports = jummahPreference

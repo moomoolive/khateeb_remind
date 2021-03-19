@@ -23,17 +23,37 @@ const twoMonthsAhead = (localTimeNow) => {
     return date
 }
 
-const runNotificationLoop = async (jummah, backup=false) => {
-    const meta = await jummah.gatherMeta()
-    const preference = jummah.khateebPreference[backup ? 1 : 0]
-    const khateeb = await $db.khateebs.findOne({ _id: preference.khateebID.toString() }).exec()
-    const note = new notificationConstructors.JummahReminderNotificationConstructor(khateeb, jummah, meta)
-    const msgs = await note.create()
-    preference.notified = true
-    console.log(msgs)
-    return $db.jummahPreferences.findOneAndUpdate({ _id: jummah._id }, jummah, { new: true })
+const sendNotificationToTargetPreference = async (targetPreference={}) => {
+    try {
+        if (targetPreference.notified)
+            throw RangeError(`Preference already notified`)
+        const khateeb = await $db.khateebs.find().safelyFindOne(targetPreference.khateebID ).exec()
+        if (!khateeb)
+            throw TypeError(`Khateeb does not exist`)
+        const meta = await targetPreference.gatherMeta()
+        const constructorRes = await new notificationConstructors.JummahReminderNotificationConstructor(khateeb, targetPreference, meta).create()
+        targetPreference.notificationID = constructorRes[0]._id.toString()
+        return targetPreference
+    } catch(err) {
+        console.log(err)
+    }
 }
 
+const runNotificationLoop = async (targetPreference={}, otherPreference={}) => {
+    try {
+        targetPreference = await sendNotificationToTargetPreference(targetPreference)
+        targetPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: targetPreference._id }, { notified: true, isGivingKhutbah: true }, { new: true }) 
+    } catch(err) {
+        console.log(err)
+    }
+    try {
+        if (otherPreference._id && otherPreference._id.toLowerCase() !== 'none')
+            otherPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: otherPreference._id }, { isGivingKhutbah: false }, { new: true })
+    } catch(err) {
+        console.log(err)
+    }
+    return { targetPreference, otherPreference }
+}
 
 module.exports = {
     oneMonthInThePast,

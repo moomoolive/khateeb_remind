@@ -14,9 +14,27 @@
         <div class="action-buttons-container">
             <div v-if="viewingWeekIsCurrentPastOrFuture === 'current'">
                 <div v-if="reciever === 'institutionAdmin'">
-                    <button class="purple">Send Notifications Now</button>
-                    <button class="yellow">Reset Notifications</button>
-                    <button class="red">Message Backup</button>
+                    <button
+                        :disabled="!mainKhateebIsScheduled || oneKhateebNotified" 
+                        class="blue"
+                        @click="runNotificationLoop()"
+                    >
+                        {{ info.khateebPreferences[0].notified ? 'Already Notified' : 'Notify Main Khateeb' }}
+                    </button>
+                    <button
+                        :disabled="!backupKhateebIsScheduled || oneKhateebNotified" 
+                        class="red" 
+                        @click="runNotificationLoop(true)"
+                    >
+                        {{ info.khateebPreferences[1].notified ? 'Already Notified' : 'Notify Backup' }}
+                    </button>
+                    <button 
+                        :disabled="!jummahHasData || !oneKhateebNotified" 
+                        class="yellow" 
+                        @click="resetNotifications()"
+                    >
+                        {{ jummahHasData ? !oneKhateebNotified ? 'None Notified' : 'Reset Notifications' : 'No Khateebs' }}
+                    </button>
                 </div>
                 <div v-else-if="reciever === 'khateeb'">
                     <button 
@@ -69,6 +87,35 @@ export default {
         },
         closePopup() {
             this.$emit('close')
+        },
+        runNotificationLoop(isBackup=false) { 
+            if (this.info.khateebPreferences[isBackup ? 1 : 0].notified)
+                return this.utils.alert(`Khateeb has already been notified. Click 'Reset Notifications' to allow another notification to be sent.`)
+            this.$emit("run-notification-loop", { isBackup, main: this.info.khateebPreferences[0], backup: this.info.khateebPreferences[1] })
+            return this.closePopup()
+        },
+        resetNotifications() {
+            this.scheduledKhateebs.forEach(p => {
+                this.$emit('clear-notifications', { _id: p._id, notified: false, notificationID: 'none', isGivingKhutbah: !p.isBackup })
+            })
+            this.closePopup()
+        }
+    },
+    computed: {
+        jummahHasData() {
+            return this.mainKhateebIsScheduled || this.backupKhateebIsScheduled
+        },
+        mainKhateebIsScheduled() {
+            return this.info.khateebPreferences[0].createdAt
+        },
+        backupKhateebIsScheduled() {
+            return this.info.khateebPreferences[1].createdAt
+        },
+        oneKhateebNotified() {
+            return this.info.khateebPreferences.find(p => p.notified)
+        },
+        scheduledKhateebs() {
+            return this.info.khateebPreferences.filter(p => p.createdAt)
         }
     }
 }

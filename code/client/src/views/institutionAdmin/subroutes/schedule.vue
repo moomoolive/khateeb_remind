@@ -1,14 +1,12 @@
 <template>
     <div>
-        <!-- to locations and timings -->
+
         <div>
             <button @click="$router.push('/institutionAdmin/locations-and-timings')">
                 Edit Locations and Timings
             </button>
         </div>
-        <!-- ENDS HERE -->
 
-        <!-- schedule -->
         <monthly-jummah-schedule
             :jummahs="jummahs"
             :locations="locations"
@@ -17,7 +15,8 @@
             :reciever="viewingMode"
             @request-jummahs="requestJummahs($event)"
             @new-preference="createNewJummahPreference($event)"
-            @update-preference="updateJummahPreference($event)"
+            @update-preference="updateJummahPreferenceDelayed($event)"
+            @update-preference-fast="updateJummahPreference($event)"
             @run-notification-loop="runNotificationLoop($event)"
         >
             <template #above-controls>
@@ -32,7 +31,6 @@
                 </div>
             </template>
         </monthly-jummah-schedule>
-        <!-- SCHEDULE ENDS HERE -->
 
     </div>
 </template>
@@ -75,7 +73,7 @@ export default {
                 }
             )
         },
-        async updateJummahPreference(updatedPreference) {
+        async updateJummahPreferenceDelayed(updatedPreference) {
             await this.utils.delayedRequest(
                 'jummahs',
                 'updateJummahPreference',
@@ -96,9 +94,9 @@ export default {
         findJummahIndexById(id) {
             return this.jummahs.findIndex(jummah => jummah._id === id)
         },
-        async updateJummah(updatedJummah) {
+        async updateJummahPreference(updatedJummah) {
             try {
-                const updated = await this.$API.jummahs.updateJummah(updatedJummah)
+                const updated = await this.$API.jummahs.updateJummahPreference(updatedJummah)
                 if (!updated)
                     return
                 this.jummahs.splice(this.findJummahIndexById(updated._id), 1, updated)
@@ -106,10 +104,21 @@ export default {
                 console.log(err)
             }
         },
-        async runNotificationLoop({ jummah, backup }) {
+        fillIdIfEmpty(main={}, backup={}) {
+            if (!main._id)
+                main = { ...main, _id: 'none' }
+            if (!backup._id)
+                backup = { ...backup, _id: 'none' }
+            return { main, backup }
+        },
+        async runNotificationLoop({ main: preprocessedMain, backup: preprocessedBackup, isBackup }) {
             try {
-                const updatedJummah = await this.$API.jummahs.runNotificationLoop({ _id: jummah._id }, backup)
-                this.jummahs.splice(this.findJummahIndexById(updatedJummah._id), 1, updatedJummah)
+                const { main, backup } = this.fillIdIfEmpty(preprocessedMain, preprocessedBackup)
+                const updatedPreferences = await this.$API.jummahs.runNotificationLoop({ main, backup }, isBackup) || { targetPreference: {}, otherPreference: {} }
+                for (const [key, value] of Object.entries(updatedPreferences)) {
+                    if (value._id && value._id.toLowerCase() !== 'none')
+                        this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
+                }
             } catch(err) {
                 console.log(err)
             }

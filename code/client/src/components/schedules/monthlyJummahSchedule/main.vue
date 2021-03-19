@@ -10,7 +10,7 @@
                 :selectedDate="selectedDate"
                 :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                 @run-notification-loop="$emit('run-notification-loop', $event)"
-                @override-jummah="$emit('jummah-update', $event)"
+                @clear-notifications="$emit('update-preference-fast', $event)"
                 @close="closeSettings()"
             />
         </general-popup-container>
