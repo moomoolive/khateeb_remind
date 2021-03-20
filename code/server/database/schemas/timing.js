@@ -33,7 +33,6 @@ timing.methods.deleteDependants = async function() {
     const res = {}
     try {
         const timingID = this._id.toString()
-        res.jummah = await $db.jummahPreferences.deleteMany({ timingID }).futureEntries()
         const khateebs = await $db.khateebs.find({ institutionID: this.institutionID }).exec()
         for (let i = 0; i < khateebs.length; i++) {
             const khateeb = khateebs[i]

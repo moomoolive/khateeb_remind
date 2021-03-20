@@ -8,29 +8,16 @@ import notifications from './modules/notifications.js'
 import websiteBanner from './modules/websiteBanner.js'
 import admin from './modules/admin.js'
 import requests from './modules/requests.js'
+import footerPopup from './modules/footerPopup.js'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: { },
   mutations: {
-    // will be added to notifications module
-    /*
-    markNotificationActionAsComplete(state, notificationId) {
-        const found = state.notificationsFromServer.find(note => note._id === notificationId)
-        found.actionPerformed = true
-    },
-    */
-   // ENDS HERE
+
   },
   actions: {
-    // need to change into one action and move to approriate vuex module
-    /*
-    markNotificationActionAsComplete({ commit }, notificationId) {
-        commit('markNotificationActionAsComplete', notificationId)
-    },
-    */
-    // ENDS HERE
     storeUserPackage({ commit }, userPackage) {
         commit('user/storeInfoFromAPI', userPackage)
         commit('notifications/stashServerNotifications', userPackage)
@@ -45,6 +32,7 @@ export default new Vuex.Store({
     notifications,
     websiteBanner,
     admin,
-    requests
+    requests,
+    footerPopup
   }
 })

@@ -109,7 +109,7 @@ export default {
         },
         updateDisplay() {
             if (!this.preferenceEntryExists)
-                return 'No Entries'
+                return 'N/A'
             const updates = this.khateebPreferences
                 .map(k => new Date(k.updatedAt).getTime())
                 .filter(unixTime => !isNaN(unixTime))

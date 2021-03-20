@@ -1,6 +1,9 @@
 <template>
     <div>
         <div class="topnav">
+            <a href="https://github.com/moomoolive/khateeb_remind" target="_blank">
+                Source Code
+            </a>
         </div>
     </div>
 </template>
@@ -23,5 +26,18 @@ export default {
     margin: 0;
     padding-left: 0.8vw;
     overflow: hidden;
+    text-align: left;
+}
+
+a {
+    position: relative;
+    top: 7px;
+    margin-left: 5px;
+    text-decoration: none;
+    color: getColor("silver");
+    font-size: 11px;
+    &:hover {
+        color: getColor("blue")
+    } 
 }
 </style>

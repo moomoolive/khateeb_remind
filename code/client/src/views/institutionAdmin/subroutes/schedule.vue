@@ -2,7 +2,10 @@
     <div>
 
         <div>
-            <button @click="$router.push('/institutionAdmin/locations-and-timings')">
+            <button
+                class="purple to-locations-timings-button"
+                @click="$router.push('/institutionAdmin/locations-and-timings')"
+            >
                 Edit Locations and Timings
             </button>
         </div>
@@ -141,6 +144,13 @@ export default {
     font-size: 14px;
     padding-bottom: 5px;
     font-weight: bold;
+}
+
+.to-locations-timings-button {
+    width: 200px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .viewing-mode-dropdown {

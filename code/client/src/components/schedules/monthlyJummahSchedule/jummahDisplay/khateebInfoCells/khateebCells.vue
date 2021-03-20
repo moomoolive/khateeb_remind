@@ -10,13 +10,20 @@
             {{ khateebDisplay(khateebPreferences[0]) }}
         </div>
         <div v-show="khateebPreferences[1].khateebID" class="khateeb-role-label" @click="toggleBackupDisplay()">
-           {{ showBackup ? '📖 Hide' : '📘 Show' }} Backup
+           <span>
+                <img 
+                    src="~@/assets/misc/rightArrow.png" 
+                    :class="`show-backup-arrow ${showBackup ? 'showing' : ''}`"
+                    alt="right arrow"
+                >
+           </span>
+           Backup
         </div>
         <collapse-transition>
             <div v-show="showBackup" class="khateeb-name-label">
                 <span v-if="khateebPreferences[1].isGivingKhutbah">
-                    ⭐ Khateeb
-                </span><br>
+                    ⭐ Khateeb<br>
+                </span>
                 {{ khateebDisplay(khateebPreferences[1]) }}
             </div>
         </collapse-transition>
@@ -83,6 +90,14 @@ div {
 .khateeb-name-label {
     margin-bottom: 15px;
     font-size: 15px;
+}
+
+.show-backup-arrow {
+    height: 12px;
+    margin-right: 5px;
+    &.showing {
+        transform: rotate(90deg);
+    }
 }
 
 span {

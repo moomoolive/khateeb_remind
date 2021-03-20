@@ -32,6 +32,12 @@
     <tutorial-prompter
       :tutorials="gettingStartedGuide"
     />
+    <collapse-transition :duration="600">
+        <footer-popup
+          v-show="$store.state.footerPopup.show"
+          class="footer-popup" 
+        />
+    </collapse-transition>
     <Footer />
   </div>
 </template>
@@ -44,6 +50,7 @@ import notificationsManager from '@/components/notifications/notificationsManger
 import headerNavigation from '@/components/header/navigation/main.vue'
 import requestManager from '@/components/misc/requestManager.vue'
 import tutorialPrompter from '@/components/notifications/tutorialPrompter.vue'
+import footerPopup from '@/components/footer/popup/main.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
@@ -56,7 +63,8 @@ export default {
     notificationsManager,
     headerNavigation,
     requestManager,
-    tutorialPrompter
+    tutorialPrompter,
+    footerPopup
   },
   data() {
     return {
@@ -172,6 +180,19 @@ h2 {
     overflow: hidden;
     border-radius: 4px;
     bottom: 5%;
+}
+
+.footer-popup {
+  position: relative;
+  bottom: 30px;
+  right: 10px;
+  z-index: 9;
+  position: fixed;
+  max-width: 200px;
+  max-height: 150px;
+  padding: 7px 4px 7px 4px;
+  border-radius: 7px;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
 }
 
 .notifications-layer {
