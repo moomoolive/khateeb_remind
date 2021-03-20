@@ -1,13 +1,16 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const middleware = require($DIR + '/middleware/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+
+const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const authHelpers = require(global.$dir + '/libraries/auth/main.js')
 
 const router = express.Router()
 
 router.post(
     '/create/institution',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("institution.name").isLength({ min: 1 }),
             validator.body("institution.abbreviatedName").isLength({ min: 1 }),
@@ -26,9 +29,8 @@ router.post(
     try {
         if (req.body.institution.name === '__TEST__')
             return res.json({ msg: `You cannot name your institution __TEST__. Pick another name please.`, status: "reserved" })
-        const institutionEntry = await $db.funcs.save('institutions', req.body.institution)
-        req.body.institutionAdmin.institutionID = institutionEntry._id.toString()
-        const rootInstitutionAdminEntry = await $db.funcs.save('rootInstitutionAdmins', req.body.institutionAdmin)
+        const institutionEntry = await new $db.institutions(req.body.institution).save()
+        const rootInstitutionAdminEntry = await institutionEntry.createRootAdministrator(req.body.institutionAdmin)
         return res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
     } catch(err) {
         console.log(err)
@@ -37,22 +39,12 @@ router.post(
     }
 )
 
-router.get('/institution-selection', async (req, res) => {
-    try {
-        const data = await $db.models.institutions.find({ confirmed: true }).select(["-createdAt", "-updatedAt"]).exec()
-        res.json(data)
-    } catch(err) {
-        console.log(err)
-        res.json(`Couldn't get institutions!`)
-    }
-})
-
 
 router.post(
     '/create/khateeb',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
-            validator.body("institutionID").isLength(20),
+            validator.body("institutionID").isLength(24),
             validator.body("password").isLength({ min: 6 }),
             validator.body("username").isLength({ min: 6 }),
             validator.body("handle").isLength({ min: 1 }),
@@ -64,22 +56,16 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const institution = req.body.institutionID
-            const settings = await $db.models.settings.findOne({ institutionID: institution }).exec()
+            const settings = await $db.settings.findOne({ institutionID: req.body.institutionID }).exec()
             if (!settings)
                 return res.json(`That institution doesn't exist!`)
             if (settings.autoConfirmRegistration)
                 req.body.confirmed = true
-            else
-                req.body.confirmed = false
-            const khateebEntry = await $db.funcs.save('khateebs', req.body)
-            if (settings.autoConfirmRegistration) {
-                const welcomeMsg = new _.notifications.welcome(khateebEntry)
-                const saved = await welcomeMsg.create()
-            }
-            const note = new _.notifications.khateebSignup(khateebEntry, settings.autoConfirmRegistration)
-            await note.setRecipentsToAdmins(institution)
-            const msgs = await note.create()
+            const khateebEntry = await new $db.khateebs(req.body).save()
+            await new notificationConstructors.WelcomeNotificationConstructor(khateebEntry).create()
+            const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, settings.autoConfirmRegistration)
+            await note.setRecipentsToAdmins(req.body.institutionID)
+            await note.create()
             return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
         console.log(err)
@@ -89,7 +75,7 @@ router.post(
 
 router.post(
     '/',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("password").isLength({ min: 1 }),
             validator.body("username").isLength({ min: 1 }),
@@ -97,7 +83,7 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const user = await $db.models.users.findOne({ username: req.body.username }).select(["-__v"]).exec()
+            const user = await $db.users.findOne({ username: req.body.username }).select(["-__v"]).exec()
             if (!user)
                 return res.status(401).json({  msg: 'unauthorized', token: null })
             validPassword = await user.comparePassword(req.body.password)
@@ -106,9 +92,9 @@ router.post(
             else if (!user.confirmed && user.__t !== 'root')
                 return res.json({ msg: `un-confirmed-${user.__t}`, token: null })
             else {
-                delete user.password
-                const tokenInfo = _.deepCopy(user)
-                return res.json({ msg: 'success', token: _.auth.createToken(tokenInfo) }) 
+                const tokenInfo = global.utils.deepCopy(user)
+                delete tokenInfo.password
+                return res.json({ msg: 'success', token: authHelpers.createToken(tokenInfo) }) 
             }
         } catch(err) {
             console.log(err)
@@ -116,9 +102,10 @@ router.post(
         }
 })
 
+// needs work
 router.post(
     '/forgot/:type', 
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("data").isLength({ min: 1 }),
         ]
@@ -127,7 +114,7 @@ router.post(
         try {
             if (req.params.type !== 'username' && req.params.type !== 'password')
                 return res.json(`Invalid Recovery Option`)
-            let khateebRemindTextInfo = await $db.models.settings.findOne({ institutionID: "__ROOT__" }).exec()
+            let khateebRemindTextInfo = await $db.settings.findOne({ institutionID: "__ROOT__" }).exec()
             if (!khateebRemindTextInfo.textAllowed)
                 return res.json({ msg:`Account recovery service is offline right now`, status: 'error' })
             khateebRemindTextInfo = khateebRemindTextInfo.decrypt()
@@ -137,17 +124,17 @@ router.post(
             let to
             if (req.params.type === 'username') {
                 to = `+1${req.body.data}`
-                const results = await $db.models.users.find({ phoneNumber: req.body.data }).exec()
+                const results = await $db.users.find({ phoneNumber: req.body.data }).exec()
                 textMsg = 'Accounts under this phone number:\n'
                 results.forEach(account => { textMsg += `\n- ${account.username}` })
                 apiMsg = `Your username(s) were sent to your recovery phone via text!`
             }
             else if (req.params.type === 'password') {
-                const account = await $db.models.users.findOne({ username: req.body.data }).exec()
+                const account = await $db.users.findOne({ username: req.body.data }).exec()
                 if (!account)
                     return res.json({ msg: `That account doesn't exist`, status: "error" }) // security risk??
                 to = `+1${account.phoneNumber}`
-                const verificationCode = await new $db.models.verificationCodes({ userID: account._id.toString() }).save()
+                const verificationCode = await new $db.verificationCodes({ userID: account._id.toString() }).save()
                 textMsg = `You requested a password recovery code from Khateeb Remind. This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
                 apiMsg = { msg: `A verification code was sent to your phone via text!`, status: "code", userID: account._id.toString()}
             }
@@ -166,7 +153,7 @@ router.post(
 
 router.post(
     '/verification-code', 
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("code").isLength({ min: 1 }),
             validator.body("userID").isLength(20),
@@ -175,15 +162,17 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const verificationCode = await $db.models.verificationCodes.findOne({ code: req.body.code }).exec()
+            const verificationCode = await $db.verificationCodes.findOne({ code: req.body.code }).exec()
             if (!verificationCode || verificationCode.userID !== req.body.userID)
                 return res.json({ msg: "Incorrect code", status: "error" })
-            const updated = await $db.models.users.updateOne({ _id: req.body.userID }, { password: req.body.password })
+            const updated = await $db.users.updateOne({ _id: req.body.userID }, { password: req.body.password })
             res.json({ msg: "Password successfully updated", status: "success" })
         } catch(err) {
             console.log(err)
             res.json({ msg: `Couldn't verify code`, status: "error" })
         }
 })
+
+// NEEDS WORK Ends here
 
 module.exports = router

@@ -1,99 +1,71 @@
 <template>
     <div>
+        <div v-if="announcements.length > 0" class="announcements-container">
+            <collapsable-box
+                v-for="(announcement, index) in announcements"
+                :key="index"
+                class="announcement-container"
+                :headline="headline(announcement)"
+                :tagDetails="tagLoader(announcement)"
+            >
+                <div class="content" >
+                    <p>{{ announcement.content }}</p>
+                </div>
+            </collapsable-box>
+        </div>
         <msg-with-pic
+            v-else
             msg="There are currently no announcements"
             gif="twirlingPlane"
             title="Your administrator doesn't seem to be the talkative type..."
-            v-if="!announcementsExists"
         />
-        <div v-if="announcementsExists">
-            <div 
-                v-for="(twoAnnouncements, index) in announcementsArraysOfTwo"
-                :key="index"
-                class="two-announcement-container"
-            >
-                <collapsable-box
-                    v-for="(announcement, ID) in twoAnnouncements" 
-                    class="announcement-container"
-                    :key="ID"
-                    :headline="
-                        `${_.dynamicDisplayDate(announcement.updatedAt)} || ${announcement.headline}`
-                    "
-                    :tagDetails="tagLoader(announcement)"
-                >
-                    <div class="content" >
-                        <p>{{ announcement.content }}</p>
-                    </div>
-                </collapsable-box>
-            </div>
-        </div>
     </div>
 </template>
 
 <script>
+import msgWithPic from '@/components/general/msgWithPic.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
+
+import announcementHelpers from '@/libraries/announcements/main.js'
+
 export default {
     name: 'announcements',
+    components: {
+        msgWithPic,
+        collapsableBox
+    },
     data() {
         return {
-            announcementsExists: true,
-            announcements: null,
-            announcementsArraysOfTwo: null,
-            lastVisit: this.$store.state.lastVisit
+            announcements: []
         }
     },
     methods: {
         tagLoader(announcement) {
-            let tagArray = []
-            if (announcement.important) tagArray.push('important')
-            if (announcement.urgent) tagArray.push('urgent')
-            if (this.isNew(announcement.savedOn)) tagArray.push('new')
-            return tagArray
+            return announcementHelpers.tagLoader(announcement, this.$store.state.user.lastLogin)
         },
-        dateLoader(stringDate) {
-            const date = new Date(stringDate)
-            const month = date.toLocaleString('default', {month: 'short'})
-            const day = date.getDate()
-            return `${month} ${day}`
+        headline(announcement) {
+            return announcementHelpers.headlineText(announcement)
         },
-        isNew(announcementDate) {
-            const date = new Date(announcementDate)
-            return date > this.lastVisit
-        },
-        announcementsToArraysOfTwo(announcements) {
-            const arraysOfTwo = []
-            let chopped = []
-            for (let i = 0; i < announcements.length; i++) {
-                const copy = this._.deepCopy(announcements[i])
-                chopped.push(copy)
-                const even = i % 2
-                if (even) {
-                    arraysOfTwo.push(chopped)
-                    chopped = []
-                }
+        async getAnnouncements() {
+            try {
+                const data = await this.$API.announcements.getAnnouncements()
+                this.announcements = data || []
+            } catch(err) {
+                console.log(err)
             }
-            arraysOfTwo.push(chopped)
-            return arraysOfTwo
         }
     },
-    async created() {
-        try{ 
-            this.announcements = await this.$API.khateeb.getAnnouncements()
-            if (this.announcements.length < 1) 
-                this.announcementsExists = false
-            else
-                this.announcementsArraysOfTwo = this.announcementsToArraysOfTwo(this.announcements)
-        } catch(err) {
-            console.log(err)
-            this.announcementsExists = false
-        }
+    created() {
+        this.getAnnouncements()
     }
 }
 </script>
 
 <style lang="scss" scoped>
-.two-announcement-container {
+.announcements-container {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     width: 90%;
     max-height: 300px;
     margin-left: auto;
@@ -121,7 +93,7 @@ p {
 }
 
 @media screen and (max-width: $phoneWidth) {
-      .two-announcement-container {
+      .announcements-container {
             flex-direction: column;
         }
         .announcement-container {

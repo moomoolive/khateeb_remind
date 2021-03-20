@@ -2,11 +2,17 @@
   <div id="app">
     <div class="header">
       <collapse-transition>
-        <website-banner v-show="siteBanner.show" />
+        <website-banner v-show="$store.state.websiteBanner.show" />
       </collapse-transition>
-      <Header />
+      <header-navigation />
     </div>
-    <div class="notifications-layer" v-if="showNotification">
+    <notifications-manager 
+      @toggle-notification-display="toggleNotificationDisplay()"
+    />
+    <div
+      v-show="$store.state.notifications.display.show"
+      class="notifications-layer"
+    >
       <transition name="dropdown">
         <notifications 
           v-if="showNotificationDisplay" 
@@ -18,109 +24,86 @@
       name="fade"
       mode="out-in"
     >
-      <router-view :class="`displayed-page page-padding ${wallpaper}`"/>
+      <router-view 
+        :class="`displayed-page page-padding ${$store.state.app.wallpaper}`"
+      />
     </transition>
+    <request-manager />
+    <tutorial-prompter
+      :tutorials="gettingStartedGuide"
+    />
+    <collapse-transition :duration="600">
+        <footer-popup
+          v-show="$store.state.footerPopup.show"
+          class="footer-popup" 
+        />
+    </collapse-transition>
     <Footer />
   </div>
 </template>
 
 <script>
-import Header from '@/components/misc/Header.vue'
-import notifications from '@/components/userInterface/components/notifications/main.vue'
-import Footer from '@/components/misc/Footer.vue'
-import websiteBanner from '@/components/misc/websiteBanner.vue'
-import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+import notifications from '@/components/notifications/main.vue'
+import Footer from '@/components/footer/main.vue'
+import websiteBanner from '@/components/header/websiteBanner.vue'
+import notificationsManager from '@/components/notifications/notificationsManger.vue'
+import headerNavigation from '@/components/header/navigation/main.vue'
+import requestManager from '@/components/misc/requestManager.vue'
+import tutorialPrompter from '@/components/notifications/tutorialPrompter.vue'
+import footerPopup from '@/components/footer/popup/main.vue'
 
-import axios from 'axios'
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 export default {
   components: {
-    Header,
     notifications,
     Footer,
     websiteBanner,
-    CollapseTransition
+    CollapseTransition,
+    notificationsManager,
+    headerNavigation,
+    requestManager,
+    tutorialPrompter,
+    footerPopup
   },
   data() {
     return {
-      firstNotification: true,
       showNotificationDisplay: false
     }
   },
   methods: {
     async setJWT() {
       let token = localStorage.getItem('token')
-      if (!token)
-        return false
-      axios.defaults.headers.common['authorization'] = token
-      return true
+      if (token)
+        this.$store.dispatch('user/updateToken', token)
     },
-    async checkIn() {
-      try {
-        await this.$API.user.checkIn()
-        return 'checked-in'
-      } catch(err) {
-        console.log(err)
-        console.log(`There was a problem retrieving user package`)
-      }
-    },
-    gettingStartedGuide() {
-      const khateebFirstTime = this.$store.getters.tokenExists && this.$store.getters.decodedJWT.__t === 'khateeb' && !localStorage.getItem('seenGettingStartedKhateeb')
-      if (khateebFirstTime) {
-        this._.tutorial("khateebs", 1, true)
-        localStorage.setItem('seenGettingStartedKhateeb', true)
-      }
-    },
+    toggleNotificationDisplay() {
+      this.showNotificationDisplay = !this.showNotificationDisplay
+    }
   },
   computed: {
-    showNotification() {
-      return this.$store.state.notifications.show
+    isLoggedIn() {
+      return this.$store.getters['user/isLoggedIn']
     },
-    wallpaper() {
-      return this.$store.state.wallpaper
+    userType() {
+      return this.$store.getters['user/type'] 
     },
-    notificationsQueue() {
-      return this.$store.state.notificationsQueue
-    },
-    userPromptedNotifications() {
-      return this.$store.state.userPromptedNotifications
-    },
-    siteBanner() {
-      return this.$store.state.siteBanner
+    gettingStartedGuide() {
+      if (this.isLoggedIn && this.userType === 'khateeb') {
+        return [{ category: 'khateebs', number: 1 }]
+      }
+      else 
+        return []
     }
   },
-  watch: {
-    showNotification(newVal) {
-      const time = 50
-      if (newVal)
-        window.setTimeout(() => { this.showNotificationDisplay = true }, time)
-      else
-        window.setTimeout(() => { this.showNotificationDisplay = false }, time)
-    },
-    notificationsQueue(newVal) {
-      if (newVal.length < 1) {
-        this.firstNotification = true
-        return
-      }
-      else if (newVal[0] === '__USER__') {
-        newVal[0] = this.userPromptedNotifications[0]
-      }
-      const milliseconds = this.firstNotification ? 100 : 2_500
-      if (this.firstNotification)
-        this.firstNotification = false
-      const upcomingNotification = newVal[0]
-      window.setTimeout(() => 
-        { this.$store.dispatch('displayNotification', upcomingNotification) }
-        , milliseconds
-      )
-    }
+  mounted() {
+    this.$nextTick(async () => {
+      if (this.$store.getters['user/isLoggedIn'])
+        await this.$API.user.checkIn()
+    })
   },
   async created() {
-    const jwtWasSet = this.setJWT()
-    if (!jwtWasSet)
-      return
-    await this.checkIn()
-    this.gettingStartedGuide()
+    this.setJWT()
   }
 }
 </script>
@@ -197,6 +180,19 @@ h2 {
     overflow: hidden;
     border-radius: 4px;
     bottom: 5%;
+}
+
+.footer-popup {
+  position: relative;
+  bottom: 30px;
+  right: 10px;
+  z-index: 9;
+  position: fixed;
+  max-width: 200px;
+  max-height: 150px;
+  padding: 7px 4px 7px 4px;
+  border-radius: 7px;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
 }
 
 .notifications-layer {

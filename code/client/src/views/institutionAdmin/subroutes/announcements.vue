@@ -1,119 +1,129 @@
 <template>
     <div>
-        <select
-            v-model="currentlyEditing" 
-            @change="changeAnnouncement($event.target.value)"
+        <div>
+            <button 
+                class="add-new-announcement-button blue"
+                @click="openAddNewAnnouncementForm()"
+            >
+                +
+            </button>
+        </div>
+        <general-popup-container
+            v-if="showAddNewAnnouncementForm" 
+            @close="closeAddNewAnnouncementForm()"
         >
-            <option value="new">New Announcement</option>
-            <option
+            <div class="popup-form">
+                <announcement-form-template
+                    :formProps="{
+                        buttonText: 'Create Announcement',
+                        backgroundColor: 'yellow'
+                    }" 
+                    @submitted="submit($event)"
+                />
+            </div>
+        </general-popup-container>
+        <div v-if="showAnnouncements">
+            <collapsable-box
                 v-for="(announcement, index) in announcements"
                 :key="index"
-                :value="index"
+                class="announcement-container"
+                :headline="headline(announcement)"
+                :tagDetails="tagLoader(announcement)"
             >
-                {{ previousEntriesNaming(announcement)  }}
-            </option>
-        </select><br>
-        <button 
-            v-show="currentlyEditingData" 
-            class="red"
-            @click="deleteAnnouncement()"
-        >
-            Delete this Announcement
-        </button>
-        <form-main
-            v-if="showForm"
-            :basedOn="currentlyEditingData"
-            :structure="structure"
-            @submitted="submit($event)"
-            :formTitle="`Announcements`"
-        />
+                <button 
+                    class="red"
+                    @click="deleteAnnouncement(announcement._id, index)"
+                >
+                    Delete this Announcement
+                </button>
+                <announcement-form-template
+                    :formProps="{
+                        basedOn: announcement,
+                        backgroundColor: 'none',
+                        buttonText: 'Update'
+                    }" 
+                    @submitted="updateAnnouncement($event, index)"
+                />
+            </collapsable-box>
+        </div>
     </div>
 </template>
 
 <script>
-import formMain from '@/components/forms/main.vue'
+import announcementFormTemplate from '@/components/forms/templates/announcement.vue'
+import generalPopupContainer from '@/components/notifications/generalPopup.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
+
+import announcementHelpers from '@/libraries/announcements/main.js'
 
 export default {
     name: 'announcements',
     components: {
-        formMain
+        generalPopupContainer,
+        collapsableBox,
+        announcementFormTemplate
     },
     data() {
         return {
-            structure: {
-                headline: {
-                    required: true
-                },
-                content: {
-                    type: 'textArea',
-                    required: true
-                },
-                important: {
-                    type: 'checkbox',
-                    required: true,
-                    default: false
-                },
-                urgent: {
-                    type: 'checkbox',
-                    required: true,
-                    default: false
-                }
-            },
             announcements: [],
-            currentlyEditing: 'new',
-            showForm: true
+            showAddNewAnnouncementForm: false,
+            showAnnouncements: true 
         }
     },
     methods: {
         async submit($event) {
             try {
-                const msg = await this.$API.institutionAdmin.updateAnnouncements($event)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                const newAnnouncement = await this.$API.announcements.createNewAnnouncement($event)
+                this.announcements.push(newAnnouncement)
+                this.showAddNewAnnouncementForm = false
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        closeAddNewAnnouncementForm() {
+            this.showAddNewAnnouncementForm = false
+        },
+        openAddNewAnnouncementForm() {
+            this.showAddNewAnnouncementForm = true
+        },
+        tagLoader(announcement) {
+            return announcementHelpers.tagLoader(announcement, this.$store.state.user.lastLogin)
+        },
+        headline(announcement) {
+            return announcementHelpers.headlineText(announcement)
+        },
+        rerenderAnnouncements() {
+            this.showAnnouncements = false
+            this.$nextTick(() => this.showAnnouncements = true)
+        },
+        async updateAnnouncement($event, index) {
+            try {
+                const updated = await this.$API.announcements.updateAnnouncement($event)
+                this.announcements.splice(index, 1, updated)
+                this.rerenderAnnouncements()
             } catch(err) {
                 console.log(err)
             }
         },
         async getAnnouncements() {
             try {
-                this.announcements = await this.$API.institutionAdmin.getAnnouncements()
+                this.announcements = await this.$API.announcements.getAnnouncements()
             } catch(err) {
                 console.log(err)
             }
         },
-        changeAnnouncement($event) {
-            this.currentlyEditing = $event
-            this.showForm = false
-            this.$nextTick(() => { this.showForm = true })
-        },
-        async deleteAnnouncement() {
+        async deleteAnnouncement(id, index) {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to permenantly delete this announcement?`)
+                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this announcement?`)
                 if (!confirm)
                     return
-                const res = await this.$API.institutionAdmin.deleteAnnouncement(this.currentlyEditingData._id)
+                const res = await this.$API.announcements.deleteAnnouncement(id)
                 console.log(res)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                this.announcements.splice(index, 1)
             } catch(err) {
                 console.log(err)
             }
         },
-        previousEntriesNaming(data) {
-            const headline = data.headline
-            const date = new Date(data.createdAt)
-            const month = date.toLocaleString('default', { month: 'short' })
-            return `${month} ${date.getDate()} ${date.getFullYear()} || ${headline}`
-        }
-    },
-    computed: {
-        currentlyEditingData() {
-            if (this.currentlyEditing === 'new')
-                return null
-            else {
-                const copy = this._.deepCopy(this.announcements[this.currentlyEditing])
-                delete copy.__v; delete copy.createdAt; delete copy.updatedAt;
-                return copy
-            }
-        }
     },
     created() {
         this.getAnnouncements()
@@ -140,12 +150,32 @@ select {
     z-index: 0;
 }
 
+.popup-form {
+    width: 100%;
+}
+
+.announcement-container {
+    width: 89%;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 button {
     width: 80%;
     max-width: 510px;
     height: 4vh;
     max-height: 35px;
     font-size: 16px;
+}
+
+.add-new-announcement-button {
+    border-radius: 100px 100px 100px 100px;
+    width: 60px;
+    height: 35px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 @media screen and (max-width: $phoneWidth) {

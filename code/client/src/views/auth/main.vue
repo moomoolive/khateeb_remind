@@ -3,7 +3,15 @@
         <img :src="require('@/assets/logos/khateebRemindLogo.svg')">
         <div class="formContainer">
             <form-main
-                :structure="formStructure"
+                :structure="{
+                    username: {
+                        required: true
+                    },
+                    password: {
+                        type: 'protected',
+                        required:true
+                    }
+                }"
                 :errorMsg="errorMsg"
                 :showInvalidationMsgs="false"
                 :backgroundColor="`darkBlue`"
@@ -24,9 +32,8 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 import formMain from '@/components/forms/main.vue'
+import notificationHelpers from '@/libraries/notifications/main.js'
 
 export default {
     name: "login",
@@ -35,35 +42,24 @@ export default {
     },
     data() {
         return {
-            formStructure: {
-                username: {
-                    required: true
-                },
-                password: {
-                    type: "protected",
-                    required: true
-                }
-            },
             errorMsg: '',
             rememberMe: !!localStorage.getItem('rememberMe')
         }
     },
     methods: {
+        unconfirmedMsg(msg) {
+            this.utils.alert(msg, 'caution', { icon: 'locked' })
+
+        },
         async login($event) {
             try {
-                if (this.$store.getters.tokenExists) {
-                    this._.alert(`You're already logged in! Log out if you want to login with another account.`)
-                    return
-                }
+                if (this.$store.getters.tokenExists)
+                    return this.utils.alert(`You're already logged in! Logout if you want to login with another account.`)
                 const authRes = await this.$API.auth.getToken($event)
-                if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin')) {
-                    const notification = { color: 'yellow', icon: "locked", msg: `Your administrator hasn't confirmed your account yet. Try again later!`, textSize: 'small' }
-                    this.$store.dispatch('createNotification', { type: 'alert', options: notification })
-                }
-                else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin') {
-                    const notification = { color: 'yellow', icon: "locked", msg: `Khateeb Remind hasn't confirmed your institution yet. Try again later!`, textSize: 'small' }
-                    this.$store.dispatch('createNotification', { type: 'alert', options: notification })
-                }
+                if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
+                    this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
+                else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
+                    this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
                 else if (authRes.token && authRes.msg === 'success') {
                     this.toApp(authRes.token)
                     await this.$API.user.checkIn()
@@ -73,50 +69,41 @@ export default {
                     this.errorMsg = 'Incorrect Username or Password'
             }
         },
+        loginRedirect() {
+            const landingPage = this.$store.state.router.landingPage
+            if (!this.$store.state.app.hasLoggedInViaLoginPage && landingPage !== this.$route.path) {
+                this.$router.push(landingPage)
+                this.$store.commit('app/loggedInViaLoginPage')
+            }
+            else
+                this.utils.toHomePage()
+        },
         toApp(token) {
             if (this.rememberMe)
                 localStorage.setItem('token', token)
-            axios.defaults.headers.common['authorization'] = token
-            this.$store.dispatch('JWT_TOKEN', token)
-            this.$nextTick(() => {
-                const landingPage = this.$store.state.landingPage
-                if (landingPage !== this.$router.currentRoute.fullPath)
-                    this.$router.push(landingPage)
-                else
-                    this._.toHomePage()
-            })
+            this.$store.dispatch('user/updateToken', token)
+            this.$nextTick(() => { this.loginRedirect() })
         },
         forgotCredentials() {
-            const info = {
-            type: 'redirect',
-            options: {
-                    color: 'grey',
-                    redirections: [
-                        {
-                            text: 'Forgot Password?',
-                            to: '/forgot/password'
-                        },
-                        {
-                            text: 'Forgot Username?',
-                            to: '/forgot/username'
-                        }
-                    ]
-                }
-            }
-            this.$store.dispatch('createNotification', info)
+            notificationHelpers.redirectionOptions(
+                [
+                    { text: 'Forgot Password?', to: '/forgot/password' },
+                    { text: 'Forgot Username?', to: '/forgot/username' }
+                ]
+            )
         }
     },
     watch: {
         rememberMe(newVal) {
             if (newVal) 
-                localStorage.setItem('rememberMe', 'yes')
+                localStorage.setItem('rememberMe', true)
             else
                 localStorage.removeItem('rememberMe')
         }
     },
     created() {
-        if (this.$store.getters.isJWTValid)
-            this._.toHomePage()
+        if (this.$store.getters['user/isLoggedIn'])
+            this.utils.toHomePage()
     }
 }
 </script>

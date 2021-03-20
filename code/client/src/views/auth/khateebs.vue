@@ -1,117 +1,85 @@
 <template>
     <div>
+        <complex-key-binder 
+            :targetKeyBinds="['t', 'Control', 'Alt']"
+            @all-key-bindings-active="includeTestInstitutionInInstitutionsList()"
+        />
         <loading>
-            <form-main
-                v-if="showForm"
-                :structure="structure"
-                :bindedExts="['confirms']"
-                :backgroundColor="`red`"
-                :buttonColor="`blue`"
-                :buttonText="`Sign Up`"
+            <user-form-template
+                v-if="showForm" 
+                :userType="`khateeb`"
+                :includeVitals="true"
+                :includeIdAppender="true"
+                :institutionIDs="filteredInstitutions"
+                :formProps="{
+                    bindedExts: ['confirms'],
+                    backgroundColor: 'red',
+                    buttonColor: 'blue',
+                    buttonText: 'Sign up',
+                    formTitle: 'Khateeb Sign Up'
+                }"
                 @submitted="signupKhateeb($event)"
-                :formTitle="`Khateeb Sign Up`"
             />
         </loading>
     </div>
 </template>
 
 <script>
-import formMain from '@/components/forms/main.vue'
-import loading from '@/components/userInterface/components/loadingScreen.vue'
+import loading from '@/components/general/loadingScreen.vue'
+import userFormTemplate from '@/components/forms/templates/user.vue'
+import complexKeyBinder from '@/components/misc/complexKeyBinder.vue'
 
 export default {
     name: "khateebSignup",
     components: {
-        formMain,
-        loading
+        loading,
+        userFormTemplate,
+        complexKeyBinder
     },
     data() {
         return {
-            structure: {
-                institutionID: {
-                    type: 'dropdown',
-                    required: true,
-                    selectOptions: null,
-                    value: '_id',
-                    display: "name",
-                    alias: 'Institution'
-                },
-                username: {
-                    required: true,
-                    validators: 'username'
-                },
-                password: {
-                    required: true,
-                    minLength: 6
-                },
-                handle: {
-                    required: true,
-                    validators: 'handle'
-                },
-                title: {
-                    type: "dropdown",
-                    required: true,
-                    selectOptions: ['none', 'Shiekh', 'Imam']
-                },
-                firstName: {
-                    required: true
-                },
-                lastName: {
-                    required: true
-                },
-                phoneNumber: {
-                    type: 'phoneNumber',
-                    required: true
-                }
-            },
-            keyBinds__TEST__: {},
-            allInstitutions: null,
-            showForm: true
+            allInstitutions: [],
+            showForm: true,
+            showTestInstitution: false
         }
     },
     methods: {
         async signupKhateeb($event) {
             try {
                 const res = await this.$API.auth.createKhateeb($event)
-                this._.alert(res, 'success')
+                this.utils.alert(res, 'success')
                 this.$router.push('/')
             } catch(err) {
                 console.log(err)
             }
         },
-        handleKeyboardEvents(target, type) {
-            if (type === "keydown")
-                this.keyBinds__TEST__[target] = true
-            else if (type === "keyup")
-                this.keyBinds__TEST__[target] = false
+        async getAllConfirmedInstitutions() {
+            try {
+                const data = await this.$API.misc.institutionSelection()
+                this.allInstitutions = data || []
+            } catch(err) {
+                console.log(err)
+            }
         },
-        keyBinds($event) {
-            const targetKeyBind = ["t", "Control", "Alt"]
-            const found = targetKeyBind.find(key => key === $event.key)
-            if (found)
-                this.handleKeyboardEvents(found, $event.type)
-            this.$nextTick(() => { 
-                if (Object.keys(this.keyBinds__TEST__).length !== 3)
-                    return
-                for (const [key, pressed] of Object.entries(this.keyBinds__TEST__)) {
-                    if (!pressed)
-                        return
-                }
-                this.structure.institutionID.selectOptions = this._.deepCopy(this.allInstitutions)
-                this.showForm = false
-                this.$nextTick(() => { this.showForm = true })
-             })
+        includeTestInstitutionInInstitutionsList() {
+            this.showTestInstitution = true
+            this.rerenderForm()
+        },
+        rerenderForm() {
+            this.showForm = false
+            this.$nextTick(() => this.showForm = true)
         }
     },
-    async created() {
-        window.addEventListener('keydown', this.keyBinds)
-        window.addEventListener('keyup', this.keyBinds)
-        this.allInstitutions = await this.$API.auth.getAvailableInstitutions()
-        this.structure.institutionID.selectOptions = this.allInstitutions.filter(inst => inst.name !== "__TEST__")
+    computed: {
+        filteredInstitutions() {
+            if (this.showTestInstitution)
+                return this.allInstitutions
+            else
+                return this.allInstitutions.filter(inst => inst.name !== "__TEST__")
+        }
     },
-    destroyed() {
-        window.addEventListener('keydown', this.keyBinds)
-        window.addEventListener('keyup', this.keyBinds)
+    created() {
+        this.getAllConfirmedInstitutions()
     }
 }
 </script>

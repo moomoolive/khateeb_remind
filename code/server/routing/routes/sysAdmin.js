@@ -1,10 +1,13 @@
 const express = require('express')
 
-const middleware = require($DIR + "/middleware/main.js")
+const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
+const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
-router.use(middleware.auth(4))
+router.use(authMiddleware.authenticate({ min: 4, max: 5 }))
+
+const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
 
 const inst = {
     async view(options) {
@@ -15,14 +18,14 @@ const inst = {
             switch(options[i]) {
                 case 'all':
                 case '-a':
-                    const allInstitutions = await $db.models.institutions.find({}).select(['name', 'country', 'state']).exec()
+                    const allInstitutions = await $db.institutions.find({}).select(['name', 'country', 'state']).exec()
                     allInstitutions.forEach(inst => {
                         msgs.push({ msg: inst, status: "okay", from: "a" })
                     })
                     break
                 case '-uc':
                 case 'unconfirmed':
-                    const pendingInstitutions = await $db.models.institutions.find({ confirmed: false }).select(['name', 'country', 'state']).exec()
+                    const pendingInstitutions = await $db.institutions.find({ confirmed: false }).select(['name', 'country', 'state']).exec()
                     pendingInstitutions.forEach(inst => {
                         msgs.push({ msg: inst, status: "okay", from: "a" })
                     })
@@ -73,7 +76,7 @@ const inst = {
             switch(instOptions[i]) {
                 case "-s":
                 case "setting":
-                    const previousSettings = await $db.models.settings.find({ institutionID: id }).exec()
+                    const previousSettings = await $db.settings.find({ institutionID: id }).exec()
                     if (previousSettings.length < 1) {
                         const settings = {
                             institutionID: id,
@@ -83,7 +86,7 @@ const inst = {
                             autoConfirmRegistration: false,
                             textAllowed: false
                         }
-                        const saved = await new $db.models.settings(settings).save()
+                        const saved = await new $db.settings(settings).save()
                         msgs.push(
                             { 
                                 msg: `Created settings for institution ${id}`,
@@ -94,26 +97,21 @@ const inst = {
                     }
                 case '-l':
                 case 'location':
-                    const previousLocations = await $db.models.locations.find({ institutionID: id }).exec()
+                    const previousLocations = await $db.locations.find({ institutionID: id }).exec()
                     if (previousLocations.length < 1) {
                         const location = {
                             institutionID: id,
                             name: 'Unknown Location 1',
                             address: "Unknown Address 1"
                         }
-                        const savedLocation = await new $db.models.locations(location).save()
+                        const savedLocation = await new $db.locations(location).save()
                         const timing = {
                             institutionID: id,
                             locationID: savedLocation._id.toString(),
                             hour: 12,
                             minute: 30
                         }
-                        const savedTiming = await new $db.models.timings(timing).save()
-                        const associatedJummahs = await _.schedule.createAssociatedJummahs(
-                            savedLocation._id.toString(), 
-                            savedTiming._id.toString(), 
-                            id
-                        )
+                        const savedTiming = await new $db.timings(timing).save()
                         msgs.push(
                             { 
                                 msg: `Created timing, location, first jummahs for institution ${id}`,
@@ -124,9 +122,9 @@ const inst = {
                     }
                 case "user":
                 case "-u":
-                    const rootAdmin = await $db.models.rootInstitutionAdmins.findOne({ institutionID: id }).exec()
-                    const updatedRootAdmin = await $db.models.rootInstitutionAdmins.updateOne({ _id: rootAdmin._id.toString() }, { confirmed: true })
-                    const welcomeMsg = new _.notifications.welcome(rootAdmin)
+                    const rootAdmin = await $db.rootInstitutionAdmins.findOne({ institutionID: id }).exec()
+                    const updatedRootAdmin = await $db.rootInstitutionAdmins.updateOne({ _id: rootAdmin._id.toString() }, { confirmed: true })
+                    const welcomeMsg = new notificationConstructors.WelcomeNotificationConstructor(rootAdmin)
                     const saved = await welcomeMsg.create()
                     msgs.push(
                         { 
@@ -137,7 +135,7 @@ const inst = {
                     )
                 case 'institution':
                 case '-i':
-                    const updated = await $db.models.institutions.updateOne({ _id: id }, { confirmed: true })
+                    const updated = await $db.institutions.updateOne({ _id: id }, { confirmed: true })
                     msgs.push(
                         { 
                             msg: `Confirmed institution ${id}'s status`,
@@ -168,7 +166,7 @@ const inst = {
 }
 
 const expandSyntax = (items, skipIncrement) => {
-    const copy = _.deepCopy(items)
+    const copy = global.utils.deepCopy(items)
     const increment = 1 + skipIncrement
     for (let i = skipIncrement; i < copy.length; i += increment) {
         const item = copy[i]
@@ -192,7 +190,7 @@ const expandSyntax = (items, skipIncrement) => {
             copy[i] = true
         else {
             const num = parseInt(item)
-            if (!_.isNumeric(item) || num === NaN)
+            if (!global.utils.isNumeric(item) || num === NaN)
                 throw SyntaxError(`${item} is not a valid type. Supported types str, true, false, int`)
             else
                 copy[i] = num
@@ -201,8 +199,7 @@ const expandSyntax = (items, skipIncrement) => {
     return copy
 }
 
-const crypto = require('crypto')
-const key = crypto.createDecipher('aes-128-cbc', process.env.ENCRYPTION_KEY || '1234')
+const securityHelpers = require(global.$dir + '/libraries/security/main.js')
 
 const sett = {
     async view(options) {
@@ -213,7 +210,7 @@ const sett = {
             switch(options[i]) {
                 case 'root':
                 case '-r':
-                    const settings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
+                    const settings = await $db.settings.findOne({ institutionID: '__ROOT__' }).exec()
                     if (!settings)
                         msgs.push({ 
                             msg: `Root account settings doesn't exist yet. Use 'sett init' to initialize`, 
@@ -221,8 +218,8 @@ const sett = {
                             from: 'a' 
                         })
                     else {
-                        settings.twilioUser = $db.funcs.decrypt(settings.twilioUser)
-                        settings.twilioKey = $db.funcs.decrypt(settings.twilioKey)
+                        settings.twilioUser = securityHelpers.decrypt(settings.twilioUser)
+                        settings.twilioKey = securityHelpers.decrypt(settings.twilioKey)
                         msgs.push({ 
                             msg: settings, 
                             status: 'extraInfo',
@@ -264,7 +261,7 @@ const sett = {
             switch(options[i]) {
                 case 'elegant':
                 case '-e':
-                    const settings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
+                    const settings = await $db.settings.findOne({ institutionID: '__ROOT__' }).exec()
                     if (settings)
                         msgs.push({ 
                             msg: `Already exists. Use -f option to overwrite`, 
@@ -272,7 +269,7 @@ const sett = {
                             from: 'a' 
                         })
                     else {
-                        const saved = await new $db.models.settings(newSettings).save()
+                        const saved = await new $db.settings(newSettings).save()
                         msgs.push({ 
                             msg: `Successfully initialized settings`, 
                             status: 'extraInfo',
@@ -280,10 +277,11 @@ const sett = {
                         })
                     } 
                     break
+                /*
                 case 'force':
                 case '-f':
-                    const oldSettings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
-                    const toBeAdded = _.deepCopy(newSettings)
+                    const oldSettings = await $db.settings.findOne({ institutionID: '__ROOT__' }).exec()
+                    const toBeAdded = global.utils.deepCopy(newSettings)
                     if (oldSettings) {
                         toBeAdded._id = oldSettings._id.toString()
                     }
@@ -294,6 +292,7 @@ const sett = {
                             from: 'a' 
                     })
                     break
+                */
                 default:
                     msgs.push({ 
                             msg: `"${options[i]}" option doesn't exist. Available options: -r, -o. Check documentation for more details.`, 
@@ -315,7 +314,7 @@ const sett = {
             return msgs
         }
         options = expandSyntax(options, 1)
-        const settings = await $db.models.settings.findOne({ institutionID: '__ROOT__' }).exec()
+        const settings = await $db.settings.findOne({ institutionID: '__ROOT__' }).exec()
         const saveObj = {}
         for (let i = 0; i < options.length; i += 2) {
             const targetData = options[i]
@@ -329,7 +328,7 @@ const sett = {
                 from: 'a' 
             })
         }
-        const saved = await $db.models.settings.updateOne({ institutionID: '__ROOT__' }, saveObj)
+        const saved = await $db.settings.updateOne({ institutionID: '__ROOT__' }, saveObj)
         return msgs
     }
 }
@@ -343,7 +342,7 @@ const cli = {
     createCommand(commandArray) {
         const targetData = commandArray.shift()
         const verb = commandArray.shift()
-        const options = _.deepCopy(commandArray)
+        const options = global.utils.deepCopy(commandArray)
         return {
             targetData,
             verb,
@@ -362,7 +361,7 @@ const validator = require('express-validator')
 
 router.post(
     '/cli',
-    middleware.validateRequest(
+    validationMiddleware.validateRequest(
         [
             validator.body("command").isArray(),
         ]

@@ -4,55 +4,50 @@ const adminRoutes = [
         name: 'institutionAdminMain',
         component: () => import('@/views/institutionAdmin/main.vue'),
         children: [
-              /*{
-                path: 'dashboard',
-                component: () => import('@/views/admin/subroutes/dashboard.vue')
-              },*/
               {
                 path: 'schedule',
                 component: () => import('@/views/institutionAdmin/subroutes/schedule.vue'),
                 meta: {
-                  requireAuthorization: true,
-                  authLevel: 2
+                  auth: { min: 2, max: 3 }
                 }
               },
               {
                 path: 'create-others',
                 component: () => import('@/views/rootInstitutionAdmin/institutionAdminViewer.vue'),
                 meta: {
-                  requireAuthorization: true,
-                  authLevel: 3
+                  auth: { level: 3 }
                 }
               },
               {
                 path: 'announcements',
                 component: () => import('@/views/institutionAdmin/subroutes/announcements.vue'),
                 meta: {
-                    requireAuthorization: true,
-                    authLevel: 2
+                    auth: { min: 2, max: 3 }
                 }
               },
               {
                 path: 'khateebs',
                 component: () => import('@/views/institutionAdmin/subroutes/khateebs.vue'),
                 meta: {
-                    requireAuthorization: true,
-                    authLevel: 2
+                    auth: { min: 2, max: 3 }
                 }
               },
               {
                 path: 'settings',
-                component: () => import('@/views/institutionAdmin/subroutes/settings/main.vue'),
+                component: () => import('@/views/institutionAdmin/subroutes/settings.vue'),
                 meta: {
-                  requireAuthorization: true,
-                  authLevel: 2
+                  auth: { min: 2, max: 3 }
                 }
               }
         ],
         meta: {
-            requireAuthorization: true,
-            authLevel: 2
+            auth: { min: 2, max: 3 }
         }
+    },
+    {
+      path: '/institutionAdmin/locations-and-timings',
+      name: 'locationsAndTimings',
+      component: () => import('@/views/institutionAdmin/locationsAndTimings.vue'),
     }
 ]
 

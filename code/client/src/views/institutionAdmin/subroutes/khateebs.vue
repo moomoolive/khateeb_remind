@@ -1,12 +1,7 @@
 <template>
     <div>
         <loading>
-            <msg-with-pic 
-                v-show="khateebCount < 1"
-                :msg="`No khateebs have signed up to your institution yet`"
-                :gif="`twirlingPlane`"
-            />
-            <div v-if="khateebCount > 0">
+            <div v-if="khateebs.length > 0">
                 <div class="search-tools">
                     <div>
                         <button class="yellow" @click="showSearchTools = !showSearchTools">
@@ -15,7 +10,7 @@
                     </div>
                     <div v-show="showSearchTools">
                         <div>
-                            <p class="search-results"><u>{{ filteredKhateebsCount }}</u> Search Results</p>
+                            <p class="search-results"><u>{{ filteredKhateebs.length }}</u> Search Results</p>
                         </div>
                         <div>
                             <button class="red reset-search" @click="resetSearch()">
@@ -55,13 +50,9 @@
                         </div>
                     </div>
                 </div>
-                <div 
-                    v-for="(twoKhateebs, index) in filteredKhateebsArraysOfTwo"
-                    :key="index"
-                    class="two-khateeb-container"
-                >
+                <div v-if="showKhateebs" class="khateebs-container">
                     <div 
-                        v-for="(khateeb, khateebNo) in twoKhateebs"
+                        v-for="(khateeb, khateebNo) in filteredKhateebs"
                         :key="khateebNo"
                         class="khateeb-container"
                     >
@@ -74,168 +65,127 @@
                                     <p v-if="khateeb.confirmed">Delete {{ khateeb.firstName }} from System</p>
                                     <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Application</p>
                                 </button>
-                                <button v-if="!khateeb.confirmed" @click="confirmKhateeb(khateeb)">
+                                <button 
+                                    v-if="!khateeb.confirmed" 
+                                    @click="editKhateeb({ _id: khateeb._id, confirmed: true })"
+                                >
                                     <p>Confirm {{ khateeb.firstName }}'s Application</p>
                                 </button>
-                                <form-main
+                                <user-form-template 
                                     v-if="khateeb.confirmed"
-                                    :basedOn="khateeb" 
-                                    :structure="structure"
-                                    :buttonText="`Edit ${khateeb.firstName}'s Info`"
-                                    :backgroundColor="`none`"
+                                    :userType="`khateeb`"
+                                    :editableKhateebFormat="true"
+                                    :formProps="{
+                                        basedOn: khateeb,
+                                        buttonText: `Edit ${khateeb.firstName}'s Info`,
+                                        backgroundColor: 'none'
+                                    }"
                                     @submitted="editKhateeb($event)"
                                 />
                             </div>
                         </collapsable-box>
                     </div>
                 </div>
-            </div>  
+            </div>
+            <msg-with-pic 
+                v-else
+                :msg="`No khateebs have signed up to your institution yet`"
+                :gif="`twirlingPlane`"
+            />  
         </loading>
     </div>
 </template>
 
 <script>
-import loading from '@/components/userInterface/components/loadingScreen.vue'
-import collapsableBox from '@/components/userInterface/components/collapsableBox.vue'
-import formMain from '@/components/forms/main.vue'
+import loading from '@/components/general/loadingScreen.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
+import msgWithPic from '@/components/general/msgWithPic.vue'
+import userFormTemplate from '@/components/forms/templates/user.vue'
+
+import datetime from '@/libraries/dateTime/main.js'
 
 export default {
     name: 'khateebs',
     components: {
         loading,
         collapsableBox,
-        formMain
+        msgWithPic,
+        userFormTemplate
     },
     data() {
         return {
             khateebs: [],
-            khateebsWithReadableAvailableTimings: [],
-            khateebsInArraysOfTwos: [],
             locations: [],
             timings: [],
-            query: {
-                confirmed: 'any',
-                active: 'any',
-                firstName: '',
-                lastName: '',
-            },
+            showKhateebs: true,
             showSearchTools: false,
-            structure: {
-                dropouts: {
-                    type: 'readOnly',
-                    required: true
-                },
-                handle: {
-                    type: 'readOnly',
-                    required: true,
-                },
-                confirmed: {
-                    type: 'readOnly',
-                    required: true
-                },
-                title: {
-                    type: "readOnly",
-                    required: true,
-                },
-                firstName: {
-                    type: "readOnly",
-                    required: true
-                },
-                lastName: {
-                    type: "readOnly",
-                    required: true
-                },
-                phoneNumber: {
-                    type: 'readOnly',
-                    format: 'phoneNumber',
-                    required: true
-                },
-                availableTimings: {
-                    type: 'readOnly',
-                    required: true
-                },
-                unavailableDates: {
-                    type: 'readOnly',
-                    required: true,
-                    alias: 'Unavailable Days this Month'
-                },
-                active: {
-                    type: 'checkbox',
-                    required: true
-                }
-            }
+            query: {}
         }
     },
     methods: {
         async getAllKhateebs() {
             try {
-                const data = await this.$API.institutionAdmin.getKhateebs()
-                this.khateebs = data
-                this.khateebsWithReadableAvailableTimings = await this.createReadableTimingsAndUnavailableDates(data)
-                this.khateebsInArraysOfTwos = this.toArraysOfTwo(data)
+                const data = await this.$API.khateebs.getKhateebs()
+                this.khateebs = data || []
             } catch(err) {
                 console.log(err)
             }
         },
-        async createReadableTimingsAndUnavailableDates(data) {
-            data = this._.deepCopy(data)
-            const khateebs = await this.substituteTimingIDsWithTimingInformation(data)
-            return this.createReadableUnavailableDates(khateebs)
-        },
-        createReadableUnavailableDates(khateebs) {
-            let msg = ""
-            khateebs.forEach(khateeb => {
-                if (khateeb.unavailableDates.length < 1)
-                    msg += "👍 Available for all"
-                else {
-                    const month = new Date().getMonth()
-                    const year = new Date().getFullYear()
-                    const unavailableThisMonth = khateeb.unavailableDates.filter(date => {
-                        const dateObject = new Date(date.date)
-                        return dateObject.getMonth() === month && dateObject.getFullYear() === year
-                    })
-                    unavailableThisMonth.forEach(unavailableDate => {
-                        const date = new Date(unavailableDate.date)
-                        msg += `📅 ${date.toLocaleString('en-US', { month: 'short' })} ${date.getDate()}\n`
-                    })
-                }
-                khateeb.unavailableDates = msg
-            })
-            return khateebs
-        },
-        async substituteTimingIDsWithTimingInformation(khateebs) {
+        async getActiveLocationsAndTimings() {
             try {
-                this.locations = await this.$API.institutionAdmin.getLocations('all')
-                this.timings = await this.$API.institutionAdmin.getTimings("all", "all")
-                khateebs.forEach(khateeb => {
-                    if (khateeb.availableTimings.length < 1)
-                        return khateeb.availableTimings = "👍 Available for\n   all timings"
-                    else
-                        khateeb.availableTimings = this.createReadableTiming(khateeb)
-                })
-                return khateebs
+                const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+                this.locations = locations || []
+                this.timings = timings || []
             } catch(err) {
-                console.log()
+                console.log(err)
             }
         },
-        createReadableTiming(khateeb) {
-            let msg = ''
+        compileAvailableTimes(availableTimingsIdArray) {
+            console.log(availableTimingsIdArray)
             const locations = {}
-            khateeb.availableTimings.forEach(availableTiming => {
-                const timingMeta = this.timings.find(timing => timing._id === availableTiming)
-                const locationMeta = this.locations.find(location => location._id === timingMeta.locationID)
-                if (!locations[locationMeta._id])
-                    locations[locationMeta._id] = [locationMeta.name]
-                let time = new Date()
-                time.setHours(timingMeta.hour, timingMeta.minute, 0, 0)
-                const readableTime = time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
-                locations[locationMeta._id].push(`⌚ ${readableTime}`)
+            availableTimingsIdArray.forEach(availableTiming => {
+                const { timingInfo, locationInfo } = this.findLocationAndTimingInfo(availableTiming)
+                if (!locations[locationInfo._id])
+                    locations[locationInfo._id] = [locationInfo.name]
+                locations[locationInfo._id].push(`⌚ ${this.createReadableTime(timingInfo)}`)
             })
-            for (let [location, msgs] of Object.entries(locations) ) {
-                msgs.push(`\n`)
+            return this.compileAllLocationMsgsIntoOne(locations)
+        },
+        compileAllLocationMsgsIntoOne(locationMsgObject) {
+            let msg = ''
+            for (const [location, msgs] of Object.entries(locationMsgObject)) {
+                msgs.push('\n')
                 msg += msgs.reduce((total, msg) => `${total}\n${msg}`)
             }
             return msg
+        },
+        createReadableTime(timingInfo) {
+            const time = new Date()
+            time.setHour(timingInfo.hour, timingInfo.minute, 0, 0)
+            return time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+        },
+        findLocationAndTimingInfo(timingId) {
+            const timingInfo = this.timings.find(timing => timing._id === timingId)
+            const locationInfo = this.locations.find(location => location._id === timingInfo.locationID)
+            return { timingInfo, locationInfo }
+        },
+        createReadableAvailableTimings(khateeb) {
+            const copy = { ...khateeb }
+            const isAvailableForAllTimings = copy.availableTimings.length < 1
+            copy.availableTimings = isAvailableForAllTimings ? "👍 Available for all" : this.compileAvailableTimes(copy.availableTimings)
+            return copy
+        },
+        createReadbleUnAvailableDates(khateeb) {
+            const copy = { ...khateeb }
+            const unavailableDatesThisMonth = copy.unavailableDates.filter(date => datetime.sameMonthSameYear(new Date(), new Date(date)))
+            const isAvailableForAllDates = unavailableDatesThisMonth.length < 1
+            copy.unavailableDates = isAvailableForAllDates ? "👍 Available for all" : this.compileUnavailableDates(unavailableDatesThisMonth)
+            return copy
+        },
+        compileUnavailableDates(unavailableDatesArray) {
+            return unavailableDatesArray
+                .map(date => `📅 ${new Date(date).toLocaleString('en-US', { month: 'short' })} ${new Date(date).getDate()}`)
+                .reduce((total, date) => `${total}\n${date}`)
         },
         resetSearch() {
             this.query.active = 'any'; this.query.confirmed = 'any';
@@ -244,88 +194,63 @@ export default {
         khateebTag(khateeb) {
             if (!khateeb.confirmed)
                 return [{ words: 'Registration Pending', color: 'important', symbol: '⏳' }]
-            const tags = []
-            if (!khateeb.active)
-                tags.push({ words: 'Inactive', color: 'urgent', symbol: '📪' })
-            const tag = { words: `Last Active ${this._.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }
-            tags.push(tag)
-            return tags
-        },
-        toArraysOfTwo(array) {
-            const arrayOfTwos = []
-            let chopped = []
-            for (let i = 0; i < array.length; i++) {
-                chopped.push(array[i])
-                const even = i % 2
-                if (even) {
-                    arrayOfTwos.push(chopped)
-                    chopped = []
-                }
-            }
-            arrayOfTwos.push(chopped)
-            return arrayOfTwos
-        },
-        async confirmKhateeb(khateeb) {
-            try {
-                const res = await this.$API.institutionAdmin.updateExistingKhateeb({ _id: khateeb._id, confirmed: true })
-                this.$store.dispatch('adminSavedChangesScreen', true)
-            } catch(err) {
-                console.log(err)
-            }
+            else if (!khateeb.active)
+                return [{ words: 'Inactive', color: 'urgent', symbol: '📪' }]
+            else
+                return [{ words: `Last Active: ${this.utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
         },
         async editKhateeb($event) {
             try {
-                const res = await this.$API.institutionAdmin.updateExistingKhateeb($event)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                const res = await this.$API.khateebs.updateExistingKhateeb($event)
+                if (!res)
+                    return
+                this.khateebs.splice(this.findKhateebIndex(res._id), 1, res)
+                this.rerenderView()
             } catch(err) {
                 console.log(err)
             }
+        },
+        findKhateebIndex(id) {
+            return this.khateebs.findIndex(khateeb => khateeb._id === id)
+        },
+        rerenderView() {
+            this.showKhateebs = false
+            this.$nextTick(() => { this.showKhateebs = true })
         },
         async deleteKhateeb(id) {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to permenantly delete this khateeb?`)
+                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this khateeb?`)
                 if (!confirm)
                     return
-                const res = await this.$API.institutionAdmin.deleteKhateeb(id)
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                const res = await this.$API.khateebs.deleteKhateeb(id)
+                console.log(res)
+                this.khateebs.splice(this.findKhateebIndex(id), 1)
             } catch(err) {
                 console.log(err)
             }
+        },
+        khateebFilter(noFilterValue="any", valueKey="active", queryParams={}) {
+            if (queryParams[valueKey] !== noFilterValue)
+                return (khateeb) => khateeb[valueKey] === queryParams[valueKey]
+            else
+                return (khateeb) => khateeb
+        },
+        khateebFilterWithQuery(noFilterValue="any", valueKey="active") {
+            return this.khateebFilter(noFilterValue, valueKey, this.query)
         }
     },
     computed: {
-        khateebCount() {
-            return this.khateebs.length
-        },
         filteredKhateebs() {
-            if (!this.searchQuery)
-                return this.khateebsWithReadableAvailableTimings
-            let filtered
-            for (let [queryField, queryVal] of Object.entries(this.searchQuery)) {
-                let toBeSearched = filtered ? filtered : this.khateebsWithReadableAvailableTimings
-                if (queryField === 'firstName' || queryField === 'lastName')
-                    filtered = toBeSearched.filter(khateeb => khateeb[queryField].toLowerCase().includes(queryVal.toLowerCase()))
-                else
-                    filtered = toBeSearched.filter(khateeb => khateeb[queryField] === queryVal)
-            }
-            return filtered
+            return this.khateebsWithReadableMeta
+                .filter(this.khateebFilterWithQuery('', "firstName"))
+                .filter(this.khateebFilterWithQuery('', "lastName"))
+                .filter(this.khateebFilterWithQuery('any', 'active'))
+                .filter(this.khateebFilterWithQuery('any', 'confirmed'))
         },
-        filteredKhateebsArraysOfTwo() {
-            return this.toArraysOfTwo(this.filteredKhateebs)
-        },
-        filteredKhateebsCount() {
-            return this.filteredKhateebs.length
-        },
-        searchQuery() {
-            let query
-            for (let [key, value] of Object.entries(this.query)) {
-                if (value !== '' && value !== 'any') {
-                    if (!query)
-                        query = {}
-                    query[key] = value
-                }
-            }
-            return query
+        khateebsWithReadableMeta() {
+            return this.khateebs
+                .map(this.createReadableAvailableTimings)
+                .map(this.createReadbleUnAvailableDates)
         }
     },
     watch: {
@@ -335,15 +260,18 @@ export default {
         }
     },
     created() {
+        this.resetSearch()
         this.getAllKhateebs()
+        this.getActiveLocationsAndTimings()
     }
 }
 </script>
 
 <style lang="scss" scoped>
-.two-khateeb-container {
+.khateebs-container {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     width: 90%;
     max-height: 300px;
     margin-left: auto;
@@ -444,7 +372,7 @@ button {
 }
 
 @media screen and (max-width: $phoneWidth) {
-      .two-khateeb-container {
+      .khateebs-container {
             flex-direction: column;
         }
         .khateeb-container {

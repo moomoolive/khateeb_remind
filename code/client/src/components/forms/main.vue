@@ -6,7 +6,7 @@
             </div>
             <div v-for="(fieldData, fieldName) in structureCopy" :key="fieldName">
                 <div class="formLabel" :for="fieldName">
-                    {{  fieldData.alias || _.stringFormat(fieldName) }}
+                    {{  fieldData.alias || utils.stringFormat(fieldName) }}
                 </div>
                 <tag-box
                     v-if="fieldData.tag && fieldData.tag === 'encrypted'"
@@ -17,9 +17,9 @@
                             symbol: '⚔️'
                     }"
                 />
-                <div v-if="extensibleType(fieldData.type)">
+                <div v-if="extensibleType(readOnly ? 'readOnly' : fieldData.type)">
                     <component 
-                        :is="fieldData.type + `Ext`"
+                        :is="readOnly ? 'readOnlyExt' : fieldData.type + `Ext`"
                         :name="fieldName"
                         :options="fieldData"
                         :defaultValidators="{
@@ -60,7 +60,7 @@
                         >
                             <template #default>
                                 <div class="formLabel">
-                                    {{ _.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
+                                    {{ utils.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
                                 </div>
                             </template>
                             <template #invalidMsgs>
@@ -81,6 +81,7 @@
                 </div>
             </div>
             <button
+                v-if="!readOnly"
                 :style="`margin-top: ${showInvalidationMsgs ? 7 : 3}%;`" 
                 :class="buttonColor" 
                 :disabled="!validSubmission"
@@ -150,8 +151,14 @@ export default {
             default: true
         },
         confirmBeforeSubmit: {
+            type: Boolean,
             required: false,
             default: true
+        },
+        readOnly: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     components: {
@@ -163,8 +170,8 @@ export default {
         "textAreaExt": () => import('./extensions/primitives/textArea.vue'),
         "checkboxExt": () => import('./extensions/free/checkbox.vue'),
         "readOnlyExt": () => import('./extensions/primitives/readOnly.vue'),
-        "tagBox": () => import('@/components/userInterface/components/tagBox.vue'),
-        defaultExtension,
+        "tagBox": () => import('@/components/general/tagBox.vue'),
+        defaultExtension
     },
     data() {
         return {
@@ -225,15 +232,15 @@ export default {
             else if (this.validations[fieldName])
                 return this.validations[fieldName].msgs
             else
-                return `Invalid ${this._.stringFormat(fieldName)}`
+                return `Invalid ${this.utils.stringFormat(fieldName)}`
         },
         setData(inputData) {
-            this.data = this._.deepCopy(inputData)
-            this.originalData = this._.deepCopy(inputData)
+            this.data = this.utils.deepCopy(inputData)
+            this.originalData = this.utils.deepCopy(inputData)
         },
         async submit() {
             if (this.confirmBeforeSubmit) {
-                const confirm = await this._.confirm(`Are you sure you want to submit?`)
+                const confirm = await this.utils.confirm(`Are you sure you want to submit?`)
                 if (confirm)
                     this.$emit('submitted', this.data)
             } else
@@ -266,7 +273,7 @@ export default {
             return data.length >= min
         },
         fillDefaultsWithBasedOn(basedOn) {
-            const copy = this._.deepCopy(basedOn)
+            const copy = this.utils.deepCopy(basedOn)
             for (let [fieldName, currentVal] of Object.entries(this.structureCopy)) {
                 this.structureCopy[fieldName].default = copy[fieldName]
             }
@@ -297,7 +304,7 @@ export default {
         }
     },
     created() {
-        this.structureCopy = this._.deepCopy(this.structure)
+        this.structureCopy = this.utils.deepCopy(this.structure)
         if (this.basedOn) {
             this.fillDefaultsWithBasedOn(this.basedOn)
             this.setData(this.basedOn)

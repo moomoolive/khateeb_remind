@@ -5,11 +5,11 @@
                 v-for="(link, index) in outboundLinks" :key="index"
             >
                 <button
-                    v-if="!link.authLevel || _.authRequirementsSatisfied(link.authLevel)"
+                    v-if="utils.validAuthentication(link.auth)"
                     class="admin-nav silver"
                     @click="outbound(link.route)"
                 >
-                <p>{{ _.stringFormat(link.name) }}<span v-if="link.indicator" class="indicator">{{ link.indicator }}</span> 
+                <p>{{ utils.stringFormat(link.name) }}<span v-if="link.indicator" class="indicator">{{ link.indicator }}</span> 
                     <span class="arrow-icon">></span></p>
                 </button>
             </div>
@@ -52,7 +52,7 @@ export default {
         toCentral() {
             this.$router.push(`/${this.baseLink}`)
             this.$emit('to-central')
-        },
+        }
     },
     computed: {
         navMode() {

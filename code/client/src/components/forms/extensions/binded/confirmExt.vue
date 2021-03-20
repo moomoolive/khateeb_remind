@@ -41,7 +41,7 @@ export default {
     methods: {
         process($event) {
             delete $event.created
-            this.cachedInput = this._.deepCopy($event)
+            this.cachedInput = this.utils.deepCopy($event)
             $event.state = this.sameAsBind($event.val)
             $event.msgs = this.invalidMsg($event.state)
             delete $event.val

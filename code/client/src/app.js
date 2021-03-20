@@ -1,17 +1,16 @@
 import Vue from 'vue'
 import Main from './Main.vue'
-import './registerServiceWorker'
 import router from './router'
 import store from './store'
 
-import API from '@/utils/API/index.js'
-import funcs from '@/utils/general/main.js'
+import API from '@/libraries/requests/index.js'
+import funcs from '@/libraries/globalUtilities.js'
 import VCalendar from 'v-calendar'
 
-import globalComponents from '@/components/userInterface/index.js'
 Vue.use(VCalendar)
+
 Vue.prototype.$API = API
-Vue.prototype._ = funcs
+Vue.prototype.utils = funcs
 
 Vue.config.productionTip = false
 

@@ -15,9 +15,12 @@ module.exports = {
     },
     pwa: {
         name: 'Khateeb Remind',
+        workboxPluginMode: 'InjectManifest',
         workboxOptions: {
-            skipWaiting: true,
-            clientsClaim: true
+            //skipWaiting: true,
+            //clientsClaim: true
+            swSrc: 'src/service-worker.js',
+            //swDest: 'service-worker.js'
         }
     }
 }

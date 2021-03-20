@@ -1,0 +1,28 @@
+{
+    "pastTags": {
+        "general": {
+            "words": "Past",
+            "color": "red",
+            "icon": "📚"
+        }
+    },
+    "futureTags": {
+        "general": {
+            "words": "Future",
+            "color": "blue",
+            "icon": "📅"
+        }
+    },
+    "defaultTag": {
+        "words": "Pending",
+        "color": "purple",
+        "icon": "⏱️"
+    },
+    "currentWeekTags": {
+        "notified": {
+            "words": "Notified",
+            "color": "purple",
+            "icon": "📱"
+        }
+    }
+}

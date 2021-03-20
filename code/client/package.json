@@ -7,13 +7,16 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "pwa": "serve dist -l 1237"
+    "pwa": "npm run build && serve dist -l 1239"
   },
   "dependencies": {
     "@ivanv/vue-collapse-transition": "^1.0.0",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
+    "dayjs": "^1.10.4",
+    "device-detector-js": "^2.2.7",
     "fast-deep-equal": "^3.1.3",
+    "qs": "^6.5.2",
     "register-service-worker": "^1.7.1",
     "v-calendar": "^2.2.3",
     "vue": "^2.6.11",

@@ -6,7 +6,7 @@
             gif="personThrowingPlane"
         />
         <div class="button">
-            <button @click="toHome()">
+            <button @click="utils.toHomePage()">
                 Go to Home
             </button>
         </div>
@@ -14,16 +14,12 @@
 </template>
 
 <script>
+import msgWithPic from '@/components/general/msgWithPic.vue'
+
 export default {
     name: 'pageNotFound',
-    methods: {
-        toHome() {
-            if (this.$store.getters.decodedJWT)
-                this.$router.push(`/${this.$store.getters.decodedJWT.__t}/`)
-            else {
-                this.$router.push('/')
-            }
-        }
+    components: {
+        msgWithPic
     }
 }
 </script>

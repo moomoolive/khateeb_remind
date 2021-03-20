@@ -1,146 +1,126 @@
 <template>
     <div>
-        <div class="admin-container">
-            <collapsable-box
-                :headline="`Create New Admin`"
+        <div>
+            <button 
+                class="add-new-admin-button blue"
+                @click="openAddNewAdminForm()"
             >
-                <form-main
-                    :structure="structure.new"
-                    :buttonText="`Create New Admin`"
-                    :bindedExts="['confirms']"
-                    :backgroundColor="`none`"
-                    @submitted="submitAdmin($event)"
+                +
+            </button>
+        </div>
+        <general-popup-container
+            v-if="showAddNewAdminForm"
+            @close="closeAddNewAdminForm()"
+        >
+            <user-form-template 
+                :userType="`institutionAdmin`"
+                :includeVitals="true"
+                :formProps="{
+                    buttonText: 'Create New Admin',
+                    bindedExts: ['confirms'],
+                    backgroundColor: 'yellow'
+                }"
+                @submitted="submitAdmin($event)"
+            />
+        </general-popup-container>
+        <loading>
+            <div v-if="admins.length > 0" class="admin-container">
+                <div v-for="(admin, index) in admins" :key="index">
+                    <collapsable-box
+                        :headline="`${admin.firstName} ${admin.lastName}`"
+                        :tagDetails="[{
+                            words: `Last Active: ${utils.dynamicDisplayDate(admin.lastLogin)}`,
+                            color: `goodNews`,
+                            symbol: `☀️`
+                        }]"
+                    >
+                        <button class="red" @click="deleteAdmin(admin._id, index)">
+                            Delete {{ admin.firstName }} from System
+                        </button>
+                        <user-form-template 
+                            :userType="`institutionAdmin`"
+                            :formProps="{
+                                readOnly: true,
+                                basedOn: admin,
+                                backgroundColor: 'none',
+                                buttonText: 'Update'
+                            }"
+                        />
+                    </collapsable-box>
+                </div>
+            </div>
+            <div v-else>
+                <msg-with-pic 
+                    :msg="`You're currently the only administrator at this institution`"
+                    :gif="`sadCat`"
                 />
-            </collapsable-box>
-        </div>
-        <div class="new-existing-divider"></div>
-        <div v-if="admins">
-            <loading>
-                <div v-if="admins.length > 0" class="admin-container">
-                    <div v-for="(admin, index) in admins" :key="index">
-                        <collapsable-box
-                            :headline="`${admin.firstName} ${admin.lastName}`"
-                            :tagDetails="[{
-                                words: `Last Active: ${_.dynamicDisplayDate(admin.lastLogin)}`,
-                                color: `goodNews`,
-                                symbol: `☀️`
-                            }]"
-                        >
-                            <button class="red" @click="deleteAdmin(admin._id)">
-                                Delete {{ admin.firstName }} from System
-                            </button>
-                            <form-main
-                                :structure="structure.existing"
-                                :basedOn="admin"
-                                :buttonText="`Update ${admin.firstName}'s Info`"
-                                :backgroundColor="`none`"
-                                @submitted="submitAdmin($event)"
-                            />
-                        </collapsable-box>
-                    </div>
-                </div>
-                <div v-else>
-                    <msg-with-pic 
-                        :msg="`You're currently the only administrator at this institution`"
-                        :gif="`sadCat`"
-                    />
-                </div>
-            </loading>
-        </div>
+            </div>
+        </loading>
     </div>
 </template>
 
 <script>
-import collapsableBox from '@/components/userInterface/components/collapsableBox.vue'
-import formMain from '@/components/forms/main.vue'
-import loading from '@/components/userInterface/components/loadingScreen.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
+import loading from '@/components/general/loadingScreen.vue'
+import msgWithPic from '@/components/general/msgWithPic.vue'
+import userFormTemplate from '@/components/forms/templates/user.vue'
+import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 
 export default {
     name: 'createOtherInstitutionAdmins',
     components: {
         collapsableBox,
-        formMain,
-        loading
+        loading,
+        msgWithPic,
+        userFormTemplate,
+        generalPopupContainer
     },
     data() {
         return {
-            admins: null,
-            structure: {
-                new: {
-                    username: {
-                        required: true,
-                        validators: 'username'
-                    },
-                    password: {
-                        required: true,
-                        minLength: 6
-                    },
-                    handle: {
-                        validators: 'handle',
-                        required: true,
-                    },
-                    firstName: {
-                        required: true
-                    },
-                    lastName: {
-                        required: true
-                    },
-                    phoneNumber: {
-                        type: 'phoneNumber',
-                        required: true
-                    }
-                },
-                existing: {
-                    username: {
-                        required: true,
-                        type: 'readOnly'
-                    },
-                    handle: {
-                        validators: 'handle',
-                        type: 'readOnly',
-                    },
-                    firstName: {
-                        required: true,
-                        type: 'readOnly',
-                    },
-                    lastName: {
-                        required: true,
-                        type: 'readOnly'
-                    },
-                    phoneNumber: {
-                        type: 'readOnly',
-                        format: 'phoneNumber',
-                        required: true
-                    }
-                }
-            }
+            admins: [],
+            showAddNewAdminForm: false
         }
     },
     methods: {
+        openAddNewAdminForm() {
+            this.showAddNewAdminForm = true
+        },
+        closeAddNewAdminForm() {
+            this.showAddNewAdminForm = false
+        },
         async submitAdmin($event) {
             try {
-                const updated = await this.$API.rootInstitutionAdmin.updateAdmin($event)
-                this.$store.dispatch('adminSavedChangesScreen', true)
-                this._.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
+                const newAdmin = await this.$API.institutionAdmins.createNewAdmin($event)
+                this.admins.push(newAdmin)
+                this.closeAddNewAdminForm()
+                this.utils.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
             } catch(err) {
                 console.log(err)
             }
         },
-        async deleteAdmin(id) {
+        async deleteAdmin(id, index) {
             try {
-                const confirm = await this._.confirm(`Do you really want to permenantly delete this administrator?`)
+                const confirm = await this.utils.confirm(`Do you really want to permenantly delete this administrator?`)
                 if (confirm) {
-                    const deleted = await this.$API.rootInstitutionAdmin.deleteAdmin(id)
+                    const deleted = await this.$API.institutionAdmins.deleteAdmin(id)
                     console.log(deleted)
-                    this.$store.dispatch('adminSavedChangesScreen', true)
+                    this.admins.splice(index, 1)
                 }
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        async getOtherAdmins() {
+            try {
+                const admins = await this.$API.institutionAdmins.getOtherAdmins()
+                this.admins = admins || []
             } catch(err) {
                 console.log(err)
             }
         }
     },
-    async created() {
-        this.admins = await this.$API.rootInstitutionAdmin.getOtherAdmins()
+    created() {
+        this.getOtherAdmins()
     }
 }
 </script>
@@ -162,6 +142,15 @@ export default {
     border-bottom: black solid 3px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.add-new-admin-button {
+    border-radius: 100px 100px 100px 100px;
+    width: 60px;
+    height: 35px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 button {

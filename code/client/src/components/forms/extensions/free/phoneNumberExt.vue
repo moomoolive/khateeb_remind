@@ -74,7 +74,7 @@ export default {
             return this.areaCode + this.first3 + this.last4
         },
         readyToSubmit() {
-            return this._.isNumeric(this.completeNumber) && this.completeNumber.length === 10 && this.no0AtChar0
+            return this.utils.isNumeric(this.completeNumber) && this.completeNumber.length === 10 && this.no0AtChar0
         },
         completeNumberInt() {
             return parseInt(this.completeNumber)
@@ -84,7 +84,7 @@ export default {
         },
         invalidMsg() {
             const msgs = []
-            if (!this._.isNumeric(this.completeNumber))
+            if (!this.utils.isNumeric(this.completeNumber))
                 msgs.push(`Must be Numeric`)
             if (!this.completeNumber.length !== 10)
                 msgs.push(`Must Be 10 Digits`)

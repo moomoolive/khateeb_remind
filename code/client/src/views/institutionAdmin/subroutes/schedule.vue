@@ -1,76 +1,169 @@
 <template>
     <div>
-        <khateeb-schedule
-            :data="APIData"
-            :reciever="`institutionAdmin`"
-            :emitCopy="true"
-            :revertToPreviousMonth="revertToPreviousMonth"
-            @copy="saveSchedule($event)"
-            @schedule-date="getSchedule($event)"
-            @override="saveSchedule($event)"
-        >   
-            <template #default="props">
-                <change-month-buttons
-                    :originalDate="props.originalDate"
-                    :date="props.date"
-                    @changed="props.changeViewingMonth($event)"
-                />
+
+        <div>
+            <button
+                class="purple to-locations-timings-button"
+                @click="$router.push('/institutionAdmin/locations-and-timings')"
+            >
+                Edit Locations and Timings
+            </button>
+        </div>
+
+        <monthly-jummah-schedule
+            :jummahs="jummahs"
+            :locations="locations"
+            :timings="timings"
+            :khateebs="khateebs"
+            :reciever="viewingMode"
+            @request-jummahs="requestJummahs($event)"
+            @new-preference="createNewJummahPreference($event)"
+            @update-preference="updateJummahPreferenceDelayed($event)"
+            @update-preference-fast="updateJummahPreference($event)"
+            @run-notification-loop="runNotificationLoop($event)"
+        >
+            <template #above-controls>
+                <div class="viewing-mode-container">
+                    <div class="select-text">
+                        Viewing Mode
+                    </div>
+                    <select v-model="viewingMode" class="viewing-mode-dropdown">
+                        <option value="institutionAdmin">Admin</option>
+                        <option value="khateeb">Khateeb</option>
+                    </select>
+                </div>
             </template>
-        </khateeb-schedule>
+        </monthly-jummah-schedule>
+
     </div>
 </template>
 
 <script>
-import khateebSchedule from '@/components/schedules/khateebSchedule.vue'
-import changeMonthButtons from '@/components/schedules/extraControls/changeMonth.vue'
+import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule/main.vue'
 
 export default {
     name: "scheduleSetter",
     components: {
-        khateebSchedule,
-        changeMonthButtons
+        monthlyJummahSchedule
     },
     data() {
         return {
-            date: null,
-            APIData: {
-                isThisADummyValue: true
-            },
-            revertToPreviousMonth: false
+            jummahs: [],
+            locations: [],
+            timings: [],
+            khateebs: [],
+            viewingMode: 'institutionAdmin'
         }
     },
     methods: {
-        async getSchedule(date) {
+        async getScheduleBuildingBlocks() {
             try {
-                const res = await this.$API.institutionAdmin.getSchedule(date.getMonth(), date.getFullYear())
-                if (typeof res !== 'string' && res)
-                    this.APIData = res
-                else if (res === 'nobuild-previous')
-                    this.revertToPrevious(`Previous month schedule doesn't exist!`)
-                else if (res === 'nobuild-future')
-                    this.revertToPrevious(`You can't schedule more than one month ahead!`)
+                const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
+                this.locations = locations
+                this.timings = timings
+                this.khateebs = khateebs
             } catch(err) {
                 console.log(err)
             }
         },
-        revertToPrevious(msg) {
-            this.revertToPreviousMonth = true
-            this._.alert(msg)
-            this.$nextTick(() => { this.revertToPreviousMonth = false })
+        async createNewJummahPreference(newPreference) {
+            await this.utils.delayedRequest(
+                'jummahs',
+                'createNewPreference',
+                {
+                    arguments: [newPreference],
+                    additionalIdentifiers: ['createNewPreference', newPreference.timingID, `backup:${newPreference.isBackup}`]
+                }
+            )
         },
-        async saveSchedule($event) {
+        async updateJummahPreferenceDelayed(updatedPreference) {
+            await this.utils.delayedRequest(
+                'jummahs',
+                'updateJummahPreference',
+                {
+                    arguments: [updatedPreference],
+                    additionalIdentifiers: ['createNewPreference', updatedPreference.timingID, `backup:${updatedPreference.isBackup}`]
+                }
+            )
+        },
+        async requestJummahs(jummahDateRange) {
             try {
-                const res = await this.$API.institutionAdmin.saveJummahs({ jummahs: $event })
-                this.$store.dispatch('adminSavedChangesScreen', true)
+                const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
+                this.jummahs = jummahs
             } catch(err) {
                 console.log(err)
             }
-        }
+        },
+        findJummahIndexById(id) {
+            return this.jummahs.findIndex(jummah => jummah._id === id)
+        },
+        async updateJummahPreference(updatedJummah) {
+            try {
+                const updated = await this.$API.jummahs.updateJummahPreference(updatedJummah)
+                if (!updated)
+                    return
+                this.jummahs.splice(this.findJummahIndexById(updated._id), 1, updated)
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        fillIdIfEmpty(main={}, backup={}) {
+            if (!main._id)
+                main = { ...main, _id: 'none' }
+            if (!backup._id)
+                backup = { ...backup, _id: 'none' }
+            return { main, backup }
+        },
+        async runNotificationLoop({ main: preprocessedMain, backup: preprocessedBackup, isBackup }) {
+            try {
+                const { main, backup } = this.fillIdIfEmpty(preprocessedMain, preprocessedBackup)
+                const updatedPreferences = await this.$API.jummahs.runNotificationLoop({ main, backup }, isBackup) || { targetPreference: {}, otherPreference: {} }
+                for (const [key, value] of Object.entries(updatedPreferences)) {
+                    if (value._id && value._id.toLowerCase() !== 'none')
+                        this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
+                }
+            } catch(err) {
+                console.log(err)
+            }
+        },
+    },
+    created() {
+        this.getScheduleBuildingBlocks()
     }
-    
 }
 </script>
 
 <style lang="scss" scoped>
+.viewing-mode-container {
+    margin-left: auto;
+    width: 53%;
+    padding-bottom: 10px;
+}
 
+.select-text {
+    font-size: 14px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.to-locations-timings-button {
+    width: 200px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.viewing-mode-dropdown {
+    width: 90px;
+    height: 25px;
+    font-size: 13px;
+    color: getColor("offWhite");
+    border: none;
+    outline: none;
+    background-color: themeRGBA("grey", 1);
+    &:focus {
+        background-color: themeRGBA("grey", 0.5);
+    }
+    border-radius: 4px;
+}
 </style>

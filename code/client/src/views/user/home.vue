@@ -1,13 +1,18 @@
 <template>
-    <div>
+    <div v-if="showProfileSettings">
         <collapsable-box
             class="user-setting"
             :headline="`Change Username`"
         >
             <form-main 
-                :structure="structure.username"
+                :structure="{
+                    username: {
+                        required: true,
+                        validators: 'username'
+                    }
+                }"
                 :backgroundColor="`none`"
-                :basedOn="{ username: $store.getters.decodedJWT.username }"
+                :basedOn="{ username: $store.getters['user/allInfo'].username }"
                 :buttonText="`Change Username`"
                 @submitted="updateInfo($event)"
             />
@@ -17,7 +22,12 @@
             :headline="`Change Password`"
         >
             <form-main
-                :structure="structure.password"
+                :structure="{
+                    password: {
+                        required: true,
+                        minLength: 6
+                    }
+                }"
                 :bindedExts="['confirms']"
                 :backgroundColor="`none`"
                 :buttonText="`Change Password`"
@@ -28,39 +38,40 @@
             class="user-setting"
             :headline="`Profile Details`"
         >
-            <form-main
-                :structure="structure.profile"
-                :basedOn="$store.getters.decodedJWT"
-                :backgroundColor="`none`"
-                :buttonText="`Update Profile`"
+            <user-form-template 
+                :userType="$store.getters['user/type']"
+                :formProps="{
+                    backgroundColor: 'none',
+                    buttonText: 'Update Profile'
+                }"
                 @submitted="updateInfo($event)"
             />
         </collapsable-box>
         <collapsable-box
-            v-if="$store.getters.decodedJWT.__t === 'khateeb'"
+            v-if="utils.validAuthentication({ level: 1 })"
             class="user-setting"
             :headline="`Available Timings`"
             :tagDetails="availableTimingsTag"
         >
             <selection-picker
-                v-if="khateebs.struct"
-                :options="khateebs.struct"
-                :currentlySelected="khateebs.availableTimings"
+                v-if="availableTimingsSelection.length > 0"
+                :options="availableTimingsSelection"
+                :currentlySelected="availableTimings"
                 @changed="updateInfo({ availableTimings: $event }, false)"
             />
         </collapsable-box>
         <collapsable-box
-            v-if="$store.getters.decodedJWT.__t === 'khateeb'"
+            v-if="utils.validAuthentication({ level: 1 })"
             class="user-setting"
             :headline="`Unavailable Dates`"
         >
             <calendar
-                :originalVal="$store.getters.decodedJWT.unavailableDates" 
+                :originalVal="$store.getters['user/allInfo'].unavailableDates" 
                 @changed="updateInfo($event, false)"
             />
         </collapsable-box>
         <collapsable-box
-            v-if="showDelete"
+            v-if="utils.validAuthentication({ max: 2 })"
             class="user-setting"
             :headline="`Danger Zone`"
             :buttonColor="`red`"
@@ -72,12 +83,11 @@
 </template>
 
 <script>
-import collapsableBox from '@/components/userInterface/components/collapsableBox.vue'
+import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
-import selectionPicker from '@/components/userInterface/components/selectionPicker.vue'
+import selectionPicker from '@/components/general/selectionPicker.vue'
 import calendar from './subviews/calendar.vue'
-
-import axios from 'axios'
+import userFormTemplate from '@/components/forms/templates/user.vue'
 
 export default {
     name: 'userHome',
@@ -85,144 +95,103 @@ export default {
         collapsableBox,
         formMain,
         selectionPicker,
-        calendar
+        calendar,
+        userFormTemplate
     },
     data() {
         return {
-            structure: {
-                password: {
-                    password: {
-                        required: true,
-                        minLength: 6
-                    }
-                },
-                username: {
-                    username: {
-                        required: true,
-                        validators: 'username'
-                    },
-                },
-                profile: {
-                    handle: {
-                        validators: 'handle',
-                        required: true,
-                    },
-                    firstName: {
-                        required: true
-                    },
-                    lastName: {
-                        required: true
-                    },
-                    phoneNumber: {
-                        type: 'phoneNumber',
-                        required: true
-                    }
-                }
-            },
-            khateebExtras: {
-                title: {
-                    type: "dropdown",
-                    required: true,
-                    selectOptions: ['none', 'Shiekh', 'Imam']
-                }
-            },
-            showDelete: null,
-            khateebs: {
-                struct: null,
-                availableTimings: null,
-                locations: null
-            }
+            showProfileSettings: true,
+            locations: [],
+            timings: []
         }
     },
     methods: {
-        async updateInfo($event, withMsgAndPush=true) {
+        async updateInfo($event, rerender=true) {
             try {
                 const res = await this.$API.user.updateInfo($event)
                 this.storeToken(res.token)
-                if (withMsgAndPush) {
-                    this._.alert(`Successfully updated!`, 'success')
-                    this._.toHomePage()
+                if (rerender) {
+                    this.rerenderProfileSettings()
+                    this.utils.alert(`Successfully updated`, 'success')
                 }
             } catch(err) {
                 console.log(err)
             }
         },
         storeToken(token) {
-            localStorage.setItem('token', token)
-            axios.defaults.headers.common['authorization'] = token
-            this.$store.dispatch('JWT_TOKEN', token)
+            this.$store.dispatch('user/updateToken', token)
+        },
+        rerenderProfileSettings() {
+            this.showProfileSettings = false
+            this.$nextTick(() => { this.showProfileSettings = true })
         },
         async deleteAccount() {
             try {
-                const confirm = await this._.confirm(`Are you sure you want to permenantly delete your account?`)
+                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete your account?`)
                 if (!confirm)
                     return
                 const res = await this.$API.user.deleteAccount()
                 console.log(res)
-                this.$store.dispatch('logout')
-                this._.toHomePage()
-                this._.alert(`Successfully delete account`, 'success')
+                this.$store.dispatch('user/logout')
+                this.utils.toHomePage()
+                this.utils.alert(`Successfully delete account`, 'success')
             } catch(err) {
                 console.log(err)
             }
         },
         async getAvailableTimings() {
             try {
-                const data = await this.$API.khateeb.getAvailableTimings()
-                this.khateebs.locations = data.locations
-                this.khateebs.availableTimings = data.availableTimings
-                this.khateebs.struct = this.buildStructs(data.locations)
+                const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+                this.locations = locations
+                this.timings = timings
             } catch(err) {
                 console.log(err)
             }
         },
-        buildStructs(data) {
-            const arrayOfStructs = []
-            data.forEach(location => {
-                location.timings.forEach(timing => {
+        createTimingSelectionOptions(location) {
+            const associatedTimings = this.timings.filter(timing => timing.locationID === location._id)
+            return associatedTimings
+                .map(timing => {
                     let time = new Date()
                     time.setHours(timing.hour, timing.minute, 0, 0)
-                    time = time.toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' })
-                    const struct = {
-                        display: [location.name, time],
+                    return {
+                        display: [location.name, time.toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' })],
                         val: timing._id,
                         extraInfo: `Address: ${location.address}`
                     }
-                    arrayOfStructs.push(struct)
                 })
-            })
-            return arrayOfStructs
-        },
-        async modifyAvailableTimings($event) {
-            try {
-                this.khateebs.availableTimings = $event
-                const res = await this.$API.user.changeProfile({ availableTimings: $event })
-                this.storeToken(res.token)
-            } catch(err) {
-                console.log(err)
-            }
-        },
+        }
     },
     computed: {
-        availableTimingsTag() {
-            const tag = [{
-                words: 'Available for All Times',
-                symbol: '⌚',
-                color: 'goodNews'
-            }]
-            if (!this.khateebs.availableTimings)
-                return tag
+        availableTimings() {
+            if (this.$store.getters['user/type'] === 'khateeb')
+                return this.$store.getters['user/allInfo'].availableTimings
             else
-                return this.khateebs.availableTimings.length < 1 ? tag : null
+                return []
+
+        },
+        availableTimingsTag() {
+            if (this.availableTimings.length < 1)
+                return [{
+                    words: 'Available for All Times',
+                    symbol: '⌚',
+                    color: 'goodNews'
+                }]
+            else
+                return null
+        },
+        availableTimingsSelection() {
+            if (this.locations.length < 1 || this.timings.length < 1)
+                return []
+            return this.locations
+                .map(location => this.createTimingSelectionOptions(location))
+                .reduce((allOptions, locationOption) => [...allOptions, ...locationOption], [])
+            
         }
     },
     created() {
-        const accountType = this.$store.getters.decodedJWT.__t
-        this.showDelete = accountType !== 'rootInstitutionAdmin' && accountType !== 'root'
-        if (this.$store.getters.decodedJWT.__t == 'khateeb') {
-            this.structure.profile = { ...this.structure.profile, ...this.khateebExtras }
+        if (this.utils.validAuthentication({ level: 1 }))
             this.getAvailableTimings()
-        }
     }
 }
 </script>

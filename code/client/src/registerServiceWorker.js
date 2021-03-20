@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
 import { register } from 'register-service-worker'
+import footerPopups from './libraries/footerPopup/main.js'
 
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {
@@ -19,8 +20,11 @@ if (process.env.NODE_ENV === 'production') {
     updatefound () {
       console.log('New content is downloading.')
     },
-    updated () {
+    updated (registration) {
       console.log('New content is available; please refresh.')
+      footerPopups.appWillUpdateMessage()
+      const threeSecondsInMilliseconds = 3_000
+      window.setTimeout(() => registration.waiting.postMessage({ action: 'skipWaiting' }) , threeSecondsInMilliseconds)
     },
     offline () {
       console.log('No internet connection found. App is running in offline mode.')
@@ -28,5 +32,13 @@ if (process.env.NODE_ENV === 'production') {
     error (error) {
       console.error('Error during service worker registration:', error)
     }
+  })
+
+  let refreshing = false
+  navigator.serviceWorker.addEventListener("controllerchange", function() {
+    if (refreshing)
+      return
+    refreshing = true
+    window.location.reload()
   })
 }

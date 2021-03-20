@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import docs from '@/components/staticHTML/docs.vue' // temp for now
+import docs from '@/staticHTMLPages/docs.vue' // temp for now
 
 export default {
     name: "cloudCLI",
@@ -43,7 +43,7 @@ export default {
             outputQueue: [],
             commandHistory: [],
             historySelector: -1,
-            name: this.$store.getters.decodedJWT.firstName,
+            name: this.$store.getters.user.allInfo.firstName,
             outputMutator: window.setInterval(() => {
                 if (this.outputQueue.length > 0) {
                     const output = this.outputQueue.shift()
@@ -198,7 +198,7 @@ export default {
     async created() {
         this.outputMutator
         window.addEventListener('keyup', this.keyBindings)
-        this.addToOutput(`Asalam Alaikoum ${this._.stringFormat(this.name)} 😀`)
+        this.addToOutput(`Asalam Alaikoum ${this.utils.stringFormat(this.name)} 😀`)
         this.addToOutput(`System is ready for commands 👍`, 'success')
         const ping = await this.$API.sysAdmin.executeCommand({ command: ["__PING__"] })
         this.addToOutput(ping[0].msg, ping[0].status, ping[0].from)

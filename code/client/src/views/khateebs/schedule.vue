@@ -1,61 +1,62 @@
 <template>
   <div>
-    <loading>
-      <logo-display
-        class="logo"
-        :logoLeft="`logo1`"
-        :logoRight="`logo2`"
-      />
-    </loading>
-      <khateeb-schedule
-        v-if="currentSchedule"
+    <logo-display
+      class="logo"
+      :logoLeft="`logo1`"
+      :logoRight="`logo2`"
+    />
+    <monthly-jummah-schedule 
+        :jummahs="jummahs"
+        :locations="locations"
+        :timings="timings"
+        :khateebs="khateebs"
         :reciever="`khateeb`"
-        :data="currentSchedule"
-      />
-      <msg-with-pic
-        v-if="!scheduleExists"
-        msg="It should be up soon insha'Allah"
-        gif="flyingPlanes"
-        title="This month's schedule hasn't been created yet"
-      />
+        @request-jummahs="requestJummahs($event)"
+    />
   </div>
 </template>
 
 <script>
 import logoDisplay from '@/components/misc/logoDisplay.vue'
-import khateebSchedule from '@/components/schedules/khateebSchedule.vue'
-import loading from '@/components/userInterface/components/loadingScreen.vue'
+import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule/main.vue'
 
 export default {
   name: 'Home',
   components: {
-    khateebSchedule,
+    monthlyJummahSchedule,
     logoDisplay,
-    loading
   },
   data() {
-    return {
-      scheduleExists: true,
-      currentSchedule: {
-                isThisADummyValue: true
-            }
-    }
+      return {
+          jummahs: [],
+          locations: [],
+          timings: [],
+          khateebs: []
+      }
   },
   methods: {
-    async getSchedule() {
-      try {
-        const monthlySchedule = await this.$API.khateeb.getCurrentSchedule()
-        if (monthlySchedule === `non-existent` || monthlySchedule.jummahs.length < 1)
-            this.scheduleExists = false
-        else 
-            this.currentSchedule = monthlySchedule
-      } catch(err) {
-        this.scheduleExists = false
+      async getScheduleBuildingBlocks() {
+          try {
+              const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
+              this.locations = locations
+              this.timings = timings
+              this.khateebs = khateebs
+          } catch(err) {
+              console.log(err)
+          }
+      },
+      async requestJummahs(jummahDateRange) {
+          try {
+              const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
+              this.jummahs = jummahs
+          } catch(err) {
+              console.log(err)
+          }
       }
-    }
+      
   },
   created() {
-    this.getSchedule()
+      this.getScheduleBuildingBlocks()
   }
 }
 </script>

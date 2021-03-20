@@ -1,16 +1,38 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import state from './state.js'
-import actions from './actions.js'
-import mutations from './mutations.js'
-import getters from './getters.js'
+import router from './modules/router.js'
+import app from './modules/app.js'
+import user from './modules/user.js'
+import notifications from './modules/notifications.js'
+import websiteBanner from './modules/websiteBanner.js'
+import admin from './modules/admin.js'
+import requests from './modules/requests.js'
+import footerPopup from './modules/footerPopup.js'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state,
-  mutations,
-  actions,
-  getters
+  state: { },
+  mutations: {
+
+  },
+  actions: {
+    storeUserPackage({ commit }, userPackage) {
+        commit('user/storeInfoFromAPI', userPackage)
+        commit('notifications/stashServerNotifications', userPackage)
+        commit('app/successfullyAssignedUserPackage')
+    }
+  },
+  getters: {},
+  modules: {
+    router,
+    app,
+    user,
+    notifications,
+    websiteBanner,
+    admin,
+    requests,
+    footerPopup
+  }
 })

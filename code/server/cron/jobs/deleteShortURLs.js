@@ -1,4 +1,4 @@
-const cronWrapper = require($DIR + '/cron/cronWrapper.js')
+const cronWrapper = require(global.$dir + '/cron/cronWrapper.js')
 
 const options = {
     job: async() => {
@@ -6,7 +6,7 @@ const options = {
             const expired = new Date()
             expired.setDate(expired.getDate() - 7)
             const anyURLsThatAreSevenDaysOrOlder = { createdAt: { $lte: expired } }
-            const dbRes = await $db.models.shortenedURLs.deleteMany(anyURLsThatAreSevenDaysOrOlder)
+            const dbRes = await $db.shortenedURLs.deleteMany(anyURLsThatAreSevenDaysOrOlder)
             console.log(`Successfully deleted expired urls. Database response ${dbRes}`)
         } catch(err) {
             console.log(`Couldn't delete expired short urls!`)

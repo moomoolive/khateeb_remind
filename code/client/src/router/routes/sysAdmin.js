@@ -9,7 +9,7 @@ export default [
                 component: () => import('@/views/sysAdmin/subroutes/cli.vue'),
                 meta: {
                     requireAuthorization: true,
-                    authLevel: 4
+                    auth: { min: 4, max: 5 }
                 }
             },
             {
@@ -17,13 +17,13 @@ export default [
                 component: () => import('@/views/sysAdmin/subroutes/roaming.vue'),
                 meta: {
                     requireAuthorization: true,
-                    authLevel: 4
+                    auth: { min: 4, max: 5 }
                 }
             }
         ],
         meta: {
             requireAuthorization: true,
-            authLevel: 4
+            auth: { min: 4, max: 5 }
         }
     }
 ]

@@ -4,8 +4,7 @@ export default [
         name: 'userHome',
         component: () => import('@/views/user/home.vue'),
         meta: {
-            requireAuthorization: true,
-            authLevel: 1
+            auth: { min: 1 }
         }
     },
 ]

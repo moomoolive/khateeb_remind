@@ -1,0 +1,58 @@
+<template>
+    <div :class="`popup-container ${backgroundColor}`">
+        <span class="close-button" @click="close()">X</span>
+        <div class="content">
+            <component 
+                :is="componentsInfo.type"
+                :componentsProps="componentsInfo.componentsProps"
+                @close="close()"
+            />
+        </div>
+    </div>
+</template>
+
+<script>
+import statusUpdate from './types/statusUpdate.vue'
+
+export default {
+    name: "footerPopup",
+    components: {
+        "statusUpdate": statusUpdate
+    },
+    data() {
+        return {
+            color: 'blue'
+        }
+    },
+    methods: {
+        close() {
+            this.$store.commit('footerPopup/close')
+        }
+    },
+    computed: {
+        componentsInfo() {
+            return this.$store.state.footerPopup.options
+        },
+        backgroundColor() {
+            return this.componentsInfo.componentsProps.color || 'blue'
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+.popup-container {
+    background: getColor("blue");
+}
+
+.close-button {
+    position: absolute;
+    font-size: 15px;
+    right: 5px;
+    top: 5px;
+}
+
+.content {
+    margin-top: 5%;
+}
+</style>
