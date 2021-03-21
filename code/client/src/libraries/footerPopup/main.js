@@ -12,6 +12,20 @@ const appWillUpdateMessage = () => {
     )
 }
 
+const youAreOffline = () => {
+    helpers.createFooterPopup(
+        'statusUpdate',
+        { 
+            gif: 'confusedDino', 
+            color: 'blue',
+            topMessage: "You're offline",
+            bottomMessage: "Some features are unavailable" ,
+            closeAfter: 4
+        }
+    )
+}
+
 export default {
-    appWillUpdateMessage
+    appWillUpdateMessage,
+    youAreOffline
 }

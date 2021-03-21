@@ -15,12 +15,16 @@ module.exports = {
     },
     pwa: {
         name: 'Khateeb Remind',
+        themeColor: "#4DBA87",
+        msTileColor: "#4DBA87",
+        appleMobileWebAppCache: "no",
+        manifestOptions: {
+            background_color: "#000000"
+        },
         workboxPluginMode: 'InjectManifest',
         workboxOptions: {
-            //skipWaiting: true,
-            //clientsClaim: true
             swSrc: 'src/service-worker.js',
-            //swDest: 'service-worker.js'
+            swDest: "service-worker.js"
         }
     }
 }

@@ -151,6 +151,10 @@ p {
     &:hover {
         background-color: lighten(themeRGBA("darkBlue", 1), 20%);
     }
+    &.profile-info {
+        background-color: getColor("silver");
+        font-size: 13px;
+    }
 }
 
 @media screen and (max-width: $phoneWidth) {
