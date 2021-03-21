@@ -1,6 +1,4 @@
-console.log('service-worker registered')
-
-workbox.core.setCacheNameDetails({prefix: "khateebRemind"});
+workbox.core.setCacheNameDetails({ prefix: "khateebRemind" });
 
 self.__precacheManifest = [].concat(self.__precacheManifest || [])
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
@@ -11,7 +9,3 @@ self.addEventListener("message", msg => {
     self.skipWaiting()
   }
 })
-
-
-
-//self.clientsClaim();

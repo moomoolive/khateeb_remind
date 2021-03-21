@@ -27,6 +27,10 @@ export default {
     methods: {
         close() {
             this.$store.commit('footerPopup/close')
+        },
+        closeAfter(seconds=4) {
+            const milliSecondsInASecond = 1_000
+            window.setTimeout(() => this.close() , seconds * milliSecondsInASecond)
         }
     },
     computed: {
@@ -35,7 +39,11 @@ export default {
         },
         backgroundColor() {
             return this.componentsInfo.componentsProps.color || 'blue'
-        }
+        },
+    },
+    created() {
+        if (this.componentsInfo.componentsProps.closeAfter)
+            this.closeAfter(this.componentsInfo.componentsProps.closeAfter)
     }
 }
 </script>

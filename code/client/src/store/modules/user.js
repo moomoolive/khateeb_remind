@@ -49,6 +49,9 @@ export default {
             const decodedPayload = window.atob(tokenPayload)
             return JSON.parse(decodedPayload)
         },
+        fullName(state, { allInfo }) {
+            return `${allInfo.firstName} ${allInfo.lastName}`
+        },
         validAuthentication(state, { isLoggedIn, allInfo: { exp: tokenExpirationInSeconds } }) {
             if (!isLoggedIn)
                 return false

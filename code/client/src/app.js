@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Main from './Main.vue'
 import router from './router'
 import store from './store'
+import './registerServiceWorker.js'
 
 import API from '@/libraries/requests/index.js'
 import funcs from '@/libraries/globalUtilities.js'

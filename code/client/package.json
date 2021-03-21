@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "pwa": "npm run build && serve dist -l 1239"
+    "pwa": "npm run build && serve dist -l 1240"
   },
   "dependencies": {
     "@ivanv/vue-collapse-transition": "^1.0.0",
