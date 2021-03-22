@@ -52,8 +52,9 @@ const institution = new mongoose.Schema({
 },
 { timestamps: true, minimize: false })
 
-institution.post('save', function(institution) {
+institution.post('save', function(institution, next) {
     console.log(`Created institution ${institution.name} with id:`, institution._id)
+    return next()
 })
 
 institution.methods.deleteDependencies = async function() {
@@ -90,6 +91,15 @@ institution.methods.createRootSystemAdmin = async function(administratorInfo) {
         const adminEntry = await new $db.root(administratorInfo).save()
         console.log(`Created root sys admin (inst:${this.name}) (id: ${adminEntry._id})`)
         return adminEntry
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+institution.methods.confirmRootAdmin = async function() {
+    try {
+        const updated = await $db.rootInstitutionAdmins.findOneAndUpdate({ institutionID: this._id.toString() }, { confirmed: true }, { new: true }).exec()
+        return updated
     } catch(err) {
         console.log(err)
     }

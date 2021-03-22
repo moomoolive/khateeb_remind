@@ -62,7 +62,6 @@ router.post(
             if (settings.autoConfirmRegistration)
                 req.body.confirmed = true
             const khateebEntry = await new $db.khateebs(req.body).save()
-            await new notificationConstructors.WelcomeNotificationConstructor(khateebEntry).create()
             const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, settings.autoConfirmRegistration)
             await note.setRecipentsToAdmins(req.body.institutionID)
             await note.create()

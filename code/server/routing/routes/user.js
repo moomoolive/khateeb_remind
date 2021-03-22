@@ -47,7 +47,7 @@ router.get('/check-in', async(req, res) => {
         const user = await $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
         userPackage.lastLogin = user.lastLogin
         userPackage.notifications = await $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        userPackage.institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
+        userPackage.institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
         return res.json(userPackage)
     } catch(err) {
         console.log(err)

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const bcyrpt = require('bcrypt')
 
+const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+
 const user = new mongoose.Schema({
     institutionID: {
         type: String,
@@ -56,7 +58,7 @@ const user = new mongoose.Schema({
 },
 { timestamps: true })
 
-user.pre('save', function (next) {
+user.pre('save', function(next) {
     const user = this
     if (!this.isModified('password'))
         return next()
@@ -72,6 +74,15 @@ user.pre('save', function (next) {
             next()
         })
     })
+})
+
+user.post('save', async function(user, next) {
+    try {
+        await new notificationConstructors.WelcomeNotificationConstructor(user).create()
+        return next()
+    } catch(err) {
+        console.log(err)
+    }
 })
 
 user.pre('updateOne', function (next) {

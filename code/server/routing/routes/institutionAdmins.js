@@ -40,7 +40,6 @@ router.post("/",
         try {
             req.body.confirmed = true
             const newInstitutionAdmin = await new $db.institutionAdmins(req.body).save()
-            await new notificationConstructors.WelcomeNotificationConstructor(newInstitutionAdmin).create()
             return res.json(newInstitutionAdmin)
         } catch(err) {
             console.log(err)

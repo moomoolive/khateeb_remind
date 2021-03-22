@@ -12,7 +12,7 @@ class cliCommand {
         this.effectResponses = []
     }
 
-    get commandName() {
+    get name() {
         return `${this.rawInput[0]} ${this.rawInput[1]}`
     }
 
@@ -29,7 +29,7 @@ class cliCommand {
     }
 
     defaultOptions() {
-        throw TypeError(`This is a virtual class, set default options in a child class`)
+        return []
     }
 
     async execute() {
@@ -40,11 +40,10 @@ class cliCommand {
             const input = proccessedInput[i]
             try {
                 const optionRes = await this.indexPossibleOptions(input)
-                if (!optionRes) {
+                if (!optionRes)
                     this.effectResponses.push(cliHelpers.createResponse(`Unknown option "${input}". Please choose from the following options: ${this.allPossibleOptions}`, "extraInfo"))
-                    continue
-                }
-                this.addResponseToResponseList(optionRes)
+                else
+                    this.addResponseToResponseList(optionRes)
             } catch(err) {
                 console.log(err)
                 const errMsg = cliHelpers.createResponse(`An error occurred when executing option "${input}" for command. Error trace: ${err}`)
@@ -57,19 +56,14 @@ class cliCommand {
     }
 
     addResponseToResponseList(res={}) {
-        const resFunc = ({ msg, status }) => { this.effectResponses.push(cliHelpers.createResponse(msg, status || 'success')) }
         if (Array.isArray(res))
-            res.forEach(r => resFunc(r) )
+            this.effectResponses = [...this.effectResponses, ...res]
         else
-            resFunc(res)
-    }
-
-    unknownOption() {
-        return null
+            this.effectResponses.push(res)
     }
 
     indexPossibleOptions(input='option') {
-        throw TypeError(`This is a virtual class, set options in child class`)
+        return cliHelpers.createResponse(`this virtual class cannot take ${input} as an argument`, 'extraInfo')
     }
 }
 
