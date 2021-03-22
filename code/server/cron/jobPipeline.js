@@ -7,9 +7,9 @@ const deleteExpiredShortURLs = require('./jobs/deleteShortURLs.js')
 const start = () => {
     if (process.env.NODE_ENV !== 'production')
         return
+    jummahNotifications.start()
     createTestInstitution.start()
     createRootUserScript.start()
-    jummahNotifications().start()
     deleteVerificationCodes.start()
     deleteExpiredShortURLs.start()
     console.log(`All cron jobs have been scheduled`)

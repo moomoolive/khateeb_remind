@@ -52,4 +52,11 @@ timing.methods.deleteDependants = async function() {
     return res
 }
 
+timing.query.activeTimings = function(institutionID='none') {
+    institutionID = institutionID.toString()
+    if (!institutionID || institutionID.toLowerCase() === 'none')
+        throw TypeError(`please provide a valid institution id`)
+    return this.where({ active: true, institutionID })
+}
+
 module.exports = timing

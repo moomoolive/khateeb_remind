@@ -33,6 +33,7 @@ const sendNotificationToTargetPreference = async (targetPreference={}) => {
         const meta = await targetPreference.gatherMeta()
         const constructorRes = await new notificationConstructors.JummahReminderNotificationConstructor(khateeb, targetPreference, meta).create()
         targetPreference.notificationID = constructorRes[0]._id.toString()
+        console.log('after update', targetPreference)
         return targetPreference
     } catch(err) {
         console.log(err)
@@ -46,17 +47,25 @@ const runNotificationLoop = async (targetPreference={}, otherPreference={}) => {
     } catch(err) {
         console.log(err)
     }
-    try {
-        if (otherPreference._id && otherPreference._id.toLowerCase() !== 'none')
+    if (otherPreference._id && otherPreference._id.toLowerCase() !== 'none') {
+        try {
             otherPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: otherPreference._id }, { isGivingKhutbah: false }, { new: true })
-    } catch(err) {
-        console.log(err)
+        } catch(err) {
+            console.log(err)
+        }
     }
     return { targetPreference, otherPreference }
+}
+
+const chronNotificationLoop = async (targetPreference={}, institution={}, timing={}) => {
+    const res = await runNotificationLoop(targetPreference)
+    console.log(`send notification for institution ${institution.name} (id: ${institution._id}), timing: ${timing._id}`)
+    return res
 }
 
 module.exports = {
     oneMonthInThePast,
     twoMonthsAhead,
-    runNotificationLoop
+    runNotificationLoop,
+    chronNotificationLoop
 }

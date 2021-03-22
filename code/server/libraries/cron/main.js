@@ -5,13 +5,14 @@ const defaultTime = (secondsAfterNow) => {
     return date
 }
 
-const wrapper = (options={}) => {
+const cronWrapper = (options={}) => {
     const cronOptions = {
         cronTime: options.time || defaultTime(3),
         onTick: options.job || defaultOnTick,
-        syncWithTimezone: options.syncWithTimezone || false
+        syncWithTimezone: options.syncWithTimezone || false,
+        timeZone: options.timeZone || null
     }
-    if (cronOptions.syncWithTimezone) {
+    if (cronOptions.syncWithTimezone && !cronOptions.timeZone) {
         if (cronOptions.cronTime instanceof Date || typeof cronOptions.cronTime !== 'string')
             throw TypeError(`You must provide a valid cron.js timing string to use 'on schedule' option`)
         cronOptions.timeZone = global.APP_CONFIG.cron.timezone
@@ -20,4 +21,6 @@ const wrapper = (options={}) => {
     return new cronJob(cronOptions)
 }
 
-module.exports = wrapper
+module.exports = { 
+    cronWrapper
+}
