@@ -5,6 +5,9 @@
                 Source Code
             </a>
         </div>
+        <div class="institution-name">
+            {{ $store.getters['user/authLevel'] > 3 ? $store.state.user.institution.name : $store.state.user.institution.abbreviatedName }}
+        </div>
     </div>
 </template>
 
@@ -39,5 +42,15 @@ a {
     &:hover {
         color: getColor("blue")
     } 
+}
+
+.institution-name {
+    text-align: right;
+    float: right;
+    position: relative;
+    bottom: 30px;
+    font-size: 11px;
+    right: 5px;
+    color: getColor("blue")
 }
 </style>

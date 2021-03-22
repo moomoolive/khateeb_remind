@@ -27,8 +27,8 @@ router.post(
     ), 
     async (req, res) => {
     try {
-        if (req.body.institution.name === '__TEST__')
-            return res.json({ msg: `You cannot name your institution __TEST__. Pick another name please.`, status: "reserved" })
+        if (req.body.institution.name === '__TEST__' || req.body.institution.name === '__ROOT__')
+            return res.json({ msg: `You cannot name your institution __TEST__ or __ROOT__. Pick another name please.`, status: "reserved" })
         const institutionEntry = await new $db.institutions(req.body.institution).save()
         const rootInstitutionAdminEntry = await institutionEntry.createRootAdministrator(req.body.institutionAdmin)
         return res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
@@ -102,6 +102,40 @@ router.post(
         }
 })
 
+router.post(
+    'forgot/username',
+    validationMiddleware.validateRequest(
+        [
+            validator.body("phoneNumber").isLength({ min: 1 }),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            return res.json('hi')
+        } catch(err) {
+            console.log(err)
+            return res.json({msg: `Couldn't send verification method`, status: "error"})
+        }
+    }
+)
+
+router.post(
+    'forgot/password',
+    validationMiddleware.validateRequest(
+        [
+            validator.body("username").isLength({ min: 1 }),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            return res.json('hi')
+        } catch(err) {
+            console.log(err)
+            return res.json({msg: `Couldn't send verification method`, status: "error"})
+        }
+    }
+)
+
 // needs work
 router.post(
     '/forgot/:type', 
@@ -172,7 +206,6 @@ router.post(
             res.json({ msg: `Couldn't verify code`, status: "error" })
         }
 })
-
 // NEEDS WORK Ends here
 
 module.exports = router

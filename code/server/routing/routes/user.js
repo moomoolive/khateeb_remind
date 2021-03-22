@@ -47,8 +47,6 @@ router.get('/check-in', async(req, res) => {
         const user = await $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
         userPackage.lastLogin = user.lastLogin
         userPackage.notifications = await $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        if (req.headers.authLevel > 3)
-            return res.json(userPackage)
         userPackage.institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v"]).exec()
         return res.json(userPackage)
     } catch(err) {

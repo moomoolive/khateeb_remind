@@ -37,9 +37,24 @@ const institution = new mongoose.Schema({
         type: String,
         required: false,
         minlength: 1
+    },
+    settings: {
+        textAPIInfo: {
+            type: Object,
+            required: false
+        },
+        autoConfirmRegistration: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
     }
 },
-{ timestamps: true })
+{ timestamps: true, minimize: false })
+
+institution.post('save', function(institution) {
+    console.log(`Created institution ${institution.name} with id:`, institution._id)
+})
 
 institution.methods.deleteDependencies = async function() {
     const deleteRes = {}
@@ -61,6 +76,19 @@ institution.methods.createRootAdministrator = async function(administratorInfo) 
     administratorInfo.institutionID = this._id.toString()
     try {
         const adminEntry = await new $db.rootInstitutionAdmins(administratorInfo).save()
+        console.log(`Created root institution admin for inst:${this.name} (id: ${adminEntry._id})`)
+        return adminEntry
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+institution.methods.createRootSystemAdmin = async function(administratorInfo) {
+    try {
+        if (this.name !== '__ROOT__')
+            throw TypeError(`Cannot create root system admin`)
+        const adminEntry = await new $db.root(administratorInfo).save()
+        console.log(`Created root sys admin (inst:${this.name}) (id: ${adminEntry._id})`)
         return adminEntry
     } catch(err) {
         console.log(err)

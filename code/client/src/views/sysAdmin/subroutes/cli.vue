@@ -43,7 +43,6 @@ export default {
             outputQueue: [],
             commandHistory: [],
             historySelector: -1,
-            name: this.$store.getters.user.allInfo.firstName,
             outputMutator: window.setInterval(() => {
                 if (this.outputQueue.length > 0) {
                     const output = this.outputQueue.shift()
@@ -141,20 +140,20 @@ export default {
                 case "bye":
                 case "exit":
                     this.exit()
-                    return { msg: `cya later ${this.name} 👋`, status: 'okay' }
+                    return { msg: `cya later ${this.userInfo.firstName} 👋`, status: 'okay' }
                 case "docs":
                 case '-d':
                     this.showDocs = !this.showDocs
                     break
                 default:
-                    return { msg: 'Command Not Found', status: 'fail' }
+                    return { msg: 'Command not found', status: 'fail' }
             }
         },
         async cli(command) {
             let cmd = this.preprocessCommand(command)
             if (cmd.length === 1) {
                 const res = await this.cloudCommands(cmd[0])
-                return [res]
+                return [{ ...res, from: 's' }]
             }
             try {
                 const res = await this.$API.sysAdmin.executeCommand({ command: cmd })
@@ -183,10 +182,8 @@ export default {
             else {
                 try {
                     const cliResponse = await this.cli(this.input)
-                    cliResponse.forEach(res => {
-                        if (res)
-                            this.addToOutput(res.msg, res.status, res.from ? res.from : 's') 
-                    })
+                    if (cliResponse)
+                        cliResponse.forEach(({ msg, status, from='a' }) => { this.addToOutput(msg, status, from) })
                 } catch(err) {
                     console.log(err)
                     this.addToOutput(`A problem occurred when executing command. Err: ${err}`, 'fail')
@@ -195,10 +192,15 @@ export default {
             this.input = ''
         }
     },
+    computed: {
+        userInfo() {
+            return this.$store.getters['user/allInfo']
+        }
+    },
     async created() {
         this.outputMutator
         window.addEventListener('keyup', this.keyBindings)
-        this.addToOutput(`Asalam Alaikoum ${this.utils.stringFormat(this.name)} 😀`)
+        this.addToOutput(`Asalam Alaikoum ${this.utils.stringFormat(this.userInfo.firstName)} 😀`)
         this.addToOutput(`System is ready for commands 👍`, 'success')
         const ping = await this.$API.sysAdmin.executeCommand({ command: ["__PING__"] })
         this.addToOutput(ping[0].msg, ping[0].status, ping[0].from)
