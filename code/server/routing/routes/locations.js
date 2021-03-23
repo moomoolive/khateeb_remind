@@ -34,7 +34,7 @@ router.post(
     async (req, res) => {
         try {
             const newLocation = await $db.locations(req.body).save()
-            const newTiming = await newLocation.createAssociatedTiming()
+            const newTiming = await newLocation.findTimings()
             return res.json({ location: newLocation, timing: newTiming })
         } catch(err) {
             console.log(err)

@@ -62,4 +62,12 @@ location.methods.createAssociatedTiming = async function() {
     }
 }
 
+location.post('save', async function(newLocation={}) {
+    try {
+        await newLocation.createAssociatedTiming()
+    } catch(err) {
+        console.log(err)
+    }
+})
+
 module.exports = location

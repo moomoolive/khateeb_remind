@@ -3,6 +3,7 @@ const validator = require('express-validator')
 
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
 
 const router = express.Router()
 
@@ -24,9 +25,10 @@ router.get(
 router.post(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
+    postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
-        validator.body("institutionID").isLength(24),
-        validator.body("locationID").isLength(24),
+        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength),
+        validator.body("locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength),
         validator.body("hour").isInt({ min: 0, max: 23 }),
         validator.body("minute").isLength({ min: 0, max: 59 })
     ]),
@@ -45,7 +47,7 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(24),
+        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength),
         validator.body("hour").isInt({ min: 0, max: 23 }).optional(),
         validator.body("minute").isLength({ min: 0, max: 59 }).optional()
     ]),
@@ -65,7 +67,7 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(24)
+        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength)
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "timings"),
     async (req, res) => {

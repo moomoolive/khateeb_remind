@@ -52,9 +52,19 @@ const institution = new mongoose.Schema({
 },
 { timestamps: true, minimize: false })
 
-institution.post('save', function(institution, next) {
+institution.post('save', async function(institution) {
     console.log(`Created institution ${institution.name} with id:`, institution._id)
-    return next()
+    if (institution.name === '__ROOT__')
+        return
+    try {
+        await new $db.locations({
+            institutionID: institution._id.toString(),
+            name: "Unknown location 1",
+            address: "Unknown address 1"
+        })
+    } catch(err) {
+        console.log(err)
+    }
 })
 
 institution.methods.deleteDependencies = async function() {
@@ -109,5 +119,9 @@ institution.methods.getLocalTime = function (date=new Date()) {
     const timeNow = dayjs(date).tz(this.timezone)
     return new Date(timeNow.toISOString())
 }
+
+institution.post('deleteOne', async function() {
+    console.log('hi')
+})
 
 module.exports = institution

@@ -25,7 +25,7 @@ export default {
             return this.$store.state.user.institution
         },
         institutionName() {
-            return this.authLevel > 3 ?  this.institution.name : this.institution.abbreviatedName
+            return this.authLevel > 3 || this.institution.name === '__TEST__' ?  this.institution.name : this.institution.abbreviatedName
         },
     }
 }

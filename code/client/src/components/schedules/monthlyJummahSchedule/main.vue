@@ -15,12 +15,13 @@
             />
         </general-popup-container>
         <div class="schedule-container">
-            <loading :loadingTime="800">   
+            <loading :loadingTime="800">
+
+                <div class="above-controls-container">
+                    <slot name="above-controls"></slot>
+                </div>
+                   
                 <div v-if="locations.length > 0">
-                    
-                    <div class="above-controls-container">
-                        <slot name="above-controls"></slot>
-                    </div>
                     
                     <schedule-standard-controls 
                         :locations="locationsWithDataThisMonth"
@@ -55,8 +56,11 @@
                     <div v-else>
                         <msg-with-pic
                             class="empty-notifications-msg" 
-                            :gif="`sadCat`"
-                            :msg="`There was a problem retrieving the schedule`"
+                            :gif="`flyingPlanesAllOver`"
+                            :msg=" reciever === 'institutionAdmin' ?
+                                `Please create you first location to get started` :
+                                `Schedule hasn't been created yet`
+                            "
                             :textColor="`white`"
                         />
                     </div>
