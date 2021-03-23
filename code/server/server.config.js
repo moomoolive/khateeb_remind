@@ -9,6 +9,12 @@ const appConfig = {
         firstName: "Mostafa",
         lastName: "Elbannan"
     },
+    rootInstitution: {
+        settingsInitial: {
+            textAPIInfo: { textAllowed: false },
+            autoConfirmRegistration: false
+        }
+    },
     testInstitutionInitialization: {
         institution: {
             timezone: "America/Edmonton",

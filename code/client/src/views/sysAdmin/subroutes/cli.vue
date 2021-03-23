@@ -155,8 +155,8 @@ export default {
                     return { msg: 'Command not found', status: 'fail' }
             }
         },
-        async cli(command) {
-            let cmd = this.preprocessCommand(command)
+        async cli(preProccessedCommand="hello world") {
+            let cmd = this.preprocessCommand(preProccessedCommand)
             if (cmd.length === 1) {
                 let res = this.cloudCommands(cmd[0])
                 if (res === 'ping')
@@ -164,11 +164,30 @@ export default {
                 return [{ ...res, from: res.from || 's' }]
             }
             try {
-                const res = await this.$API.sysAdmin.executeCommand({ command: cmd })
+                const { query, command } = this.preprocessCommandForServer(cmd)
+                const res = await this.$API.sysAdmin.executeCommand({ command }, query)
                 return res
             } catch(err) {
                 console.log(err)
             return [{ msg: `A problem was encounter when executing command. Err: ${err}`, status: 'fail' }]
+            }
+        },
+        preprocessCommandForServer(command=[]) {
+            const queryStartIndex = command.findIndex(cmd => {
+                const casted = cmd.toLowerCase()
+                return casted === 'query:' || casted === 'values:' 
+            })
+            if (queryStartIndex === -1)
+                return { command }
+            const queryEndIndex = command.findIndex(cmd => cmd.toLowerCase() === '$end')
+            return this.concatenateQuery(command, queryStartIndex, queryEndIndex)
+        },
+        concatenateQuery(command=[], queryStart=0, queryEnd=-1) {
+            const endIndex = queryEnd === -1 ? command.length : queryEnd
+            const queryParts = command.slice(queryStart + 1, endIndex)
+            return { 
+                query: queryParts.reduce((total, qp) => `${total}&${qp}`),
+                command: command.filter((cmd, index) => index < queryStart || index > endIndex ) 
             }
         },
         preprocessCommand(command) {

@@ -3,6 +3,8 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const path = require('path')
+const queryType = require('query-types')
+const qs = require('qs')
 
 // set enviromental variable from a .env file at project root
 // look at the README for required enviromental factors
@@ -23,13 +25,12 @@ mongoose.connect(DATABASE, dbSettings)
 const db = mongoose.connection
 
 const globalMiddleWare = require('./middleware/globalMiddleware/main.js')
-const queryBoolParser = require('express-query-boolean')
 
 app.use(cors())
 app.use(express.json())
 app.use(globalMiddleWare.generalError)
-app.set('query parser', 'extended')
-app.use(queryBoolParser())
+app.set('query parser', str => qs.parse(str, { comma: true }))
+app.use(queryType.middleware())
 
 app.options('*', cors())
 app.post('*', globalMiddleWare.noEmptyBody)

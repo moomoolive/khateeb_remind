@@ -11,7 +11,7 @@ const options = {
                     confirmed: true,
                     country: 'none',
                     settings: {
-                        textAPIInfo: {}
+                        ...global.APP_CONFIG.rootInstitution.settingsInitial
                     }
                 }).save()
             else

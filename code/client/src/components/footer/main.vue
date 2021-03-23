@@ -5,8 +5,8 @@
                 Source Code
             </a>
         </div>
-        <div class="institution-name">
-            {{ $store.getters['user/authLevel'] > 3 ? $store.state.user.institution.name : $store.state.user.institution.abbreviatedName }}
+        <div v-if="showInstitutionName" class="institution-name">
+            {{ institutionName }}
         </div>
     </div>
 </template>
@@ -14,6 +14,20 @@
 <script>
 export default {
     name: 'Footer',
+    computed: {
+        authLevel() {
+            return this.$store.getters['user/authLevel'] 
+        },
+        showInstitutionName() {
+            return this.authLevel > 0 && this.$store.getters['user/isLoggedIn'] 
+        },
+        institution() {
+            return this.$store.state.user.institution
+        },
+        institutionName() {
+            return this.authLevel > 3 ?  this.institution.name : this.institution.abbreviatedName
+        },
+    }
 }
 </script>
 

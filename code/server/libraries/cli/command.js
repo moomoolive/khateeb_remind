@@ -1,7 +1,7 @@
 const cliHelpers = require(global.$dir + '/libraries/cli/main.js')
 
 class cliCommand {
-    constructor(input=[], userIdentity={}, optionsList=[]) {
+    constructor(input=[], userIdentity={}, userQuery={}, optionsList=[], requiredAuthLevel=4) {
         if (!Array.isArray(input))
             throw TypeError(`cli command input must be an array`)
         else if (Object.keys(userIdentity).length < 1)
@@ -9,6 +9,8 @@ class cliCommand {
         this.rawInput = input
         this.userIdentity = userIdentity
         this.optionsList = optionsList
+        this.requiredAuthLevel = requiredAuthLevel
+        this.userQuery = userQuery
         this.effectResponses = []
     }
 
@@ -24,6 +26,10 @@ class cliCommand {
         return this.optionsList.reduce((total, option) => `${total}, ${option}`)
     }
 
+    isAllowedToExecuteCommand() {
+        return this.userIdentity.authLevel >= this.requiredAuthLevel
+    }
+
     preprocessInput() {
         return this.options
     }
@@ -33,6 +39,13 @@ class cliCommand {
     }
 
     async execute() {
+        if (!this.isAllowedToExecuteCommand())
+            return cliHelpers.createSingleResponseMsg(`You aren't authorized to execute this command`, 'fail')
+        const commandRes = await this.executeCommand()
+        return commandRes
+    }
+
+    async executeCommand() {
         let proccessedInput = this.preprocessInput()
         if (proccessedInput.length < 1)
             proccessedInput = this.defaultOptions()

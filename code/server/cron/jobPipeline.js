@@ -8,8 +8,7 @@ const start = () => {
     if (process.env.NODE_ENV !== 'production')
         return
     createTestInstitution.start()
-    createRootInstitutionAndUser.start()
-    createTestInstitution.start()
+    createRootInstitutionAndUser.start()    
     jummahNotifications.start()
     deleteVerificationCodes.start()
     deleteExpiredShortURLs.start()

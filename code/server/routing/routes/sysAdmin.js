@@ -15,14 +15,13 @@ router.post(
     '/cli',
     validationMiddleware.validateRequest([ validator.body("command").isArray({ min: 1 })]),
     async (req, res) => {
-        console.log(req.body)
         const commandCategory = req.body.command[0]
         const specificCommand = req.body.command[1]
         const errOrException = cliResponseTemplates.exceptionAndNonExistentCommandHandling(commandCategory, specificCommand)
         if (errOrException)
             return res.json(errOrException)
         try {
-            const commandRes = await new cliCommandIndex[commandCategory][specificCommand](req.body.command, req.headers).execute()
+            const commandRes = await new cliCommandIndex[commandCategory][specificCommand](req.body.command, req.headers, req.query).execute()
             return res.json(commandRes)
         } catch(err) {
             console.log(err)
