@@ -33,7 +33,7 @@ export default {
                 const { msg, status } = await this.$API.auth.forgotUsername(phoneNumber)
                 this.utils.alert(msg, status === 'error' ? 'caution' : 'success')
                 if (status !== "error")
-                    console.log('hi')
+                    this.$router.push('/')
             } catch(err) {
                 console.log(err)
             }

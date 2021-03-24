@@ -30,5 +30,11 @@ export default [
         name: "forgotUsername",
         component: () => import('@/views/auth/forgotUsername.vue'),
         ...commonMeta
+    },
+    {
+        path: "/forgot/password",
+        name: "forgotPassword",
+        component: () => import('@/views/auth/forgotPassword.vue'),
+        ...commonMeta
     }
 ]

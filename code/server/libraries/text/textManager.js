@@ -63,22 +63,29 @@ class textManager {
         this.textAllowed = value
     }
 
-    useVendorService(serviceName='message') {
-        if (this.textVendorConnection && this.textAllowed)
-            return this[serviceName + 'VendorService']
+    isVendorServiceUsable() {
+        return this.textVendorConnection && this.textAllowed
     }
 
     //only supports messaging to american and canada
-    messageVendorService(toBeTextPhoneNumber=100_000_0000, body="hello from khateeb remind", obj=this) {
-        return obj.textVendorConnection.messages.create({
+    messageVendorService(toBeTextPhoneNumber=100_000_0000, body="hello from khateeb remind") {
+        return this.textVendorConnection.messages.create({
             body: `${body}\n\n🤖 From Khateeb Remind Bot`,
             to: `+1${toBeTextPhoneNumber}`,
-            from: `+${obj.phoneNumber}`
+            from: `+${this.phoneNumber}`
         })
     }
 
-    sendText(toBeTextPhoneNumber=100_000_0000, body="hello from khateeb remind") {
-        return this.useVendorService('message')(toBeTextPhoneNumber, body, this)
+    async sendText(toBeTextPhoneNumber=100_000_0000, body="hello from khateeb remind") {
+        try {
+            if (!this.isVendorServiceUsable())
+                throw TypeError(`Vendor services are not active right now`)
+            const vendorRes = await this.messageVendorService(toBeTextPhoneNumber, body)
+            return vendorRes
+        } catch(err) {
+            console.log(err)
+            return { msg: `There was an error that occured when sending your text` }
+        }
     }
 
 }

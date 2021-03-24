@@ -101,31 +101,33 @@ router.post(
         }
 })
 
+// only supporting canada and US right now
 router.post(
-    'forgot/password',
-    validationMiddleware.validateRequest(
-        [
-            validator.body("username").isLength({ min: 1 }),
-        ]
-    ),
+    '/forgot/password',
+    validationMiddleware.validateRequest([validator.body("username").isLength({ min: 1 })]),
     async (req, res) => {
         try {
-            return res.json('hi')
+            if (!global.textManager.isTextServiceOnline())
+                return res.json({ msg: `Account recovery is under maintenance right now! Try again later.`, status: "error" })
+            const account = await $db.users.findOne(req.body).exec()
+            if (account) {
+                const verificationCode = await new $db.verificationCodes({ username: account.username }).save()
+                await global.textManager.sendText(
+                    account.phoneNumber,
+                    `You're recieveing this message because you requested a password recovery code.\n\nThis code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
+                )
+            }
+            return res.json({ msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username}'s associated phone number will be recieving a text with a verification code in the next few minutes insha'Allah`, status: 'okay' })
         } catch(err) {
             console.log(err)
-            return res.json({msg: `Couldn't send verification method`, status: "error"})
+            return res.json({msg: `Something went wrong when sending verification code`, status: "error"})
         }
     }
 )
 
-// only supporting canada and US right now
 router.post(
     '/forgot/username',
-    validationMiddleware.validateRequest(
-        [
-            validator.body("phoneNumber").isNumeric(),
-        ]
-    ),
+    validationMiddleware.validateRequest([validator.body("phoneNumber").isNumeric()]),
     async (req, res) => {
         try {
             if (!global.textManager.isTextServiceOnline())
@@ -148,76 +150,26 @@ router.post(
     }
 )
 
-/*
-router.post(
-    '/forgot/:type', 
-    validationMiddleware.validateRequest(
-        [
-            validator.body("data").isLength({ min: 1 }),
-        ]
-    ),
-    async (req, res) => {
-        try {
-            if (req.params.type !== 'username' && req.params.type !== 'password')
-                return res.json(`Invalid Recovery Option`)
-            let khateebRemindTextInfo = await $db.settings.findOne({ institutionID: "__ROOT__" }).exec()
-            if (!khateebRemindTextInfo.textAllowed)
-                return res.json({ msg:`Account recovery service is offline right now`, status: 'error' })
-            khateebRemindTextInfo = khateebRemindTextInfo.decrypt()
-            const twilio = require('twilio')(khateebRemindTextInfo.twilioUser, khateebRemindTextInfo.twilioKey)
-            let apiMsg
-            let textMsg
-            let to
-            if (req.params.type === 'username') {
-                to = `+1${req.body.data}`
-                const results = await $db.users.find({ phoneNumber: req.body.data }).exec()
-                textMsg = 'Accounts under this phone number:\n'
-                results.forEach(account => { textMsg += `\n- ${account.username}` })
-                apiMsg = `Your username(s) were sent to your recovery phone via text!`
-            }
-            else if (req.params.type === 'password') {
-                const account = await $db.users.findOne({ username: req.body.data }).exec()
-                if (!account)
-                    return res.json({ msg: `That account doesn't exist`, status: "error" }) // security risk??
-                to = `+1${account.phoneNumber}`
-                const verificationCode = await new $db.verificationCodes({ userID: account._id.toString() }).save()
-                textMsg = `You requested a password recovery code from Khateeb Remind. This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
-                apiMsg = { msg: `A verification code was sent to your phone via text!`, status: "code", userID: account._id.toString()}
-            }
-            textMsg += `\n\nYou recieved this message because you requested help recovering your ${req.params.type}.\n\n🤖 Sent from Khateeb Remind Bot`
-            await twilio.messages.create({
-                to,
-                from: khateebRemindTextInfo.twilioPhoneNumber,
-                body: textMsg 
-            })
-            res.json(apiMsg)
-        } catch(err) {
-            console.log(err)
-            res.json({msg: `Couldn't send verification method`, status: "error"})
-        }
-})
-
-router.post(
+router.put(
     '/verification-code', 
     validationMiddleware.validateRequest(
         [
             validator.body("code").isLength({ min: 1 }),
-            validator.body("userID").isLength(20),
-            validator.body("password").isLength({ min: 6 }),
+            validator.body("username").isLength({ min: 1 }),
+            validator.body("newPassword").isLength({ min: 6 })
         ]
     ),
     async (req, res) => {
         try {
             const verificationCode = await $db.verificationCodes.findOne({ code: req.body.code }).exec()
-            if (!verificationCode || verificationCode.userID !== req.body.userID)
+            if (!verificationCode || verificationCode.username !== req.body.username)
                 return res.json({ msg: "Incorrect code", status: "error" })
-            const updated = await $db.users.updateOne({ _id: req.body.userID }, { password: req.body.password })
-            res.json({ msg: "Password successfully updated", status: "success" })
+            await $db.users.updateOne({ username: req.body.username }, { password: req.body.newPassword })
+            return res.json({ msg: "Password successfully updated", status: "success" })
         } catch(err) {
             console.log(err)
             res.json({ msg: `Couldn't verify code`, status: "error" })
         }
 })
-*/
 
 module.exports = router

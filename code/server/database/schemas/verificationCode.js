@@ -9,9 +9,10 @@ const verificationCode = new mongoose.Schema({
         minlength: 11,
         maxlength: 11
     },
-    userID: {
+    username: {
         type: String,
-        required: true
+        required: true,
+        minlength: 6
     }
 }, { timestamps: true })
 
