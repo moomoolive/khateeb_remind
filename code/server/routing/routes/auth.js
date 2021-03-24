@@ -114,7 +114,7 @@ router.post(
                 const verificationCode = await new $db.verificationCodes({ username: account.username }).save()
                 await global.textManager.sendText(
                     account.phoneNumber,
-                    `You're recieveing this message because you requested a password recovery code.\n\nThis code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
+                    `You're recieving this message because you requested a password recovery code.\n\nThis code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
                 )
             }
             return res.json({ msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username}'s associated phone number will be recieving a text with a verification code in the next few minutes insha'Allah`, status: 'okay' })

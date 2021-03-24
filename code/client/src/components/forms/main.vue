@@ -102,7 +102,7 @@ import equal from 'fast-deep-equal'
 
 import defaultExtension from './extensions/free/defaultExt.vue'
 import extsList from './extsList.json'
-import validators from './validators.js'
+import validators from '@/libraries/formValidation/main.js'
 
 export default {
     name: "formMain",

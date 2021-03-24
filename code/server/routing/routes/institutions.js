@@ -31,6 +31,7 @@ router.put(
         validator.body("timezone").isLength({ min: 1 }).optional(),
         validator.body("country").isLength({ min: 1 }).optional(),
         validator.body("state").isLength({ min: 1 }).optional(),
+        validator.body("settings").optional()
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "institutions"),
     async (req, res) => {

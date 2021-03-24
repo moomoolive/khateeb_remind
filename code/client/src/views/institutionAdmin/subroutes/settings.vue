@@ -23,14 +23,14 @@
         <collapsable-box
             class="setting-container"
             :headline="`Registration Settings`"
-            :tagDetails="settings ? [{
-                words: settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
+            :tagDetails="institution && institution.settings ? [{
+                words: institution.settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
                 color: 'default',
-                symbol: settings.autoConfirmRegistration ? `🤖` : `📜`
+                symbol: institution.settings.autoConfirmRegistration ? `🤖` : `📜`
             }] : null"
         >
             <form-main
-                v-if="settings" 
+                v-if="institution && institution.settings" 
                 :structure="{
                     autoConfirmRegistration: {
                         type: 'checkbox',
@@ -38,8 +38,8 @@
                     }
                 }"
                 :backgroundColor="`none`"
-                :basedOn="settings"
-                @submitted="saveSettings($event)"
+                :basedOn="institution.settings"
+                @submitted="saveInstitutionDetails({ _id: institution._id, settings: $event })"
             />
         </collapsable-box>
         <collapsable-box
@@ -71,35 +71,20 @@ export default {
     data() {
         return {
             institution: null,
-            settings: null,
             showSettings: true
         }
     },
     methods: {
         async getSettingsAndInstitutionInfo() {
             try {
-                const [settings, institution] = await Promise.all([
-                    this.$API.settings.getSettings(),
-                    this.$API.institutions.getInstitution()
-                ])
-                this.settings = settings
-                this.institution = institution
+                this.institution = await this.$API.institutions.getInstitution()
             } catch(err) {
                 console.log(err)
             }
         },
-        async saveSettings($event) {
+        async saveInstitutionDetails(newChanges={}) {
             try {
-                const updatedSettings = await this.$API.settings.updateSettings($event)
-                this.settings = updatedSettings || this.settings
-                this.rerenderSettings()
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        async saveInstitutionDetails($event) {
-            try {
-                const updatedInstitution = await this.$API.institutions.updateInstitution($event)
+                const updatedInstitution = await this.$API.institutions.updateInstitution(newChanges)
                 this.institution = updatedInstitution || this.institution
                 this.rerenderSettings()
             } catch(err) {
