@@ -7,6 +7,8 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(objectSupport)
 
+const scripts = require(global.$dir + '/libraries/scripts/main.js')
+
 const institution = new mongoose.Schema({
     name: {
         type: String,
@@ -120,8 +122,11 @@ institution.methods.getLocalTime = function (date=new Date()) {
     return new Date(timeNow.toISOString())
 }
 
-institution.post('deleteOne', async function() {
-    console.log('hi')
+institution.post('deleteOne', async function(institution) {
+    if (institution.name === '__ROOT__')
+        await scripts.createRootInstitutionAndUser()
+    else if (institution.name === '__TEST__')
+        await scripts.createTestInstitution()
 })
 
 module.exports = institution

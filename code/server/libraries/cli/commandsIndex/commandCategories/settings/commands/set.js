@@ -22,7 +22,7 @@ class set extends cliCommand {
             case this.optionsList[0]:
                 return this.overwriteSettingsWithInitialValues(input)
             case this.optionsList[1]:
-                return cliHelpers.createResponse('Not defined yet', "extraInfo")
+                return this.listOptions()
             case this.optionsList[2]:
                 return this.setIndividualSettings(input)
         }
@@ -42,21 +42,50 @@ class set extends cliCommand {
         }
     }
 
+    filteredTextSettings(settingsUpdate={}) {
+        const textSettings = settingsUpdate.textAPIInfo
+        if (!textSettings)
+            return settingsUpdate
+        const filteredTextSettings = {}
+        const allTextFields = global.textManager.allFields
+        allTextFields.forEach(f => {
+            if (textSettings[f] !== undefined)
+                filteredTextSettings[f] = textSettings[f]
+        })
+        return filteredTextSettings
+    }
+
     async setIndividualSettings({ values }) {
         try {
             const institution = await $db.institutions.findOne({ name: "__ROOT__" }).select(['settings']).exec()
-            const settings = { ...institution.settings, ...values }
+            const filteredValues = this.filteredTextSettings(values)
+            const settings = { 
+                ...institution.settings, 
+                textAPIInfo: { ...institution.settings.textAPIInfo, ...filteredValues} 
+            }
             const updated = await $db.institutions.findOneAndUpdate({ _id: institution._id.toString() }, { settings }, { new: true }).exec()
-            const updatedSettingsFields = []
-            for (const [key, value] of Object.entries(updated.settings))
-                updatedSettingsFields.push(cliHelpers.createResponse(`${key}: ${JSON.stringify(value)}`, 'extraInfo'))
+            global.textManager.refreshSettings(updated.settings.textAPIInfo)
             return [
                 cliHelpers.createResponse(`Successfully set values.`),
-                ...updatedSettingsFields
+                ...this.createUpdatesArray(updated.settings)
             ]
         } catch(err) {
             console.log(err)
         }
+    }
+
+    createUpdatesArray(updated={}) {
+        const updatedSettingsFields = []
+        for (const [key, value] of Object.entries(updated))
+            updatedSettingsFields.push(cliHelpers.createResponse(`${key}: ${JSON.stringify(value)}`, 'extraInfo'))
+        return updatedSettingsFields
+    }
+
+    listOptions() {
+        const textOptions = global.textManager.allFields
+            .reduce((total, f) => `${total}, textAPIInfo[${f}]`, '')
+            .slice(1)
+        return cliHelpers.createResponse(`autoConfirmRegistration, ${textOptions}`, 'extraInfo')
     }
 }
 

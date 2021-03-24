@@ -1,5 +1,5 @@
 const defaultOnTick = () => { console.log(`cron is active (default job)`) }
-const defaultTime = (secondsAfterNow) => {
+const defaultTime = (secondsAfterNow=3) => {
     const date = new Date()
     date.setSeconds(date.getSeconds() + secondsAfterNow)
     return date

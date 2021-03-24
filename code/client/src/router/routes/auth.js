@@ -26,9 +26,9 @@ export default [
         ...commonMeta
     },
     {
-        path: "/forgot/:type",
-        name: "accountRecovery",
-        component: () => import('@/views/auth/accountRecovery.vue'),
+        path: "/forgot/username",
+        name: "forgotUsername",
+        component: () => import('@/views/auth/forgotUsername.vue'),
         ...commonMeta
     }
 ]

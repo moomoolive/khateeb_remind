@@ -102,23 +102,6 @@ router.post(
 })
 
 router.post(
-    'forgot/username',
-    validationMiddleware.validateRequest(
-        [
-            validator.body("phoneNumber").isLength({ min: 1 }),
-        ]
-    ),
-    async (req, res) => {
-        try {
-            return res.json('hi')
-        } catch(err) {
-            console.log(err)
-            return res.json({msg: `Couldn't send verification method`, status: "error"})
-        }
-    }
-)
-
-router.post(
     'forgot/password',
     validationMiddleware.validateRequest(
         [
@@ -135,7 +118,37 @@ router.post(
     }
 )
 
-// needs work
+// only supporting canada and US right now
+router.post(
+    '/forgot/username',
+    validationMiddleware.validateRequest(
+        [
+            validator.body("phoneNumber").isNumeric(),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            if (!global.textManager.isTextServiceOnline())
+                return res.json({ msg: `Account recovery is under maintenance right now! Try again later.`, status: "error" })
+            const accounts = await $db.users.find(req.body).exec()
+            if (accounts.length > 0) {
+                const accountsString = accounts
+                    .map(a => a.username)
+                    .reduce((total, a) => `${total}\n- ${a.username}`)    
+                await global.textManager.sendText(
+                    req.body.phoneNumber,
+                    `You're recieving this message because you requested help recovering your username.\n\nAccounts under this phone number:\n- ${accountsString}`
+                )
+            }
+            return res.json({ msg: `If ${req.body.phoneNumber} is the system, it should be recieving a text shortly insha'Allah`, status: 'okay' })
+        } catch(err) {
+            console.log(err)
+            return res.json({msg: `An error occured when sending verification text! Try again later`, status: "error"})
+        }
+    }
+)
+
+/*
 router.post(
     '/forgot/:type', 
     validationMiddleware.validateRequest(
@@ -205,6 +218,6 @@ router.post(
             res.json({ msg: `Couldn't verify code`, status: "error" })
         }
 })
-// NEEDS WORK Ends here
+*/
 
 module.exports = router
