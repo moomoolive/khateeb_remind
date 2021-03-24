@@ -9,36 +9,18 @@
         name="fade"
         mode="out-in"
         >
-            <router-view
-                v-if="!showSavedChangesScreen" 
-                class="pages"
-            ></router-view>
+            <router-view class="pages"></router-view>
         </transition>
-        <div v-if="showSavedChangesScreen">
-            <msg-with-pic
-                title="Alhamdillah!"
-                gif="flyingPlanesAllOver"
-                msg="Changes successfully made!"
-            />
-            <button 
-                class="green make-more-changes"
-                @click="closeSuccessScreen()"
-            >
-                Make More Changes
-            </button>
-        </div>
     </div>
 </template>
 
 <script>
 import centralNav from '@/components/misc/centralNav.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
 
 export default {
     name: 'adminParentRoute',
     components: {
         centralNav,
-        msgWithPic
     },
     data() {
         return {
@@ -70,10 +52,6 @@ export default {
         }
     },
     methods: {
-        closeSuccessScreen() {
-            if (this.showSavedChangesScreen)
-                this.$store.commit('admin/hideSavedChangesScreen')
-        },
         async verifyPending() {
             try {
                 const pendingKhateebs = await this.$API.khateebs.getKhateebs({ confirmed: false })
@@ -84,11 +62,6 @@ export default {
             }
         },
     },
-    computed: {
-        showSavedChangesScreen() {
-            return this.$store.state.admin.savedChanges
-        }
-    },
     watch:{
         currentRoute(newVal) {
             if (newVal === '/institutionAdmin')
@@ -97,9 +70,6 @@ export default {
     },
     updated() {
         this.currentRoute = this.$router.currentRoute.fullPath
-    },
-    destroyed() {
-        this.closeSuccessScreen()
     },
     created() {
         this.verifyPending()

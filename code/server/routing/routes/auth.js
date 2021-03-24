@@ -104,7 +104,11 @@ router.post(
 // only supporting canada and US right now
 router.post(
     '/forgot/password',
-    validationMiddleware.validateRequest([validator.body("username").isLength({ min: 1 })]),
+    validationMiddleware.validateRequest(
+        [
+            validator.body("username").isString().isLength({ min: 1 })
+        ]
+    ),
     async (req, res) => {
         try {
             if (!global.textManager.isTextServiceOnline())
@@ -112,9 +116,10 @@ router.post(
             const account = await $db.users.findOne(req.body).exec()
             if (account) {
                 const verificationCode = await new $db.verificationCodes({ username: account.username }).save()
-                await global.textManager.sendText(
+                await global.textManager.sendRecoveryText(
                     account.phoneNumber,
-                    `You're recieving this message because you requested a password recovery code.\n\nThis code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
+                    `This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`,
+                    "password"
                 )
             }
             return res.json({ msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username}'s associated phone number will be recieving a text with a verification code in the next few minutes insha'Allah`, status: 'okay' })
@@ -127,7 +132,11 @@ router.post(
 
 router.post(
     '/forgot/username',
-    validationMiddleware.validateRequest([validator.body("phoneNumber").isNumeric()]),
+    validationMiddleware.validateRequest(
+        [
+            validator.body("phoneNumber").isNumeric()
+        ]
+    ),
     async (req, res) => {
         try {
             if (!global.textManager.isTextServiceOnline())
@@ -137,9 +146,9 @@ router.post(
                 const accountsString = accounts
                     .map(a => a.username)
                     .reduce((total, a) => `${total}\n- ${a.username}`)    
-                await global.textManager.sendText(
+                await global.textManager.sendRecoveryText(
                     req.body.phoneNumber,
-                    `You're recieving this message because you requested help recovering your username.\n\nAccounts under this phone number:\n- ${accountsString}`
+                    `Accounts under this phone number:\n- ${accountsString}`
                 )
             }
             return res.json({ msg: `If ${req.body.phoneNumber} is the system, it should be recieving a text shortly insha'Allah`, status: 'okay' })

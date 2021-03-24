@@ -87,8 +87,8 @@ export default {
         forgotCredentials() {
             notificationHelpers.redirectionOptions(
                 [
-                    { text: 'Forgot Password?', to: '/forgot/password' },
-                    { text: 'Forgot Username?', to: '/forgot/username' }
+                    { text: 'Forgot Username?', to: '/forgot/username' },
+                    { text: 'Forgot Password?', to: '/forgot/password' }
                 ]
             )
         }

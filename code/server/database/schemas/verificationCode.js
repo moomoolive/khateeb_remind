@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const nanoId = require('nanoid')
+const mathHelpers = require(global.$dir + '/libraries/math/main.js')
 
 const verificationCode = new mongoose.Schema({
     code: {
@@ -17,7 +17,7 @@ const verificationCode = new mongoose.Schema({
 }, { timestamps: true })
 
 verificationCode.pre('save', function(next) {
-    this.code = "KR-" + nanoId.nanoid(8)
+    this.code = "KR-" + mathHelpers.generateRandomNumber(6)
     next()
 })
 

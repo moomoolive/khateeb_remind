@@ -1,18 +1,17 @@
+const textVendorServices = require('./main.js')
+
 class textManager {
     constructor() {
         this.textAllowed = null
         this.accountSid = 'account'
         this.accountAuthToken = 'token'
         this.phoneNumber = '+11000000000'
-        this.textVendorConnection = null
-    }
-
-    get allFieldsIncludingNonSettable() {
-        return Object.keys(this)
+        this.$textVendorConnection = null
+        this.$textManagerSignature = "\n\n🤖 From Khateeb Remind Bot"
     }
 
     get allFields() {
-        return this.allFieldsIncludingNonSettable.filter(f => f !== 'textVendorConnection')
+        return Object.keys(this).filter(f => f[0] !== "$")
     }
 
     get allTextVendorFields() {
@@ -43,7 +42,7 @@ class textManager {
     }
 
     createTextVendorConnection() {
-        this.textVendorConnection = require('twilio')(this.accountSid, this.accountAuthToken)
+        this.$textVendorConnection = textVendorServices.createTextConnection(this.accountSid)(this.accountAuthToken)
     }
 
     setAllFields(textSettings={}) {
@@ -63,29 +62,24 @@ class textManager {
         this.textAllowed = value
     }
 
-    isVendorServiceUsable() {
-        return this.textVendorConnection && this.textAllowed
+    useVendorService(serviceName="message") {
+        if (!this.textAllowed)
+            return console.log(`${serviceName} cannot be used because text service is offline`)
+        else if (!this.$textVendorConnection)
+            return console.log(`Text vendor connection not established`)
+        else
+            return textVendorServices[serviceName]
     }
 
-    //only supports messaging to american and canada
-    messageVendorService(toBeTextPhoneNumber=100_000_0000, body="hello from khateeb remind") {
-        return this.textVendorConnection.messages.create({
-            body: `${body}\n\n🤖 From Khateeb Remind Bot`,
-            to: `+1${toBeTextPhoneNumber}`,
-            from: `+${this.phoneNumber}`
-        })
+    sendText(sendTo=100_000_0000, body="hello from khateeb remind", withSignature=true) {
+        return this.useVendorService('message')
+            (this.$textVendorConnection)
+            (sendTo, this.phoneNumber)
+            (`${body}${withSignature ? this.$textManagerSignature : ''}`)
     }
 
-    async sendText(toBeTextPhoneNumber=100_000_0000, body="hello from khateeb remind") {
-        try {
-            if (!this.isVendorServiceUsable())
-                throw TypeError(`Vendor services are not active right now`)
-            const vendorRes = await this.messageVendorService(toBeTextPhoneNumber, body)
-            return vendorRes
-        } catch(err) {
-            console.log(err)
-            return { msg: `There was an error that occured when sending your text` }
-        }
+    sendRecoveryText(sendTo=100_000_0000, body="hello from khateeb remind", type="username") {
+        return this.sendText(sendTo, `You're recieving this message because you requested help recovering your ${type}.\n\n${body}`)
     }
 
 }
