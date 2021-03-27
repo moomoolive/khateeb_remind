@@ -57,14 +57,10 @@ export default {
     },
     methods: {
         async getScheduleBuildingBlocks() {
-            try {
-                const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
-                this.locations = locations
-                this.timings = timings
-                this.khateebs = khateebs
-            } catch(err) {
-                console.log(err)
-            }
+            const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
+            this.locations = locations
+            this.timings = timings
+            this.khateebs = khateebs
         },
         async createNewJummahPreference(newPreference) {
             await this.utils.delayedRequest(
@@ -87,25 +83,14 @@ export default {
             )
         },
         async requestJummahs(jummahDateRange) {
-            try {
-                const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
-                this.jummahs = jummahs
-            } catch(err) {
-                console.log(err)
-            }
+            this.jummahs = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
         },
         findJummahIndexById(id) {
             return this.jummahs.findIndex(jummah => jummah._id === id)
         },
-        async updateJummahPreference(updatedJummah) {
-            try {
-                const updated = await this.$API.jummahs.updateJummahPreference(updatedJummah)
-                if (!updated)
-                    return
-                this.jummahs.splice(this.findJummahIndexById(updated._id), 1, updated)
-            } catch(err) {
-                console.log(err)
-            }
+        async updateJummahPreference(updatedJummah={}) {
+            const updated = await this.$API.jummahs.updateJummahPreference(updatedJummah)
+            this.jummahs.splice(this.findJummahIndexById(updated._id), 1, updated)
         },
         fillIdIfEmpty(main={}, backup={}) {
             if (!main._id)
@@ -115,16 +100,10 @@ export default {
             return { main, backup }
         },
         async runNotificationLoop({ main: preprocessedMain, backup: preprocessedBackup, isBackup }) {
-            try {
-                const { main, backup } = this.fillIdIfEmpty(preprocessedMain, preprocessedBackup)
-                const updatedPreferences = await this.$API.jummahs.runNotificationLoop({ main, backup }, isBackup) || { targetPreference: {}, otherPreference: {} }
-                for (const [key, value] of Object.entries(updatedPreferences)) {
-                    if (value._id && value._id.toLowerCase() !== 'none')
-                        this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
-                }
-            } catch(err) {
-                console.log(err)
-            }
+            const { main, backup } = this.fillIdIfEmpty(preprocessedMain, preprocessedBackup)
+            const updatedPreferences = await this.$API.jummahs.runNotificationLoop({ main, backup }, isBackup)
+            for (const [key, value] of Object.entries(updatedPreferences))
+                this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
         },
     },
     created() {

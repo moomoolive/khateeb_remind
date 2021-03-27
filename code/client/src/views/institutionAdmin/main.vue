@@ -3,7 +3,6 @@
         <central-nav 
             :baseLink="`institutionAdmin`"
             :outboundLinks="outboundLinks"
-            @to-central="closeSuccessScreen()"
         />
         <transition
         name="fade"

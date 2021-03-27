@@ -1,5 +1,6 @@
 <template>
     <div>
+
         <div>
             <button 
                 class="add-new-admin-button blue"
@@ -8,6 +9,7 @@
                 +
             </button>
         </div>
+
         <general-popup-container
             v-if="showAddNewAdminForm"
             @close="closeAddNewAdminForm()"
@@ -23,9 +25,13 @@
                 @submitted="submitAdmin($event)"
             />
         </general-popup-container>
+
         <loading>
             <div v-if="admins.length > 0" class="admin-container">
-                <div v-for="(admin, index) in admins" :key="index">
+                <div 
+                    v-for="(admin, index) in admins.filter(a => Object.keys(a).length > 0)" 
+                    :key="index"
+                >
                     <collapsable-box
                         :headline="`${admin.firstName} ${admin.lastName}`"
                         :tagDetails="[{
@@ -49,13 +55,16 @@
                     </collapsable-box>
                 </div>
             </div>
+
             <div v-else>
                 <msg-with-pic 
                     :msg="`You're currently the only administrator at this institution`"
                     :gif="`sadCat`"
                 />
             </div>
+
         </loading>
+
     </div>
 </template>
 
@@ -65,6 +74,8 @@ import loading from '@/components/general/loadingScreen.vue'
 import msgWithPic from '@/components/general/msgWithPic.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
 import generalPopupContainer from '@/components/notifications/generalPopup.vue'
+
+import requestHelpers from '@/libraries/requests/helperLib/main.js'
 
 export default {
     name: 'createOtherInstitutionAdmins',
@@ -88,35 +99,22 @@ export default {
         closeAddNewAdminForm() {
             this.showAddNewAdminForm = false
         },
-        async submitAdmin($event) {
-            try {
-                const newAdmin = await this.$API.institutionAdmins.createNewAdmin($event)
-                this.admins.push(newAdmin)
-                this.closeAddNewAdminForm()
-                this.utils.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
-            } catch(err) {
-                console.log(err)
-            }
+        async submitAdmin(newAdmin={}) {
+            const newlySavedAdmin = await this.$API.institutionAdmins.createNewAdmin(newAdmin)
+            this.admins.push(newlySavedAdmin)
+            this.closeAddNewAdminForm()
+            this.utils.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
         },
         async deleteAdmin(id, index) {
-            try {
-                const confirm = await this.utils.confirm(`Do you really want to permenantly delete this administrator?`)
-                if (confirm) {
-                    const deleted = await this.$API.institutionAdmins.deleteAdmin(id)
-                    console.log(deleted)
+            const confirm = await this.utils.confirm(`Do you really want to permenantly delete this administrator?`)
+            if (confirm) {
+                const res = await this.$API.institutionAdmins.deleteAdmin(id)
+                if (requestHelpers.dataWasDeleted(res))
                     this.admins.splice(index, 1)
-                }
-            } catch(err) {
-                console.log(err)
             }
         },
         async getOtherAdmins() {
-            try {
-                const admins = await this.$API.institutionAdmins.getOtherAdmins()
-                this.admins = admins || []
-            } catch(err) {
-                console.log(err)
-            }
+            this.admins = await this.$API.institutionAdmins.getOtherAdmins()
         }
     },
     created() {

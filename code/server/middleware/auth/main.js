@@ -2,8 +2,6 @@ const authHelpers = require(global.$dir + '/libraries/auth/main.js')
 
 const jwt = require('jsonwebtoken')
 
-// _.validAuthentication({ max: 2 })
-
 const authenticate = (authOptions={}) => {
     return (request, response, next) => {
         jwt.verify(request.headers.authorization, process.env.JWT_SECRET || 'secret', (err, decoded) => {
@@ -12,15 +10,6 @@ const authenticate = (authOptions={}) => {
             request.headers = authHelpers.mutateHeadersToIncludeUserInfo(request, decoded)
             return next()
         })
-    }
-}
-
-const isAllowedToCreateResource = (validateKeys=[]) => {
-    return (request, response, next) => {
-        if (!authHelpers.isValidResourceCreator(request, validateKeys))
-            return response.status(403).json(`You're not allowed to create this resource`)
-        else
-            return next()
     }
 }
 
@@ -57,7 +46,6 @@ const isAllowedToUpdateResource = (validateKeys=[], resourceType="locations") =>
 }
 
 module.exports = {
-    isAllowedToCreateResource,
     isAllowedToDeleteResource,
     isAllowedToUpdateResource,
     authenticate

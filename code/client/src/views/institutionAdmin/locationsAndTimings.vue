@@ -15,7 +15,7 @@
             <div class="locations-container">
 
                 <collapsable-box
-                    v-for="(location, locationIndex) in locations"
+                    v-for="(location, locationIndex) in locations.filter(l => Object.keys(l).length > 0)"
                     :key="locationIndex"
                     :headline="location.name"
                 >
@@ -101,6 +101,8 @@ import loading from '@/components/general/loadingScreen.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import timingMutator from '@/components/general/timingMutator.vue'
 
+import requestHelpers from '@/libraries/requests/helperLib/main.js'
+
 export default {
     name: 'editLocationAndTimings',
     components: {
@@ -138,36 +140,28 @@ export default {
             )
         },
         async addNewLocation() {
-            const length = this.locations.length
-            try {
-                const { location, timing } = await this.$API.locations.createNewLocation({ name: `Unknown Location ${length}`, address: `Unknown Address ${length}` })
-                this.timings.push(timing[0])
-                this.locations.push(location)
-            } catch(err) {
-                console.log(err)
-            }
+            const length = this.locations.length + 1
+            const { location, timing } = await this.$API.locations.createNewLocation({ name: `Unknown Location ${length}`, address: `Unknown Address ${length}` })
+            this.timings.push(timing)
+            this.locations.push(location)
         },
         async addTiming(location) {
             const target = this.timings.find(t => t.locationID === location._id) || { hour: 12, minute: 29 }
-            try {
-                const newTiming = await this.$API.timings.createNewTiming({ 
-                    locationID: location._id,
-                    minute: target.minute === 59 ? 0 : target.minute + 1,
-                    hour: target.minute === 59 ? target.hour + 1 : target.hour
-                })
-                this.timings.push(newTiming)
-            } catch(err) {
-                console.log(err)
-            }
+            const newTiming = await this.$API.timings.createNewTiming({ 
+                locationID: location._id,
+                minute: target.minute === 59 ? 0 : target.minute + 1,
+                hour: target.minute === 59 ? target.hour + 1 : target.hour
+            })
+            this.timings.push(newTiming)
         },
         async deleteTiming(timing) {
             if (this.timings.filter(t => timing.locationID === t.locationID).length < 2)
                 return this.utils.alert(`You must have at least one timing per location!`)
             const confirm = await this.utils.confirm(`Are you sure you want delete this timing?`)
             if (confirm) {
-                const res = await this.$API.timings.deleteTiming(timing._id) 
-                console.log(res)
-                this.timings.splice(this.findIndexById(timing._id), 1)
+                const res = await this.$API.timings.deleteTiming(timing._id)
+                if (requestHelpers.dataWasDeleted(res)) 
+                    this.timings.splice(this.findIndexById(timing._id), 1)
             }
         },
         async deleteLocation(location) {
@@ -176,22 +170,26 @@ export default {
             const confirm = await this.utils.confirm(`Are you sure you want to delete this location?`)
             if (confirm) {
                 const res = await this.$API.locations.deleteLocation(location._id)
-                console.log(res)
-                this.locations.splice(this.findIndexById(location._id, 'locations'), 1)
-                this.timings = this.timings.filter(t => t.locationID === location._id)
+                if (requestHelpers.dataWasDeleted(res)) {
+                    this.locations.splice(this.findIndexById(location._id, 'locations'), 1)
+                    this.timings = this.timings.filter(t => t.locationID === location._id)
+                }
             }
         },
         findIndexById(id="123456789012345678901234", data="timings") {
             return this[data].findIndex(d => d._id === id)
+        },
+        async getLocationsAndTimings() {
+            const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+            this.locations = locations
+            this.timings = timings
         }
     },
     computed: {
         
     },
-    async created() {
-        const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
-        this.locations = locations
-        this.timings = timings
+    created() {
+        this.getLocationsAndTimings()
     }
 }
 </script>

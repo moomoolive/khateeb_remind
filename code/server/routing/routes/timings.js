@@ -11,13 +11,12 @@ router.get(
     '/',
     authMiddleware.authenticate({ min: 1, max: 3 }),
     async (req, res) => {
-        let timings = []
         try {
-            timings = await $db.timings.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
-            return res.json(timings)
+            const data = await $db.timings.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json({ timings, msg: { status: 'err', errorTrace: err } })
+            return res.status(503).json({ data: [], msg: { status: 'err', errorTrace: err } })
         }
     }
 )
@@ -27,18 +26,18 @@ router.post(
     authMiddleware.authenticate({ min: 2, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
-        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength),
-        validator.body("locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength),
+        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
         validator.body("hour").isInt({ min: 0, max: 23 }),
-        validator.body("minute").isLength({ min: 0, max: 59 })
+        validator.body("minute").isInt({ min: 0, max: 59 })
     ]),
-    authMiddleware.isAllowedToCreateResource(["institutionID"]),
     async (req, res) => {
         try {
-            const newTiming = await $db.timings(req.body).save()
-            return res.json(newTiming)
+            const data = await $db.timings(req.body).save()
+            return res.json({ data })
         } catch(err) {
             console.log(err)
+            return res.status(503).json({ data: {}, msg: `Couldn't create new timing. Err trace: ${err}` })
         }
     }
 )
@@ -47,18 +46,18 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength),
+        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
         validator.body("hour").isInt({ min: 0, max: 23 }).optional(),
-        validator.body("minute").isLength({ min: 0, max: 59 }).optional()
+        validator.body("minute").isInt({ min: 0, max: 59 }).optional()
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "timings"),
     async (req, res) => {
         try {
-            const updated = await $db.timings.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
-            return res.json(updated)
+            const data = await $db.timings.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't timing location`)
+            return res.status(503).json({ data: {}, msg: `Couldn't update timing. Err trace: ${err}` })
         }
     }
 )
@@ -67,17 +66,17 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength)
+        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "timings"),
     async (req, res) => {
         try {
             const deactivedTiming= await $db.timings.findOneAndUpdate(req.query, { active: false }, { new: true })
             const deletedDependants = await deactivedTiming.deleteDependants()
-            return res.json({ timing: deactivedTiming, deletedDependants })
+            return res.json({ data: { timing: deactivedTiming, deletedDependants } })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't delete timing`)
+            return res.status(503).json({ data: {}, msg: `Couldn't delete timing. Err trace: ${err}` })
         }
     }
 )

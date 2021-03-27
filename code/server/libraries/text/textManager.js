@@ -7,7 +7,6 @@ class textManager {
         this.accountAuthToken = 'token'
         this.phoneNumber = '+11000000000'
         this.$textVendorConnection = null
-        this.$textManagerSignature = "\n\n🤖 From Khateeb Remind Bot"
     }
 
     get allFields() {
@@ -42,7 +41,7 @@ class textManager {
     }
 
     createTextVendorConnection() {
-        this.$textVendorConnection = textVendorServices.createTextConnection(this.accountSid)(this.accountAuthToken)
+        this.$textVendorConnection = textVendorServices.createTextConnection(this.accountSid, this.accountAuthToken)
     }
 
     setAllFields(textSettings={}) {
@@ -67,19 +66,18 @@ class textManager {
             return console.log(`${serviceName} cannot be used because text service is offline`)
         else if (!this.$textVendorConnection)
             return console.log(`Text vendor connection not established`)
+        else if (!textVendorServices[serviceName])
+            return console.log(`Service does not exist`)
         else
             return textVendorServices[serviceName]
     }
 
-    sendText(sendTo=100_000_0000, body="hello from khateeb remind", withSignature=true) {
-        return this.useVendorService('message')
-            (this.$textVendorConnection)
-            (sendTo, this.phoneNumber)
-            (`${body}${withSignature ? this.$textManagerSignature : ''}`)
+    sendText(to=100_000_0000, body="hello from khateeb remind", withSignature=true) {
+        return this.useVendorService('message')(this.$textVendorConnection)(to, this.phoneNumber, `${body}${withSignature ? "\n\n🤖 From Khateeb Remind Bot" : ''}`)
     }
 
-    sendRecoveryText(sendTo=100_000_0000, body="hello from khateeb remind", type="username") {
-        return this.sendText(sendTo, `You're recieving this message because you requested help recovering your ${type}.\n\n${body}`)
+    sendRecoveryText(to=100_000_0000, body="hello from khateeb remind", type="username") {
+        return this.sendText(to, `You're recieving this message because you requested help recovering your ${type}.\n\n${body}`)
     }
 
 }

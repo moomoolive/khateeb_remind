@@ -1,58 +1,70 @@
 <template>
-    <div v-if="showSettings" class="settings-container">
-        <collapsable-box
-            class="setting-container"
-            :headline="`Institution Details`"
-            :tagDetails="institution ? [{
-                words: `${institution.timezone} Timezone`,
-                color: 'goodNews',
-                symbol: '🌎' 
-            }] : null"
-        >
-            <institution-form-template 
-                v-if="institution"
-                :formProps="{
-                    basedOn: institution,
-                    bindedExts: ['states'],
-                    backgroundColor: 'none',
-                    buttonText: 'Update Institution'
-                }"
-                @submitted="saveInstitutionDetails($event)"
-            />
-        </collapsable-box>
-        <collapsable-box
-            class="setting-container"
-            :headline="`Registration Settings`"
-            :tagDetails="institution && institution.settings ? [{
-                words: institution.settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
-                color: 'default',
-                symbol: institution.settings.autoConfirmRegistration ? `🤖` : `📜`
-            }] : null"
-        >
-            <form-main
-                v-if="institution && institution.settings" 
-                :structure="{
-                    autoConfirmRegistration: {
-                        type: 'checkbox',
-                        required: true
-                    }
-                }"
-                :backgroundColor="`none`"
-                :basedOn="institution.settings"
-                @submitted="saveInstitutionDetails({ _id: institution._id, settings: $event })"
-            />
-        </collapsable-box>
-        <collapsable-box
-            v-if="utils.validAuthentication(3)"
-            class="setting-container"
-            :headline="`Danger Zone`"
-            :buttonColor="`red`"
-            :bodyColor="`silver`"
-        >
-            <button class="yellow delete-institution" @click="deleteInstitution()">
-                Delete Institution
-            </button>
-        </collapsable-box>
+    <div>
+        <div v-if="showSettings && settingsArePresent" class="settings-container">
+            
+            <collapsable-box
+                class="setting-container"
+                :headline="`Institution Details`"
+                :tagDetails="institution ? [{
+                    words: `${institution.timezone} Timezone`,
+                    color: 'goodNews',
+                    symbol: '🌎' 
+                }] : null"
+            >
+                <institution-form-template 
+                    :formProps="{
+                        basedOn: institution,
+                        bindedExts: ['states'],
+                        backgroundColor: 'none',
+                        buttonText: 'Update Institution'
+                    }"
+                    @submitted="saveInstitutionDetails($event)"
+                />
+            </collapsable-box>
+
+            <collapsable-box
+                class="setting-container"
+                :headline="`Registration Settings`"
+                :tagDetails="institution && institution.settings ? [{
+                    words: institution.settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
+                    color: 'default',
+                    symbol: institution.settings.autoConfirmRegistration ? `🤖` : `📜`
+                }] : null"
+            >
+                <form-main
+                    v-if="institution.settings" 
+                    :structure="{
+                        autoConfirmRegistration: {
+                            type: 'checkbox',
+                            required: true
+                        }
+                    }"
+                    :backgroundColor="`none`"
+                    :basedOn="institution.settings"
+                    @submitted="saveInstitutionDetails({ _id: institution._id, settings: $event })"
+                />
+            </collapsable-box>
+
+            <collapsable-box
+                v-if="utils.validAuthentication(3)"
+                class="setting-container"
+                :headline="`Danger Zone`"
+                :buttonColor="`red`"
+                :bodyColor="`silver`"
+            >
+                <button class="yellow delete-institution" @click="deleteInstitution()">
+                    Delete Institution
+                </button>
+            </collapsable-box>
+
+        </div>
+
+        <msg-with-pic 
+            v-else
+            :msg="`Couldn't retrieve settings...`"
+            :gif="`sadCatStanding`"
+        /> 
+
     </div>
 </template>
 
@@ -60,53 +72,54 @@
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
 import institutionFormTemplate from '@/components/forms/templates/institution.vue'
+import msgWithPic from '@/components/general/msgWithPic.vue'
+
+import requestHelpers from '@/libraries/requests/helperLib/main.js'
 
 export default {
     name: "settings",
     components: {
         collapsableBox,
         formMain,
-        institutionFormTemplate
+        institutionFormTemplate,
+        msgWithPic
     },
     data() {
         return {
-            institution: null,
+            institution: {},
             showSettings: true
         }
     },
     methods: {
         async getSettingsAndInstitutionInfo() {
-            try {
-                this.institution = await this.$API.institutions.getInstitution()
-            } catch(err) {
-                console.log(err)
-            }
+            this.institution = await this.$API.institutions.getInstitution()
         },
         async saveInstitutionDetails(newChanges={}) {
-            try {
-                const updatedInstitution = await this.$API.institutions.updateInstitution(newChanges)
-                this.institution = updatedInstitution || this.institution
-                this.rerenderSettings()
-            } catch(err) {
-                console.log(err)
-            }
+            const updated = await this.$API.institutions.updateInstitution(newChanges)
+            if (Object.keys(updated).length < 1)
+                return
+            this.institution = updated
+            this.rerenderSettings()
         },
         async deleteInstitution() {
             const confirm = await this.utils.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
             if (confirm) {
-                try {
-                    await this.$API.institutions.deleteInstitution()
-                    this.utils.alert(`You've successfully deleted your institution`, 'success')
-                    this.$router.push('/')
-                    this.$store.dispatch('logout')
-                } catch(err) {
-                    console.log(err)
-                }
+                const res = await this.$API.institutions.deleteInstitution()
+                if (!requestHelpers.dataWasDeleted(res))
+                    return
+                this.utils.alert(`You've successfully deleted your institution`, 'success')
+                this.$router.push('/')
+                this.$store.dispatch('logout')
             }
         },
         rerenderSettings() {
             this.showSettings = false
             this.$nextTick(() => { this.showSettings = true })
+        }
+    },
+    computed: {
+        settingsArePresent() {
+            return Object.keys(this.institution).length > 0
         }
     },
     async created() {

@@ -1,18 +1,16 @@
 import helpers from './helpers.js'
 
-import axios from 'axios'
-
-const extension = helpers.targetURL('khateebs')
+const extension = "khateebs"
 
 const requests = {
-    getKhateebs(params) {
-        return axios.get(extension, { params })
+    getKhateebs(params={}) {
+        return helpers.returnArrayFromRequest("get", extension, { params })
     },
-    updateExistingKhateeb(updatedKhateeb) {
-        return axios.put(extension, updatedKhateeb)
+    updateExistingKhateeb(updatedKhateeb={}) {
+        return helpers.returnEmptyObjectFromRequest("put", extension, updatedKhateeb)
     }, 
-    deleteKhateeb(_id) {
-        return axios.delete(extension, { params: { _id } })
+    deleteKhateeb(_id="1234") {
+        return helpers.returnEmptyObjectFromRequest("delete", extension, { params: { _id } })
     }
 }
 

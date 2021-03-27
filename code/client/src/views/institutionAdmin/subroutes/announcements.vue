@@ -22,9 +22,10 @@
                 />
             </div>
         </general-popup-container>
+
         <div v-if="showAnnouncements">
             <collapsable-box
-                v-for="(announcement, index) in announcements"
+                v-for="(announcement, index) in announcements.filter(a => Object.keys(a).length > 0)"
                 :key="index"
                 class="announcement-container"
                 :headline="headline(announcement)"
@@ -42,10 +43,11 @@
                         backgroundColor: 'none',
                         buttonText: 'Update'
                     }" 
-                    @submitted="updateAnnouncement($event, index)"
+                    @submitted="updateAnnouncement($event)"
                 />
             </collapsable-box>
         </div>
+
     </div>
 </template>
 
@@ -55,6 +57,7 @@ import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
 
 import announcementHelpers from '@/libraries/announcements/main.js'
+import requestHelpers from '@/libraries/requests/helperLib/main.js'
 
 export default {
     name: 'announcements',
@@ -71,14 +74,10 @@ export default {
         }
     },
     methods: {
-        async submit($event) {
-            try {
-                const newAnnouncement = await this.$API.announcements.createNewAnnouncement($event)
-                this.announcements.push(newAnnouncement)
-                this.showAddNewAnnouncementForm = false
-            } catch(err) {
-                console.log(err)
-            }
+        async submit(newAnnouncement={}) {
+            const newlySavedAnnouncement = await this.$API.announcements.createNewAnnouncement(newAnnouncement)
+            this.announcements.push(newlySavedAnnouncement)
+            this.showAddNewAnnouncementForm = false
         },
         closeAddNewAnnouncementForm() {
             this.showAddNewAnnouncementForm = false
@@ -96,33 +95,22 @@ export default {
             this.showAnnouncements = false
             this.$nextTick(() => this.showAnnouncements = true)
         },
-        async updateAnnouncement($event, index) {
-            try {
-                const updated = await this.$API.announcements.updateAnnouncement($event)
-                this.announcements.splice(index, 1, updated)
-                this.rerenderAnnouncements()
-            } catch(err) {
-                console.log(err)
-            }
+        async updateAnnouncement($event) {
+            const updated = await this.$API.announcements.updateAnnouncement($event)
+            const index = this.announcements.findIndex(a => a._id === updated._id)
+            this.announcements.splice(index, 1, updated)
+            this.rerenderAnnouncements()
         },
         async getAnnouncements() {
-            try {
-                this.announcements = await this.$API.announcements.getAnnouncements()
-            } catch(err) {
-                console.log(err)
-            }
+            this.announcements = await this.$API.announcements.getAnnouncements()
         },
         async deleteAnnouncement(id, index) {
-            try {
-                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this announcement?`)
-                if (!confirm)
-                    return
-                const res = await this.$API.announcements.deleteAnnouncement(id)
-                console.log(res)
+            const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this announcement?`)
+            if (!confirm)
+                return
+            const res = await this.$API.announcements.deleteAnnouncement(id)
+            if (requestHelpers.dataWasDeleted(res))
                 this.announcements.splice(index, 1)
-            } catch(err) {
-                console.log(err)
-            }
         },
     },
     created() {

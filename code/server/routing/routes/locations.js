@@ -11,13 +11,12 @@ router.get(
     '/',
     authMiddleware.authenticate({ min: 1, max: 3 }),
     async (req, res) => {
-        let locations = []
         try {
-            locations = await $db.locations.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
-            return res.json(locations)
+            const data = await $db.locations.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json({ locations, msg: { status: 'err', errorTrace: err } })
+            return res.status(503).json({ data: [], msg: `Error retrieving jummahs. Err trace: ${err}` })
         }
     }
 )
@@ -27,17 +26,18 @@ router.post(
     authMiddleware.authenticate({ min: 2, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
-        validator.body("institutionID").isLength(24),
-        validator.body("name").isLength({ min: 1 }),
-        validator.body("address").isLength({ min: 1 })
+        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("name").isLength({ min: 1 }).isString(),
+        validator.body("address").isLength({ min: 1 }).isString()
     ]),
     async (req, res) => {
         try {
             const newLocation = await $db.locations(req.body).save()
             const newTiming = await newLocation.findTimings()
-            return res.json({ location: newLocation, timing: newTiming })
+            return res.json({ data: { location: newLocation, timing: newTiming[0] }})
         } catch(err) {
             console.log(err)
+            return res.status(503).json({ data: { location: {}, timing: {} }, msg: `Couldn't create new location. Err trace: ${err}` })
         }
     }
 )
@@ -46,18 +46,18 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(24),
-        validator.body("name").isLength({ min: 1 }).optional(),
-        validator.body("address").isLength({ min: 1 }).optional()
+        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("name").isLength({ min: 1 }).isString().optional(),
+        validator.body("address").isLength({ min: 1 }).isString().optional()
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "locations"),
     async (req, res) => {
         try {
-            const updated = await $db.locations.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
-            return res.json(updated)
+            const data = await $db.locations.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't update location`)
+            return res.status(503).json({ data: {}, msg: `Couldn't update location. Err trace: ${err}` })
         }
     }
 )
@@ -66,17 +66,17 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(24)
+        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "locations"),
     async (req, res) => {
         try {
             const deactivedLocation = await $db.locations.findOneAndUpdate(req.query, { active: false }, { new: true })
             const deletedDependants = await deactivedLocation.deleteDependants()
-            return res.json({ location: deactivedLocation, deletedDependants })
+            return res.json({ data: { location: deactivedLocation, deletedDependants } })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't delete location`)
+            return res.status(503).json({ data: {}, msg: `Couldn't delete location. Err trace: ${err}` })
         }
     }
 )

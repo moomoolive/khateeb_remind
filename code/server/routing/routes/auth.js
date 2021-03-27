@@ -12,16 +12,16 @@ router.post(
     '/create/institution',
     validationMiddleware.validateRequest(
         [
-            validator.body("institution.name").isLength({ min: 1 }),
-            validator.body("institution.abbreviatedName").isLength({ min: 1 }),
-            validator.body("institution.timezone").isLength({ min: 1 }),
-            validator.body("institution.country").isLength({ min: 1 }),
-            validator.body("institution.state").isLength({ min: 1 }).optional(),
-            validator.body("institutionAdmin.password").isLength({ min: 6 }),
-            validator.body("institutionAdmin.username").isLength({ min: 6 }),
-            validator.body("institutionAdmin.handle").isLength({ min: 1 }),
-            validator.body("institutionAdmin.firstName").isLength({ min: 1 }),
-            validator.body("institutionAdmin.lastName").isLength({ min: 1 }),
+            validator.body("institution.name").isLength({ min: 1 }).isString(),
+            validator.body("institution.abbreviatedName").isLength({ min: 1 }).isString(),
+            validator.body("institution.timezone").isLength({ min: 1 }).isString(),
+            validator.body("institution.country").isLength({ min: 1 }).isString(),
+            validator.body("institution.state").isLength({ min: 1 }).isString().optional(),
+            validator.body("institutionAdmin.password").isLength({ min: 6 }).isString(),
+            validator.body("institutionAdmin.username").isLength({ min: 6 }).isString(),
+            validator.body("institutionAdmin.handle").isLength({ min: 1 }).isString(),
+            validator.body("institutionAdmin.firstName").isLength({ min: 1 }).isString(),
+            validator.body("institutionAdmin.lastName").isLength({ min: 1 }).isString(),
             validator.body("institutionAdmin.phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
         ]
     ), 
@@ -44,14 +44,14 @@ router.post(
     '/create/khateeb',
     validationMiddleware.validateRequest(
         [
-            validator.body("institutionID").isLength(24),
-            validator.body("password").isLength({ min: 6 }),
-            validator.body("username").isLength({ min: 6 }),
-            validator.body("handle").isLength({ min: 1 }),
-            validator.body("firstName").isLength({ min: 1 }),
-            validator.body("lastName").isLength({ min: 1 }),
+            validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+            validator.body("password").isLength({ min: 6 }).isString(),
+            validator.body("username").isLength({ min: 6 }).isString(),
+            validator.body("handle").isLength({ min: 1 }).isString(),
+            validator.body("firstName").isLength({ min: 1 }).isString(),
+            validator.body("lastName").isLength({ min: 1 }).isString(),
             validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
-            validator.body("title").isLength({ min: 1 })
+            validator.body("title").isLength({ min: 1 }).isString()
         ]
     ),
     async (req, res) => {
@@ -76,8 +76,8 @@ router.post(
     '/',
     validationMiddleware.validateRequest(
         [
-            validator.body("password").isLength({ min: 1 }),
-            validator.body("username").isLength({ min: 1 }),
+            validator.body("password").isLength({ min: 1 }).isString(),
+            validator.body("username").isLength({ min: 1 }).isString(),
         ]
     ),
     async (req, res) => {
@@ -101,7 +101,6 @@ router.post(
         }
 })
 
-// only supporting canada and US right now
 router.post(
     '/forgot/password',
     validationMiddleware.validateRequest(
@@ -148,7 +147,8 @@ router.post(
                     .reduce((total, a) => `${total}\n- ${a.username}`)    
                 await global.textManager.sendRecoveryText(
                     req.body.phoneNumber,
-                    `Accounts under this phone number:\n- ${accountsString}`
+                    `Accounts under this phone number:\n- ${accountsString}`,
+                    "username"
                 )
             }
             return res.json({ msg: `If ${req.body.phoneNumber} is the system, it should be recieving a text shortly insha'Allah`, status: 'okay' })
@@ -164,8 +164,8 @@ router.put(
     validationMiddleware.validateRequest(
         [
             validator.body("code").isLength({ min: 1 }),
-            validator.body("username").isLength({ min: 1 }),
-            validator.body("newPassword").isLength({ min: 6 })
+            validator.body("username").isLength({ min: 1 }).isString(),
+            validator.body("newPassword").isLength({ min: 6 }).isString()
         ]
     ),
     async (req, res) => {

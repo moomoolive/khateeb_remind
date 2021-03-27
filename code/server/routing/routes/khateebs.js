@@ -10,13 +10,12 @@ router.get(
     '/',
     authMiddleware.authenticate({ min: 1, max: 3 }),
     async (req, res) => {
-        let khateebs = []
         try {
-            khateebs = await $db.khateebs.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
-            return res.json(khateebs)
+            const data = await $db.khateebs.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json({ khateebs, msg: { status: 'err', errorTrace: err } })
+            return res.status(503).json({ data: [], msg: `Error retrieving khateebs. Err trace: ${err}` })
         }
     }
 )
@@ -25,18 +24,18 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(24),
+        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
         validator.body("active").isBoolean().optional(),
         validator.body("confirmed").isBoolean().optional()
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "khateebs"),
     async (req, res) => {
         try {
-            const updated = await $db.khateebs.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
-            return res.json(updated)
+            const data = await $db.khateebs.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't update khateeb`)
+            return res.status(503).json({ data: {}, msg: `Couldn't update khateeb. Err trace: ${err}` })
         }
     }
 )
@@ -45,7 +44,7 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(24)
+        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "khateebs"),
     async (req, res) => {
@@ -53,10 +52,10 @@ router.delete(
             const khateeb = await $db.khateebs.findOne(req.query)
             const dependantsRes = await khateeb.deleteNotifications()
             const deleted = await $db.khateebs.deleteOne(req.query)
-            return res.json({ khateeb: deleted, dependantsRes })
+            return res.json({ data: { khateeb: deleted, dependantsRes } })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't delete location`)
+            return res.status(503).json({ data: `Couldn't delete khateeb. Err trace: ${err}` })
         }
     }
 )

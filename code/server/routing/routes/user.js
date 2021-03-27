@@ -13,15 +13,15 @@ router.put(
     '/', 
     validationMiddleware.validateRequest(
         [
-            validator.body("password").isLength({ min: 6 }).optional(),
-            validator.body("username").isLength({ min: 6 }).optional(),
-            validator.body("handle").isLength({ min: 1 }).optional(),
-            validator.body("firstName").isLength({ min: 1 }).optional(),
-            validator.body("lastName").isLength({ min: 1 }).optional(),
+            validator.body("password").isLength({ min: 6 }).isString().optional(),
+            validator.body("username").isLength({ min: 6 }).isString().optional(),
+            validator.body("handle").isLength({ min: 1 }).isString().optional(),
+            validator.body("firstName").isLength({ min: 1 }).isString().optional(),
+            validator.body("lastName").isLength({ min: 1 }).isString().optional(),
             validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }).optional(),
             validator.body("availableTimings").isArray().optional(),
             validator.body("unavailableDates").isArray().optional(),
-            validator.body("title").isLength({ min: 1 }).optional()
+            validator.body("title").isLength({ min: 1 }).isString().optional()
         ]
     ),
     async (req, res) => {
@@ -59,7 +59,7 @@ router.put(
     '/notification',
     validationMiddleware.validateRequest(
         [
-            validator.body("_id").isLength(24),
+            validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
             validator.body("seen").isBoolean().optional(),
             validator.body("actionPerformed").isBoolean().optional(),
             validator.body("meta").optional()

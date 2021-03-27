@@ -74,7 +74,6 @@ export default {
         runQueryLoop(dateStringQuery, locationQuery, monthChanged) {
             if (!this.validRouterQueries(dateStringQuery, locationQuery)) {
                 const queries = this.createValidQueries(dateStringQuery)
-                console.log(queries)
                 return this.setRouterQueries(queries)
             }
             this.$emit('changed', { date: new Date(dateStringQuery), location: locationQuery , monthChanged })
@@ -91,8 +90,6 @@ export default {
         $route(newVal, oldVal) {
             const newDate = new Date(newVal.query[this.selectedDateQueryKey])
             const oldDate = new Date(oldVal.query[this.selectedDateQueryKey])
-            //console.log('newDate', newDate)
-            //console.log('oldDate', oldDate)
             const monthChanged = !datetime.sameMonthSameYear(newDate, oldDate)
             return this.emitQueryChanges(monthChanged)
         }
