@@ -14,7 +14,7 @@ router.get(
     authMiddleware.authenticate({ min: 1, max: 3 }), 
     async (req, res) => {
         try {
-            const data = await $db.jummahPreferences.find({ institutionID: req.headers.institutionid, ...req.query }).exec()
+            const data = await $db.jummahPreferences.find({ institutionID: req.headers.institutionid, ...req.query }).sort("-date").exec()
             return res.json({ data })
         } catch(err) {
             console.log(err)

@@ -1,10 +1,12 @@
 <template>
   <div>
+    
     <logo-display
       class="logo"
       :logoLeft="`logo1`"
       :logoRight="`logo2`"
     />
+
     <monthly-jummah-schedule 
         :jummahs="jummahs"
         :locations="locations"
@@ -13,6 +15,7 @@
         :reciever="`khateeb`"
         @request-jummahs="requestJummahs($event)"
     />
+
   </div>
 </template>
 
@@ -36,22 +39,13 @@ export default {
   },
   methods: {
       async getScheduleBuildingBlocks() {
-          try {
-              const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
-              this.locations = locations
-              this.timings = timings
-              this.khateebs = khateebs
-          } catch(err) {
-              console.log(err)
-          }
+        const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
+        this.locations = locations
+        this.timings = timings
+        this.khateebs = khateebs
       },
-      async requestJummahs(jummahDateRange) {
-          try {
-              const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
-              this.jummahs = jummahs
-          } catch(err) {
-              console.log(err)
-          }
+      async requestJummahs(jummahDateRange={}) {
+        this.jummahs = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
       }
       
   },

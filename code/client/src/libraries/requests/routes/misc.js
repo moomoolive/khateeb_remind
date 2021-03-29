@@ -12,7 +12,7 @@ const requests = {
         return axios.get(extension + `/redirect/${shortURLExtension}`)
     },
     institutionSelection() {
-        return helpers.returnArrayFromRequest("get", "/institution-selection")
+        return helpers.returnArrayFromRequest("get", ["misc", "institution-selection"])
     }
 }
 

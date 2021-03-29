@@ -57,7 +57,8 @@ export default {
         khateebDisplay(preference) {
             if (Object.keys(preference).length < 1 || preference.khateebID === 'none')
                 return 'To Be Decided'
-            return this.khateebName(this.khateebs.find(k => k._id === preference.khateebID))
+            const name = this.khateebName(this.khateebs.find(k => k._id === preference.khateebID))
+            return `${name}${preference.khateebID === this.$store.getters['user/allInfo']._id ? ' (You)' : ''}`
         },
         khateebName(khateeb) {
             let base = `${khateeb.firstName} ${khateeb.lastName}`

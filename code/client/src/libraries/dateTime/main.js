@@ -46,6 +46,12 @@ const dateFormatYM = (date, includeDate=false) => {
     return base
 }
 
+const sameDateMonthAndYear = (a=new Date(), b=new Date()) => {
+    const dateA = new Date(a)
+    const dateB = new Date(b)
+    return helpers.sameMonthSameYear(dateA, dateB) && dateA.getDate() === dateB.getDate()
+}
+
 export default {
     allUpcomingFridays,
     daysInThePast,
@@ -53,6 +59,7 @@ export default {
     dateFormatYM,
     findUpcomingFriday: helpers.findUpcomingFriday,
     sameMonthSameYear: helpers.sameMonthSameYear,
-    localizeToTimezone
+    localizeToTimezone,
+    sameDateMonthAndYear
 }
 

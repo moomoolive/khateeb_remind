@@ -219,17 +219,6 @@ h2 {
       }
 }
 
-@mixin color($color) {
-    background-color: getColor($color);
-    &:hover{ border: 0.1vh solid getColor($color); }
-}
-
-@mixin allColors($list: $themeColors) {
-    @each $colorName, $color in $list {
-        &.#{$colorName} { @include color($colorName); }
-    }
-}
-
 button {
     background-color: getColor("green");
     border: none;

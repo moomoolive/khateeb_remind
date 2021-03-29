@@ -3,8 +3,12 @@ import axios from 'axios'
 import requestConsts from '@/libraries/requests/consts.js'
 import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
 
-const targetURL = (extension) => {
-    return requestConsts.API_URL + `/${extension}`
+const targetURL = (extension=["misc", "unique-username"]) => {
+    const baseURL = requestConsts.API_URL
+    if (Array.isArray(extension))
+        return  baseURL + extension.reduce((total, e) => `${total}/${e}` , '')
+    else
+        return baseURL + `/${extension}`
 }
 
 const returnDataTypeFromRequest = (checkFn=Array.isArray) => (returnVal=[]) => {

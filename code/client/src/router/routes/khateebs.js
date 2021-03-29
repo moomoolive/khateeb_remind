@@ -3,18 +3,26 @@ import home from '@/views/khateebs/schedule.vue'
 export default [
     {
         path: '/khateeb',
-        name: 'khateeb-home',
+        name: 'khateebHome',
         component: home,
         meta: {
-            auth: { min: 1, max: 3 }
+            auth: { level: 1 }
         }
     },
     {
         path: '/khateeb/announcements',
-        name: 'announcements',
-        component: () => import ('@/views/khateebs/announcements.vue'),
+        name: 'khateebAnnouncements',
+        component: () => import('@/views/khateebs/announcements.vue'),
         meta: {
-            auth: { min: 1, max: 3 }
+            auth: { level: 1 }
+        }
+    },
+    {
+        path: '/khateeb/my-khutbahs',
+        name: 'myKhutbahs',
+        component: () => import('@/views/khateebs/myKhutbahs.vue'),
+        meta: {
+            auth: { level: 1 }
         }
     }
 ]

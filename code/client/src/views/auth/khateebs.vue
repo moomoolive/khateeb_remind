@@ -64,7 +64,7 @@ export default {
             }
         },
         async getAllConfirmedInstitutions() {
-            const data = await this.$API.misc.institutionSelection()
+            this.allInstitutions = await this.$API.misc.institutionSelection()
         },
         includeTestInstitutionInInstitutionsList() {
             this.showTestInstitution = true

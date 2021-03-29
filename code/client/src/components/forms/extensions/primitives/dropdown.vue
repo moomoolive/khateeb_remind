@@ -5,7 +5,7 @@
             @change="toMain()"
         >
             <option
-                v-for="(option, index) in options.selectOptions"
+                v-for="(option, index) in selectOptions"
                 :key="index"
                 :value="value(option)"
             >
@@ -26,31 +26,54 @@ export default {
     },
     data() {
         return {
-            currentlySelected: this.options.default || this.startValue()
+            currentlySelected: this.options.default || null
         }
     },
     methods: {
         display(option) {
-            if (typeof this.options.display !== "undefined")
+            if (this.options.display !== undefined)
                 return option[this.options.display]
             else
                 return option
         },
         value(option) {
-            if (typeof this.options.value !== 'undefined')
+            if (this.options.value !== undefined)
                 return option[this.options.value]
             else
                 return option
         },
         startValue() {
-            if (typeof this.options.value !== 'undefined')
-                return this.options.selectOptions[0][this.options.value]
+            if (this.options.value !== undefined)
+                return this.selectOptions[0][this.options.value]
             else
-                return this.options.selectOptions[0]
+                return this.selectOptions[0]
         },
         toMain(options) {
             this.$emit('changed', { val: this.currentlySelected, ...options})
         }
+    },
+    computed: {
+        selectOptions() {
+            if (this.options.selectOptions && this.options.selectOptions.length > 0)
+                return this.options.selectOptions
+            let defaultVal = this.options.value || this.options.display ? {} : 'none'
+            if (this.options.value)
+                defaultVal[this.options.value] = 'none'
+            if (this.options.display)
+                defaultVal[this.options.display] = 'None'
+            return [defaultVal]
+        }
+    },
+    watch: {
+        currentlySelected() {
+            this.toMain()
+        }
+    },
+    mounted() {
+        this.$nextTick(() => {
+            if (!this.currentlySelected)
+                this.currentlySelected = this.startValue()
+        })
     },
     created() {
         this.toMain({ created: true })

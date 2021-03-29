@@ -1,5 +1,6 @@
 <template>
     <div>
+        
         <general-popup-container
             v-if="showJummahSettings"
             @close="closeSettings()"
@@ -14,6 +15,7 @@
                 @close="closeSettings()"
             />
         </general-popup-container>
+
         <div class="schedule-container">
             <loading :loadingTime="800">
 
@@ -144,7 +146,6 @@ export default {
             this.showJummahSettings = false
         },
         updateViewBasedOnQuery(info) {
-            //console.log(info)
             this.selectedLocation = info.location
             if (info.monthChanged)
                 this.requestJummahs(info.date)
@@ -164,7 +165,6 @@ export default {
             date.setMonth(date.getMonth() + increment)
             date.setDate(1)
             const target = datetime.findUpcomingFriday(date)
-            console.log(target)
             this.changeViewingWeek(target)
         },
         backToCurrentMonth() {

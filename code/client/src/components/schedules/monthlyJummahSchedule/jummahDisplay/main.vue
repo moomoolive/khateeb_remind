@@ -16,11 +16,13 @@
         <div class="jummahPreferences">
             
             <div class="settings-icon-container">
-                <img 
-                    src="~@/assets/misc/settingsCog.png"
-                    class="settings-icon"
+                <button 
+                    :disabled="viewingWeekIsCurrentPastOrFuture === 'past'" 
+                    class="icon-button blue"
                     @click="$emit('open-settings', { khateebPreferences, timing, location })"
                 >
+                    ⚙️
+                </button>
             </div>
 
             <component
@@ -147,6 +149,15 @@ export default {
 
 .settings-icon {
     width: 100%;
+}
+
+.icon-button {
+    height: 30px;
+    width: 30px;
+    font-size: 15px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
 }
 
 .settings-icon-container {

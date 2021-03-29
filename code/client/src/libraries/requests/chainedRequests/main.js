@@ -16,6 +16,12 @@ const requests = {
             locations.getLocations(query),
             timings.getTimings(query)
         ])
+    },
+    getAllLocationsAndTimings() {
+        return Promise.all([
+            locations.getLocations(),
+            timings.getTimings()
+        ])
     }
 }
 
