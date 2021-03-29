@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="showJummah">
         
         <div class="timing-container">
             <div class="jummah-status-container">
@@ -38,7 +38,7 @@
             />
 
             <div class="last-updated">
-                <span class="timing">Last Updated:</span><br>
+                <div class="timing">Last Updated:</div>
                 {{ updateDisplay() }}
             </div>
 
@@ -90,7 +90,8 @@ export default {
     },
     data() {
         return {
-            jummahStaticTags
+            jummahStaticTags,
+            showJummah: true
         }
     },
     methods: {
@@ -120,6 +121,10 @@ export default {
         },
         oneKhateebWasNotified() {
             return this.khateebPreferences.find(p => p.notified)
+        },
+        rerenderCell() {
+            this.showJummah = false
+            this.$nextTick(() => this.showJummah = true)
         }
     },
     computed: {
@@ -130,6 +135,14 @@ export default {
                     exists = true
              })
             return exists
+        },
+    },
+    watch: {
+        khateebPreferences() {
+            this.rerenderCell()
+        },
+        selectedDate() {
+            this.rerenderCell()
         }
     }
 }
@@ -198,11 +211,12 @@ export default {
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
 }
 
-span {
+div {
     &.timing {
         font-size: 14px;
         text-decoration: underline;
         color: getColor("offWhite");
+        margin-bottom: 2px;
     }
 }
 

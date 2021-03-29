@@ -18,8 +18,7 @@
             :reciever="viewingMode"
             @request-jummahs="requestJummahs($event)"
             @new-preference="createNewJummahPreference($event)"
-            @update-preference="updateJummahPreferenceDelayed($event)"
-            @update-preference-fast="updateJummahPreference($event)"
+            @update-preference="updateJummahPreference($event)"
             @run-notification-loop="runNotificationLoop($event)"
         >
             <template #above-controls>
@@ -62,25 +61,10 @@ export default {
             this.timings = timings
             this.khateebs = khateebs
         },
-        async createNewJummahPreference(newPreference) {
-            await this.utils.delayedRequest(
-                'jummahs',
-                'createNewPreference',
-                {
-                    arguments: [newPreference],
-                    additionalIdentifiers: ['createNewPreference', newPreference.timingID, `backup:${newPreference.isBackup}`]
-                }
-            )
-        },
-        async updateJummahPreferenceDelayed(updatedPreference) {
-            await this.utils.delayedRequest(
-                'jummahs',
-                'updateJummahPreference',
-                {
-                    arguments: [updatedPreference],
-                    additionalIdentifiers: ['createNewPreference', updatedPreference.timingID, `backup:${updatedPreference.isBackup}`]
-                }
-            )
+        async createNewJummahPreference(newPreference={}) {
+            const newJummahPreference = await this.$API.jummahs.createNewJummahPreference(newPreference)
+            if (Object.keys(newJummahPreference).length > 0)
+                this.jummahs.push(newJummahPreference)
         },
         async requestJummahs(jummahDateRange) {
             this.jummahs = await this.$API.jummahs.getJummahs({ date: jummahDateRange })

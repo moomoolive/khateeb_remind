@@ -30,7 +30,11 @@ router.post(
         validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
         validator.body("timingID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
         validator.body("locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
-        validator.body("khateebID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("khateebID").custom(val => {
+            if (val !== 'none' && val.length !== global.APP_CONFIG.consts.mongooseIdLength)
+                throw TypeError('Invalid Khateeb Id')
+            return true
+        }),
         validator.body("notificationID").isLength({ min: 4 }).isString(),
         validator.body("date").isLength({ min: 1 }),
         validator.body("notified").isBoolean(),
@@ -55,7 +59,11 @@ router.put(
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
-        validator.body("khateebID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("khateebID").custom(val => {
+            if (val !== 'none' && val.length !== global.APP_CONFIG.consts.mongooseIdLength)
+                throw TypeError('Invalid Khateeb Id')
+            return true
+        }).optional(),
         validator.body("notificationID").isLength({ min: 4 }).isString().optional(),
         validator.body("notified").isBoolean().optional(),
         validator.body("isGivingKhutbah").isBoolean().optional()

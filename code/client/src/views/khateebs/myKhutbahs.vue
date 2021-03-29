@@ -89,9 +89,11 @@ export default {
             })
         },
         khutbahsInTheFuture() {
-            return this.khutbahs.filter(k => {
-                return !this.sameDateAsUpcomingFriday(k.date) && new Date(k.date).getTime() > this.upcomingFriday.getTime()
-            }) 
+            return this.khutbahs
+                .filter(k => {
+                    return !this.sameDateAsUpcomingFriday(k.date) && new Date(k.date).getTime() > this.upcomingFriday.getTime()
+                })
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) 
         }
     },
     created() {

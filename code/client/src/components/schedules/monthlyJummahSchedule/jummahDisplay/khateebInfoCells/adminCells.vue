@@ -108,17 +108,20 @@ export default {
                     date: this.preferenceDate().toISOString() 
                 })
             }
-            else
+            else {
+                if (this.khateebPreferences[index].isGivingKhutbah)
+                    this.khateebPreferences[index].isGivingKhutbah = khateebID !== 'none'
                 this.$emit('update-preference', { 
                     ...this.khateebPreferences[index], 
                     khateebID,
                     notified: false,
                     notificationID: 'none' 
                 })
+            }
             this.cachePreferences()
         },
         async allowedToMutate(index) {
-            if (this.khateebPreferencesMirror[0].khateebID === this.khateebPreferencesMirror[1].khateebID)
+            if (this.khateebPreferencesMirror[0].khateebID === this.khateebPreferencesMirror[1].khateebID && this.khateebPreferencesMirror[index].khateebID !== 'none')
                 return this.reverseChangeAndAlert(index, `Main and backup khateeb cannot be the same`)
             return true
         },
@@ -159,7 +162,7 @@ export default {
             date.setUTCDate(this.selectedDate.getDate())
             date.setUTCHours(12, 0, 0, 0)
             return date
-        },
+        }
     },
     created() {
         this.setInitialValue()

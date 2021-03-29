@@ -11,7 +11,7 @@
                 :selectedDate="selectedDate"
                 :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                 @run-notification-loop="$emit('run-notification-loop', $event)"
-                @clear-notifications="$emit('update-preference-fast', $event)"
+                @clear-notifications="$emit('update-preference', $event)"
                 @close="closeSettings()"
             />
         </general-popup-container>
@@ -32,9 +32,23 @@
                         :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
                         @change-location="changeViewingLocation($event)"
                         @change-week="changeViewingWeek($event)"
-                        @change-month="changeViewingMonth($event)"
-                        @back-to-current-month="backToCurrentMonth()"
                     />
+
+                    <div class="change-month-buttons-container">
+                        <div>
+                            <button class="yellow change-month-buttons" @click="changeViewingMonth(-1)">
+                                <
+                            </button>
+                        </div>
+                        <div class="month-indicator-text">
+                            {{ this.selectedDate.toLocaleString('en-US', { month: "long", year: "2-digit" }) + "'" }}
+                        </div>
+                        <div>
+                            <button class="yellow change-month-buttons" @click="changeViewingMonth(1)">
+                                >
+                            </button>
+                        </div>
+                    </div>
 
                     <locations-display
                         v-if="showLocations"
@@ -229,14 +243,6 @@ export default {
             return this.locationsWithDataThisMonth.filter(filterFunc)
         },
     },
-    watch: {
-        jummahs() {
-            this.rerenderLocations()
-        },
-        selectedDate() {
-            this.rerenderLocations()
-        }
-    },
     created() {
         this.initializeSettingsInfo()
     }
@@ -244,6 +250,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.change-month-buttons-container {
+    margin-top: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.month-indicator-text {
+    color: getColor("offWhite");
+    font-size: 16px;
+}
+
+.change-month-buttons {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    font-size: 14px;
+    font-weight: bold;
+    max-height: 30px;
+    max-width: 40px;
+    color: black;
+}
+
 .schedule-container {
     padding-top: 15px;
     padding-bottom: 15px;
@@ -257,75 +284,10 @@ export default {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
-.locations-container {
-    margin-top: 60px;
-}
-
 .above-controls-container {
     width: 95%;
     margin-left: auto;
     margin-right: auto;
-}
-
-.location-container {
-    background: themeRGBA("green", 0.7);
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    margin-bottom: 60px;
-    border-radius: 7px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
-}
-
-.jummahContainer {
-    display: flex;
-    width: 70%;
-    height: 20%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 20px;
-    flex-direction: row;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
-    border-radius: 7px;
-}
-
-.location-label {
-    font-size: 35px;
-    font-weight: bold;
-    text-decoration: underline dotted;
-}
-
-.timing-container {
-    background: getColor("offWhite");
-    height: auto !important;
-    border-top-left-radius: 7px;
-    border-bottom-left-radius: 7px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.timingLabel {
-    font-size: 19px;
-}
-
-.jummah-status-container {
-    height: 40%;
-    width: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.jummahPreferences {
-    background: getColor("silver");
-    border-top-right-radius: 7px;
-    border-bottom-right-radius: 7px;
-    padding-top: 10px;
-    padding-bottom: 10px;
 }
 
 .std-controls {
@@ -340,132 +302,16 @@ export default {
     margin-top: 10px;
 }
 
-.location-btns {
-    width: 30%;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 10px;
-}
-
-.external-controls {
-    width: 80%;
-    background: themeRGBA("grey", 0.8);
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 7px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
-    margin-top: 10px;
-}
-
-.std-controls-container {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 10px;
-}
-
-.active-controls {
-    @include blinkingAnimation()
-}
-
-.submit-schedule {
-    width: 80%;
-    height: 6vh;
-    max-height: 50px;
-    font-size: 18px;
-    color: black;
-}
-
-.last-updated {
-    font-size: 16px;
-    margin-top: 10px;
-    font-weight: bold;
-    background: themeRGBA("red", 0.9);
-    margin-left: auto;
-    margin-right: auto;
-    width: 87%;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-radius: 4px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
-}
-
-span {
-    &.timing {
-        font-size: 14px;
-        text-decoration: underline;
-        color: getColor("offWhite");
-    }
-}
-
 @media screen and (max-width: $phoneWidth) {
-    .last-updated {
-        font-size: 2.2vh;
-    }
     .schedule-container {
             background: themeRGBA("darkBlue", 0.5);
             width: 90%;
-    }
-    .locations-container {
-        margin-top: 8vh;
-    }
-    .jummahContainer {
-        display: flex;
-        flex-direction: column;
-    }
-    .location-container {
-        margin-bottom: 20%;
-    }
-    .location-label {
-        font-size: 3.6vh;
-    }
-    .timingLabel {
-        font-size: 3vh;
-    }
-    .timing-container {
-        padding-top: 2vh;
-        padding-bottom: 2vh;
-        background: getColor("offWhite");
-        height: auto !important;
-        border-radius: 0;
-        border-top-left-radius: 7px;
-        border-top-right-radius: 7px;
-    }
-    .jummah-status-container {
-        margin-bottom: 2vh;
-        height: 5vh;
-    }
-    .jummahPreferences {
-        border-radius: 0;
-        border-bottom-left-radius: 7px;
-        border-bottom-right-radius: 7px;
-        padding-top: 2vh;
-        padding-bottom: 2vh;
-        padding-top: 0;
     }
     .std-controls {
         display: flex;
         flex-direction: column;
         width: 40%;
         height: auto !important;
-    }
-    .std-controls-container {
-        display: flex;
-        flex-direction: row;
-    }
-    .external-controls {
-        width: 73%;
-    }
-    .submit-schedule {
-        font-size: 2vh;
-    }
-    .location-btns {
-        width: 85%;
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 1vh;
     }
 }
 

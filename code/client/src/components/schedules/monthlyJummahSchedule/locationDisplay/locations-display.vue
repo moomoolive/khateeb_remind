@@ -119,7 +119,7 @@ export default {
 
 <style lang="scss" scoped>
 .locations-container {
-    margin-top: 60px;
+    margin-top: 10px;
 }
 
 ::v-deep .button-label {
@@ -143,11 +143,5 @@ export default {
     font-size: 30px;
     font-weight: bold;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-}
-
-@media screen and (max-width: $phoneWidth) {
-    .locations-container {
-        margin-top: 8vh;
-    }
 }
 </style>
