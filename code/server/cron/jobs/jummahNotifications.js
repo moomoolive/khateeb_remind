@@ -8,14 +8,46 @@ const job = async () => {
         const upcomingFriday = scheduleHelpers.findUpcomingFridayDBFormat()
         for (let i = 0; i < institutions.length; i++) {
             const targetInstitution = institutions[i]
+            const numberOfJummahThisMonth = scheduleHelpers.numberOfJummahThisMonth(targetInstitution.getLocalTime())
             const activeTimings = await $db.timings.find().activeTimings(targetInstitution._id).exec()
             const scheduledUpcomingJummahs = await $db.jummahPreferences.find().upcomingJummahsForInstitution(upcomingFriday, targetInstitution._id).exec()
             for (let x = 0; x < activeTimings.length; x++) {
                 const targetTiming = activeTimings[x]
-                const khateebsScheduledForThisTiming = scheduledUpcomingJummahs.filter(j => j.timingID === targetTiming._id.toString())
+                let khateebsScheduledForThisTiming = scheduledUpcomingJummahs.filter(j => j.timingID === targetTiming._id.toString())
+                let mainKhateeb = khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah)
+                let backupKhateeb = khateebsScheduledForThisTiming.find(k => k.isBackup)
+                if (khateebsScheduledForThisTiming.length < 2) {
+                    const defaultKhateebs = targetTiming.defaultKhateebs[numberOfJummahThisMonth - 1]
+                    if (!mainKhateeb && defaultKhateebs.mainKhateeb !== 'none') {
+                        const defaultMain = await new $db.jummahPreferences({
+                            locationID: targetTiming.locationID,
+                            institutionID: targetTiming.timingID,
+                            timingID: targetTiming._id.toString(),
+                            // not localized
+                            date: scheduleHelpers.findUpcomingFridayDBFormat(),
+                            khateebID: defaultKhateebs.mainKhateeb,
+                            isGivingKhutbah: true,
+                            isBackup: false
+                        }).save()
+                        khateebsScheduledForThisTiming.push(defaultMain)
+                    }
+                    if (!backupKhateeb && defaultKhateebs.backup !== 'none') {
+                        const defaultBackup = await new $db.jummahPreferences({
+                            locationID: targetTiming.locationID,
+                            institutionID: targetTiming.timingID,
+                            timingID: targetTiming._id.toString(),
+                            // not localized
+                            date: scheduleHelpers.findUpcomingFridayDBFormat(),
+                            khateebID: defaultKhateebs.mainKhateeb,
+                            isGivingKhutbah: !khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah),
+                            isBackup: true
+                        }).save()
+                        khateebsScheduledForThisTiming.push(defaultBackup)
+                    } 
+                }
                 if (khateebsScheduledForThisTiming.length < 1)
                     continue
-                let mainKhateeb = khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah)
+                mainKhateeb = khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah)
                 if (!mainKhateeb)
                     mainKhateeb = await $db.jummahPreferences.findOneAndUpdate({ _id: khateebsScheduledForThisTiming[0]._id.toString() }, { isGivingKhutbah: true }, { new: true })
                 cronWrapper({ 
