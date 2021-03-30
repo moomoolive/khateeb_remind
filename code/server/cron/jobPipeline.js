@@ -5,11 +5,11 @@ const createTestInstitution = require('./jobs/createTestInstitution.js')
 const deleteExpiredShortURLs = require('./jobs/deleteShortURLs.js')
 
 const start = () => {
+    jummahNotifications.start()
     if (process.env.NODE_ENV !== 'production')
         return
     createTestInstitution.start()
     createRootInstitutionAndUser.start()    
-    jummahNotifications.start()
     deleteVerificationCodes.start()
     deleteExpiredShortURLs.start()
     console.log(`All cron jobs have been scheduled`)

@@ -90,7 +90,7 @@ const runNotificationLoop = async (targetPreference={}, otherPreference={}) => {
 
 const chronNotificationLoop = async (targetPreference={}, institution={}, timing={}) => {
     const res = await runNotificationLoop(targetPreference)
-    console.log(`send notification for institution ${institution.name} (id: ${institution._id}), timing: ${timing._id}`)
+    console.log(`sent notification for institution ${institution.name} (id: ${institution._id}), timing: ${timing._id}`)
     return res
 }
 

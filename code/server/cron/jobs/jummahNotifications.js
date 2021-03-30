@@ -16,15 +16,16 @@ const job = async () => {
                 let khateebsScheduledForThisTiming = scheduledUpcomingJummahs.filter(j => j.timingID === targetTiming._id.toString())
                 let mainKhateeb = khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah)
                 let backupKhateeb = khateebsScheduledForThisTiming.find(k => k.isBackup)
+                console.log(scheduledUpcomingJummahs)
                 if (khateebsScheduledForThisTiming.length < 2) {
                     const defaultKhateebs = targetTiming.defaultKhateebs[numberOfJummahThisMonth - 1]
                     if (!mainKhateeb && defaultKhateebs.mainKhateeb !== 'none') {
                         const defaultMain = await new $db.jummahPreferences({
                             locationID: targetTiming.locationID,
-                            institutionID: targetTiming.timingID,
+                            institutionID: targetTiming.institutionID,
                             timingID: targetTiming._id.toString(),
                             // not localized
-                            date: scheduleHelpers.findUpcomingFridayDBFormat(),
+                            date: upcomingFriday,
                             khateebID: defaultKhateebs.mainKhateeb,
                             isGivingKhutbah: true,
                             isBackup: false
@@ -34,11 +35,11 @@ const job = async () => {
                     if (!backupKhateeb && defaultKhateebs.backup !== 'none') {
                         const defaultBackup = await new $db.jummahPreferences({
                             locationID: targetTiming.locationID,
-                            institutionID: targetTiming.timingID,
+                            institutionID: targetTiming.institutionID,
                             timingID: targetTiming._id.toString(),
                             // not localized
                             date: scheduleHelpers.findUpcomingFridayDBFormat(),
-                            khateebID: defaultKhateebs.mainKhateeb,
+                            khateebID: upcomingFriday,
                             isGivingKhutbah: !khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah),
                             isBackup: true
                         }).save()
@@ -48,13 +49,15 @@ const job = async () => {
                 if (khateebsScheduledForThisTiming.length < 1)
                     continue
                 mainKhateeb = khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah)
-                if (!mainKhateeb)
+                if (!mainKhateeb && !khateebsScheduledForThisTiming[0].notified )
                     mainKhateeb = await $db.jummahPreferences.findOneAndUpdate({ _id: khateebsScheduledForThisTiming[0]._id.toString() }, { isGivingKhutbah: true }, { new: true })
-                cronWrapper({ 
-                    time: '00 00 6 * * 3', // hardcoded right now, every wednesday at 6AM
-                    timeZone: targetInstitution.timezone, 
-                    job: jummahHelpers.chronNotificationLoop(mainKhateeb, targetInstitution, targetTiming)    
-                }).start()
+                console.log('before chron', mainKhateeb)
+                if (!mainKhateeb.notified)    
+                    cronWrapper({ 
+                        /*time: '00 00 6 * * 3',*/ // hardcoded right now, every wednesday at 6AM
+                        timeZone: targetInstitution.timezone, 
+                        job: jummahHelpers.chronNotificationLoop(mainKhateeb, targetInstitution, targetTiming)    
+                    }).start()
             }
         }
         console.log(`Set notification cron jobs for institutions!`)
@@ -65,4 +68,4 @@ const job = async () => {
 }
 
 // every sunday @ 6AM
-module.exports = cronWrapper({ time: '00 00 6 * * 0', syncWithTimezone: true, job })
+module.exports = cronWrapper({ /*time: '00 00 6 * * 0' , syncWithTimezone: true,*/ job })

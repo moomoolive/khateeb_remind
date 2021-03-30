@@ -18,15 +18,16 @@ const sameMonthDateAndYear = (a=new Date(), b=new Date()) => {
 }
 
 const numberOfJummahThisMonth = (date=new Date()) => {
-    const upcomingFriday = new Date(helpers.findUpcomingFriday({
+    const dayjs = helpers.createDayJs({
         month: date.getMonth(),
         year: date.getFullYear(),
         date: date.getDate()
-    }).toISOString())
-    const firstFriday = findFirstFriday(date.getMonth(), date.getFullYear())
+    })
+    const upcomingFriday = new Date(helpers.findUpcomingFriday(dayjs).toISOString())
+    const firstFriday = findFirstFriday(date.getMonth() + 1, date.getFullYear())
     let count = 1
     const week = 7
-    while (!sameMonthDateAndYear(upcomingFriday, findFirstFriday)) {
+    while (!sameMonthDateAndYear(upcomingFriday, firstFriday)) {
         firstFriday.setDate(firstFriday.getDate() + week)
         count++
     }

@@ -55,14 +55,13 @@ jummahPreference.methods.gatherMeta = async function() {
     }
 }
 
-jummahPreference.query.upcomingJummahsForInstitution = function (date=new Date(), institutionID='none', notified=false) {
+jummahPreference.query.upcomingJummahsForInstitution = function (date=new Date(), institutionID='none') {
     institutionID = institutionID.toString()
     if (!institutionID || institutionID === 'none')
         throw TypeError(`You must provide a valid institution id`)
     return this.where({
         institutionID,
         date,
-        notified,
         khateebID: { $ne: 'none' }
     })
 }
