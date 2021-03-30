@@ -86,7 +86,7 @@ export default {
             return date.toLocaleTimeString('en-US', { minute: '2-digit', hour: '2-digit' })
         },
         closePopup() {
-            this.$emit('close')
+            return this.$emit('close')
         },
         runNotificationLoop(isBackup=false) { 
             if (this.info.khateebPreferences[isBackup ? 1 : 0].notified)

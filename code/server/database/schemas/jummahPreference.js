@@ -23,7 +23,8 @@ const jummahPreference = new mongoose.Schema({
     },
     notified: {
         type: Boolean,
-        required: true
+        required: false,
+        default: false
     },
     isBackup: {
         type: Boolean,
@@ -35,7 +36,8 @@ const jummahPreference = new mongoose.Schema({
     },
     notificationID: {
         type: String,
-        required: true
+        required: false,
+        default: 'none'
     }
 }, { timestamps: true })
 

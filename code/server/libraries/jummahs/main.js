@@ -33,6 +33,7 @@ const sendNotificationToTargetPreference = async (targetPreference={}) => {
         const meta = await targetPreference.gatherMeta()
         const constructorRes = await new notificationConstructors.JummahReminderNotificationConstructor(khateeb, targetPreference, meta).create()
         targetPreference.notificationID = constructorRes[0]._id.toString()
+        targetPreference.notified = true
         console.log('after update', targetPreference)
         return targetPreference
     } catch(err) {
@@ -40,16 +41,46 @@ const sendNotificationToTargetPreference = async (targetPreference={}) => {
     }
 }
 
+const createJummahPreferenceAndReturn = async (preference={}) => {
+    try {
+        if (preference._id)
+            delete preference._id
+        const createdPreference = await new $db.jummahPreferences(preference).save()
+        return createdPreference
+    } catch(err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
 const runNotificationLoop = async (targetPreference={}, otherPreference={}) => {
     try {
+        let targetUpsert = false
+        if (targetPreference.upsert) {
+            targetPreference = await createJummahPreferenceAndReturn(targetPreference)
+            targetUpsert = true
+        }
         targetPreference = await sendNotificationToTargetPreference(targetPreference)
-        targetPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: targetPreference._id }, { notified: true, isGivingKhutbah: true }, { new: true }) 
+        targetPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: targetPreference._id }, { notified: true, isGivingKhutbah: true }, { new: true })
+        if (targetUpsert) {
+            targetPreference = global.utils.deepCopy(targetPreference)
+            targetPreference.upsert = true 
+        }
     } catch(err) {
         console.log(err)
     }
-    if (otherPreference._id && otherPreference._id.toLowerCase() !== 'none') {
+    if (otherPreference._id && (otherPreference._id.toLowerCase() !== 'none' || otherPreference.upsert)) {
         try {
+            let OtherUpserted = false
+            if (otherPreference.upsert) {
+                otherPreference = await createJummahPreferenceAndReturn(otherPreference)
+                OtherUpserted = true
+            }
             otherPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: otherPreference._id }, { isGivingKhutbah: false }, { new: true })
+            if (OtherUpserted) {
+                otherPreference = global.utils.deepCopy(otherPreference)
+                otherPreference.upsert = true
+            }
         } catch(err) {
             console.log(err)
         }

@@ -94,14 +94,21 @@ export default {
             const targetVal = defaultsForTiming[backup ? 'backup' : "mainKhateeb"]
             if (targetVal === 'none')
                 return null
-            else
-                return {
-                    updatedAt: timing.updatedAt,
-                    createdAt: timing.createdAt,
-                    isGivingKhutbah: !backup,
-                    isBackup: backup,
-                    khateebID: targetVal
-                }
+            const date = new Date(this.selectedDate)
+            date.setUTCHours(12, 0, 0, 0)
+            return {
+                updatedAt: timing.updatedAt,
+                createdAt: timing.createdAt,
+                isGivingKhutbah: !backup,
+                isBackup: backup,
+                khateebID: targetVal,
+                notified: false,
+                upsert: true,
+                date: date.toISOString(),
+                timingID: timing._id,
+                locationID: this.location._id,
+                institutionID: this.$store.state.user.institution._id
+            }
         }
     }
 }

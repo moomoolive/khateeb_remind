@@ -86,8 +86,12 @@ export default {
         async runNotificationLoop({ main: preprocessedMain, backup: preprocessedBackup, isBackup }) {
             const { main, backup } = this.fillIdIfEmpty(preprocessedMain, preprocessedBackup)
             const updatedPreferences = await this.$API.jummahs.runNotificationLoop({ main, backup }, isBackup)
-            for (const [key, value] of Object.entries(updatedPreferences))
-                this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
+            for (const [key, value] of Object.entries(updatedPreferences)) {
+                if (value.upsert)
+                    this.jummahs.push(value)
+                else if (value._id && value._id !== 'none')
+                    this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
+            }
         },
     },
     created() {

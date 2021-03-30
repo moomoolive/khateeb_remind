@@ -13,7 +13,7 @@ const requests = {
         return helpers.returnEmptyObjectFromRequest("put", extension, updatedJummah)
     },
     runNotificationLoop(jummah={}, backup=false) {
-        return helpers.returnCustomObjectFromRequest({ targetPreference: {}, otherPreference: {} })("put", extension, jummah, { params: { backup } })
+        return helpers.returnCustomObjectFromRequest({ targetPreference: {}, otherPreference: {} })("put", [extension, 'run-loop'], jummah, { params: { backup } })
     }
 }
 

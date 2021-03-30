@@ -81,25 +81,44 @@ router.put(
 )
 
 router.put(
-    '/run-loop/:backup',
+    '/run-loop',
     validationMiddleware.validateRequest([
         validator.body("main._id").isLength({ min: 4 }).isString(),
         validator.body("main.khateebID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
         validator.body("main.isGivingKhutbah").isBoolean().optional(),
+        validator.body("main.isBackup").isBoolean().optional(),
         validator.body("main.notified").isBoolean().optional(),
+        validator.body("main.upsert").isBoolean().optional(),
+        validator.body("main.date").isISO8601().optional(),
+        validator.body("main.institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("main.timingID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("main.locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+
         validator.body("backup._id").isLength({ min: 4 }).isString(),
         validator.body("backup.khateebID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
         validator.body("backup.isGivingKhutbah").isBoolean().optional(),
+        validator.body("backup.isBackup").isBoolean().optional(),
         validator.body("backup.notified").isBoolean().optional(),
+        validator.body("backup.upsert").isBoolean().optional(),
+        validator.body("backup.date").isISO8601().optional(),
+        validator.body("backup.institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("backup.timingID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("backup.locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
     ]),
     authMiddleware.authenticate({ min: 2, max: 3 }),
     async (req, res) => {
         try {
-            const targetPreference = await $db.jummahPreferences.findOne({ _id: req.body[req.query.backup ? 'backup' : 'main']._id }).exec()
-            if (!targetPreference)
-                return res.status(422).json({ msg: `Target preference does not exist` })
-            else if (targetPreference.institutionID !== req.headers.institutionid)
-                return res.status(403).json({ msg: 'forbidden resource' })
+            let targetPreference = req.body[req.query.backup ? 'backup' : 'main']
+            if (targetPreference.upsert) {
+                if (targetPreference.institutionID !== req.headers.institutionid)
+                    return res.json(403).json({ msg: 'forbidden resource' })
+            } else {
+                targetPreference = await $db.jummahPreferences.findOne({ _id: target._id }).exec()
+                if (!targetPreference)
+                    return res.status(422).json({ msg: `Target preference does not exist` })
+                else if (targetPreference.institutionID !== req.headers.institutionid)
+                    return res.status(403).json({ msg: 'forbidden resource' })
+            }
             const updatedPreferences = await jummahHelpers.runNotificationLoop(targetPreference, req.body[!req.query.backup ? 'backup' : 'main'])
             return res.json({ data: updatedPreferences })
         } catch(err) {
