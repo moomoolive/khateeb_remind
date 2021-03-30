@@ -14,7 +14,7 @@
                 class="jummah-container"
                 :reciever="reciever"
                 :khateebs="khateebs"
-                :khateebPreferences="khateebPreferencesForTiming(timing._id)"
+                :khateebPreferences="khateebPreferencesForTiming(timing._id, timing)"
                 :location="location"
                 :timing="timing"
                 :selectedDate="selectedDate"
@@ -73,17 +73,35 @@ export default {
             type: Date,
             required: true
         },
+        fridayNumberOfSelectedMonth: {
+            type: Number,
+            required: true
+        }
     },
     methods: {
-        khateebPreferencesForTiming(timingId) {
+        khateebPreferencesForTiming(timingId="1234", timing={}) {
             const preferences = this.jummahs.filter(j => j.timingID === timingId && j.locationID === this.location._id)
-            const mainKhateeb = preferences.find(p => !p.isBackup) || {}
-            const backupKhateeb = preferences.find(p => p.isBackup) || {}
+            const mainKhateeb = preferences.find(p => !p.isBackup) || this.findDefaultKhateeb(timing, false) || {}
+            const backupKhateeb = preferences.find(p => p.isBackup) || this.findDefaultKhateeb(timing, true) || {}
             return [mainKhateeb, backupKhateeb]
         },
         jummahContentAvailable() {
             const preferencesAvailable = this.jummahs.filter(j => j.locationID === this.location._id).length > 0
             return preferencesAvailable || this.viewingWeekIsCurrentPastOrFuture !== 'past'
+        },
+        findDefaultKhateeb(timing, backup=false) {
+            const defaultsForTiming = timing.defaultKhateebs[this.fridayNumberOfSelectedMonth - 1]
+            const targetVal = defaultsForTiming[backup ? 'backup' : "mainKhateeb"]
+            if (targetVal === 'none')
+                return null
+            else
+                return {
+                    updatedAt: timing.updatedAt,
+                    createdAt: timing.createdAt,
+                    isGivingKhutbah: !backup,
+                    isBackup: backup,
+                    khateebID: targetVal
+                }
         }
     }
 }

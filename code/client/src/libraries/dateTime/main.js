@@ -60,6 +60,7 @@ export default {
     findUpcomingFriday: helpers.findUpcomingFriday,
     sameMonthSameYear: helpers.sameMonthSameYear,
     localizeToTimezone,
-    sameDateMonthAndYear
+    sameDateMonthAndYear,
+    findFirstFridayOfMonth: helpers.findFirstFridayOfMonth
 }
 

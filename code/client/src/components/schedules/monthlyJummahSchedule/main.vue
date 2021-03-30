@@ -61,6 +61,7 @@
                         :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                         :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
                         :selectedDate="selectedDate"
+                        :fridayNumberOfSelectedMonth="fridayNumberOfSelectedMonth"
                         :monthsFromCurrent="monthsFromCurrent"
                         @new-preference="$emit('new-preference', $event)"
                         @update-preference="$emit('update-preference', $event)"
@@ -208,6 +209,16 @@ export default {
     computed: {
         monthsFromCurrent() {
             return datetime.monthsFromDate(new Date(this.upcomingFriday), new Date(this.selectedDate))
+        },
+        fridayNumberOfSelectedMonth() {
+            const firstFriday = datetime.findFirstFridayOfMonth(new Date(this.selectedDate))
+            let count = 1
+            const oneWeek = 7
+            while (!datetime.sameDateMonthAndYear(firstFriday, this.selectedDate)) {
+                firstFriday.setDate(firstFriday.getDate() + oneWeek)
+                count++
+            }
+            return count
         },
         viewingMonthIsCurrentPastOrFuture() {
             if (this.monthsFromCurrent > 0)

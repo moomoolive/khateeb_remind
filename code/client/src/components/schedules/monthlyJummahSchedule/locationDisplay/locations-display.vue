@@ -11,6 +11,7 @@
                 :reciever="reciever"
                 :khateebs="khateebs"
                 :selectedDate="selectedDate"
+                :fridayNumberOfSelectedMonth="fridayNumberOfSelectedMonth"
                 :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                 @new-preference="$emit('new-preference', $event)"
                 @update-preference="$emit('update-preference', $event)"
@@ -75,6 +76,10 @@ export default {
             required: true
         },
         monthsFromCurrent: {
+            type: Number,
+            required: true
+        },
+        fridayNumberOfSelectedMonth: {
             type: Number,
             required: true
         }

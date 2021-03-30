@@ -33,6 +33,8 @@
 <script>
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
+import khateebHelpers from '@/libraries/khateebs/main.js'
+
 export default {
     name: 'khateebKhateebCells',
     components: {
@@ -61,10 +63,7 @@ export default {
             return `${name}${preference.khateebID === this.$store.getters['user/allInfo']._id ? ' (You)' : ''}`
         },
         khateebName(khateeb) {
-            let base = `${khateeb.firstName} ${khateeb.lastName}`
-            if (khateeb.title.toLowerCase() !== 'none')
-                base += khateeb.title + ' '
-            return base
+            return khateebHelpers.khateebName(khateeb)
         },
         toggleBackupDisplay() {
             this.showBackup = !this.showBackup

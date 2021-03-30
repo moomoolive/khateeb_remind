@@ -1,13 +1,19 @@
 const mongoose = require('mongoose')
 
+const subDocs = require(global.$dir + "/database/subDocuments/main.js")
+
 const timing = new mongoose.Schema({
     institutionID: {
         type: String,
-        required: true
+        required: true,
+        minlength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxlength: global.APP_CONFIG.consts.mongooseIdLength
     },
     locationID: {
         type: String,
-        required: true
+        required: true,
+        minlength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxlength: global.APP_CONFIG.consts.mongooseIdLength
     },
     hour: {
         type: Number,
@@ -25,6 +31,23 @@ const timing = new mongoose.Schema({
         type: Boolean,
         required: false,
         default: true
+    },
+    defaultKhateebs: {
+        type: [subDocs.defaultKhateebForWeek],
+        required: false,
+        default: () => [
+            { mainKhateeb: 'none', backup: 'none' },
+            { mainKhateeb: 'none', backup: 'none' },
+            { mainKhateeb: 'none', backup: 'none' },
+            { mainKhateeb: 'none', backup: 'none' },
+            { mainKhateeb: 'none', backup: 'none' },
+        ],
+        validate: {
+            validator: function(t) {
+                return t.length === 5
+            },
+            message: t => `Default khateebs array must have five entries. Got ${t.length}`
+        }
     }
 }, { timestamps: true })
 

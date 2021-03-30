@@ -48,7 +48,8 @@ router.put(
     validationMiddleware.validateRequest([
         validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
         validator.body("hour").isInt({ min: 0, max: 23 }).optional(),
-        validator.body("minute").isInt({ min: 0, max: 59 }).optional()
+        validator.body("minute").isInt({ min: 0, max: 59 }).optional(),
+        validator.body("defaultKhateebs").isArray().isLength(5).optional()
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "timings"),
     async (req, res) => {

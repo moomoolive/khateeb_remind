@@ -10,6 +10,65 @@
             </button>
         </div>
 
+        <general-popup-container 
+            v-show="showEditDefaultKhateebsContainer" 
+            @close="closePopup()"
+        >
+            <div 
+                v-if="defaultKhateebsArray.length === 5" 
+                class="default-khateebs-container"
+            >
+                <div 
+                    v-for="(defaultKhateebsForWeek, index) in defaultKhateebsArray" 
+                    :key="index"
+                >
+                    
+                    <div class="default-khateebs-week-text" @click="changeDefaultKhateebsSelectedWeek(index)">
+                        <span class="default-week-open-indicator">
+                            {{ selectedDefaultKhateebsWeek === index ? '-' : '+' }}
+                        </span>
+                         Week {{ index + 1 }}{{ index === defaultKhateebsArray.length - 1 ? " (if applicable)" : "" }}
+                    </div>
+
+                    <div 
+                        v-show="selectedDefaultKhateebsWeek === index" 
+                        class="default-khateebs-weekly-container"
+                    >
+
+                        <div v-for="x in 2" :key="x">
+                            <div class="default-khateebs-input-text">
+                                {{ x === 1 ? 'Main Khateeb' : 'Backup' }}
+                            </div>
+                            <select
+                                v-model="timings
+                                    .find(t => t._id === defaultKhateebsInfo)
+                                    .defaultKhateebs[index][x === 1 ? 'mainKhateeb' : 'backup' ]
+                                " 
+                                class="default-khateebs-input"
+                                @change="defaultKhateebChanged(x === 1 ? 'mainKhateeb' : 'backup')"
+                            >
+                                <option value="none">None</option>
+                                <option
+                                    v-for="(khateeb, khateebIndex) in khateebs" 
+                                    :key="khateebIndex"
+                                    :value="khateeb._id"
+                                >
+                                    {{ khateebName(khateeb) }}
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div v-else>
+                There was a problem displaying default khateebs
+            </div>
+
+        </general-popup-container>
+
         <loading>
 
             <div class="locations-container">
@@ -50,6 +109,13 @@
                                 :timing="timing"
                                 @changed="incrementTime($event, timing)"
                             />
+
+                            <button 
+                                class="purple edit-default-khateebs-button"
+                                @click="showDefaultKhateebs(timing)"    
+                            >
+                                Edit Default Khateebs
+                            </button>
 
                             <button 
                                 class="red timing-btns extra-margin"
@@ -100,23 +166,71 @@
 import loading from '@/components/general/loadingScreen.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import timingMutator from '@/components/general/timingMutator.vue'
+import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
+import khateebHelpers from '@/libraries/khateebs/main.js'
 
 export default {
     name: 'editLocationAndTimings',
     components: {
         collapsableBox,
         loading,
-        timingMutator
+        timingMutator,
+        generalPopupContainer
     },
     data() {
         return {
             locations: [],
-            timings: []
+            timings: [],
+            khateebs: [],
+            showEditDefaultKhateebsContainer: false,
+            defaultKhateebsInfo: 'none',
+            selectedDefaultKhateebsWeek: -1,
+            cachedTimings: []
         }
     },
     methods: {
+        khateebName(khateeb) {
+            return khateebHelpers.khateebName(khateeb)
+        },
+        defaultKhateebChanged(role="mainKhateeb") {
+            const targetData = this.timings
+                .find(t => t._id === this.defaultKhateebsInfo)
+                .defaultKhateebs[this.selectedDefaultKhateebsWeek]
+            if (!this.newPreferenceChangeIsAllowed(targetData, role))
+                return this.overwriteTimingsWithCache()
+            this.updateTiming(this.defaultKhateebsTiming)
+            
+        },
+        overwriteTimingsWithCache() {
+            this.timings = this.utils.deepCopy(this.cachedTimings)
+        },
+        newPreferenceChangeIsAllowed(newPreferences={}, role="mainKhateeb") {
+            if (newPreferences.mainKhateeb === newPreferences.backup && newPreferences[role] !== 'none') {
+                this.utils.alert(`Main and backup khateeb cannot be the same`)
+                return false
+            }
+            const khateeb = this.khateebs.find(k => k._id === newPreferences[role])
+            if (khateeb && khateeb.availableTimings.length > 0 && !khateeb.availableTimings.find(t => t === this.defaultKhateebsTiming._id)) {
+                this.utils.alert(`${khateeb.firstName} has specified that he is not available for this timing. You are not allowed to schedule him as a default khateeb here.`)
+                return false
+            }
+            return true
+        },
+        async updateTiming(updatedTiming={}) {
+            const res = await this.$API.timings.updateTiming(updatedTiming)
+            if (Object.keys(res).length > 0)
+                this.timings.splice(this.findIndexById(res._id, "timings"), 1, res)
+            else
+                this.overwriteTimingsWithCache()
+        },
+        changeDefaultKhateebsSelectedWeek(index=1) {
+            if (this.selectedDefaultKhateebsWeek !== index)
+                this.selectedDefaultKhateebsWeek = index
+            else
+                this.selectedDefaultKhateebsWeek = -1
+        },
         async updateLocation(location, index) {
             await this.utils.delayedRequest(
                 'locations',
@@ -138,6 +252,15 @@ export default {
                     additionalIdentifiers: [index.toString()]
                 }
             )
+        },
+        showDefaultKhateebs(timing={}) {
+            this.defaultKhateebsInfo = timing._id
+            this.showEditDefaultKhateebsContainer = true
+        },
+        closePopup() {
+            this.showEditDefaultKhateebsContainer = false
+            this.selectedDefaultKhateebsWeek = -1
+            this.defaultKhateebsInfo = 'none'
         },
         async addNewLocation() {
             const length = this.locations.length + 1
@@ -183,13 +306,33 @@ export default {
             const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
             this.locations = locations
             this.timings = timings
+        },
+        async getKhateebs() {
+            this.khateebs = await this.$API.khateebs.getKhateebs()
         }
     },
     computed: {
-        
+        defaultKhateebsTiming() {
+            if (this.defaultKhateebsInfo !== 'none')
+                return this.timings[this.findIndexById(this.defaultKhateebsInfo, "timings")]
+            else
+                return {}
+        },
+        defaultKhateebsArray() {
+            if (Object.keys(this.defaultKhateebsTiming).length > 0)
+                return this.defaultKhateebsTiming.defaultKhateebs
+            else
+                return []
+        }
+    },
+    watch: {
+        timings(newVal) {
+            this.cachedTimings = this.utils.deepCopy(newVal)
+        }
     },
     created() {
         this.getLocationsAndTimings()
+        this.getKhateebs()
     }
 }
 </script>
@@ -201,6 +344,11 @@ export default {
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.default-khateebs-container {
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 p {
@@ -252,6 +400,55 @@ input {
 
 button {
     max-height: 45px;
+}
+
+.edit-default-khateebs-button {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    max-width: 200px;
+    height: 30px;
+    font-size: 15px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.default-khateebs-weekly-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.default-khateebs-input-text {
+    color: getColor("purple");
+    font-size: 16px;
+    margin-bottom: 3px;
+}
+
+.default-khateebs-input {
+    width: 105px;
+    margin-bottom: 12px;
+    height: 30px;
+    border: none;
+    outline: none;
+    border-radius: 4px;
+    background: getColor("silver");
+    color: getColor("purple");
+}
+
+.default-khateebs-week-text {
+    color: getColor("offWhite");
+    font-size: 18px;
+    text-align: left;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
+.default-week-open-indicator {
+    color: getColor("blue");
 }
 
 .timing-btns {

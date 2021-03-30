@@ -1,33 +1,31 @@
 const mongoose = require('mongoose')
 
+const defaultKhateebForWeek = new mongoose.Schema({
+    mainKhateeb: {
+        type: String,
+        required: true,
+        minlength: 1
+    },
+    backup: {
+        type: String,
+        required: true,
+        minlength: 1
+    },
+}, { timestamps: true })
+
+const unavailableDate = new mongoose.Schema({
+    vCalendarId: {
+        type: String,
+        required: true
+    }, 
+    date: {
+        type: Date,
+        required: true
+    }
+}, { timestamps: true })
+
 module.exports = {
-    prayerSlot: new mongoose.Schema({
-        notified: {
-            type: Boolean,
-            required: true
-        },
-        confirmed: {
-            type: Boolean,
-            required: true
-        },
-        responded: {
-            type: Boolean,
-            required: true
-        },
-        khateebID: {
-            type: String,
-            required: true
-        }
-    }, { timestamps: true }),
-    unavailableDate: new mongoose.Schema({
-        vCalendarId: {
-            type: String,
-            required: true
-        }, 
-        date: {
-            type: Date,
-            required: true
-        }
-    }, { timestamps: true })
+    unavailableDate,
+    defaultKhateebForWeek
 }
 

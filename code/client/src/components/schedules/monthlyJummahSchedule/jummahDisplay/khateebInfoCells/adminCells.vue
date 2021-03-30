@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import khateebHelpers from '@/libraries/khateebs/main.js'
+
 export default {
     name: "adminKhateebCells",
     props: {
@@ -84,10 +86,7 @@ export default {
     },
     methods: {
         khateebName(khateeb) {
-            let name = `${khateeb.firstName} ${khateeb.lastName}`
-            if (khateeb.title.toLowerCase() !== 'none')
-                name += khateeb.title + " "
-            return name
+            return khateebHelpers.khateebName(khateeb)
         },
         async khateebSelectionChanged(change, index) {
             const khateebID = change.target.value

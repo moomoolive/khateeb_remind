@@ -37,7 +37,7 @@
                 @update-preference="$emit('update-preference', $event)"
             />
 
-            <div class="last-updated">
+            <div v-if="preferenceEntryExists" class="last-updated">
                 <div class="timing">Last Updated:</div>
                 {{ updateDisplay() }}
             </div>

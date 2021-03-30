@@ -6,7 +6,7 @@
             </a>
         </div>
         <div v-if="showInstitutionName" class="institution-name">
-            {{ institutionName }}
+            {{ institution.name }}
         </div>
     </div>
 </template>
@@ -19,14 +19,11 @@ export default {
             return this.$store.getters['user/authLevel'] 
         },
         showInstitutionName() {
-            return this.authLevel > 0 && this.$store.getters['user/isLoggedIn'] 
+            return this.$store.getters['user/isLoggedIn'] && (this.institution.name === '__TEST__' || this.institution.name === '__ROOT__')
         },
         institution() {
             return this.$store.state.user.institution
-        },
-        institutionName() {
-            return this.authLevel > 3 || this.institution.name === '__TEST__' ?  this.institution.name : this.institution.abbreviatedName
-        },
+        }
     }
 }
 </script>
