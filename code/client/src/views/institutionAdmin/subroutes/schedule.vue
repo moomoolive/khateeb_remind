@@ -23,14 +23,27 @@
             @khateeb-signup="utils.alert('This feature is only available to khateebs!')"
         >
             <template #above-controls>
-                <div class="viewing-mode-container">
-                    <div class="select-text">
-                        Viewing Mode
+                <div>
+                    
+                    <div 
+                        v-if="institutionSettings.allowJummahNotifications && showChronTime" 
+                        class="notification-time-container"
+                    >
+                        <button class="notification-time-button turquoise" @click="chronInfo()">
+                            ⏰ {{ chronTiming() }}
+                        </button>
                     </div>
-                    <select v-model="viewingMode" class="viewing-mode-dropdown">
-                        <option value="institutionAdmin">Admin</option>
-                        <option value="khateeb">Khateeb</option>
-                    </select>
+
+                    <div class="viewing-mode-container">
+                        <div class="select-text">
+                            Viewing Mode
+                        </div>
+                        <select v-model="viewingMode" class="viewing-mode-dropdown">
+                            <option value="institutionAdmin">Admin</option>
+                            <option value="khateeb">Khateeb</option>
+                        </select>
+                    </div>
+
                 </div>
             </template>
         </monthly-jummah-schedule>
@@ -40,6 +53,8 @@
 
 <script>
 import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule/main.vue'
+
+import timingHelpers from '@/libraries/timings/main.js'
 
 export default {
     name: "scheduleSetter",
@@ -52,15 +67,25 @@ export default {
             locations: [],
             timings: [],
             khateebs: [],
-            viewingMode: 'institutionAdmin'
+            viewingMode: 'institutionAdmin',
+            institutionSettings: {},
+            showChronTime: true
         }
     },
     methods: {
+        chronInfo() {
+            return this.utils.alert(
+                `Khateeb remind sends notifications to all your scheduled khateebs on ${this.chronTiming('long')}. If you want to change the scheduled time or turn off notifications you can do so by heading to settings.`,
+                "success",
+                { icon: "clock-no-markings" }
+            )
+        },
         async getScheduleBuildingBlocks() {
-            const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
+            const [locations, timings, khateebs, { settings }] = await this.$API.chainedRequests.getScheduleComponents()
             this.locations = locations
             this.timings = timings
             this.khateebs = khateebs
+            this.institutionSettings = settings
         },
         async createNewJummahPreference(newPreference={}) {
             const newJummahPreference = await this.$API.jummahs.createNewJummahPreference(newPreference)
@@ -94,6 +119,12 @@ export default {
                     this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
             }
         },
+        chronTiming(weekDayFormat="short") {
+            const date = timingHelpers.chronTiming(this.institutionSettings.jummahNotificationsTiming)
+            const dayOfWeek = date.toLocaleString('en-US', { weekday: weekDayFormat })
+            const time = date.toLocaleString('en-US', { minute: '2-digit', hour: 'numeric' })
+            return `${dayOfWeek} @ ${time}`
+        }
     },
     created() {
         this.getScheduleBuildingBlocks()
@@ -106,6 +137,18 @@ export default {
     margin-left: auto;
     width: 53%;
     padding-bottom: 10px;
+}
+
+.notification-time-container {
+    margin-right: auto;
+    width: 59%;
+}
+
+.notification-time-button {
+    font-size: 12px;
+    border-radius: 99999px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    color: black;
 }
 
 .select-text {

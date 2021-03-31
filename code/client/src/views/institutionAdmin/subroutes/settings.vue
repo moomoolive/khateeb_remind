@@ -129,7 +129,7 @@ import institutionFormTemplate from '@/components/forms/templates/institution.vu
 import msgWithPic from '@/components/general/msgWithPic.vue'
 
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
-import datetime from '@/libraries/dateTime/main.js'
+import timingHelpers from '@/libraries/timings/main.js'
 
 export default {
     name: "settings",
@@ -192,10 +192,7 @@ export default {
         notificationTiming() {
             if (!this.settingsArePresent)
                 return 'Wednesdays @ 6:00 AM'
-            const info = this.institution.settings.jummahNotificationsTiming
-            let date = new Date()
-            date = datetime.setDayOfWeek(date, info.dayOfWeek)
-            date.setHours(info.hour, info.minute, 0, 0)
+            const date = timingHelpers.chronTiming(this.institution.settings.jummahNotificationsTiming)
             const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' })
             const time = date.toLocaleString('en-US', { minute: '2-digit', hour: 'numeric' })
             return `${dayOfWeek}s @ ${time}`
