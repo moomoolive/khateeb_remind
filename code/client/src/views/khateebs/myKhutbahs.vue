@@ -6,7 +6,44 @@
                 Back to Home
             </button>
 
-            <div v-if="khutbahs.length > 0">
+            <div v-if="allKhutbahs.length > 0">
+
+                <div v-if="defaultKhateebsWithUser.length > 0">
+                    
+                    <button class="my-regularly-scheduled-khutbahs-button" @click="openDefaultKhateebsPopup()">
+                        Your Regularly Scheduled Khutbahs
+                    </button>
+
+                    <general-popup-container 
+                        v-show="showDefaultKhateebsPopup"
+                        @close="closeDefaultKhateebsPopup()"
+                    >
+                        <div
+                            v-for="(khutbah, khutbahIndex) in defaultKhateebsWithUser"
+                            :key="khutbahIndex"
+                            class="my-regularly-scheduled-khutbahs-text"
+                        >
+                            
+                            <div>
+                                Location: {{ locations.find(l => l._id === khutbah.locationId).name }}
+                            </div>
+
+                            <div>
+                                Time: {{ timingDisplay(khutbah.timingId) }}
+                            </div>
+
+                            <div>
+                                Role: {{ khutbah.isBackup ? "Backup" : 'Main Khateeb' }}
+                            </div>
+
+                            <div>
+                                Week: {{ khutbah.week + 1 }}{{ khutbah.week === 4 ? ' (if applicable)' : '' }}
+                            </div>
+
+                        </div>
+                    </general-popup-container>
+                
+                </div>
                 
                 <my-khutbahs-display 
                     :header="`Your Khutbahs this Week`"
@@ -48,27 +85,53 @@
 import msgWithPic from '@/components/general/msgWithPic.vue'
 import myKhutbahsDisplay from '@/components/misc/myKhutbahsDisplay.vue'
 import loading from '@/components/general/loadingScreen.vue'
+import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
+import jummahHelpers from '@/libraries/jummahs/main.js'
+import timingHelpers from '@/libraries/timings/main.js'
 
 export default {
     name: "myKhutbahs",
     components: {
         msgWithPic,
         myKhutbahsDisplay,
-        loading
+        loading,
+        generalPopupContainer
     },
     data() {
         return {
             khutbahs: [],
             upcomingFriday: datetime.findUpcomingFriday(),
             timings: [],
-            locations: []
+            locations: [],
+            allKhutbahsUntilTheEndOfNextMonthNotFromUser: [],
+            showDefaultKhateebsPopup: false
         }
     },
     methods: {
+        openDefaultKhateebsPopup() {
+            this.showDefaultKhateebsPopup = true
+        },
+        closeDefaultKhateebsPopup() {
+            this.showDefaultKhateebsPopup = false
+        },
+        timingDisplay(timingId="1234") {
+            const timing = this.timings.find(t => t._id === timingId)
+            return timingHelpers.timingDisplay(timing)
+        },
+        async requestJummahsForCurrentUser() {
+            this.khutbahs = await this.requestJummahs({ khateebID: this.currentUserId })
+        }, 
         async requestJummahs(query={}) {
-            this.khutbahs = await this.$API.jummahs.getJummahs(query)
+            const data = await this.$API.jummahs.getJummahs(query)
+            return data 
+        },
+        async requestJummahsUpUntilTheEndOfNextMonth() {
+            this.allKhutbahsUntilTheEndOfNextMonthNotFromUser = await this.requestJummahs({ 
+                date: this.createQueryRangeFromThisFridayToNextMonth(), 
+                khateebID: { $ne: this.currentUserId } 
+            })
         },
         async getAllLocationsAndTimings() {
             const [locations, timings] = await this.$API.chainedRequests.getAllLocationsAndTimings()
@@ -77,27 +140,92 @@ export default {
         },
         sameDateAsUpcomingFriday(candidate=new Date()) {
             return datetime.sameDateMonthAndYear(new Date(candidate), this.upcomingFriday)
-        }
+        },
+        createQueryRangeFromThisFridayToNextMonth() {
+            const startDate = jummahHelpers.fridayToFridayDBFormat(this.upcomingFriday)
+            const nextMonth = new Date(this.upcomingFriday)
+            nextMonth.setMonth(nextMonth.getMonth() + 1)
+            const { $lt } = jummahHelpers.createMonthlyRequestRange(nextMonth)
+            return {
+                $gte: startDate,
+                $lt
+            }
+        },
     },
     computed: {
+        allUserJummahsPlusUpcomingJummahUntilTheEndOfNextMonth() {
+            return [...this.khutbahs, ...this.allKhutbahsUntilTheEndOfNextMonthNotFromUser]
+        },
         upcomingWeekKhutbahs() {
-            return this.khutbahs.filter(k => this.sameDateAsUpcomingFriday(k.date))
+            return this.allKhutbahs.filter(k => this.sameDateAsUpcomingFriday(k.date))
         },
         khutbahsInThePast() {
-            return this.khutbahs.filter(k => {
+            return this.allKhutbahs.filter(k => {
                 return !this.sameDateAsUpcomingFriday(k.date) && new Date(k.date).getTime() < this.upcomingFriday.getTime()
             })
         },
         khutbahsInTheFuture() {
-            return this.khutbahs
+            return this.allKhutbahs
                 .filter(k => {
                     return !this.sameDateAsUpcomingFriday(k.date) && new Date(k.date).getTime() > this.upcomingFriday.getTime()
                 })
                 .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) 
+        },
+        activeTimings() {
+            return this.timings.filter(t => t.active)
+        },
+        defaultKhateebsWithUser() {
+            return this.activeTimings
+                .map(t => ({ default: t.defaultKhateebs.map((d, index) => ({ index, data: { ...d, timingId: t._id, locationId: t.locationID } })) }))
+                .reduce((total, timingInfo) => [...total, ...timingInfo.default], [])
+                .filter(t => t.data.mainKhateeb === this.currentUserId || t.data.backup === this.currentUserId)
+                .map(t => ({ ...t.data, week: t.index, isBackup: t.data.backup === this.currentUserId }))
+        },
+        upcomingKhutbahsFromDefaultKhateebs() {
+            return Object.keys(this.allFridaysThisMonthAndNext)
+                .map(m => {
+                    return this.defaultKhateebsWithUser
+                        .map(t => {
+                            return {
+                                updatedAt: t.updatedAt,
+                                locationID: t.locationId,
+                                timingID: t.timingId,
+                                date: new Date(this.allFridaysThisMonthAndNext[m][t.week]),
+                                isBackup: t.isBackup,
+                                isGivingKhutbah: !t.isBackup,
+                                fromDefaults: true
+                            }
+                        })
+                        .filter(t => {
+                            return !this.allUserJummahsPlusUpcomingJummahUntilTheEndOfNextMonth
+                                .find(k => {
+                                    return k.locationID === t.locationID && 
+                                        k.timingID === t.timingID && 
+                                        datetime.sameDateMonthAndYear(new Date(k.date), new Date(t.date))
+                                })
+                        })
+                })
+                .reduce((total, m) => [...total, ...m], [])
+        },
+        currentUserId() {
+            return this.$store.getters['user/allInfo']._id
+        },
+        allFridaysThisMonthAndNext() {
+            const thisMonth = new Date(this.upcomingFriday)
+            const nextMonth = new Date(thisMonth)
+            nextMonth.setMonth(nextMonth.getMonth() + 1)
+            return {
+                thisMonth: datetime.allUpcomingFridays(thisMonth, true),
+                nextMonth: datetime.allUpcomingFridays(nextMonth, true)
+            }
+        },
+        allKhutbahs() {
+            return [...this.khutbahs, ...this.upcomingKhutbahsFromDefaultKhateebs]
         }
     },
     created() {
-        this.requestJummahs({ khateebID: this.$store.getters['user/allInfo']._id })
+        this.requestJummahsForCurrentUser()
+        this.requestJummahsUpUntilTheEndOfNextMonth()
         this.getAllLocationsAndTimings()
     }
 }
@@ -114,5 +242,21 @@ export default {
 .content-container {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+.my-regularly-scheduled-khutbahs-text {
+    color: getColor("offWhite");
+    text-align: left;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.my-regularly-scheduled-khutbahs-button {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 </style>

@@ -40,6 +40,16 @@
                         }"
                     />
 
+                    <tag-circle
+                        v-if="khutbah.fromDefaults"
+                        class="info-tag time"
+                        :info="{ 
+                            words: 'Regular',
+                            icon: '📅',
+                            color: 'red'
+                        }"
+                    />
+
                 </div>
 
                 <div>
@@ -62,6 +72,8 @@
 
 <script>
 import tagCircle from '@/components/general/tagCircle.vue'
+
+import timingHelpers from '@/libraries/timings/main.js'
 
 export default {
     name: "myKhutbahDisplayer",
@@ -105,13 +117,11 @@ export default {
             else if (!isGivingKhutbah && !isBackup)
                 return `Your admin scheduled a backup khateeb in your place.`
             else
-                return `You aren't scheduled to give this khutbah.`
+                return `You haven't been asked to substitute for this khutbah yet.`
         },
         timingDisplay({ timingID }) {
             const timing = this.timings.find(t => t._id === timingID)
-            const date = new Date()
-            date.setHours(timing.hour, timing.minute, 0, 0)
-            return date.toLocaleTimeString('en-US', { minute: '2-digit', hour: '2-digit' })
+            return timingHelpers.timingDisplay(timing)
         },
         locationDisplay({ locationID }) {
             const location = this.locations.find(l => l._id === locationID)
@@ -192,6 +202,7 @@ div {
     box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
     padding-top: 10px;
     padding-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .status-text {

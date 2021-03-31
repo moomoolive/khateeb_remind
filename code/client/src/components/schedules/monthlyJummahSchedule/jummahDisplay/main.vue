@@ -51,6 +51,8 @@
 import tagCircle from '@/components/general/tagCircle.vue'
 import jummahStaticTags from './jummahTags.json'
 
+import timingHelpers from '@/libraries/timings/main.js'
+
 export default {
     name: 'jummahDisplayer',
     components: {
@@ -96,9 +98,7 @@ export default {
     },
     methods: {
         jummahTiming() {
-            const timing = new Date()
-            timing.setHours(this.timing.hour, this.timing.minute, 0, 0)
-            return timing.toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" })
+            return timingHelpers.timingDisplay(this.timing)
         },
         renderJummahTag(viewingWeek) {
             if (viewingWeek === 'past')

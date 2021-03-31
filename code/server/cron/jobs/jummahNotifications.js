@@ -54,7 +54,7 @@ const job = async () => {
                 console.log('before chron', mainKhateeb)
                 if (!mainKhateeb.notified)    
                     cronWrapper({ 
-                        /*time: '00 00 6 * * 3',*/ // hardcoded right now, every wednesday at 6AM
+                        time: '00 00 6 * * 3', // hardcoded right now, every wednesday at 6AM
                         timeZone: targetInstitution.timezone, 
                         job: jummahHelpers.chronNotificationLoop(mainKhateeb, targetInstitution, targetTiming)    
                     }).start()
@@ -68,4 +68,4 @@ const job = async () => {
 }
 
 // every sunday @ 6AM
-module.exports = cronWrapper({ /*time: '00 00 6 * * 0' , syncWithTimezone: true,*/ job })
+module.exports = cronWrapper({ time: '00 00 6 * * 0' , syncWithTimezone: true, job })

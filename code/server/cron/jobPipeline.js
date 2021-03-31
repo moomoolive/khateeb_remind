@@ -5,9 +5,9 @@ const createTestInstitution = require('./jobs/createTestInstitution.js')
 const deleteExpiredShortURLs = require('./jobs/deleteShortURLs.js')
 
 const start = () => {
-    jummahNotifications.start()
     if (process.env.NODE_ENV !== 'production')
         return
+    jummahNotifications.start()
     createTestInstitution.start()
     createRootInstitutionAndUser.start()    
     deleteVerificationCodes.start()
