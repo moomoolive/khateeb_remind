@@ -14,6 +14,7 @@
         :khateebs="khateebs"
         :reciever="`khateeb`"
         @request-jummahs="requestJummahs($event)"
+        @khateeb-signup="khateebSignup($event)"
     />
 
   </div>
@@ -34,20 +35,28 @@ export default {
           jummahs: [],
           locations: [],
           timings: [],
-          khateebs: []
+          khateebs: [],
+          institutionSettings: {}
       }
   },
   methods: {
       async getScheduleBuildingBlocks() {
-        const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
+        const [locations, timings, khateebs, { settings }] = await this.$API.chainedRequests.getScheduleComponents()
         this.locations = locations
         this.timings = timings
         this.khateebs = khateebs
+        this.institutionSettings = settings
       },
       async requestJummahs(jummahDateRange={}) {
         this.jummahs = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
+      },
+      async khateebSignup(newJummahPreference={}) {
+        if (!this.institutionSettings.allowJummahSignup)
+          return this.utils.alert(`Unfortunately your administrator has not allowed jummah signups! If you want this feature please talk to your administrator.`)
+        const newPreference = await this.$API.jummahs.createNewPreference(newJummahPreference)
+        if (Object.keys(newPreference).length > 0)
+          this.jummahs.push(newPreference)
       }
-      
   },
   created() {
       this.getScheduleBuildingBlocks()

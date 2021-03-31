@@ -52,6 +52,14 @@ const sameDateMonthAndYear = (a=new Date(), b=new Date()) => {
     return helpers.sameMonthSameYear(dateA, dateB) && dateA.getDate() === dateB.getDate()
 }
 
+const setDayOfWeek = (date=new Date(), dayOfWeek=4, nextWeek=true) => {
+    const newDate = new Date(date)
+    const increment = nextWeek ? 1 : -1
+    while (newDate.getDay() !== dayOfWeek)
+        newDate.setDate(newDate.getDate() + increment)
+    return newDate
+}
+
 export default {
     allUpcomingFridays,
     daysInThePast,
@@ -61,6 +69,7 @@ export default {
     sameMonthSameYear: helpers.sameMonthSameYear,
     localizeToTimezone,
     sameDateMonthAndYear,
-    findFirstFridayOfMonth: helpers.findFirstFridayOfMonth
+    findFirstFridayOfMonth: helpers.findFirstFridayOfMonth,
+    setDayOfWeek
 }
 

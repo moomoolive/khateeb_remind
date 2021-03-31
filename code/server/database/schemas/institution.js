@@ -49,24 +49,46 @@ const institution = new mongoose.Schema({
             type: Boolean,
             required: false,
             default: false
+        },
+        allowJummahSignup: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
+        allowJummahNotifications: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
+        jummahNotificationsTiming : {
+            hour: {
+                type: Number,
+                required: false,
+                default: 6,
+                min: 0,
+                max: 23
+            },
+            minute: {
+                type: Number,
+                required: false,
+                default: 0,
+                min: 0,
+                max: 59
+            },
+            dayOfWeek: {
+                type: Number,
+                required: false,
+                default: 3,
+                min: 0,
+                max: 6
+            }
         }
     }
 },
 { timestamps: true, minimize: false })
 
-institution.post('save', async function(institution) {
+institution.post('save', function(institution) {
     console.log(`Created institution ${institution.name} with id:`, institution._id)
-    if (institution.name === '__ROOT__')
-        return
-    try {
-        await new $db.locations({
-            institutionID: institution._id.toString(),
-            name: "Unknown location 1",
-            address: "Unknown address 1"
-        })
-    } catch(err) {
-        console.log(err)
-    }
 })
 
 institution.methods.deleteDependencies = async function() {

@@ -8,6 +8,8 @@ const job = async () => {
         const upcomingFriday = scheduleHelpers.findUpcomingFridayDBFormat()
         for (let i = 0; i < institutions.length; i++) {
             const targetInstitution = institutions[i]
+            if (!targetInstitution.settings.allowJummahNotifications)
+                continue
             const numberOfJummahThisMonth = scheduleHelpers.numberOfJummahThisMonth(targetInstitution.getLocalTime())
             const activeTimings = await $db.timings.find().activeTimings(targetInstitution._id).exec()
             const scheduledUpcomingJummahs = await $db.jummahPreferences.find().upcomingJummahsForInstitution(upcomingFriday, targetInstitution._id).exec()
@@ -24,7 +26,6 @@ const job = async () => {
                             locationID: targetTiming.locationID,
                             institutionID: targetTiming.institutionID,
                             timingID: targetTiming._id.toString(),
-                            // not localized
                             date: upcomingFriday,
                             khateebID: defaultKhateebs.mainKhateeb,
                             isGivingKhutbah: true,
@@ -37,7 +38,6 @@ const job = async () => {
                             locationID: targetTiming.locationID,
                             institutionID: targetTiming.institutionID,
                             timingID: targetTiming._id.toString(),
-                            // not localized
                             date: scheduleHelpers.findUpcomingFridayDBFormat(),
                             khateebID: upcomingFriday,
                             isGivingKhutbah: !khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah),
@@ -53,9 +53,12 @@ const job = async () => {
                     mainKhateeb = await $db.jummahPreferences.findOneAndUpdate({ _id: khateebsScheduledForThisTiming[0]._id.toString() }, { isGivingKhutbah: true }, { new: true })
                 console.log('before chron', mainKhateeb)
                 if (!mainKhateeb.notified)    
-                    cronWrapper({ 
-                        time: '00 00 6 * * 3', // hardcoded right now, every wednesday at 6AM
-                        timeZone: targetInstitution.timezone, 
+                    cronWrapper({
+                        time: jummahHelpers.cronNotificationTiming(
+                            upcomingFriday, 
+                            targetInstitution.settings.jummahNotificationsTiming, 
+                            targetInstitution.timezone
+                        ), 
                         job: jummahHelpers.chronNotificationLoop(mainKhateeb, targetInstitution, targetTiming)    
                     }).start()
             }

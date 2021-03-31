@@ -8,14 +8,14 @@ const router = express.Router()
 
 router.get(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 1, max: 3 }),
     async (req, res) => {
         try {
             const data = await $db.institutions.findOne({ _id: req.headers.institutionid }).exec()
             return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.status(503).json({ data: {}, msg: `Couldn't retrieve institution. Err trace: ${err}` })
+            return res.status(503).json({ data: { settings: {} }, msg: `Couldn't retrieve institution. Err trace: ${err}` })
         }
     }
 )

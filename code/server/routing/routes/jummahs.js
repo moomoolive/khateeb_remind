@@ -6,6 +6,7 @@ const validationMiddleware = require(global.$dir + '/middleware/validation/main.
 const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
 
 const jummahHelpers = require(global.$dir + '/libraries/jummahs/main.js')
+const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
 
 const router = express.Router()
 
@@ -24,7 +25,7 @@ router.get(
 
 router.post(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 1, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
         validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
@@ -44,8 +45,23 @@ router.post(
     async (req, res) => {
         try {
             if (jummahHelpers.oneMonthInThePast().getTime() >= new Date(req.body.date).getTime())
-                return res.status(422).json({ msg: 'You cannot create entries for the past' })
+                return res.status(422).json({ data: {}, msg: 'You cannot create entries for the past' })
+            const duplicateEntry = await $db.jummahPreferences.findOne({ 
+                institutionID: req.body.institutionID, 
+                timingID: req.body.timingID, 
+                locationID: req.body.locationID, 
+                date: req.body.date, 
+            }).exec()
+            if (duplicateEntry)
+                return res.status(422).json({ data: {}, msg: `You cannot create duplicate entries!` })
             const data = await new $db.jummahPreferences(req.body).save()
+            if (req.headers.usertype === 'khateeb') {
+                const jummahMeta = await data.gatherMeta()
+                const khateeb = await $db.khateebs.findOne({ _id: req.headers.userid }).exec()
+                const note = new notificationConstructors.khateebJummahSignupConstructor(khateeb, data, jummahMeta)
+                await note.setRecipentsToAdmins(req.headers.institutionid)
+                note.create()
+            }
             return res.json({ data })
         } catch(err) {
             console.log(err)

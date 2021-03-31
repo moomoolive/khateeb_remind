@@ -4,6 +4,7 @@ const createRootInstitutionAndUser = async () => {
         if (!rootInstitution)
             rootInstitution = await new $db.institutions({
                 name: "__ROOT__",
+                abbreviatedName: "__ROOT__",
                 timezone: global.APP_CONFIG.cron.timezone,
                 confirmed: true,
                 country: 'none',
@@ -38,6 +39,8 @@ const createTestInstitution = async () => {
         else
             testInstitution = await new $db.institutions({
                 name: "__TEST__",
+                abbreviatedName: "__TEST__",
+                confirmed: true,
                 ...global.APP_CONFIG.testInstitutionInitialization.institution,
             }).save()
         let testInstitutionRootAdmin = await $db.rootInstitutionAdmins.findOne({ institutionID: testInstitution._id.toString() }).exec()
@@ -47,7 +50,8 @@ const createTestInstitution = async () => {
             await testInstitution.createRootAdministrator({
                 institutionID: testInstitution._id.toString(),
                 ...global.APP_CONFIG.testInstitutionInitialization.rootAdmin,
-                phoneNumber: 100_000_0000
+                phoneNumber: 100_000_0000,
+                confirmed: true
             })
     } catch(err) {
         console.log(err)

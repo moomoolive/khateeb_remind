@@ -58,14 +58,14 @@ router.post(
         try {
             const instituion = await $db.institutions.findOne({ _id: req.body.institutionID }).exec()
             if (!instituion)
-                return res.json(`That institution doesn't exist!`)
+                return res.status(422).json({ msg: `That institution doesn't exist!` })
             if (instituion.settings.autoConfirmRegistration)
                 req.body.confirmed = true
             const khateebEntry = await new $db.khateebs(req.body).save()
             const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, instituion.settings.autoConfirmRegistration)
             await note.setRecipentsToAdmins(req.body.institutionID)
             await note.create()
-            return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
+            return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${instituion.settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
         console.log(err)
         return res.json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)

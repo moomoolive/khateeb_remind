@@ -34,9 +34,18 @@ const numberOfJummahThisMonth = (date=new Date()) => {
     return count
 }
 
+const findDayOfWeek = (date=new Date(), dayOfWeek=4, nextWeek=true) => {
+    const day = new Date(date)
+    const increment = nextWeek ? 1 : -1
+    while (date.getDay() !== dayOfWeek)
+        day.setDate(day.getDate() + increment)
+    return day
+}
+
 module.exports = {
     findUpcomingFriday: helpers.findUpcomingFriday,
     findUpcomingFridayDBFormat,
     findFirstFriday,
-    numberOfJummahThisMonth
+    numberOfJummahThisMonth,
+    findDayOfWeek
 }

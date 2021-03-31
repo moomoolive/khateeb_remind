@@ -6,7 +6,7 @@
                 class="purple to-locations-timings-button"
                 @click="$router.push('/institutionAdmin/locations-and-timings')"
             >
-                Edit Locations and Timings
+                {{ locations.length > 0 ? "Edit Locations and Timings" : "Create First Location" }}
             </button>
         </div>
 
@@ -20,6 +20,7 @@
             @new-preference="createNewJummahPreference($event)"
             @update-preference="updateJummahPreference($event)"
             @run-notification-loop="runNotificationLoop($event)"
+            @khateeb-signup="utils.alert('This feature is only available to khateebs!')"
         >
             <template #above-controls>
                 <div class="viewing-mode-container">

@@ -1,4 +1,13 @@
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
+
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+const objectSupport = require('dayjs/plugin/objectSupport')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(objectSupport)
 
 const localToUTCEquivalent = (localTimeNow=new Date()) => {
     const localTime = new Date(localTimeNow)
@@ -94,9 +103,28 @@ const chronNotificationLoop = async (targetPreference={}, institution={}, timing
     return res
 }
 
+const cronNotificationTiming = (upcomingFriday=new Date(), chronTimingInfo={}, timezone="America/Edmonton") => {
+    const targetDayOfWeek = scheduleHelpers.findDayOfWeek(
+        upcomingFriday,
+        chronTimingInfo.dayOfWeek,
+        false
+    )
+    const targetDate = dayjs()
+        .tz(timezone)
+        .year(targetDayOfWeek.getFullYear())
+        .month(targetDayOfWeek.getMonth())
+        .date(targetDayOfWeek.getDate())
+        .hour(chronTimingInfo.hour)
+        .minute(chronTimingInfo.minute)
+        .second(0)
+        .millisecond(0)
+    return new Date(targetDate.toISOString())
+}
+
 module.exports = {
     oneMonthInThePast,
     twoMonthsAhead,
     runNotificationLoop,
-    chronNotificationLoop
+    chronNotificationLoop,
+    cronNotificationTiming
 }

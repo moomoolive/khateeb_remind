@@ -4,7 +4,7 @@ const extension = "institutions"
 
 const requests = {
     getInstitution(params={}) {
-        return helpers.returnEmptyObjectFromRequest("get", extension, { params })
+        return helpers.returnCustomObjectFromRequest({ settings: {} })("get", extension, { params })
     },
     updateInstitution(updatedInstitution={}) {
         return helpers.returnEmptyObjectFromRequest("put", extension, updatedInstitution)

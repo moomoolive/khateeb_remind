@@ -7,7 +7,8 @@
         "handle",
         "textArea",
         "checkbox",
-        "readOnly"
+        "readOnly",
+        "timingMutator"
     ],
     "bindedExts": [
         {

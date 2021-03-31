@@ -12,6 +12,7 @@
                 :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                 @run-notification-loop="$emit('run-notification-loop', $event)"
                 @clear-notifications="$emit('update-preference', $event)"
+                @khateeb-signup="$emit('khateeb-signup', $event)"
                 @close="closeSettings()"
             />
         </general-popup-container>

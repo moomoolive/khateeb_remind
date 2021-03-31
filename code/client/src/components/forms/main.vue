@@ -1,13 +1,17 @@
 <template>
     <div v-if="showForm">
         <div :class="`${backgroundColor} ${ backgroundColor === 'none' ? '' : 'box-shadow'} formContainer`" v-if="data">
+            
             <div v-if="formTitle" class="formTitle">
                 {{ formTitle }}
             </div>
+
             <div v-for="(fieldData, fieldName) in structureCopy" :key="fieldName">
+                
                 <div class="formLabel" :for="fieldName">
                     {{  fieldData.alias || utils.stringFormat(fieldName) }}
                 </div>
+
                 <tag-box
                     v-if="fieldData.tag && fieldData.tag === 'encrypted'"
                     class="tag-box"
@@ -17,6 +21,7 @@
                             symbol: '⚔️'
                     }"
                 />
+
                 <div v-if="extensibleType(readOnly ? 'readOnly' : fieldData.type)">
                     <component 
                         :is="readOnly ? 'readOnlyExt' : fieldData.type + `Ext`"
@@ -28,6 +33,7 @@
                         @changed="extensionInterface(fieldName, $event)"
                     />
                 </div>
+
                 <div v-else-if="!fieldData.type">
                     <default-extension
                         @changed="extensionInterface(fieldName, $event)"
@@ -36,6 +42,7 @@
                         :validators="passValidator(fieldData, fieldName)"
                     />
                 </div>
+
                 <div 
                     v-if="fieldNeedsValidationAndIsInvalid(fieldName) && showInvalidationMsgs"
                 >
@@ -47,8 +54,10 @@
                         ❌ {{ feedback }}
                     </div>
                 </div>
+
                 <div v-if="bindedExtSupported(fieldName)">
                     <transition :name="initalDisplay ? `none` : `dropdown`">
+                        
                         <component 
                             :is="`${bindedExtName(fieldName)}Ext`"
                             :bindedTo="data[bindedExtBindedTo(fieldName)]"
@@ -77,9 +86,11 @@
                                 </div>
                             </template>
                         </component>
+
                     </transition>
                 </div>
             </div>
+
             <button
                 v-if="!readOnly"
                 :style="`margin-top: ${showInvalidationMsgs ? 7 : 3}%;`" 
@@ -89,10 +100,13 @@
             >
                 {{ buttonText }}
             </button>
+
             <slot></slot>
+
             <div v-if="errorMsg" class="errorMsg">
                 {{ errorMsg }}
             </div>
+
         </div>
     </div>
 </template>
@@ -171,6 +185,7 @@ export default {
         "checkboxExt": () => import('./extensions/free/checkbox.vue'),
         "readOnlyExt": () => import('./extensions/primitives/readOnly.vue'),
         "tagBox": () => import('@/components/general/tagBox.vue'),
+        "timingMutatorExt": () => import('./extensions/primitives/timingMutator.vue'),
         defaultExtension
     },
     data() {
@@ -247,16 +262,15 @@ export default {
                 this.$emit('submitted', this.data)
         },
         extensionInterface(extension, $event) {
-            if (typeof $event.val !== "undefined")
+            if ($event.val !== undefined)
                 this.$set(this.data, extension, $event.val)
-            if ($event.created) {
+            if ($event.created)
                 this.setData(this.data)
-            }
             if ($event.deleted) {
                 delete this.data[extension]
                 delete this.originalData[extension]
             }
-            const fieldNeedsValidation = typeof $event.state !== 'undefined'
+            const fieldNeedsValidation = $event.state !== undefined
             if (fieldNeedsValidation) {
                 if (!this.validations[extension])
                         this.$set(this.validations, extension, {})

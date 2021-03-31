@@ -1,5 +1,6 @@
 <template>
     <div>
+
         <div>
             <div class="jummah-settings-title">
                 Jummah Options
@@ -11,49 +12,61 @@
                 {{ dateDisplay() }}
             </div>
         </div>
+
         <div class="action-buttons-container">
-            <div v-if="viewingWeekIsCurrentPastOrFuture === 'current'">
-                <div v-if="reciever === 'institutionAdmin'">
-                    <button
-                        :disabled="!mainKhateebIsScheduled || oneKhateebNotified" 
-                        class="blue"
-                        @click="runNotificationLoop()"
-                    >
-                        {{ info.khateebPreferences[0].notified ? 'Already Notified' : 'Notify Main Khateeb' }}
-                    </button>
-                    <button
-                        :disabled="!backupKhateebIsScheduled || oneKhateebNotified" 
-                        class="red" 
-                        @click="runNotificationLoop(true)"
-                    >
-                        {{ info.khateebPreferences[1].notified ? 'Already Notified' : 'Notify Backup' }}
-                    </button>
-                    <button 
-                        :disabled="!jummahHasData || !oneKhateebNotified" 
-                        class="yellow" 
-                        @click="resetNotifications()"
-                    >
-                        {{ jummahHasData ? !oneKhateebNotified ? 'None Notified' : 'Reset Notifications' : 'No Khateebs' }}
-                    </button>
-                </div>
-                <div v-else-if="reciever === 'khateeb'">
-                    <button 
-                        class="blue"
-                        :disabled="$store.getters['user/type'] !== 'khateeb'"
-                        @click="utils.alert('Feature coming soon isa!')" 
-                    >
-                        Sign up for this Jummah
-                    </button>
-                </div>
+                
+            <div v-if="reciever === 'institutionAdmin'">
+                <button
+                    :disabled="!mainKhateebIsScheduled || oneKhateebNotified" 
+                    class="blue"
+                    @click="runNotificationLoop()"
+                >
+                    {{ info.khateebPreferences[0].notified ? 'Already Notified' : 'Notify Main Khateeb' }}
+                </button>
+                <button
+                    :disabled="!backupKhateebIsScheduled || oneKhateebNotified" 
+                    class="red" 
+                    @click="runNotificationLoop(true)"
+                >
+                    {{ info.khateebPreferences[1].notified ? 'Already Notified' : 'Notify Backup' }}
+                </button>
+                <button 
+                    :disabled="!jummahHasData || !oneKhateebNotified" 
+                    class="yellow" 
+                    @click="resetNotifications()"
+                >
+                    {{ jummahHasData ? !oneKhateebNotified ? 'None Notified' : 'Reset Notifications' : 'No Khateebs' }}
+                </button>
             </div>
+
+            <div v-else-if="reciever === 'khateeb'">
+                <button 
+                    class="blue"
+                    :disabled="mainKhateebIsScheduled"
+                    @click="signupKhateeb(false)" 
+                >
+                    {{ mainKhateebIsScheduled ? "Already Filled" : "Sign up as Main Khateeb"}}
+                </button>
+                <button 
+                    class="red"
+                    :disabled="backupKhateebIsScheduled"
+                    @click="signupKhateeb(true)" 
+                >
+                    {{ backupKhateebIsScheduled ? "Already Filled" : "Sign up as Backup"}}
+                </button>
+            </div>
+
             <div v-else>
                 No options available ⚙️
             </div>
+
         </div>
     </div>
 </template>
 
 <script>
+import jummahHelpers from '@/libraries/jummahs/main.js'
+
 export default {
     name: "jummahSettingsPopup",
     props: {
@@ -75,6 +88,22 @@ export default {
         }
     },
     methods: {
+        signupKhateeb(isBackup=false) {
+            if (this.currentUserIsAlreadySignedUpForThisJummah)
+                return this.utils.alert(`You're already signed up for this jummah!`)
+            this.$emit('khateeb-signup', {
+                date: jummahHelpers.fridayToFridayDBFormat(new Date(this.selectedDate)),
+                timingID: this.info.timing._id,
+                locationID: this.info.timing.locationID,
+                institutionID: this.info.timing.institutionID,
+                isBackup,
+                isGivingKhutbah: !isBackup,
+                khateebID: this.currentUser,
+                notified: false,
+                notificationID: 'none'
+            })
+            return this.closePopup()
+        },
         dateDisplay() {
             const date = new Date(this.selectedDate)
             const month = date.toLocaleString('en-US', { month: 'long' })
@@ -88,8 +117,9 @@ export default {
         closePopup() {
             return this.$emit('close')
         },
-        runNotificationLoop(isBackup=false) { 
-            if (this.info.khateebPreferences[isBackup ? 1 : 0].notified)
+        runNotificationLoop(isBackup=false) {
+            const target = this.getTargetPreference(isBackup) 
+            if (target.notified)
                 return this.utils.alert(`Khateeb has already been notified. Click 'Reset Notifications' to allow another notification to be sent.`)
             this.$emit("run-notification-loop", { isBackup, main: this.info.khateebPreferences[0], backup: this.info.khateebPreferences[1] })
             return this.closePopup()
@@ -98,7 +128,10 @@ export default {
             this.scheduledKhateebs.forEach(p => {
                 this.$emit('clear-notifications', { _id: p._id, notified: false, notificationID: 'none', isGivingKhutbah: !p.isBackup })
             })
-            this.closePopup()
+            return this.closePopup()
+        },
+        getTargetPreference(isBackup=false) {
+            return this.info.khateebPreferences[isBackup ? 1 : 0]
         }
     },
     computed: {
@@ -106,16 +139,22 @@ export default {
             return this.mainKhateebIsScheduled || this.backupKhateebIsScheduled
         },
         mainKhateebIsScheduled() {
-            return this.info.khateebPreferences[0].createdAt
+            return this.info.khateebPreferences[0].updatedAt
         },
         backupKhateebIsScheduled() {
-            return this.info.khateebPreferences[1].createdAt
+            return this.info.khateebPreferences[1].updatedAt
         },
         oneKhateebNotified() {
             return this.info.khateebPreferences.find(p => p.notified)
         },
         scheduledKhateebs() {
             return this.info.khateebPreferences.filter(p => p.createdAt)
+        },
+        currentUser() {
+            return this.$store.getters['user/allInfo']._id
+        },
+        currentUserIsAlreadySignedUpForThisJummah() {
+            return this.info.khateebPreferences.find(kp => kp.khateebID === this.currentUser)
         }
     }
 }

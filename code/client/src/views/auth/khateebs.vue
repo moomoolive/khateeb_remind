@@ -83,7 +83,7 @@ export default {
                 return this.allInstitutions.filter(inst => inst.name !== "__TEST__")
         },
         thereAreInstitutionsToSignupFor() {
-            return this.allInstitutions.length > 0
+            return this.filteredInstitutions.length > 0
         }
     },
     created() {

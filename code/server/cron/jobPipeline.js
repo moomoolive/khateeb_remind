@@ -9,7 +9,7 @@ const start = () => {
         return
     jummahNotifications.start()
     createTestInstitution.start()
-    createRootInstitutionAndUser.start()    
+    createRootInstitutionAndUser.start() 
     deleteVerificationCodes.start()
     deleteExpiredShortURLs.start()
     console.log(`All cron jobs have been scheduled`)

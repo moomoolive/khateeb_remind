@@ -1,18 +1,20 @@
 <template>
     <div class="container">
+
         <div class="display">
-            <button @click="incrementHour(1)">+</button>
-            <p>{{ hour }}</p>
-            <button class="red" @click="incrementHour(-1)">-</button>
+            <button :class="elementSize" @click="incrementHour(1)">+</button>
+            <p :class="`${textColor} ${elementSize}`">{{ hour }}</p>
+            <button :class="`red ${elementSize}`" @click="incrementHour(-1)">-</button>
         </div>
         <div class="display">
-            <button @click="incrementMinute(1)">+</button>
-            <p>{{ minute }}</p>
-            <button class="red" @click="incrementMinute(-1)">-</button>
+            <button :class="elementSize" @click="incrementMinute(1)">+</button>
+            <p :class="`${textColor} ${elementSize}`">{{ minute }}</p>
+            <button :class="`red ${elementSize}`" @click="incrementMinute(-1)">-</button>
         </div>
         <div class="display">
-            <p class="am-pm">{{ amOrPm }}</p>
+            <p :class="`am-pm ${textColor} ${elementSize}`">{{ amOrPm }}</p>
         </div>
+
     </div>
 </template>
 
@@ -23,6 +25,16 @@ export default {
         timing: {
             type: Object,
             required: true
+        },
+        textColor: {
+            type: String,
+            required: false,
+            default: 'none'
+        },
+        elementSize: {
+            type: String,
+            required: false,
+            default: 'none'
         }
     },
     methods: {
@@ -67,11 +79,23 @@ export default {
 
 p {
     font-size: 20px;
+    &.black {
+        color: black;
+    }
+    &.white {
+        color: getColor("offWhite");
+    }
+    &.small {
+        font-size: 15px;
+    }
 }
 
 button {
     font-size: 15px;
     font-weight: bold;
+    &.small {
+        font-size: 12px;
+    }
 }
 
 @media screen and (max-width: $phoneWidth) {

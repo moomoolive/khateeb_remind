@@ -24,7 +24,7 @@
 
             <collapsable-box
                 class="setting-container"
-                :headline="`Registration Settings`"
+                :headline="`Registration`"
                 :tagDetails="institution && institution.settings ? [{
                     words: institution.settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
                     color: 'default',
@@ -37,11 +37,65 @@
                         autoConfirmRegistration: {
                             type: 'checkbox',
                             required: true
+                        },
+                        allowJummahSignup: {
+                            type: 'checkbox',
+                            required: true
                         }
                     }"
                     :backgroundColor="`none`"
                     :basedOn="institution.settings"
                     @submitted="saveInstitutionDetails({ _id: institution._id, settings: $event })"
+                />
+            </collapsable-box>
+
+            <collapsable-box
+                class="setting-container"
+                :headline="`Notifications`"
+                :tagDetails="institution && institution.settings ? [{
+                    words: institution.settings.allowJummahNotifications ? notificationTiming : `Off`,
+                    color: institution.settings.allowJummahNotifications ? `goodNews` : `important`,
+                    symbol: '✉️'
+                }] : null"
+            >
+                <form-main
+                    v-if="institution.settings" 
+                    :structure="{
+                        allowJummahNotifications: {
+                            type: 'checkbox',
+                            required: true
+                        },
+                        dayOfWeek: {
+                            type: 'dropdown',
+                            required: true,
+                            selectOptions: [
+                                { text: 'Tuesday', num: 2 },
+                                { text: 'Wednesday', num: 3 },
+                                { text: 'Thursday', num: 4 },
+                            ],
+                            value: 'num',
+                            display: 'text'
+                        },
+                        timing: {
+                            type: 'timingMutator',
+                            required: true,
+                            textColor: 'white',
+                            size: 'small'
+                        }
+                    }"
+                    :backgroundColor="`none`"
+                    :basedOn="notificationsSettings"
+                    @submitted="saveInstitutionDetails({ 
+                        _id: institution._id,
+                        settings: {
+                            allowJummahNotifications: $event.allowJummahNotifications,
+                            jummahNotificationsTiming: { 
+                                hour: $event.timing.hour,
+                                minute: $event.timing.minute,
+                                dayOfWeek: $event.dayOfWeek
+                            }
+                        } 
+                    })"
                 />
             </collapsable-box>
 
@@ -75,6 +129,7 @@ import institutionFormTemplate from '@/components/forms/templates/institution.vu
 import msgWithPic from '@/components/general/msgWithPic.vue'
 
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
+import datetime from '@/libraries/dateTime/main.js'
 
 export default {
     name: "settings",
@@ -120,6 +175,30 @@ export default {
     computed: {
         settingsArePresent() {
             return Object.keys(this.institution).length > 0
+        },
+        notificationsSettings() {
+            if (this.settingsArePresent)
+                return { 
+                    allowJummahNotifications: this.institution.settings.allowJummahNotifications,
+                    dayOfWeek: this.institution.settings.jummahNotificationsTiming.dayOfWeek,
+                    timing: {
+                        minute: this.institution.settings.jummahNotificationsTiming.minute,
+                        hour: this.institution.settings.jummahNotificationsTiming.hour 
+                    }
+                }
+            else
+                return {}
+        },
+        notificationTiming() {
+            if (!this.settingsArePresent)
+                return 'Wednesdays @ 6:00 AM'
+            const info = this.institution.settings.jummahNotificationsTiming
+            let date = new Date()
+            date = datetime.setDayOfWeek(date, info.dayOfWeek)
+            date.setHours(info.hour, info.minute, 0, 0)
+            const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' })
+            const time = date.toLocaleString('en-US', { minute: '2-digit', hour: 'numeric' })
+            return `${dayOfWeek}s @ ${time}`
         }
     },
     async created() {
