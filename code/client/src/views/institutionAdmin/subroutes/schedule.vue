@@ -26,7 +26,7 @@
                 <div>
                     
                     <div 
-                        v-if="institutionSettings.allowJummahNotifications && showChronTime" 
+                        v-if="institutionSettings.allowJummahNotifications" 
                         class="notification-time-container"
                     >
                         <button class="notification-time-button turquoise" @click="chronInfo()">
@@ -68,8 +68,7 @@ export default {
             timings: [],
             khateebs: [],
             viewingMode: 'institutionAdmin',
-            institutionSettings: {},
-            showChronTime: true
+            institutionSettings: {}
         }
     },
     methods: {
