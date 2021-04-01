@@ -91,4 +91,40 @@ router.delete('/', async (req, res) => {
     }
 })
 
+const pwaNotes = require(global.$dir + '/libraries/pwaNotifications/main.js')
+
+router.post('/pwa-subscription', async (req, res) => {
+    try {
+        let subscriptions = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).exec()
+        if (!subscriptions)
+            subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid, institutionID: req.headers.institutionid }).save()
+        if (subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid))
+            return res.json({ msg: `This device is already subscribed to notifications` })
+        const updated = await $db.pwaSubscriptions.findOneAndUpdate(
+            { _id: subscriptions._id.toString() },
+            { subscriptions: [
+                    ...subscriptions.subscriptions, 
+                    { 
+                        ...req.body, 
+                        deviceId: req.headers.deviceid,
+                        deviceType: req.headers.devicetype,
+                        deviceBrand: req.headers.devicebrand,
+                        browserBrand: req.headers.browserbrand 
+                    }
+                ] 
+            },
+            { new: true }
+        )
+        const ress = await pwaNotes.sendPWANotifications(
+            { title: "hello from KR", body: "first pwa" },
+            updated.subscriptions[0]
+        )
+        console.log(ress)
+        return res.json({ data: updated })
+    } catch(err) {
+        console.log(`Couldn't create subscription`, err)
+        return res.json({ data: {}, msg: `Couldn't create subscription. ${err}` })
+    }
+})
+
 module.exports = router

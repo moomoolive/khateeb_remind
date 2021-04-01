@@ -54,6 +54,12 @@ import footerPopup from '@/components/footer/popup/main.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
+import pwaHelpers from './libraries/pwa/main.js'
+import localStorageHelpers from './libraries/localStorageManagement/main.js'
+
+import { nanoid } from 'nanoid'
+import axios from 'axios'
+
 export default {
   components: {
     notifications,
@@ -77,8 +83,25 @@ export default {
       if (token)
         this.$store.dispatch('user/updateToken', token)
     },
+    setDeviceId() {
+      if (!localStorageHelpers.get("deviceId"))
+        localStorageHelpers.commit("deviceId", nanoid(21))
+      axios.defaults.headers.common.deviceid = localStorageHelpers.get("deviceId")
+    },
+    setDeviceInfo() {
+      axios.defaults.headers.common.devicetype = this.$store.getters['user/deviceType']
+      axios.defaults.headers.common.browserBrand = this.$store.getters['user/browserBrand']
+      axios.defaults.headers.common.deviceBrand = this.$store.getters['user/deviceBrand']
+    },
     toggleNotificationDisplay() {
       this.showNotificationDisplay = !this.showNotificationDisplay
+    },
+    async signUserUpForPushNotifications() {
+      const serviceWorkerReg = await pwaHelpers.getServiceWorkerRegistration()
+      if (serviceWorkerReg) {
+        const pushSub = await pwaHelpers.subscribeUserToPushNotifications(serviceWorkerReg)
+        await this.$API.pwa.createPWASubscription(pushSub)
+      } 
     }
   },
   computed: {
@@ -96,6 +119,14 @@ export default {
         return []
     }
   },
+  watch: {
+    async isLoggedIn(newVal) {
+      if (!newVal || localStorageHelpers.get("hasLoggedInOnce"))
+        return
+      await this.signUserUpForPushNotifications()
+      localStorageHelpers.commit("hasLoggedInOnce", true)
+    }
+  },
   mounted() {
     this.$nextTick(async () => {
       if (this.$store.getters['user/isLoggedIn'])
@@ -104,6 +135,8 @@ export default {
   },
   async created() {
     this.setJWT()
+    this.setDeviceId()
+    this.setDeviceInfo()
   }
 }
 </script>

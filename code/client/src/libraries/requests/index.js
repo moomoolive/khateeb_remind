@@ -12,6 +12,7 @@ import khateebs from './routes/khateebs.js'
 import chainedRequests from './chainedRequests/main.js'
 import announcements from './routes/announcements.js'
 import institutions from './routes/institutions.js'
+import pwa from './routes/pwa.js'
 
 import axios from 'axios'
 
@@ -33,4 +34,5 @@ export default {
     sysAdmin,
     user,
     misc,
+    pwa,
 }

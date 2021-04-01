@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'production') {
         'For more details, visit https://goo.gl/AFskqB'
       )
     },
-    registered() {
+    async registered() {
       console.log('New service worker has been registered.')
     },
     cached() {
