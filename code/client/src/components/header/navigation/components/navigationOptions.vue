@@ -40,6 +40,11 @@
         <div class="menu-item" @click="redirect('/user')">
             <p>My Profile</p>
         </div>
+        <div class="menu-item" @click="redirect('/notification-subscriptions')">
+            <p>
+                My Notifications
+            </p>
+        </div>
         <div
             v-if="!$store.state.user.isBrowsingOnPWA && deferredPrompt" 
             class="menu-item get-the-app" 

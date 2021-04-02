@@ -91,7 +91,15 @@ router.delete('/', async (req, res) => {
     }
 })
 
-const pwaNotes = require(global.$dir + '/libraries/pwaNotifications/main.js')
+router.get('/pwa-subscription', async (req, res) => {
+    try {
+        const data = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).exec()
+        return res.json({ data: data.subscriptions })
+    } catch(err) {
+        console.log(err)
+        return res.json({ data: [], msg: `There was an error retrieving your subscriptions. ${err}` })
+    }
+})
 
 router.post('/pwa-subscription', async (req, res) => {
     try {
@@ -115,15 +123,22 @@ router.post('/pwa-subscription', async (req, res) => {
             },
             { new: true }
         )
-        const ress = await pwaNotes.sendPWANotifications(
-            { title: "hello from KR", body: "first pwa" },
-            updated.subscriptions[0]
-        )
-        console.log(ress)
         return res.json({ data: updated })
     } catch(err) {
         console.log(`Couldn't create subscription`, err)
         return res.json({ data: {}, msg: `Couldn't create subscription. ${err}` })
+    }
+})
+
+router.delete('/pwa-subscription', async (req, res) => {
+    try {
+        const subscriptions = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).exec()
+        const updatedSubscriptions = subscriptions.subscriptions.filter(s => s.deviceId !== req.headers.deviceid)
+        const updated = await $db.pwaSubscriptions.updateOne({ userID: req.headers.userid }, { subscriptions: updatedSubscriptions })
+        return res.json({ data: updated })
+    } catch(err) {
+        console.log(err)
+        return res.status(503).json({ data: {}, msg: `Couldn't delete subscription. ${err}` })
     }
 })
 

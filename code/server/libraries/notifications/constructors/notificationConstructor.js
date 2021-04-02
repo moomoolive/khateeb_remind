@@ -1,11 +1,14 @@
+const pwaNotifications = require(global.$dir + '/libraries/pwaNotifications/main.js')
+
 module.exports = class NotificationConstructor {
 
-    constructor(userInfo, tag='none', options={}) {
+    constructor(userInfo, tag='none', options={}, PWAMessages=false) {
         this.setRecipents(userInfo)
         this.msgInfo = options.msgInfo || userInfo,
         this.tag = tag
         this.meta = options.meta || {}
         this.additionalInfo = options
+        this.PWAMessages = PWAMessages
     }
 
     setRecipents(recipents) {
@@ -19,6 +22,10 @@ module.exports = class NotificationConstructor {
         for (let i = 0; i < this.userInfo.length; i++) {
             const savedNotification = await this.saveNotificationToDatabase(this.compileNotificationInfo(this.userInfo[i]))
             msgsInfo.push(savedNotification)
+            if (this.PWAMessages && this.pwaMsgObject()) {
+                const pwaRes = await this.executePWANotifications(this.userInfo[i]._id.toString())
+                msgsInfo.push(pwaRes)
+            }
         }
         return msgsInfo
     }
@@ -59,6 +66,40 @@ module.exports = class NotificationConstructor {
         } catch(err) {
             console.log(err)
             console.log(`Couldn't create notification`)
+        }
+    }
+
+    async executePWANotifications(userId="1234") {
+        const subscriptions = await this.getPWASubscriptions(userId)
+        if (!info)
+            return []
+        const pwaRes = await this.sendPWANotifications(subscriptions)
+        return pwaRes
+    } 
+
+    async sendPWANotifications(subscriptions=[]) {
+        const messages = []
+        for (let i = 0; i < subscriptions.length; i++) {
+            try {
+                const res = await pwaNotifications.sendPWANotifications(
+                    this.pwaMsgObject(),
+                    subscriptions[i]
+                )
+                messages.push(res)
+            } catch(err) {
+                console.log(err)
+            }
+        }
+        return messages
+    }
+
+    async getPWASubscriptions(userID="1234") {
+        try {
+            const data = await $db.pwaSubscriptions.findOne({ userID }).exec()
+            return data.subscriptions
+        } catch(err) {
+            console.log(err)
+            return []
         }
     }
 

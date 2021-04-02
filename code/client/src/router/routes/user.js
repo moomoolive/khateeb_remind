@@ -7,4 +7,12 @@ export default [
             auth: { min: 1 }
         }
     },
+    {
+        path: '/notification-subscriptions',
+        name: 'notificationSubscriptions',
+        component: () => import('@/views/user/notificationSubscriptions.vue'),
+        meta: {
+            auth: { min: 1 }
+        }
+    }
 ]

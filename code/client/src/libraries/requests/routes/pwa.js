@@ -8,6 +8,12 @@ const extension = helpers.targetURL('user') + '/pwa-subscription'
 const requests = {
     createPWASubscription(subscriptionInfo={}) {
         return axios.post(extension, subscriptionInfo)
+    },
+    deleteSubscription() {
+        return helpers.returnEmptyObjectFromRequest('delete', ['user', '/pwa-subscription'])
+    },
+    getSubscriptions() {
+        return helpers.returnArrayFromRequest('get', ['user', '/pwa-subscription'])
     }
 }
 
