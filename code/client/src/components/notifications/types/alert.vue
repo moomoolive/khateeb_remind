@@ -33,7 +33,7 @@ export default {
         handleEnter($event) {
             const enter = 13
             if ($event.keyCode === enter)
-                this.close()
+                this.$emit('close')
         },
         graphicType(name) {
             if (this.options.graphicType)

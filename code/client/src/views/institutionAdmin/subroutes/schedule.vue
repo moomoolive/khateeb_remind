@@ -6,7 +6,7 @@
                 class="purple to-locations-timings-button"
                 @click="$router.push('/institutionAdmin/locations-and-timings')"
             >
-                Edit Locations and Timings
+                {{ locations.length > 0 ? "Edit Locations and Timings" : "Create First Location" }}
             </button>
         </div>
 
@@ -18,19 +18,32 @@
             :reciever="viewingMode"
             @request-jummahs="requestJummahs($event)"
             @new-preference="createNewJummahPreference($event)"
-            @update-preference="updateJummahPreferenceDelayed($event)"
-            @update-preference-fast="updateJummahPreference($event)"
+            @update-preference="updateJummahPreference($event)"
             @run-notification-loop="runNotificationLoop($event)"
+            @khateeb-signup="utils.alert('This feature is only available to khateebs!')"
         >
             <template #above-controls>
-                <div class="viewing-mode-container">
-                    <div class="select-text">
-                        Viewing Mode
+                <div>
+                    
+                    <div 
+                        v-if="institutionSettings.allowJummahNotifications" 
+                        class="notification-time-container"
+                    >
+                        <button class="notification-time-button turquoise" @click="chronInfo()">
+                            ⏰ {{ chronTiming() }}
+                        </button>
                     </div>
-                    <select v-model="viewingMode" class="viewing-mode-dropdown">
-                        <option value="institutionAdmin">Admin</option>
-                        <option value="khateeb">Khateeb</option>
-                    </select>
+
+                    <div class="viewing-mode-container">
+                        <div class="select-text">
+                            Viewing Mode
+                        </div>
+                        <select v-model="viewingMode" class="viewing-mode-dropdown">
+                            <option value="institutionAdmin">Admin</option>
+                            <option value="khateeb">Khateeb</option>
+                        </select>
+                    </div>
+
                 </div>
             </template>
         </monthly-jummah-schedule>
@@ -40,6 +53,8 @@
 
 <script>
 import monthlyJummahSchedule from '@/components/schedules/monthlyJummahSchedule/main.vue'
+
+import timingHelpers from '@/libraries/timings/main.js'
 
 export default {
     name: "scheduleSetter",
@@ -52,60 +67,39 @@ export default {
             locations: [],
             timings: [],
             khateebs: [],
-            viewingMode: 'institutionAdmin'
+            viewingMode: 'institutionAdmin',
+            institutionSettings: {}
         }
     },
     methods: {
+        chronInfo() {
+            return this.utils.alert(
+                `Khateeb remind sends notifications to all your scheduled khateebs on ${this.chronTiming('long')}. If you want to change the scheduled time or turn off notifications you can do so by heading to settings.`,
+                "success",
+                { icon: "clock-no-markings" }
+            )
+        },
         async getScheduleBuildingBlocks() {
-            try {
-                const [locations, timings, khateebs] = await this.$API.chainedRequests.getScheduleComponents()
-                this.locations = locations
-                this.timings = timings
-                this.khateebs = khateebs
-            } catch(err) {
-                console.log(err)
-            }
+            const [locations, timings, khateebs, { settings }] = await this.$API.chainedRequests.getScheduleComponents()
+            this.locations = locations
+            this.timings = timings
+            this.khateebs = khateebs
+            this.institutionSettings = settings
         },
-        async createNewJummahPreference(newPreference) {
-            await this.utils.delayedRequest(
-                'jummahs',
-                'createNewPreference',
-                {
-                    arguments: [newPreference],
-                    additionalIdentifiers: ['createNewPreference', newPreference.timingID, `backup:${newPreference.isBackup}`]
-                }
-            )
-        },
-        async updateJummahPreferenceDelayed(updatedPreference) {
-            await this.utils.delayedRequest(
-                'jummahs',
-                'updateJummahPreference',
-                {
-                    arguments: [updatedPreference],
-                    additionalIdentifiers: ['createNewPreference', updatedPreference.timingID, `backup:${updatedPreference.isBackup}`]
-                }
-            )
+        async createNewJummahPreference(newPreference={}) {
+            const newJummahPreference = await this.$API.jummahs.createNewJummahPreference(newPreference)
+            if (Object.keys(newJummahPreference).length > 0)
+                this.jummahs.push(newJummahPreference)
         },
         async requestJummahs(jummahDateRange) {
-            try {
-                const { jummahs } = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
-                this.jummahs = jummahs
-            } catch(err) {
-                console.log(err)
-            }
+            this.jummahs = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
         },
         findJummahIndexById(id) {
             return this.jummahs.findIndex(jummah => jummah._id === id)
         },
-        async updateJummahPreference(updatedJummah) {
-            try {
-                const updated = await this.$API.jummahs.updateJummahPreference(updatedJummah)
-                if (!updated)
-                    return
-                this.jummahs.splice(this.findJummahIndexById(updated._id), 1, updated)
-            } catch(err) {
-                console.log(err)
-            }
+        async updateJummahPreference(updatedJummah={}) {
+            const updated = await this.$API.jummahs.updateJummahPreference(updatedJummah)
+            this.jummahs.splice(this.findJummahIndexById(updated._id), 1, updated)
         },
         fillIdIfEmpty(main={}, backup={}) {
             if (!main._id)
@@ -115,17 +109,21 @@ export default {
             return { main, backup }
         },
         async runNotificationLoop({ main: preprocessedMain, backup: preprocessedBackup, isBackup }) {
-            try {
-                const { main, backup } = this.fillIdIfEmpty(preprocessedMain, preprocessedBackup)
-                const updatedPreferences = await this.$API.jummahs.runNotificationLoop({ main, backup }, isBackup) || { targetPreference: {}, otherPreference: {} }
-                for (const [key, value] of Object.entries(updatedPreferences)) {
-                    if (value._id && value._id.toLowerCase() !== 'none')
-                        this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
-                }
-            } catch(err) {
-                console.log(err)
+            const { main, backup } = this.fillIdIfEmpty(preprocessedMain, preprocessedBackup)
+            const updatedPreferences = await this.$API.jummahs.runNotificationLoop({ main, backup }, isBackup)
+            for (const [key, value] of Object.entries(updatedPreferences)) {
+                if (value.upsert)
+                    this.jummahs.push(value)
+                else if (value._id && value._id !== 'none')
+                    this.jummahs.splice(this.findJummahIndexById(value._id), 1, value)
             }
         },
+        chronTiming(weekDayFormat="short") {
+            const date = timingHelpers.chronTiming(this.institutionSettings.jummahNotificationsTiming)
+            const dayOfWeek = date.toLocaleString('en-US', { weekday: weekDayFormat })
+            const time = date.toLocaleString('en-US', { minute: '2-digit', hour: 'numeric' })
+            return `${dayOfWeek} @ ${time}`
+        }
     },
     created() {
         this.getScheduleBuildingBlocks()
@@ -138,6 +136,18 @@ export default {
     margin-left: auto;
     width: 53%;
     padding-bottom: 10px;
+}
+
+.notification-time-container {
+    margin-right: auto;
+    width: 59%;
+}
+
+.notification-time-button {
+    font-size: 12px;
+    border-radius: 99999px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    color: black;
 }
 
 .select-text {

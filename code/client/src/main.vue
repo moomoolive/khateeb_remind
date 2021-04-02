@@ -54,6 +54,12 @@ import footerPopup from '@/components/footer/popup/main.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
+import pwaHelpers from './libraries/pwa/main.js'
+import localStorageHelpers from './libraries/localStorageManagement/main.js'
+
+import { nanoid } from 'nanoid'
+import axios from 'axios'
+
 export default {
   components: {
     notifications,
@@ -77,8 +83,40 @@ export default {
       if (token)
         this.$store.dispatch('user/updateToken', token)
     },
+    setDeviceId() {
+      if (!localStorageHelpers.get("deviceId"))
+        localStorageHelpers.commit("deviceId", nanoid(24))
+      axios.defaults.headers.common.deviceid = localStorageHelpers.get("deviceId")
+    },
+    setDeviceInfo() {
+      axios.defaults.headers.common.devicetype = this.$store.getters['user/deviceType']
+      axios.defaults.headers.common.browserBrand = this.$store.getters['user/browserBrand']
+      axios.defaults.headers.common.deviceBrand = this.$store.getters['user/deviceBrand']
+    },
     toggleNotificationDisplay() {
       this.showNotificationDisplay = !this.showNotificationDisplay
+    },
+    async signUserUpForPushNotifications() {
+      const serviceWorkerReg = await pwaHelpers.getServiceWorkerRegistration()
+      if (serviceWorkerReg) {
+        const pushSub = await pwaHelpers.subscribeUserToPushNotifications(serviceWorkerReg)
+        await this.$API.pwa.createPWASubscription(pushSub)
+      } 
+    },
+    setFirstLogin() {
+      if (!localStorageHelpers.get("hasLoggedInOnce"))
+        localStorageHelpers.commit("hasLoggedInOnce", true)
+    },
+    async executePushNotificationWorkflow() {
+      const res = await this.signUserUpForPushNotifications()
+      if (Object.keys(res).length > 0)
+        localStorageHelpers.commit("recievingPushNotifications", true)
+    },
+    isFirstLogin() {
+      return this.isLoggedIn && !localStorageHelpers.get("hasLoggedInOnce")
+    },
+    hasNotSignedUpForPushNotificationsYet() {
+      return this.isLoggedIn && !localStorageHelpers.get("recievingPushNotifications")
     }
   },
   computed: {
@@ -96,6 +134,14 @@ export default {
         return []
     }
   },
+  watch: {
+    isLoggedIn(newVal) {
+      if (newVal)
+        this.setFirstLogin()
+      if (this.isFirstLogin() || this.hasNotSignedUpForPushNotificationsYet())
+        this.executePushNotificationWorkflow()
+    }
+  },
   mounted() {
     this.$nextTick(async () => {
       if (this.$store.getters['user/isLoggedIn'])
@@ -104,6 +150,8 @@ export default {
   },
   async created() {
     this.setJWT()
+    this.setDeviceId()
+    this.setDeviceInfo()
   }
 }
 </script>
@@ -217,17 +265,6 @@ h2 {
         padding-bottom: 5%;
         padding-top: 13% !important;
       }
-}
-
-@mixin color($color) {
-    background-color: getColor($color);
-    &:hover{ border: 0.1vh solid getColor($color); }
-}
-
-@mixin allColors($list: $themeColors) {
-    @each $colorName, $color in $list {
-        &.#{$colorName} { @include color($colorName); }
-    }
 }
 
 button {

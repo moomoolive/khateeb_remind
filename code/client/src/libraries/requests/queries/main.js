@@ -5,7 +5,7 @@ const stringify = (params) => {
 }
 
 const parse = (paramsString) => {
-    return qs.parse(paramsString)
+    return qs.parse(paramsString, { comma: true })
 }
 
 export default {

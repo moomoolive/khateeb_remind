@@ -23,7 +23,8 @@ const jummahPreference = new mongoose.Schema({
     },
     notified: {
         type: Boolean,
-        required: true
+        required: false,
+        default: false
     },
     isBackup: {
         type: Boolean,
@@ -35,7 +36,8 @@ const jummahPreference = new mongoose.Schema({
     },
     notificationID: {
         type: String,
-        required: true
+        required: false,
+        default: 'none'
     }
 }, { timestamps: true })
 
@@ -51,6 +53,17 @@ jummahPreference.methods.gatherMeta = async function() {
         console.log(err)
         console.log(`Couldn't gather jummah meta`)
     }
+}
+
+jummahPreference.query.upcomingJummahsForInstitution = function (date=new Date(), institutionID='none') {
+    institutionID = institutionID.toString()
+    if (!institutionID || institutionID === 'none')
+        throw TypeError(`You must provide a valid institution id`)
+    return this.where({
+        institutionID,
+        date,
+        khateebID: { $ne: 'none' }
+    })
 }
 
 module.exports = jummahPreference

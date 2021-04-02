@@ -16,14 +16,20 @@
 </template>
 
 <script>
+import notificationScroller from './types/notification-scroller.vue'
+import redirect from './types/redirect.vue'
+import confirm from './types/confirm.vue'
+import tutorial from './types/tutorial.vue'
+import alert from './types/alert.vue'
+
 export default {
     name: "notificationsMain",
     components: {
-        'alert': () => import('./types/alert.vue'),
-        'redirect': () => import('./types/redirect.vue'),
-        'confirm': () => import('./types/confirm.vue'),
-        'notificationScroller': () => import('./types/notification-scroller.vue'),
-        "tutorial": () => import('./types/tutorial.vue'),
+        'alert': alert,
+        'redirect': redirect,
+        'confirm': confirm,
+        'notificationScroller': notificationScroller,
+        "tutorial": tutorial,
     },
     methods: {
         close() {

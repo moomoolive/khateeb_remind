@@ -12,23 +12,23 @@ router.post(
     '/create/institution',
     validationMiddleware.validateRequest(
         [
-            validator.body("institution.name").isLength({ min: 1 }),
-            validator.body("institution.abbreviatedName").isLength({ min: 1 }),
-            validator.body("institution.timezone").isLength({ min: 1 }),
-            validator.body("institution.country").isLength({ min: 1 }),
-            validator.body("institution.state").isLength({ min: 1 }).optional(),
-            validator.body("institutionAdmin.password").isLength({ min: 6 }),
-            validator.body("institutionAdmin.username").isLength({ min: 6 }),
-            validator.body("institutionAdmin.handle").isLength({ min: 1 }),
-            validator.body("institutionAdmin.firstName").isLength({ min: 1 }),
-            validator.body("institutionAdmin.lastName").isLength({ min: 1 }),
+            validator.body("institution.name").isLength({ min: 1 }).isString(),
+            validator.body("institution.abbreviatedName").isLength({ min: 1 }).isString(),
+            validator.body("institution.timezone").isLength({ min: 1 }).isString(),
+            validator.body("institution.country").isLength({ min: 1 }).isString(),
+            validator.body("institution.state").isLength({ min: 1 }).isString().optional(),
+            validator.body("institutionAdmin.password").isLength({ min: 6 }).isString(),
+            validator.body("institutionAdmin.username").isLength({ min: 6 }).isString(),
+            validator.body("institutionAdmin.handle").isLength({ min: 1 }).isString(),
+            validator.body("institutionAdmin.firstName").isLength({ min: 1 }).isString(),
+            validator.body("institutionAdmin.lastName").isLength({ min: 1 }).isString(),
             validator.body("institutionAdmin.phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
         ]
     ), 
     async (req, res) => {
     try {
-        if (req.body.institution.name === '__TEST__')
-            return res.json({ msg: `You cannot name your institution __TEST__. Pick another name please.`, status: "reserved" })
+        if (req.body.institution.name === '__TEST__' || req.body.institution.name === '__ROOT__')
+            return res.json({ msg: `You cannot name your institution __TEST__ or __ROOT__. Pick another name please.`, status: "reserved" })
         const institutionEntry = await new $db.institutions(req.body.institution).save()
         const rootInstitutionAdminEntry = await institutionEntry.createRootAdministrator(req.body.institutionAdmin)
         return res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
@@ -44,32 +44,31 @@ router.post(
     '/create/khateeb',
     validationMiddleware.validateRequest(
         [
-            validator.body("institutionID").isLength(24),
-            validator.body("password").isLength({ min: 6 }),
-            validator.body("username").isLength({ min: 6 }),
-            validator.body("handle").isLength({ min: 1 }),
-            validator.body("firstName").isLength({ min: 1 }),
-            validator.body("lastName").isLength({ min: 1 }),
+            validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+            validator.body("password").isLength({ min: 6 }).isString(),
+            validator.body("username").isLength({ min: 6 }).isString(),
+            validator.body("handle").isLength({ min: 1 }).isString(),
+            validator.body("firstName").isLength({ min: 1 }).isString(),
+            validator.body("lastName").isLength({ min: 1 }).isString(),
             validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
-            validator.body("title").isLength({ min: 1 })
+            validator.body("title").isLength({ min: 1 }).isString()
         ]
     ),
     async (req, res) => {
         try {
-            const settings = await $db.settings.findOne({ institutionID: req.body.institutionID }).exec()
-            if (!settings)
-                return res.json(`That institution doesn't exist!`)
-            if (settings.autoConfirmRegistration)
+            const instituion = await $db.institutions.findOne({ _id: req.body.institutionID }).exec()
+            if (!instituion)
+                return res.status(422).json({ msg: `That institution doesn't exist!` })
+            if (instituion.settings.autoConfirmRegistration)
                 req.body.confirmed = true
             const khateebEntry = await new $db.khateebs(req.body).save()
-            await new notificationConstructors.WelcomeNotificationConstructor(khateebEntry).create()
-            const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, settings.autoConfirmRegistration)
+            const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, instituion.settings.autoConfirmRegistration)
             await note.setRecipentsToAdmins(req.body.institutionID)
             await note.create()
-            return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${ settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
+            return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${instituion.settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
         console.log(err)
-        res.json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)
+        return res.json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)
     }
 })
 
@@ -77,8 +76,8 @@ router.post(
     '/',
     validationMiddleware.validateRequest(
         [
-            validator.body("password").isLength({ min: 1 }),
-            validator.body("username").isLength({ min: 1 }),
+            validator.body("password").isLength({ min: 1 }).isString(),
+            validator.body("username").isLength({ min: 1 }).isString(),
         ]
     ),
     async (req, res) => {
@@ -102,77 +101,84 @@ router.post(
         }
 })
 
-// needs work
 router.post(
-    '/forgot/:type', 
+    '/forgot/password',
     validationMiddleware.validateRequest(
         [
-            validator.body("data").isLength({ min: 1 }),
+            validator.body("username").isString().isLength({ min: 1 })
         ]
     ),
     async (req, res) => {
         try {
-            if (req.params.type !== 'username' && req.params.type !== 'password')
-                return res.json(`Invalid Recovery Option`)
-            let khateebRemindTextInfo = await $db.settings.findOne({ institutionID: "__ROOT__" }).exec()
-            if (!khateebRemindTextInfo.textAllowed)
-                return res.json({ msg:`Account recovery service is offline right now`, status: 'error' })
-            khateebRemindTextInfo = khateebRemindTextInfo.decrypt()
-            const twilio = require('twilio')(khateebRemindTextInfo.twilioUser, khateebRemindTextInfo.twilioKey)
-            let apiMsg
-            let textMsg
-            let to
-            if (req.params.type === 'username') {
-                to = `+1${req.body.data}`
-                const results = await $db.users.find({ phoneNumber: req.body.data }).exec()
-                textMsg = 'Accounts under this phone number:\n'
-                results.forEach(account => { textMsg += `\n- ${account.username}` })
-                apiMsg = `Your username(s) were sent to your recovery phone via text!`
+            if (!global.textManager.isTextServiceOnline())
+                return res.json({ msg: `Account recovery is under maintenance right now! Try again later.`, status: "error" })
+            const account = await $db.users.findOne(req.body).exec()
+            if (account) {
+                const verificationCode = await new $db.verificationCodes({ username: account.username }).save()
+                await global.textManager.sendRecoveryText(
+                    account.phoneNumber,
+                    `This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`,
+                    "password"
+                )
             }
-            else if (req.params.type === 'password') {
-                const account = await $db.users.findOne({ username: req.body.data }).exec()
-                if (!account)
-                    return res.json({ msg: `That account doesn't exist`, status: "error" }) // security risk??
-                to = `+1${account.phoneNumber}`
-                const verificationCode = await new $db.verificationCodes({ userID: account._id.toString() }).save()
-                textMsg = `You requested a password recovery code from Khateeb Remind. This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
-                apiMsg = { msg: `A verification code was sent to your phone via text!`, status: "code", userID: account._id.toString()}
-            }
-            textMsg += `\n\nYou recieved this message because you requested help recovering your ${req.params.type}.\n\n🤖 Sent from Khateeb Remind Bot`
-            await twilio.messages.create({
-                to,
-                from: khateebRemindTextInfo.twilioPhoneNumber,
-                body: textMsg 
-            })
-            res.json(apiMsg)
+            return res.json({ msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username}'s associated phone number will be recieving a text with a verification code in the next few minutes insha'Allah`, status: 'okay' })
         } catch(err) {
             console.log(err)
-            res.json({msg: `Couldn't send verification method`, status: "error"})
+            return res.json({msg: `Something went wrong when sending verification code`, status: "error"})
         }
-})
+    }
+)
 
 router.post(
+    '/forgot/username',
+    validationMiddleware.validateRequest(
+        [
+            validator.body("phoneNumber").isNumeric()
+        ]
+    ),
+    async (req, res) => {
+        try {
+            if (!global.textManager.isTextServiceOnline())
+                return res.json({ msg: `Account recovery is under maintenance right now! Try again later.`, status: "error" })
+            const accounts = await $db.users.find(req.body).exec()
+            if (accounts.length > 0) {
+                const accountsString = accounts
+                    .map(a => a.username)
+                    .reduce((total, a) => `${total}\n- ${a.username}`)    
+                await global.textManager.sendRecoveryText(
+                    req.body.phoneNumber,
+                    `Accounts under this phone number:\n- ${accountsString}`,
+                    "username"
+                )
+            }
+            return res.json({ msg: `If ${req.body.phoneNumber} is the system, it should be recieving a text shortly insha'Allah`, status: 'okay' })
+        } catch(err) {
+            console.log(err)
+            return res.json({msg: `An error occured when sending verification text! Try again later`, status: "error"})
+        }
+    }
+)
+
+router.put(
     '/verification-code', 
     validationMiddleware.validateRequest(
         [
             validator.body("code").isLength({ min: 1 }),
-            validator.body("userID").isLength(20),
-            validator.body("password").isLength({ min: 6 }),
+            validator.body("username").isLength({ min: 1 }).isString(),
+            validator.body("newPassword").isLength({ min: 6 }).isString()
         ]
     ),
     async (req, res) => {
         try {
             const verificationCode = await $db.verificationCodes.findOne({ code: req.body.code }).exec()
-            if (!verificationCode || verificationCode.userID !== req.body.userID)
+            if (!verificationCode || verificationCode.username !== req.body.username)
                 return res.json({ msg: "Incorrect code", status: "error" })
-            const updated = await $db.users.updateOne({ _id: req.body.userID }, { password: req.body.password })
-            res.json({ msg: "Password successfully updated", status: "success" })
+            await $db.users.updateOne({ username: req.body.username }, { password: req.body.newPassword })
+            return res.json({ msg: "Password successfully updated", status: "success" })
         } catch(err) {
             console.log(err)
             res.json({ msg: `Couldn't verify code`, status: "error" })
         }
 })
-
-// NEEDS WORK Ends here
 
 module.exports = router

@@ -7,6 +7,9 @@
             <div class="menu-item" @click="redirect('/khateeb/announcements')">
                 <p>Announcements</p>
             </div>
+            <div class="menu-item" @click="redirect('/khateeb/my-khutbahs')">
+                <p>My Khutbahs</p>
+            </div>
         </div>
         <div v-if="utils.validAuthentication({ min: 2, max: 3 })" class="user-items">
             <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
@@ -36,6 +39,11 @@
         </div>
         <div class="menu-item" @click="redirect('/user')">
             <p>My Profile</p>
+        </div>
+        <div class="menu-item" @click="redirect('/notification-subscriptions')">
+            <p>
+                My Notifications
+            </p>
         </div>
         <div
             v-if="!$store.state.user.isBrowsingOnPWA && deferredPrompt" 

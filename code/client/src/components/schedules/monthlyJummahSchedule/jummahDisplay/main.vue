@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="showJummah">
         
         <div class="timing-container">
             <div class="jummah-status-container">
@@ -16,11 +16,13 @@
         <div class="jummahPreferences">
             
             <div class="settings-icon-container">
-                <img 
-                    src="~@/assets/misc/settingsCog.png"
-                    class="settings-icon"
+                <button 
+                    :disabled="viewingWeekIsCurrentPastOrFuture === 'past'" 
+                    class="icon-button blue"
                     @click="$emit('open-settings', { khateebPreferences, timing, location })"
                 >
+                    ⚙️
+                </button>
             </div>
 
             <component
@@ -35,8 +37,8 @@
                 @update-preference="$emit('update-preference', $event)"
             />
 
-            <div class="last-updated">
-                <span class="timing">Last Updated:</span><br>
+            <div v-if="preferenceEntryExists" class="last-updated">
+                <div class="timing">Last Updated:</div>
                 {{ updateDisplay() }}
             </div>
 
@@ -48,6 +50,8 @@
 <script>
 import tagCircle from '@/components/general/tagCircle.vue'
 import jummahStaticTags from './jummahTags.json'
+
+import timingHelpers from '@/libraries/timings/main.js'
 
 export default {
     name: 'jummahDisplayer',
@@ -88,14 +92,13 @@ export default {
     },
     data() {
         return {
-            jummahStaticTags
+            jummahStaticTags,
+            showJummah: true
         }
     },
     methods: {
         jummahTiming() {
-            const timing = new Date()
-            timing.setHours(this.timing.hour, this.timing.minute, 0, 0)
-            return timing.toLocaleTimeString('en-US', { hour: "2-digit", minute: "2-digit" })
+            return timingHelpers.timingDisplay(this.timing)
         },
         renderJummahTag(viewingWeek) {
             if (viewingWeek === 'past')
@@ -118,6 +121,10 @@ export default {
         },
         oneKhateebWasNotified() {
             return this.khateebPreferences.find(p => p.notified)
+        },
+        rerenderCell() {
+            this.showJummah = false
+            this.$nextTick(() => this.showJummah = true)
         }
     },
     computed: {
@@ -128,6 +135,14 @@ export default {
                     exists = true
              })
             return exists
+        },
+    },
+    watch: {
+        khateebPreferences() {
+            this.rerenderCell()
+        },
+        selectedDate() {
+            this.rerenderCell()
         }
     }
 }
@@ -147,6 +162,15 @@ export default {
 
 .settings-icon {
     width: 100%;
+}
+
+.icon-button {
+    height: 30px;
+    width: 30px;
+    font-size: 15px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
 }
 
 .settings-icon-container {
@@ -187,11 +211,12 @@ export default {
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
 }
 
-span {
+div {
     &.timing {
         font-size: 14px;
         text-decoration: underline;
         color: getColor("offWhite");
+        margin-bottom: 2px;
     }
 }
 

@@ -8,12 +8,12 @@ const announcement = new mongoose.Schema({
     headline: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     content: {
         type: String,
         default: 'no content',
-        minlength: 1
+        minLength: 1
     },
     important: {
         type: Boolean,

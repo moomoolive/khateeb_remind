@@ -5,12 +5,26 @@
                 Source Code
             </a>
         </div>
+        <div v-if="showInstitutionName" class="institution-name">
+            {{ institution.name }}
+        </div>
     </div>
 </template>
 
 <script>
 export default {
     name: 'Footer',
+    computed: {
+        authLevel() {
+            return this.$store.getters['user/authLevel'] 
+        },
+        showInstitutionName() {
+            return this.$store.getters['user/isLoggedIn'] && (this.institution.name === '__TEST__' || this.institution.name === '__ROOT__')
+        },
+        institution() {
+            return this.$store.state.user.institution
+        }
+    }
 }
 </script>
 
@@ -39,5 +53,15 @@ a {
     &:hover {
         color: getColor("blue")
     } 
+}
+
+.institution-name {
+    text-align: right;
+    float: right;
+    position: relative;
+    bottom: 30px;
+    font-size: 11px;
+    right: 5px;
+    color: getColor("blue")
 }
 </style>

@@ -1,18 +1,16 @@
 import helpers from './helpers.js'
 
-import axios from 'axios'
-
-const extension = helpers.targetURL('institutions')
+const extension = "institutions"
 
 const requests = {
-    getInstitution(params) {
-        return axios.get(extension, { params })
+    getInstitution(params={}) {
+        return helpers.returnCustomObjectFromRequest({ settings: {} })("get", extension, { params })
     },
-    updateInstitution(updatedInstitution) {
-        return axios.put(extension, updatedInstitution)
+    updateInstitution(updatedInstitution={}) {
+        return helpers.returnEmptyObjectFromRequest("put", extension, updatedInstitution)
     },
     deleteInstitution() {
-        return axios.delete(extension)
+        return helpers.returnEmptyObjectFromRequest("delete", extension)
     }
 }
 

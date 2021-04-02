@@ -41,6 +41,19 @@ const generalServerError = () => {
     helpers.createNotification(info)
 }
 
+const serverCaughtError = () => {
+    const info = {
+        type: 'alert',
+        options: {
+            color: "yellow",
+            icon: "clock-no-markings",
+            msg: "There was an error that occured when contacting the server. Try again later!",
+            textSize: "small",
+        }
+    }
+    helpers.createNotification(info)
+}
+
 const redirectionOptions = (redirections, options={}) => {
     if (!Array.isArray(redirections))
         throw TypeError(`Redirections must be in array format`)
@@ -98,5 +111,6 @@ export default {
     redirectionOptions,
     confirmationPrompt,
     popupMsg,
-    downloadAppPrompt
+    downloadAppPrompt,
+    serverCaughtError
 }

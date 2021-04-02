@@ -1,4 +1,13 @@
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
+
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+const objectSupport = require('dayjs/plugin/objectSupport')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(objectSupport)
 
 const localToUTCEquivalent = (localTimeNow=new Date()) => {
     const localTime = new Date(localTimeNow)
@@ -33,30 +42,89 @@ const sendNotificationToTargetPreference = async (targetPreference={}) => {
         const meta = await targetPreference.gatherMeta()
         const constructorRes = await new notificationConstructors.JummahReminderNotificationConstructor(khateeb, targetPreference, meta).create()
         targetPreference.notificationID = constructorRes[0]._id.toString()
+        targetPreference.notified = true
+        console.log('after update', targetPreference)
         return targetPreference
     } catch(err) {
         console.log(err)
     }
 }
 
+const createJummahPreferenceAndReturn = async (preference={}) => {
+    try {
+        if (preference._id)
+            delete preference._id
+        const createdPreference = await new $db.jummahPreferences(preference).save()
+        return createdPreference
+    } catch(err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
 const runNotificationLoop = async (targetPreference={}, otherPreference={}) => {
     try {
+        let targetUpsert = false
+        if (targetPreference.upsert) {
+            targetPreference = await createJummahPreferenceAndReturn(targetPreference)
+            targetUpsert = true
+        }
         targetPreference = await sendNotificationToTargetPreference(targetPreference)
-        targetPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: targetPreference._id }, { notified: true, isGivingKhutbah: true }, { new: true }) 
+        targetPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: targetPreference._id }, { notified: true, isGivingKhutbah: true }, { new: true })
+        if (targetUpsert) {
+            targetPreference = global.utils.deepCopy(targetPreference)
+            targetPreference.upsert = true 
+        }
     } catch(err) {
         console.log(err)
     }
-    try {
-        if (otherPreference._id && otherPreference._id.toLowerCase() !== 'none')
+    if (otherPreference._id && (otherPreference._id.toLowerCase() !== 'none' || otherPreference.upsert)) {
+        try {
+            let OtherUpserted = false
+            if (otherPreference.upsert) {
+                otherPreference = await createJummahPreferenceAndReturn(otherPreference)
+                OtherUpserted = true
+            }
             otherPreference = await $db.jummahPreferences.findOneAndUpdate({ _id: otherPreference._id }, { isGivingKhutbah: false }, { new: true })
-    } catch(err) {
-        console.log(err)
+            if (OtherUpserted) {
+                otherPreference = global.utils.deepCopy(otherPreference)
+                otherPreference.upsert = true
+            }
+        } catch(err) {
+            console.log(err)
+        }
     }
     return { targetPreference, otherPreference }
+}
+
+const chronNotificationLoop = async (targetPreference={}, institution={}, timing={}) => {
+    const res = await runNotificationLoop(targetPreference)
+    console.log(`sent notification for institution ${institution.name} (id: ${institution._id}), timing: ${timing._id}`)
+    return res
+}
+
+const cronNotificationTiming = (upcomingFriday=new Date(), chronTimingInfo={}, timezone="America/Edmonton") => {
+    const targetDayOfWeek = scheduleHelpers.findDayOfWeek(
+        upcomingFriday,
+        chronTimingInfo.dayOfWeek,
+        false
+    )
+    const targetDate = dayjs()
+        .tz(timezone)
+        .year(targetDayOfWeek.getFullYear())
+        .month(targetDayOfWeek.getMonth())
+        .date(targetDayOfWeek.getDate())
+        .hour(chronTimingInfo.hour)
+        .minute(chronTimingInfo.minute)
+        .second(0)
+        .millisecond(0)
+    return new Date(targetDate.toISOString())
 }
 
 module.exports = {
     oneMonthInThePast,
     twoMonthsAhead,
-    runNotificationLoop
+    runNotificationLoop,
+    chronNotificationLoop,
+    cronNotificationTiming
 }

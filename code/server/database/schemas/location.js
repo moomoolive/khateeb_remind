@@ -8,12 +8,12 @@ const location = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     address: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     active: {
         type: Boolean,
@@ -61,5 +61,13 @@ location.methods.createAssociatedTiming = async function() {
         console.log(`${err}\nCouldn't create assoicated timing`)
     }
 }
+
+location.post('save', async function(newLocation={}) {
+    try {
+        await newLocation.createAssociatedTiming()
+    } catch(err) {
+        console.log(err)
+    }
+})
 
 module.exports = location

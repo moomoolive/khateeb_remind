@@ -56,6 +56,7 @@
                         :key="khateebNo"
                         class="khateeb-container"
                     >
+                        
                         <collapsable-box
                             :headline="`${khateeb.firstName} ${khateeb.lastName}`"
                             :tagDetails="khateebTag(khateeb)"
@@ -84,14 +85,17 @@
                                 />
                             </div>
                         </collapsable-box>
+
                     </div>
                 </div>
             </div>
+
             <msg-with-pic 
                 v-else
                 :msg="`No khateebs have signed up to your institution yet`"
                 :gif="`twirlingPlane`"
-            />  
+            />
+
         </loading>
     </div>
 </template>
@@ -103,6 +107,7 @@ import msgWithPic from '@/components/general/msgWithPic.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
+import requestHelpers from '@/libraries/requests/helperLib/main.js'
 
 export default {
     name: 'khateebs',
@@ -124,21 +129,12 @@ export default {
     },
     methods: {
         async getAllKhateebs() {
-            try {
-                const data = await this.$API.khateebs.getKhateebs()
-                this.khateebs = data || []
-            } catch(err) {
-                console.log(err)
-            }
+            this.khateebs = await this.$API.khateebs.getKhateebs()
         },
         async getActiveLocationsAndTimings() {
-            try {
-                const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
-                this.locations = locations || []
-                this.timings = timings || []
-            } catch(err) {
-                console.log(err)
-            }
+            const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+            this.locations = locations
+            this.timings = timings
         },
         compileAvailableTimes(availableTimingsIdArray) {
             console.log(availableTimingsIdArray)
@@ -200,15 +196,9 @@ export default {
                 return [{ words: `Last Active: ${this.utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
         },
         async editKhateeb($event) {
-            try {
-                const res = await this.$API.khateebs.updateExistingKhateeb($event)
-                if (!res)
-                    return
-                this.khateebs.splice(this.findKhateebIndex(res._id), 1, res)
-                this.rerenderView()
-            } catch(err) {
-                console.log(err)
-            }
+            const res = await this.$API.khateebs.updateExistingKhateeb($event)
+            this.khateebs.splice(this.findKhateebIndex(res._id), 1, res)
+            this.rerenderView()
         },
         findKhateebIndex(id) {
             return this.khateebs.findIndex(khateeb => khateeb._id === id)
@@ -218,16 +208,12 @@ export default {
             this.$nextTick(() => { this.showKhateebs = true })
         },
         async deleteKhateeb(id) {
-            try {
-                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this khateeb?`)
-                if (!confirm)
-                    return
-                const res = await this.$API.khateebs.deleteKhateeb(id)
-                console.log(res)
+            const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this khateeb?`)
+            if (!confirm)
+                return
+            const res = await this.$API.khateebs.deleteKhateeb(id)
+            if (requestHelpers.dataWasDeleted(res))
                 this.khateebs.splice(this.findKhateebIndex(id), 1)
-            } catch(err) {
-                console.log(err)
-            }
         },
         khateebFilter(noFilterValue="any", valueKey="active", queryParams={}) {
             if (queryParams[valueKey] !== noFilterValue)

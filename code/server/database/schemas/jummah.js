@@ -1,5 +1,5 @@
 // DEPRECATED SCHEMA
-
+/*
 const mongoose = require('mongoose')
 
 const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
@@ -78,3 +78,4 @@ jummah.query.futureEntries = function() {
 }
 
 module.exports = jummah
+*/

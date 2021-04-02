@@ -22,8 +22,13 @@
             </div>
         </div>
         <div class="inputContainer">
-            <button class="silver" @click="execute(input)">Execute</button><br>
-            <input type="text" v-model="input">
+            <div>
+                <button class="silver" @click="execute(input)">Execute</button>
+            </div>
+            <div>
+                <input type="text" v-model="terminalPrompt" class="terminal-arm">
+                <input type="text" v-model="input">
+            </div>
         </div>
     </div>
 </template>
@@ -38,18 +43,12 @@ export default {
     },
     data() {
         return {
+            terminalPrompt: "> ",
             input: '',
             output: [],
             outputQueue: [],
             commandHistory: [],
             historySelector: -1,
-            name: this.$store.getters.user.allInfo.firstName,
-            outputMutator: window.setInterval(() => {
-                if (this.outputQueue.length > 0) {
-                    const output = this.outputQueue.shift()
-                    this.output.push(output)
-                }
-            }, 300),
             icons: {
                 ser: '📡',
                 usr: '⌨️',
@@ -59,8 +58,8 @@ export default {
         }
     },
     methods:{
-        prefix(from, display=true) {
-            let val
+        prefix(from='sys', display=true) {
+            let val = ''
             switch(from) {
                 case 's':
                     val = 'sys'
@@ -71,6 +70,8 @@ export default {
                 case 'a':
                     val = 'ser'
                     break
+                default:
+                    val = 'sys'
             }
             if (display)
                 val = `[ ${this.icons[val]} ${val} ] : `
@@ -112,13 +113,20 @@ export default {
                 this.$router.push('/sysAdmin')
             }, 2_300)
         },
-        async cloudCommands(command) {
+        async pingServer() {
+            try {
+                const ping =  await this.$API.sysAdmin.executeCommand({ command: ["__PING__"] })
+                return { ...ping[0], from: 'a' }
+            } catch(err) {
+                console.log(err)
+            }
+        },
+        cloudCommands(command) {
             switch(command) {
                 case 'ping':
                 case 'p':
                 case '-p':
-                    const ping = await this.$API.sysAdmin.executeCommand({ command: ["__PING__"] })
-                    return ping[0]
+                    return 'ping'
                 case '-c':
                 case 'cls':
                 case 'clear':
@@ -127,10 +135,7 @@ export default {
                     return
                 case '-t':
                 case 'test':
-                    return {
-                        msg: `👋 I'm still here! 👋`,
-                        status: `success`
-                    }
+                    return { msg: `👋 I'm still here! 👋`, status: `success` }
                 case '-h':
                 case 'help':
                 case '--help':
@@ -141,27 +146,48 @@ export default {
                 case "bye":
                 case "exit":
                     this.exit()
-                    return { msg: `cya later ${this.name} 👋`, status: 'okay' }
+                    return { msg: `cya later ${this.userInfo.firstName} 👋`, status: 'okay' }
                 case "docs":
                 case '-d':
                     this.showDocs = !this.showDocs
                     break
                 default:
-                    return { msg: 'Command Not Found', status: 'fail' }
+                    return { msg: 'Command not found', status: 'fail' }
             }
         },
-        async cli(command) {
-            let cmd = this.preprocessCommand(command)
+        async cli(preProccessedCommand="hello world") {
+            let cmd = this.preprocessCommand(preProccessedCommand)
             if (cmd.length === 1) {
-                const res = await this.cloudCommands(cmd[0])
-                return [res]
+                let res = this.cloudCommands(cmd[0])
+                if (res === 'ping')
+                    res = await this.pingServer()
+                return [{ ...res, from: res.from || 's' }]
             }
             try {
-                const res = await this.$API.sysAdmin.executeCommand({ command: cmd })
+                const { query, command } = this.preprocessCommandForServer(cmd)
+                const res = await this.$API.sysAdmin.executeCommand({ command }, query)
                 return res
             } catch(err) {
                 console.log(err)
             return [{ msg: `A problem was encounter when executing command. Err: ${err}`, status: 'fail' }]
+            }
+        },
+        preprocessCommandForServer(command=[]) {
+            const queryStartIndex = command.findIndex(cmd => {
+                const casted = cmd.toLowerCase()
+                return casted === 'query:' || casted === 'values:' 
+            })
+            if (queryStartIndex === -1)
+                return { command }
+            const queryEndIndex = command.findIndex(cmd => cmd.toLowerCase() === '$end')
+            return this.concatenateQuery(command, queryStartIndex, queryEndIndex)
+        },
+        concatenateQuery(command=[], queryStart=0, queryEnd=-1) {
+            const endIndex = queryEnd === -1 ? command.length : queryEnd
+            const queryParts = command.slice(queryStart + 1, endIndex)
+            return { 
+                query: queryParts.reduce((total, qp) => `${total}&${qp}`),
+                command: command.filter((cmd, index) => index < queryStart || index > endIndex ) 
             }
         },
         preprocessCommand(command) {
@@ -183,25 +209,56 @@ export default {
             else {
                 try {
                     const cliResponse = await this.cli(this.input)
-                    cliResponse.forEach(res => {
-                        if (res)
-                            this.addToOutput(res.msg, res.status, res.from ? res.from : 's') 
-                    })
+                    if (cliResponse)
+                        cliResponse.forEach(({ msg, status, from='a' }) => { this.addToOutput(msg, status, from) })
                 } catch(err) {
                     console.log(err)
                     this.addToOutput(`A problem occurred when executing command. Err: ${err}`, 'fail')
                 }
             }
             this.input = ''
+        },
+        async firstOutputs() {
+            this.addToOutput(`Asalam Alaikoum ${this.utils.stringFormat(this.userInfo.firstName)} 😀`)
+            this.addToOutput(`System is ready for commands 👍`, 'success')
+            try {
+                const { msg, status, from } = await this.pingServer()
+                this.addToOutput(msg, status, from)
+            } catch(err) {
+                console.log(err)
+                this.addToOutput('Error Contacting server', 'fail')
+            }
+        },
+        scheduleOutputMutator() {
+            const threeTenthOfASecond = 300
+            window.setInterval(() => {
+                if (this.outputQueue.length > 0) {
+                    const output = this.outputQueue.shift()
+                    this.output.push(output)
+                }
+            }, threeTenthOfASecond)
+        },
+        blinkingTerminalPrompt() {
+            const x = 1_000
+            window.setInterval(() => {
+                const apparentArm = '> '
+                if (this.terminalPrompt === apparentArm)
+                    this.terminalPrompt = '  '
+                else
+                    this.terminalPrompt = apparentArm
+            }, x)
+        }
+    },
+    computed: {
+        userInfo() {
+            return this.$store.getters['user/allInfo']
         }
     },
     async created() {
-        this.outputMutator
         window.addEventListener('keyup', this.keyBindings)
-        this.addToOutput(`Asalam Alaikoum ${this.utils.stringFormat(this.name)} 😀`)
-        this.addToOutput(`System is ready for commands 👍`, 'success')
-        const ping = await this.$API.sysAdmin.executeCommand({ command: ["__PING__"] })
-        this.addToOutput(ping[0].msg, ping[0].status, ping[0].from)
+        this.scheduleOutputMutator()
+        this.blinkingTerminalPrompt()
+        this.firstOutputs()
     },
     destroyed() {
         window.clearInterval(this.outputMutator)
@@ -262,6 +319,10 @@ export default {
 
 .inputContainer {
     margin-top: 6vh;
+    width: 93%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1090px;
 }
 
 p {
@@ -301,8 +362,7 @@ span {
 }
 
 input {
-    width: 80%;
-    max-width: 1090px;
+    width: 94%;
     color: getColor("offWhite");
     font-weight: bold;
     height: 5vh;
@@ -311,15 +371,17 @@ input {
     border: none;
     background-color: getColor("grey");
     font-size: 15px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    &.terminal-arm {
+        width: 4%;
+    }
 }
 
 button {
     color: black;
     height: 5vh;
-    width: 80%;
     max-height: 35px;
     font-size: 15px;
+    width: 98.5%;
     max-width: 1090px;
     border-radius: 0;
     font-weight: bold;
@@ -327,30 +389,36 @@ button {
 }
 
 @media screen and (max-width: $phoneWidth) {
+    
     p {
         line-height: 3.4vh;
         margin-top: 1vh;
         margin-left: 1vh;
         font-size: 2.2vh;
     }
+
     .outputBox {
         background: getColor('grey');
         height: 70vh;
         width: 90%;
     }
+
     .docs-container {
         height: 60vh;
         width: 90%;
     }
+
     input {
         width: 89%;
         height: 5vh;
     }
+
     button {
         margin-top: 0;
         font-size: 2vh;
-        width: 90%;
+        width: 95%;
     }
+
     .inputContainer {
         margin-bottom: 10vh;
     }

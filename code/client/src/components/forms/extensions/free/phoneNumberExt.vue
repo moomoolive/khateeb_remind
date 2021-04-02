@@ -1,5 +1,6 @@
 <template>
     <div class="phone-number-container" v-if="init">
+
         <input-primitive 
             class="phone-section"
             :inputType="`text`"
@@ -8,7 +9,8 @@
             :placeholder="`Area Code`"
             :default="areaCode"
             @changed="toVal('areaCode', $event)"
-        /><p>-</p> 
+        /><p>-</p>
+
         <input-primitive 
             class="phone-section"
             :inputType="`text`"
@@ -18,6 +20,7 @@
             :default="first3"
             @changed="toVal('first3', $event)"
         /><p>-</p>
+
         <input-primitive 
             class="phone-section"
             :inputType="`text`"
@@ -27,6 +30,7 @@
             :default="last4"
             @changed="toVal('last4', $event)"
         />
+
     </div>
 </template>
 
@@ -36,7 +40,7 @@ import inputPrimitive from '@/components/forms/extensions/primitives/input.vue'
 export default {
     name: "formPhoneNumberExt",
     components: {
-        inputPrimitive
+        inputPrimitive,
     },
     props: {
         options: {
@@ -60,13 +64,12 @@ export default {
 
         },
         process(options) {
-            const info = {
+            this.$emit('changed', {
                 ...options,
                 val: this.completeNumberInt,
                 state: this.readyToSubmit,
                 msgs: this.invalidMsg
-            }
-            this.$emit('changed', info)
+            })
         } 
     },
     computed: {
@@ -106,7 +109,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .phone-number-container {
     width: 89%;
     text-align: left;

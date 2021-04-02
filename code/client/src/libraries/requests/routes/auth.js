@@ -8,17 +8,20 @@ const requests = {
     getToken(credentials) {
         return axios.post(extension + '/', credentials)
     },
-    createInstitution(institutionAndAdminInfo) {
+    createInstitution(institutionAndAdminInfo={}) {
         return axios.post(extension + '/create/institution', institutionAndAdminInfo)
     },
-    createKhateeb(khateebInfo) {
+    createKhateeb(khateebInfo={}) {
         return axios.post(extension + "/create/khateeb", khateebInfo)
     },
-    forgot(usernameOrPassword, data) {
-        return axios.post(extension + `/forgot/${usernameOrPassword}`, data)
+    sendVerificationCode(username={ username: "moomoo" }) {
+        return axios.post(extension + '/forgot/password', username)
     },
-    verificationCode(passwordAndCode) {
-        return axios.post(extension + '/verification-code', passwordAndCode)
+    forgotUsername(phoneNumber={ phoneNumber: 100_000_0000 }) {
+        return axios.post(extension + `/forgot/username`, phoneNumber)
+    },
+    verificationCodeCheck(passwordAndCode={}) {
+        return axios.put(extension + '/verification-code', passwordAndCode)
     }
 }
 

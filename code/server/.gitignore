@@ -12,3 +12,4 @@ TZ_env/
 .env
 
 text.json
+vapidKeys.json

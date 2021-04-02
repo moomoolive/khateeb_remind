@@ -12,13 +12,12 @@ router.get(
     '/',
     authMiddleware.authenticate({ min: 1, max: 3 }),
     async (req, res) => {
-        let announcements = []
         try {
-            announcements = await $db.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).sort("-updatedAt").limit(20).exec()
-            return res.json(announcements)
+            const data = await $db.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).sort("-updatedAt").limit(20).exec()
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json({ announcements, msg: { status: 'err', errorTrace: err } })
+            return res.status(503).json({ data: [], msg: `Couldn't retrieve announcements. Err trace: ${err}` })
         }
     }
 )
@@ -28,19 +27,19 @@ router.post(
     authMiddleware.authenticate({ min: 2, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
-        validator.body("institutionID").isLength(24),
-        validator.body("headline").isLength({ min: 1 }),
-        validator.body("content").isLength({ min: 1 }),
+        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("headline").isLength({ min: 1 }).isString(),
+        validator.body("content").isLength({ min: 1 }).isString(),
         validator.body("important").isBoolean(),
         validator.body("urgent").isBoolean(),
     ]),
     async (req, res) => {
         try {
-            const newAnnouncement = await $db.announcements(req.body).save()
-            return res.json(newAnnouncement)
+            const data = await $db.announcements(req.body).save()
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't create announcement`)
+            return res.status(503).json({ data: {}, msg: `Couldn't update announcement. Err trace: ${err}` })
         }
     }
 )
@@ -49,20 +48,20 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(24),
-        validator.body("headline").isLength({ min: 1 }).optional(),
-        validator.body("content").isLength({ min: 1 }).optional(),
+        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("headline").isLength({ min: 1 }).isString().optional(),
+        validator.body("content").isLength({ min: 1 }).isString().optional(),
         validator.body("important").isBoolean().optional(),
         validator.body("urgent").isBoolean().optional(),
     ]),
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "announcements"),
     async (req, res) => {
         try {
-            const updated = await $db.announcements.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
-            return res.json(updated)
+            const data = await $db.announcements.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't update announcement`)
+            return res.status(503).json({ data: {}, msg: `Couldn't update announcement. Err trace ${err}` })
         }
     }
 )
@@ -71,16 +70,16 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(24)
+        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "announcements"),
     async (req, res) => {
         try {
-            await $db.announcements.deleteOne(req.query)
-            return res.json({ msg: `Deleted Announcement ${req.query._id}` })
+            const data = await $db.announcements.deleteOne(req.query)
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json(`Couldn't delete timing`)
+            return res.status(503).json({ data: {}, msg: `Couldn't delete announcement. Err trace: ${err}` })
         }
     }
 )

@@ -48,7 +48,7 @@ export default {
             this.$emit('changed', { val: this.data, ...options })
         },
         startVal() {
-            return typeof this.default !== 'undefined' ? this.default : null
+            return this.default !== undefined ? this.default : null
         }
     },
     watch: {

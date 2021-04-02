@@ -6,18 +6,6 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(objectSupport)
 
-
-const linkTimesAndLocations = (prayerInfo) => {
-    const linkedStruct = {  }
-    prayerInfo.locations.forEach(location => {
-        linkedStruct[location._id] = []
-    })
-    prayerInfo.timings.forEach(timing => {
-        linkedStruct[timing.locationID].push(timing._id)
-    })
-    return linkedStruct
-}
-
 const createDayJs = (options={}) => {
     const date = new Date()
     let dayJsOptions = {
@@ -61,24 +49,15 @@ const getActiveLocationsAndTimings = async (institutionID) => {
     }
 }
 
-
-// Deprecated
-
 const findFirstFriday = (month, year) => {
     let date = dayjs().month(month).year(year).date(1)
     return findUpcomingFriday(date)
 }
 
-const findNextMonth = () => {
-    let date = dayjs()
-    return dayjs(date).month(date.month() + 1)
-}
-
-
 module.exports = {
     getActiveLocationsAndTimings,
     findUpcomingFriday,
     findAllFridays,
-    linkTimesAndLocations,
-    createDayJs
+    createDayJs,
+    findFirstFriday
 }

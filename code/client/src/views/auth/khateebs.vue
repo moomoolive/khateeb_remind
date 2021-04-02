@@ -5,8 +5,9 @@
             @all-key-bindings-active="includeTestInstitutionInInstitutionsList()"
         />
         <loading>
+
             <user-form-template
-                v-if="showForm" 
+                v-if="showForm && thereAreInstitutionsToSignupFor" 
                 :userType="`khateeb`"
                 :includeVitals="true"
                 :includeIdAppender="true"
@@ -20,6 +21,13 @@
                 }"
                 @submitted="signupKhateeb($event)"
             />
+
+            <msg-with-pic 
+                v-else
+                :msg="`There was a problem finding institutions to sign up for...`"
+                :gif="`sadCat`"
+            /> 
+
         </loading>
     </div>
 </template>
@@ -28,13 +36,15 @@
 import loading from '@/components/general/loadingScreen.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
 import complexKeyBinder from '@/components/misc/complexKeyBinder.vue'
+import msgWithPic from '@/components/general/msgWithPic.vue'
 
 export default {
     name: "khateebSignup",
     components: {
         loading,
         userFormTemplate,
-        complexKeyBinder
+        complexKeyBinder,
+        msgWithPic
     },
     data() {
         return {
@@ -54,12 +64,7 @@ export default {
             }
         },
         async getAllConfirmedInstitutions() {
-            try {
-                const data = await this.$API.misc.institutionSelection()
-                this.allInstitutions = data || []
-            } catch(err) {
-                console.log(err)
-            }
+            this.allInstitutions = await this.$API.misc.institutionSelection()
         },
         includeTestInstitutionInInstitutionsList() {
             this.showTestInstitution = true
@@ -76,6 +81,9 @@ export default {
                 return this.allInstitutions
             else
                 return this.allInstitutions.filter(inst => inst.name !== "__TEST__")
+        },
+        thereAreInstitutionsToSignupFor() {
+            return this.filteredInstitutions.length > 0
         }
     },
     created() {

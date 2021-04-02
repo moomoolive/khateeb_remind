@@ -6,7 +6,6 @@ import app from './modules/app.js'
 import user from './modules/user.js'
 import notifications from './modules/notifications.js'
 import websiteBanner from './modules/websiteBanner.js'
-import admin from './modules/admin.js'
 import requests from './modules/requests.js'
 import footerPopup from './modules/footerPopup.js'
 
@@ -31,7 +30,6 @@ export default new Vuex.Store({
     user,
     notifications,
     websiteBanner,
-    admin,
     requests,
     footerPopup
   }

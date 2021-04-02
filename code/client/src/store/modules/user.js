@@ -75,6 +75,19 @@ export default {
         },
         deviceType({ browsingDevice }) {
             return browsingDevice.device.type
+        },
+        browserBrand({ browsingDevice }) {
+            const brand = browsingDevice.client.name
+            if (browsingDevice.client.type === 'browser')
+                return brand
+            else
+                return 'unknown'
+        },
+        deviceBrand({ browsingDevice }) {
+            if (browsingDevice.device.brand)
+                return browsingDevice.device.brand
+            else
+                return 'unknown'
         }
     } 
 }

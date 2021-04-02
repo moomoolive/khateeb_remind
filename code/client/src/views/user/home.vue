@@ -42,7 +42,8 @@
                 :userType="$store.getters['user/type']"
                 :formProps="{
                     backgroundColor: 'none',
-                    buttonText: 'Update Profile'
+                    buttonText: 'Update Profile',
+                    basedOn: $store.getters['user/allInfo']
                 }"
                 @submitted="updateInfo($event)"
             />

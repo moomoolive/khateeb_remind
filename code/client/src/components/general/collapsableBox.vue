@@ -6,7 +6,7 @@
         >
             {{ headline }}
             <span style="float: right;" class="icon">
-                {{ icon }}
+                {{ isActive ? "-" : "+" }}
             </span>
             <div class="tag">
                 <tag-box 
@@ -18,9 +18,10 @@
         </button>
         <transition name="dropdown">
             <div
+                v-if="isActive"
                 :class="`content ${bodyColor}`"
                 :style="`width: ${contentWidth}%;`"
-                v-if="isActive"
+                v-on-clickaway="clickedAwayFromContent"
             >
                 <slot></slot>
             </div>
@@ -31,8 +32,11 @@
 <script>
 import tagBox from '@/components/general/tagBox.vue'
 
+import { mixin as clickaway } from 'vue-clickaway'
+
 export default {
     name:'collapsableBox',
+    mixins: [clickaway],
     components: {
         tagBox
     },
@@ -63,15 +67,16 @@ export default {
     },
     data() {
         return {
-            isActive: false,
-            icon: '+',
-            component: null
+            isActive: false
         }
     },
     methods: {
         clicked() {
             this.isActive = !this.isActive
-            this.isActive ? this.icon = "-" : this.icon = "+"
+        },
+        clickedAwayFromContent() {
+            if (this.isActive)
+                this.isActive = false
         }
     }
 }

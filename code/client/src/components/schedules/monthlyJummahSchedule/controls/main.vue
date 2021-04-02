@@ -17,27 +17,18 @@
 
         </div>
 
-        <switch-months-button-group 
-            class="external-controls"
-            :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
-            @change-month="$emit('change-month', $event)"
-            @back-to-current="$emit('back-to-current-month')"
-        />
-
     </div>
 </template>
 
 <script>
 import locationsButtonGroup from './buttonGroups/locations.vue'
 import switchWeeksButtonGroup from './buttonGroups/weeks.vue'
-import switchMonthsButtonGroup from './buttonGroups/months.vue'
 
 export default {
     name: 'standardMonthlyScheduleControls',
     components: {
         locationsButtonGroup,
         switchWeeksButtonGroup,
-        switchMonthsButtonGroup
     },
     props: {
         locations: {

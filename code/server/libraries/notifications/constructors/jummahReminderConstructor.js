@@ -3,7 +3,7 @@ const NotificationConstructor = require('./notificationConstructor.js')
 module.exports = class JummahReminderNotificationConstructor extends NotificationConstructor {
     
     constructor(khateeb ,jummah, jummahMeta) {
-        super(khateeb, 'jummah', { msgInfo: jummahMeta, urgent: true, meta: { preferenceReference: jummah._id.toString() } })
+        super(khateeb, 'jummah', { msgInfo: jummahMeta, urgent: true, meta: { preferenceReference: jummah._id.toString() } }, true)
     }
     
     msg() {

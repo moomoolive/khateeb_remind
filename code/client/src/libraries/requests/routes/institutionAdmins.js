@@ -1,18 +1,16 @@
 import helpers from './helpers.js'
 
-import axios from 'axios'
-
-const extension = helpers.targetURL('institutionAdmins')
+const extension = "institutionAdmins"
 
 const requests = {
-    getOtherAdmins(params) {
-        return axios.get(extension, { params })
+    getOtherAdmins(params={}) {
+        return helpers.returnArrayFromRequest("get", extension, { params })
     },
-    createNewAdmin(updatedAdmin) {
-        return axios.post(extension, updatedAdmin)
+    createNewAdmin(newAdmin={}) {
+        return helpers.returnEmptyObjectFromRequest("post", extension, newAdmin)
     },
-    deleteAdmin(_id) {
-        return axios.delete(extension, { params: { _id } })
+    deleteAdmin(_id="1234") {
+        return helpers.returnEmptyObjectFromRequest("delete", extension, { params: { _id } })
     }
 }
 
