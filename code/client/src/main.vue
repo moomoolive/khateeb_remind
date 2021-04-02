@@ -102,6 +102,21 @@ export default {
         const pushSub = await pwaHelpers.subscribeUserToPushNotifications(serviceWorkerReg)
         await this.$API.pwa.createPWASubscription(pushSub)
       } 
+    },
+    setFirstLogin() {
+      if (!localStorageHelpers.get("hasLoggedInOnce"))
+        localStorageHelpers.commit("hasLoggedInOnce", true)
+    },
+    async executePushNotificationWorkflow() {
+      const res = await this.signUserUpForPushNotifications()
+      if (Object.keys(res).length > 0)
+        localStorageHelpers.commit("recievingPushNotifications", true)
+    },
+    isFirstLogin() {
+      return this.isLoggedIn && !localStorageHelpers.get("hasLoggedInOnce")
+    },
+    hasNotSignedUpForPushNotificationsYet() {
+      return this.isLoggedIn && !localStorageHelpers.get("recievingPushNotifications")
     }
   },
   computed: {
@@ -120,11 +135,11 @@ export default {
     }
   },
   watch: {
-    async isLoggedIn(newVal) {
-      if (!newVal /*|| localStorageHelpers.get("hasLoggedInOnce")*/)
-        return
-      await this.signUserUpForPushNotifications()
-      localStorageHelpers.commit("hasLoggedInOnce", true)
+    isLoggedIn(newVal) {
+      if (newVal)
+        this.setFirstLogin()
+      if (this.isFirstLogin() || this.hasNotSignedUpForPushNotificationsYet())
+        this.executePushNotificationWorkflow()
     }
   },
   mounted() {
