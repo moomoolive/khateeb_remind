@@ -6,7 +6,7 @@ const khateeb = new mongoose.Schema({
     title: {
         type: String,
         default: 'none',
-        minlength: 1
+        minLength: 1
     },
     active: {
         type: Boolean,

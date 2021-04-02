@@ -8,12 +8,12 @@ const location = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     address: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     active: {
         type: Boolean,

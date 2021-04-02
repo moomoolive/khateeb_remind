@@ -6,13 +6,13 @@ const verificationCode = new mongoose.Schema({
     code: {
         type: String,
         required: false,
-        minlength: 11,
-        maxlength: 11
+        minLength: 11,
+        maxLength: 11
     },
     username: {
         type: String,
         required: true,
-        minlength: 6
+        minLength: 6
     }
 }, { timestamps: true })
 

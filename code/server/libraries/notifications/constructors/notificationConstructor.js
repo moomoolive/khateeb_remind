@@ -83,7 +83,7 @@ module.exports = class NotificationConstructor {
             try {
                 const res = await pwaNotifications.sendPWANotifications(
                     this.pwaMsgObject(),
-                    subscriptions[i]
+                    subscriptions[i].browserSubscriptionDetails
                 )
                 messages.push(res)
             } catch(err) {
@@ -96,7 +96,7 @@ module.exports = class NotificationConstructor {
     async getPWASubscriptions(userID="1234") {
         try {
             const data = await $db.pwaSubscriptions.findOne({ userID }).exec()
-            return data.subscriptions
+            return data.subscriptions.filter(s => s.active)
         } catch(err) {
             console.log(err)
             return []

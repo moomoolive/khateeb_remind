@@ -4,12 +4,12 @@ const defaultKhateebForWeek = new mongoose.Schema({
     mainKhateeb: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     backup: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
 }, { timestamps: true })
 
@@ -24,8 +24,42 @@ const unavailableDate = new mongoose.Schema({
     }
 }, { timestamps: true })
 
+const individualPWASubscription = new mongoose.Schema({
+    deviceId: {
+        type: String,
+        required: true,
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength
+    },
+    browserSubscriptionDetails: {
+        type: Object,
+        required: true
+    },
+    deviceType: {
+        type: String,
+        required: true,
+        minLength: 1
+    },
+    deviceBrand: {
+        type: String,
+        required: true,
+        minLength: 1
+    },
+    browserBrand: {
+        type: String,
+        required: true,
+        minLength: 1
+    },
+    active: {
+        type: Boolean,
+        required: false,
+        default: true
+    }
+}, { timestamps: true, _id: false })
+
 module.exports = {
     unavailableDate,
-    defaultKhateebForWeek
+    defaultKhateebForWeek,
+    individualPWASubscription
 }
 

@@ -93,8 +93,8 @@ router.delete('/', async (req, res) => {
 
 router.get('/pwa-subscription', async (req, res) => {
     try {
-        const data = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).exec()
-        return res.json({ data: data.subscriptions })
+        const data = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).select(["-subscriptions.browserSubscriptionDetails"]).exec()
+        return res.json({ data: data.subscriptions || [] })
     } catch(err) {
         console.log(err)
         return res.json({ data: [], msg: `There was an error retrieving your subscriptions. ${err}` })
@@ -108,21 +108,14 @@ router.post('/pwa-subscription', async (req, res) => {
             subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid, institutionID: req.headers.institutionid }).save()
         if (subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid))
             return res.json({ msg: `This device is already subscribed to notifications` })
-        const updated = await $db.pwaSubscriptions.findOneAndUpdate(
-            { _id: subscriptions._id.toString() },
-            { subscriptions: [
-                    ...subscriptions.subscriptions, 
-                    { 
-                        ...req.body, 
-                        deviceId: req.headers.deviceid,
-                        deviceType: req.headers.devicetype,
-                        deviceBrand: req.headers.devicebrand,
-                        browserBrand: req.headers.browserbrand 
-                    }
-                ] 
-            },
-            { new: true }
-        )
+        const deviceInfo = {
+            deviceId: req.headers.deviceid,
+            deviceType: req.headers.devicetype,
+            deviceBrand: req.headers.devicebrand,
+            browserBrand: req.headers.browserbrand 
+        }
+        const newSubscriptionsArray = [...subscriptions.subscriptions, { ...deviceInfo, browserSubscriptionDetails: req.body, } ]
+        const updated = await $db.pwaSubscriptions.findOneAndUpdate({ _id: subscriptions._id.toString() }, { subscriptions: newSubscriptionsArray }, { new: true })
         return res.json({ data: updated })
     } catch(err) {
         console.log(`Couldn't create subscription`, err)
@@ -130,16 +123,25 @@ router.post('/pwa-subscription', async (req, res) => {
     }
 })
 
-router.delete('/pwa-subscription', async (req, res) => {
-    try {
-        const subscriptions = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).exec()
-        const updatedSubscriptions = subscriptions.subscriptions.filter(s => s.deviceId !== req.headers.deviceid)
-        const updated = await $db.pwaSubscriptions.updateOne({ userID: req.headers.userid }, { subscriptions: updatedSubscriptions })
-        return res.json({ data: updated })
-    } catch(err) {
-        console.log(err)
-        return res.status(503).json({ data: {}, msg: `Couldn't delete subscription. ${err}` })
-    }
+router.put('/pwa-subscription', 
+    validationMiddleware.validateRequest(
+        [
+            validator.body("status").isBoolean(),
+            validator.body("deviceId").isString().isLength(global.APP_CONFIG.consts.mongooseIdLength)
+        ]
+    ),
+    async (req, res) => {
+        try {
+            const data = await $db.pwaSubscriptions.findOneAndUpdate(
+                { userID: req.headers.userid, "subscriptions.deviceId": req.body.deviceId },
+                { $set: { "subscriptions.$.active": req.body.status } },
+                { new: true }
+            ).select(["-subscriptions.browserSubscriptionDetails"]) || { subscriptions: [] }
+            return res.json({ data: data.subscriptions.find(s => s.deviceId === req.body.deviceId) || {} })
+        } catch(err) {
+            console.log(err)
+            return res.status(503).json({ data: {}, msg: `Couldn't delete subscription. ${err}` })
+        }
 })
 
 module.exports = router

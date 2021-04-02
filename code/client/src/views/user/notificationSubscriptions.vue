@@ -25,6 +25,20 @@
                         Current Device
                     </div>
 
+                    <div 
+                        v-if="subscription.active" 
+                        class="current-device purple"
+                    >
+                        {{ `Since: ${new Date(subscription.updatedAt).toLocaleString('en-US', { month: "short", year: "numeric" })}` }}
+                    </div>
+
+                    <div 
+                        v-if="!subscription.active" 
+                        class="current-device red"
+                    >
+                        Deactivated
+                    </div>
+
                     <div class="device-info-text">
                         {{ utils.stringFormat(subscription.deviceBrand) }}
                     </div>
@@ -34,8 +48,11 @@
                     </div>
 
                     <div>
-                        <button class="red unsubscribe-button" @click="unsubscribe()">
-                            Unsubscribe
+                        <button 
+                            :class="`unsubscribe-button ${subscription.active ? 'red' : 'green'}`" 
+                            @click="unsubscribe(subscription)"
+                        >
+                            {{ subscription.active ? 'Deactivate' : 'Activate' }}
                         </button>
                     </div>
 
@@ -79,25 +96,16 @@ export default {
     methods: {
         async getSubscriptions() {
             this.subscriptions = await this.$API.pwa.getSubscriptions()
-            //const copy = this.utils.deepCopy(this.subscriptions[0])
-            //this.subscriptions.push(copy)
-            //this.subscriptions.push(this.utils.deepCopy(copy))
-            //this.subscriptions.push(this.utils.deepCopy(copy))
-            //this.subscriptions.push(this.utils.deepCopy(copy))
-            //this.subscriptions[1].browserBrand = "random"
-            //this.subscriptions[2].browserBrand = "mozilla"
-            //this.subscriptions[3].browserBrand = "safAri"
-            //this.subscriptions[3].browserBrand = "edge"
         },
-        async unsubscribe() {
-            const confirm = await this.utils.confirm(`Are you sure you want to unsubscribe? You will no longer recieve notifications to this device!`)
-            if (!confirm)
-                return
-            const res = await this.$API.pwa.deleteSubscription()
-            if (!Object.keys(res).length > 0)
-                return
-            const index = this.subscriptions.findIndex(s => s.deviceId === this.deviceId)
-            this.subscriptions.splice(index, 1)
+        async unsubscribe({ active=false, deviceId="1234" }) {
+            if (active) {
+                const confirm = await this.utils.confirm(`Are you sure you want to unsubscribe? You will no longer recieve notifications to this device!`)
+                if (!confirm)
+                    return
+            }
+            const res = await this.$API.pwa.updateSubscriptionStatus({ status: !active, deviceId })
+            const index = this.subscriptions.findIndex(s => s.deviceId === res.deviceId)
+            this.subscriptions.splice(index, 1, res)
         },
         browserLogo(name="Chrome mobile") {
             if (/chrome|google/gi.test(name))
@@ -203,6 +211,12 @@ export default {
     color: getColor("offWhite");
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     background: getColor("green");
+    &.purple {
+        background: getColor("purple");
+    }
+    &.red {
+        background: getColor("red");
+    }
 }
 
 @media screen and (max-width: $phoneWidth) {

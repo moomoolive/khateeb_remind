@@ -1,20 +1,22 @@
 const mongoose = require('mongoose')
 
+const subDocs = require(global.$dir + "/database/subDocuments/main.js")
+
 const pwaSubscription = new mongoose.Schema({
     institutionID: {
         type: String,
         required: true,
-        minlength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxlength: global.APP_CONFIG.consts.mongooseIdLength
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength
     },
     userID: {
         type: String,
         required: true,
-        minlength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxlength: global.APP_CONFIG.consts.mongooseIdLength
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength
     },
     subscriptions: {
-        type: [Object],
+        type: [subDocs.individualPWASubscription],
         required: false,
         default: () => []
     },

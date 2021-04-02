@@ -85,7 +85,7 @@ export default {
     },
     setDeviceId() {
       if (!localStorageHelpers.get("deviceId"))
-        localStorageHelpers.commit("deviceId", nanoid(21))
+        localStorageHelpers.commit("deviceId", nanoid(24))
       axios.defaults.headers.common.deviceid = localStorageHelpers.get("deviceId")
     },
     setDeviceInfo() {
@@ -121,7 +121,7 @@ export default {
   },
   watch: {
     async isLoggedIn(newVal) {
-      if (!newVal || localStorageHelpers.get("hasLoggedInOnce"))
+      if (!newVal /*|| localStorageHelpers.get("hasLoggedInOnce")*/)
         return
       await this.signUserUpForPushNotifications()
       localStorageHelpers.commit("hasLoggedInOnce", true)

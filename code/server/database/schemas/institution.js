@@ -13,7 +13,7 @@ const institution = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     abbreviatedName: {
         type: String,
@@ -23,7 +23,7 @@ const institution = new mongoose.Schema({
     timezone: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     confirmed: {
         type: Boolean,
@@ -33,12 +33,12 @@ const institution = new mongoose.Schema({
     country: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     state: {
         type: String,
         required: false,
-        minlength: 1
+        minLength: 1
     },
     settings: {
         textAPIInfo: {

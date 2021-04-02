@@ -6,14 +6,14 @@ const timing = new mongoose.Schema({
     institutionID: {
         type: String,
         required: true,
-        minlength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxlength: global.APP_CONFIG.consts.mongooseIdLength
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength
     },
     locationID: {
         type: String,
         required: true,
-        minlength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxlength: global.APP_CONFIG.consts.mongooseIdLength
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength
     },
     hour: {
         type: Number,

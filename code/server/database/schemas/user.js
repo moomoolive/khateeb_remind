@@ -12,12 +12,12 @@ const user = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        minlength: 6
+        minLength: 6
     },
     password: {
         type: String,
         default: 'password',
-        minlength: 6
+        minLength: 6
     },
     confirmed: {
         type: Boolean,
@@ -28,7 +28,7 @@ const user = new mongoose.Schema({
         type: String,
         required: false,
         default: "__NO-HANDLE__",
-        minlength: 1,
+        minLength: 1,
         validate: {
             validator: (val) => val[0] !== "@",
             message: "Illegal 'at' symbol in position 0"
@@ -37,12 +37,12 @@ const user = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     lastName: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     phoneNumber: {
         type: Number,

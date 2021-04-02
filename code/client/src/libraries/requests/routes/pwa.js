@@ -9,8 +9,8 @@ const requests = {
     createPWASubscription(subscriptionInfo={}) {
         return axios.post(extension, subscriptionInfo)
     },
-    deleteSubscription() {
-        return helpers.returnEmptyObjectFromRequest('delete', ['user', '/pwa-subscription'])
+    updateSubscriptionStatus(data={}) {
+        return helpers.returnEmptyObjectFromRequest('put', ['user', '/pwa-subscription'], data)
     },
     getSubscriptions() {
         return helpers.returnArrayFromRequest('get', ['user', '/pwa-subscription'])

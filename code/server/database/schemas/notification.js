@@ -8,12 +8,12 @@ const notification = new mongoose.Schema({
     userID: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     msg: {
         type: String,
         required: true,
-        minlength: 1
+        minLength: 1
     },
     seen: {
         type: Boolean,
