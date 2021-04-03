@@ -101,9 +101,10 @@ export default {
 }
 
 .scroller-container {
-    max-height: 500px;
+    max-height: 375px;
     overflow-y: scroll;
     overflow-x: hidden;
+
     ::-webkit-scrollbar {
         width: 12px;
     }
@@ -123,7 +124,7 @@ export default {
 
 .empty-notifications-container {
     background-color: getColor("grey");
-    padding-bottom: 8%;
+    padding-bottom: 10px;
 }
 
 .notification-container {
@@ -147,12 +148,11 @@ export default {
 
 .notification-msg {
     width: 85%;
-    margin-left: auto;
-    margin-right: auto;
+    @include centerMargin();
     text-align: left;
-    padding-top: 2%;
+    padding-top: 6px;
     font-size: 16px;
-    padding-bottom: 5%;
+    padding-bottom: 12px;
     color: getColor("offWhite");
 }
 
@@ -171,13 +171,9 @@ export default {
 }
 
 @media screen and (max-width: $phoneWidth) {
-    
-    .scroller-container {
-        max-height: 50vh;
-    }
 
     .needs-attention {
-        font-size: 2.4vh;
+        font-size: 14px;
     }
 }
 

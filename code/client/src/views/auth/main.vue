@@ -2,6 +2,7 @@
     <div>
         <img :src="require('@/assets/logos/khateebRemindLogo.svg')">
         <div class="formContainer">
+
             <form-main
                 :structure="{
                     username: {
@@ -19,14 +20,22 @@
                 :confirmBeforeSubmit="false"
                 @submitted="login($event)"
             >
+                
                 <div class="remember-me">
-                    <input type="checkbox" v-model="rememberMe">
-                    <p>Remember Me</p>
+                    <div>
+                        <input type="checkbox" v-model="rememberMe">
+                    </div>
+                    <div>
+                        <p>Remember Me</p>
+                    </div>
                 </div>
+
             </form-main>
+
             <div>
                 <a @click="forgotCredentials()">Forgot Username or Password?</a>
             </div>
+
         </div>
     </div>
 </template>
@@ -49,7 +58,6 @@ export default {
     methods: {
         unconfirmedMsg(msg) {
             this.utils.alert(msg, 'caution', { icon: 'locked' })
-
         },
         async login($event) {
             try {
@@ -112,46 +120,52 @@ export default {
 
 img {
     width: 5vh;
-    height: 5vh;
+    max-width: 50px;
+    margin-top: 30px;
 }
 
 input {
-    display: inline;
-    width: 12px;
-    height: 12px;
+    width: 15px;
+    height: 15px;
+    margin-right: 6px;
 }
 
 .remember-me {
+    margin-top: 5px;
     font-size: 15px;
     font-weight: bold;
-    margin-top: 0px;
+    @include flexboxDefault();
+    width: 40%;
+    @include centerMargin();
 }
 
 p {
     margin-top: 0;
-    display: inline;
     color: getColor("offWhite");
 }
 
 a {
     position: relative;
-    top: 25px;
-    font-size: 16px;
+    top: 50px;
+    font-size: 19px;
     text-decoration: underline;
     font-weight: bold;
+    cursor: default;
 }
 
 @media screen and (max-width: $phoneWidth) {
+      
       .remember-me {
         font-size: 1.8vh;
       }
+
       input {
           width: 2vh;
           height: 2vh;
       }
+
       a {
-        font-size: 2.4vh;
-        top: 5vh;
+        font-size: 15px;
     }
 }
 

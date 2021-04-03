@@ -1,0 +1,17 @@
+@mixin flexWrap() {
+    flex-wrap: wrap;
+}
+
+@mixin flexboxDefault($direction: row, $withWrap: false) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: $direction;
+    @if $withWrap {
+        @include flexWrap();
+    }
+}
+
+@mixin mobileFlex() {
+    flex-direction: column;
+}

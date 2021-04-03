@@ -89,10 +89,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-div {
-    width: auto;
-}
-
 @keyframes vibrate {
   0%, 2%, 4%, 6%, 8%, 10%, 12%, 14%, 16%, 18% {
     -webkit-transform: translate3d(-1px, 0, 0);
@@ -109,10 +105,10 @@ div {
 }
 
 svg {
-  height: 70%;
-  margin-top: 5%;
-  float: left;
-  padding: 1vh;
+  height: 35px;
+  margin-top: 4px;
+  margin-left: 7px;
+  margin-right: 7px;
   &.vibrate {
     -webkit-animation: vibrate 5s cubic-bezier(.36, .07, .19, .97) infinite;
     animation: vibrate 5s cubic-bezier(.36, .07, .19, .97) infinite;

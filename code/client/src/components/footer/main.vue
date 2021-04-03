@@ -1,12 +1,22 @@
 <template>
     <div>
         <div class="topnav">
-            <a href="https://github.com/moomoolive/khateeb_remind" target="_blank">
-                Source Code
+            <a 
+                class="green footer-selection"
+                href="https://github.com/moomoolive/khateeb_remind" 
+                target="_blank"
+            >
+                Feedback
             </a>
         </div>
-        <div v-if="showInstitutionName" class="institution-name">
-            {{ institution.name }}
+
+        <div class="contribute-now">
+            <a 
+                href="https://github.com/moomoolive/khateeb_remind"
+                target="_blank"
+            >
+                Are you a developer and want to contribute? <span class="green">Click here!</span>
+            </a>
         </div>
     </div>
 </template>
@@ -15,53 +25,70 @@
 export default {
     name: 'Footer',
     computed: {
-        authLevel() {
-            return this.$store.getters['user/authLevel'] 
-        },
-        showInstitutionName() {
-            return this.$store.getters['user/isLoggedIn'] && (this.institution.name === '__TEST__' || this.institution.name === '__ROOT__')
-        },
-        institution() {
-            return this.$store.state.user.institution
-        }
     }
 }
 </script>
 
 <style lang="scss" scoped>
 .topnav {
-    margin-top: 30px;
     overflow: hidden;
     left: 0;
     min-height: 20px;
-    max-height: 40px;
-    height: 7.1vh;
+    max-height: 90px;
+    height: 10vh;
     width: 95.2vw;
+    min-width: $minimumAppWidth;
     margin: 0;
-    padding-left: 0.8vw;
     overflow: hidden;
     text-align: left;
 }
 
 a {
     position: relative;
-    top: 7px;
-    margin-left: 5px;
     text-decoration: none;
     color: getColor("silver");
-    font-size: 11px;
+    font-size: 15px;
+    
     &:hover {
-        color: getColor("blue")
-    } 
+        color: getColor("blue") !important;
+    }
+    
+    &.green {
+        color: getColor("green");
+    }
+    
+    &.footer-selection {
+        margin-left: 10px;
+        top: 12px;
+    }
+}
+
+span {
+    &:hover {
+        color: getColor("blue") !important;
+    }
+}
+
+.contribute-now {
+    position: relative;
+    bottom: 15px;
+    @include centerMargin();
 }
 
 .institution-name {
     text-align: right;
-    float: right;
-    position: relative;
-    bottom: 30px;
     font-size: 11px;
-    right: 5px;
     color: getColor("blue")
+}
+
+@media screen and (max-width: $phoneWidth) {
+    a {
+        font-size: 11px;
+        &.footer-selection {
+            top: 7px;
+            margin-left: 7px;
+        }
+    }
+
 }
 </style>

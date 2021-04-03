@@ -1,18 +1,17 @@
 <template>
   <div id="app">
+
     <div class="header">
+
       <collapse-transition>
         <website-banner v-show="$store.state.websiteBanner.show" />
       </collapse-transition>
+
       <header-navigation />
+
     </div>
-    <notifications-manager 
-      @toggle-notification-display="toggleNotificationDisplay()"
-    />
-    <div
-      v-show="$store.state.notifications.display.show"
-      class="notifications-layer"
-    >
+
+    <div v-show="$store.state.notifications.display.show" class="notifications-layer">
       <transition name="dropdown">
         <notifications 
           v-if="showNotificationDisplay" 
@@ -20,6 +19,7 @@
         />
       </transition>
     </div>
+
     <transition
       name="fade"
       mode="out-in"
@@ -28,16 +28,21 @@
         :class="`displayed-page page-padding ${$store.state.app.wallpaper}`"
       />
     </transition>
+
     <request-manager />
+     <notifications-manager @toggle-notification-display="toggleNotificationDisplay()" />
+
     <tutorial-prompter
       :tutorials="gettingStartedGuide"
     />
+
     <collapse-transition :duration="600">
         <footer-popup
           v-show="$store.state.footerPopup.show"
           class="footer-popup" 
         />
     </collapse-transition>
+
     <Footer />
   </div>
 </template>
@@ -163,35 +168,14 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    min-width: 350px;
-}
-
-div {
-    height: 100%;
-    width: 100%;
-}
-  
-img {
-    min-width: 0px;
-    min-height: 0px;
-}
-  
-body {
-    margin: 0 0 0 0;
-    background-color: getColor("grey");
-}
-
-h2 {
-    font-size: 3.2vh;
-    padding-left: 0.4vw;
-    padding-right: 0.4vw;
+    min-width: $minimumAppWidth;
 }
 
 .displayed-page {
     position: relative;
     z-index: 0;
     background-image: url('~@/assets/wallpaper/app.jpg');
-    background-color: getColor("offWhite");
+    background-color: getColor("blue");
     margin: auto;
     min-height: 76vh;
     &.main {
@@ -226,7 +210,7 @@ h2 {
     position: relative;
     z-index: 9;
     overflow: hidden;
-    border-radius: 4px;
+    @include lightBorderRounding();
     bottom: 5%;
 }
 
@@ -240,16 +224,17 @@ h2 {
   max-height: 150px;
   padding: 7px 4px 7px 4px;
   border-radius: 7px;
-  box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
+  @include floatingBoxShadow(0.4);
 }
 
 .notifications-layer {
   z-index: 9;
   position: fixed;
   background: themeRGBA('grey', 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  min-width: $minimumAppWidth;
+  @include flexboxDefault();
 }
 
 .notifications-size-position {
@@ -257,7 +242,7 @@ h2 {
   height: auto;
   max-height: 400px;
   max-width: 400px;
-  box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
+  @include floatingBoxShadow(0.4);
 }
 
 @media screen and (max-width: $phoneWidth) {
@@ -265,42 +250,5 @@ h2 {
         padding-bottom: 5%;
         padding-top: 13% !important;
       }
-}
-
-button {
-    background-color: getColor("green");
-    border: none;
-    border-radius: 4px;
-    color: white;
-    padding: 1vh 2vh;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 2vh;
-    transition-duration: 0.4s;
-    outline: none;
-
-    $marginOne: 1vh;
-    margin: $marginOne $marginOne $marginOne $marginOne;
-    &:hover {
-      background-color: white !important;
-      color: black !important;
-      border: 0.1vh solid getColor("green");
-    }
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-    &:focus { @include blinkingAnimation(); }
-    @include allColors();
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>
