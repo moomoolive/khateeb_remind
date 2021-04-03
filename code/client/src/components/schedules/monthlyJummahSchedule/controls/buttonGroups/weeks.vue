@@ -53,6 +53,4 @@ export default {
 
 <style lang="scss" scoped>
 @import '~@/scss/jummahSchedule/buttons.scss';
-
-
 </style>

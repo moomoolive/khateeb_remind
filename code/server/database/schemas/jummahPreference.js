@@ -38,6 +38,12 @@ const jummahPreference = new mongoose.Schema({
         type: String,
         required: false,
         default: 'none'
+    },
+    loopRunCount: {
+        type: Number,
+        required: false,
+        default: 0,
+        min: 0
     }
 }, { timestamps: true })
 

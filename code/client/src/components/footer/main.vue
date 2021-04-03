@@ -2,8 +2,9 @@
     <div>
         <div class="topnav">
             <a 
+                v-show="isLoggedIn"
                 class="green footer-selection"
-                href="https://github.com/moomoolive/khateeb_remind" 
+                :href="feedbackURL" 
                 target="_blank"
             >
                 Feedback
@@ -24,7 +25,15 @@
 <script>
 export default {
     name: 'Footer',
+    data() {
+        return {
+            feedbackURL: process.env.VUE_APP_FEEDBACK_FORM_URL || '#'
+        }
+    },
     computed: {
+        isLoggedIn() {
+            return this.$store.getters['user/isLoggedIn']
+        }
     }
 }
 </script>

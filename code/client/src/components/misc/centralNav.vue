@@ -1,5 +1,6 @@
 <template>
     <div>
+        
         <div  v-if="navMode === 'central'">
             <div 
                 v-for="(link, index) in outboundLinks" :key="index"
@@ -14,6 +15,7 @@
                 </button>
             </div>
         </div>
+
         <div v-if="navMode === 'outbound'" class="return-to-central-container">
             <button class="back-to-central silver" @click="toCentral()">
                 <p>
@@ -23,6 +25,7 @@
                 </p>
             </button>
         </div>
+
     </div>
 </template>
 
@@ -77,8 +80,8 @@ export default {
     max-height: 200px;
     max-width: 850px;
     padding: 10px 30px;
-    border-radius: 100px 100px 100px 100px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    @include completelyRoundBorder();
+    @include floatingBoxShadow();
     color: black;
 }
 
@@ -103,28 +106,32 @@ p {
 .return-to-central-container {
     width: 95%;
     max-width: 1100px;
-    margin-left: auto;
-    margin-right: auto;
+    @include centerMargin();
     text-align: left;
 }
 
 .back-to-central {
-    width: 23%;
-    max-width: 110px;
-    height: 5vh;
-    max-height: 45px;
-    border-radius: 100px 100px 100px 100px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    width: 100px;
+    height: 40px;
+    @include completelyRoundBorder();
+    @include floatingBoxShadow();
     color: black;
 }
 
 @media screen and (max-width: $phoneWidth) {
+      
       .admin-nav {
           width: 90% !important;
-          padding: 1vh 3vh;
+          padding: 7px 18px;
       }
+
       p {
-          font-size: 2.4vh;
+          font-size: 14px;
+      }
+
+      .back-to-central {
+          width: 70px;
+          height: 32px;
       }
 }
 </style>

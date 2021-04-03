@@ -4,25 +4,30 @@
             :loadingTime="900"
             :textColor="`white`"
         >
+            
             <div v-if="allNotifications.length > 0">
                 <div 
                     v-for="(notification, index) in allNotifications" :key="index"
                     :class="`notification-container`"
                 >       
+                    
                     <div>
                         <tag-circle class="tag" :info="tagLoader(notification)"/>
                         <span class="needs-attention" v-if="notification.urgent">
                             ⚠️
                         </span>
                     </div>
+
                     <div class="notification-msg">
-                        <span class="notification-date">
+                        <span class="notification-date purple">
                             {{ utils.dynamicDisplayDate(notification.createdAt) }}
                         </span><br><br>
                         {{ notification.msg }}
                     </div>
+
                 </div>
             </div>
+
             <div v-else class="empty-notifications-container">
                 <msg-with-pic
                     class="empty-notifications-msg" 
@@ -31,6 +36,7 @@
                     :textColor="`white`"
                 />
             </div>
+
         </loading>
     </div>
 </template>
@@ -120,6 +126,7 @@ export default {
         box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
         -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
     }
+    
 }
 
 .empty-notifications-container {
@@ -129,18 +136,19 @@ export default {
 
 .notification-container {
     height: 15%;
-    background: white;
     border-bottom: getColor("silver") solid 1px;
     border-top: getColor("silver") solid 1px;
-    padding-top: 3.5%;
-    padding-bottom: 3.5%;
+    padding-top: 15px;
+    padding-bottom: 15px;
     background-color: getColor("grey");
-    box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
+    @include floatingBoxShadow(0.4);
     display: flex;
     flex-direction: column;
+    
     &:first-child {
         border-top: none;
     }
+    
     &:last-child {
         border-bottom: none;
     }
@@ -158,15 +166,11 @@ export default {
 
 .notification-date {
     font-size: 12px;
-    color: getColor("purple");
 }
 
 .tag {
-    width: 40%;
-    margin-left: 6%;
-    margin-bottom: 2%;
-    padding-top: 0.1%;
-    padding-bottom: 1.4%;
+    margin-left: 20px;
+    margin-bottom: 5px;
     float: left;
 }
 
@@ -174,6 +178,10 @@ export default {
 
     .needs-attention {
         font-size: 14px;
+    }
+
+    .tag {
+        margin-left: 15px;
     }
 }
 

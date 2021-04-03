@@ -1,7 +1,7 @@
 <template>
     <div>
         <button
-            :class="`collapsible ${buttonColor} ${isActive ? `active` : ``}`"
+            :class="`collapsible ${buttonColor} ${isActive ? `active` : ``} ${boxShadow ? 'box-shadow' : ''}`"
             @click="clicked()"
         >
             {{ headline }}
@@ -10,7 +10,7 @@
             </span>
             <div class="tag">
                 <tag-box 
-                    v-for="(tag, index) in tagDetails" :key="index"
+                    v-for="(tag, index) in tagsArray" :key="index"
                     :info="tag"
                     style="display: inline;"
                 />
@@ -47,7 +47,8 @@ export default {
         },
         tagDetails: {
             type: Array,
-            required: false
+            required: false,
+            default: () => []
         },
         contentWidth: {
             type: Number,
@@ -63,6 +64,21 @@ export default {
             type: String,
             required: false,
             default: 'blue'
+        },
+        closeOnClickAway: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
+        boxShadow: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
+        invisibleTagIfEmpty: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     },
     data() {
@@ -75,8 +91,23 @@ export default {
             this.isActive = !this.isActive
         },
         clickedAwayFromContent() {
-            if (this.isActive)
+            if (this.isActive && this.closeOnClickAway)
                 this.isActive = false
+        }
+    },
+    computed: {
+        tagsArray() {
+            if (this.tagDetails && this.tagDetails.length > 0)
+                return this.tagDetails
+            else if (this.invisibleTagIfEmpty)
+                return [{
+                    words: 'Imporant',
+                    symbol: '⭐',
+                    color: 'important',
+                    isInvisible: true
+                }]
+            else
+                return []
         }
     }
 }
@@ -120,6 +151,10 @@ export default {
   position: relative;
   z-index: 0;
   width: 98%;
+}
+
+.box-shadow {
+    @include floatingBoxShadow();
 }
 
 .icon {

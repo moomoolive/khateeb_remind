@@ -267,20 +267,24 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 20px;
 }
 
 .month-indicator-text {
     color: getColor("offWhite");
-    font-size: 16px;
+    font-size: 18px;
+    width: 150px;
 }
 
 .change-month-buttons {
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    @include floatingBoxShadow();
     font-size: 14px;
     font-weight: bold;
     max-height: 30px;
     max-width: 40px;
     color: black;
+    margin-left: 30px;
+    margin-right: 30px;
 }
 
 .schedule-container {
@@ -302,29 +306,19 @@ export default {
     margin-right: auto;
 }
 
-.std-controls {
-    width: 98%;
-    background: themeRGBA("grey", 0.8);
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 7px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
-    margin-top: 10px;
-}
-
 @media screen and (max-width: $phoneWidth) {
+    
     .schedule-container {
             background: themeRGBA("darkBlue", 0.5);
             width: 90%;
     }
-    .std-controls {
-        display: flex;
-        flex-direction: column;
-        width: 40%;
-        height: auto !important;
+
+    .month-indicator-text {
+        font-size: 16px;
+        font-size: 16px;
+        width: 120px;
     }
+
 }
 
 </style>

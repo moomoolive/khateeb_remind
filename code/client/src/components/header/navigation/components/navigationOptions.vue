@@ -1,74 +1,84 @@
 <template>
-    <div>
-        <div v-if="utils.validAuthentication({ level: 1 })" class="user-items">
+    <div v-on-clickaway="close">
+        
+        <div v-if="utils.validAuthentication({ level: 1 })">
+            
             <div class="menu-item" @click="redirect('/khateeb/')">
-                <p class="top-item">Schedule</p>
+                <p>Schedule</p>
             </div>
+            
             <div class="menu-item" @click="redirect('/khateeb/announcements')">
                 <p>Announcements</p>
             </div>
+            
             <div class="menu-item" @click="redirect('/khateeb/my-khutbahs')">
                 <p>My Khutbahs</p>
             </div>
+
         </div>
-        <div v-if="utils.validAuthentication({ min: 2, max: 3 })" class="user-items">
+
+        <div v-if="utils.validAuthentication({ min: 2, max: 3 })">
+            
             <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
-                <p class="top-item">Set Schedule</p>
+                <p>Set Schedule</p>
             </div>
+            
             <div class="menu-item" @click="redirect('/institutionAdmin/announcements')">
                 <p>Announcements</p>
             </div>
+            
             <div class="menu-item" @click="redirect('/institutionAdmin')">
                 <p>Admin Central</p>
             </div>
+
         </div>
-        <div 
-            v-if="utils.validAuthentication({ min: 4 })" 
-            class="user-items"
-        >
+
+        <div v-if="utils.validAuthentication({ min: 4 })" >
+            
             <div class="menu-item" @click="redirect('/sysAdmin')">
-                <p class="top-item">
-                    Admin Central
-                </p>
+                <p>Admin Central</p>
             </div>
+            
             <div class="menu-item" @click="redirect('/root/roaming')">
-                <p class="top-item">
-                    Roaming Mode
-                </p>
+                <p>Roaming Mode</p>
             </div>
+
         </div>
-        <div class="menu-item" @click="redirect('/user')">
-            <p>My Profile</p>
-        </div>
-        <div class="menu-item" @click="redirect('/notification-subscriptions')">
-            <p>
-                My Notifications
-            </p>
-        </div>
+
         <div
-            v-if="!$store.state.user.isBrowsingOnPWA && deferredPrompt" 
+            v-if="deferredPrompt && !$store.state.user.isBrowsingOnPWA"
             class="menu-item get-the-app" 
             @click="downloadApp()"
         >
-            <p class="get-the-app-text">Download the App</p>
+            <p class="alternate-text-color">Download the App</p>
         </div>
+        
         <div class="menu-item caution" @click="logout()">
-            <p class="caution-text">Logout</p>
+            <p class="alternate-text-color">Logout</p>
         </div>
+
     </div>
 </template>
 
 <script>
 import { VuePwaInstallMixin, BeforeInstallPromptEvent } from 'vue-pwa-install'
+import { mixin as clickaway } from 'vue-clickaway'
 
 import notificationHelpers from '@/libraries/notifications/main.js'
 
 export default {
     name: "navigationOptions",
-    mixins: [VuePwaInstallMixin],
+    mixins: [VuePwaInstallMixin, clickaway],
+    props: {
+        activeMenu: {
+            type: Boolean,
+            required: true
+        }
+    },
     data() {
         return {
-            deferredPrompt: BeforeInstallPromptEvent || null
+            deferredPrompt: BeforeInstallPromptEvent || null,
+            firstOpened: false
         }
     },
     methods: {
@@ -99,11 +109,28 @@ export default {
         redirect(path) {
             this.$emit('redirect', path)
         },
-        logout() {
+        close() {
+            if (this.activeMenu && this.firstOpened)
+                this.$emit('close-nav')
+        },
+        async logout() {
+            this.close()
+            const confirm = await this.utils.confirm(`Are you sure you want to logout?`)
+            if (!confirm)
+                return
             this.$store.dispatch('user/logout')
-            this.$emit('close-nav')
             this.$nextTick(() => { this.utils.toHomePage() })
         },
+    },
+    watch: {
+        activeMenu(newVal, oldVal) {
+            if (newVal && !oldVal){
+                const oneTenthOfASecondInMilliseconds = 100
+                window.setTimeout(() => this.firstOpened = true, oneTenthOfASecondInMilliseconds)
+            }
+            else if (!newVal && oldVal)
+                this.firstOpened = false
+        }
     },
     created() {
         this.$on('canInstall', this.stashPwaPrompt)
@@ -113,19 +140,30 @@ export default {
 
 <style lang="scss" scoped>
 p {
-    margin-bottom: 0;
-    margin-top: 0;
-    margin-right: 0;
-    margin-left: 2%;
-    padding-top: 1%;
     font-size: 18px;
     font-weight: bold;
     text-align: left;
-    color: lighten(getColor("darkBlue"), 50%);
+    color: getColor("offWhite");
 }
 
-.user-items {
-    display: inline;
+.menu-item {
+    background-color: themeRGBA("grey", 0.9);
+    cursor: default;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    
+    &:hover {
+        background-color: lighten(themeRGBA("grey", 1), 20%);
+        
+    }
+    
+    > :hover {
+        &:after {
+            content: "  >";
+        }
+    }
 }
 
 .get-the-app {
@@ -136,47 +174,28 @@ p {
     }
 }
 
-.get-the-app-text {
-  color: black;
-}
-
 .caution {
     background-color: themeRGBA("yellow", 0.9) !important;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
     &:hover {
       background-color: lighten(themeRGBA("yellow", 1), 20%) !important;
     }
 }
 
-.caution-text {
+.alternate-text-color {
     color: black;
 }
 
-.menu-item {
-    height: 15%;
-    max-height: 45px;
-    background-color: themeRGBA("darkBlue", 0.9);
-    cursor: default;
-    &:hover {
-        background-color: lighten(themeRGBA("darkBlue", 1), 20%);
-    }
-    &.profile-info {
-        background-color: getColor("silver");
-        font-size: 13px;
-    }
-}
-
 @media screen and (max-width: $phoneWidth) {
+      
       p {
-        font-size: 3vh;
+        font-size: 16px;
         text-align: center;
       }
-      .top-item {
-        margin-left: auto;
-        margin-right: auto;
-        width: 35%;
-      }
+      
       .menu-item {
-        padding-top: 1vh;
+        
       }
 }
 

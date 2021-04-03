@@ -133,6 +133,7 @@ export default {
     margin-bottom: 15px;
     font-weight: bold;
     color: getColor("offWhite");
+    
     &.no-jummahs {
         text-decoration: underline;
     }

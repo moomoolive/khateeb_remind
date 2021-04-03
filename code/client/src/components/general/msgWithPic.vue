@@ -1,8 +1,10 @@
 <template>
     <div>
-        <h2 v-if="title">{{ title }}</h2>
-        <img :src="require(`@/assets/gifs/${gif}.gif`)" alt="">
-        <h2 :class="textColor" >{{ msg }}</h2>
+        <div class="content-container">
+            <h2 v-if="title">{{ title }}</h2>
+            <img :src="require(`@/assets/gifs/${gif}.gif`)">
+            <h2 :class="textColor" >{{ msg }}</h2>
+        </div>
     </div>
 </template>
 
@@ -36,6 +38,14 @@ img {
     height: 40vh;
     max-width: 1000px;
     max-height: 1000px;
+    @include centerMargin();
+}
+
+.content-container {
+    width: 88%;
+    max-width: 1000px;
+    max-height: 1000px;
+    @include centerMargin();
 }
 
 h2 {
@@ -46,15 +56,14 @@ h2 {
 }
 
 div {
-    width: 88%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
-    max-width: 1100px;
 }
 
 @media screen and (max-width: $phoneWidth) {
     h2 {
-        font-size: 4vh;
+        font-size: 24px;
     }
 }
 

@@ -1,15 +1,18 @@
 <template>
     <div>
+        
         <div>
             <button 
-                class="add-new-announcement-button blue"
+                class="add-new-announcement-button round blue"
                 @click="openAddNewAnnouncementForm()"
             >
                 +
             </button>
         </div>
+
         <general-popup-container
-            v-if="showAddNewAnnouncementForm" 
+            v-if="showAddNewAnnouncementForm"
+            :closeOnClickAway="false" 
             @close="closeAddNewAnnouncementForm()"
         >
             <div class="popup-form">
@@ -120,26 +123,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-select {
-    border: none;
-    outline: none;
-    border-radius: 4px;
-    height: 6vh;
-    width: 80%;
-    max-height: 50px;
-    max-width: 510px;
-    color: getColor("offWhite");
-    font-size: 15px;
-    background-color: themeRGBA("grey", 1);
-    &:focus {
-        background-color: themeRGBA("grey", 0.5);
-    }
-    position: relative;
-    z-index: 0;
-}
-
 .popup-form {
-    width: 100%;
+    max-height: 305px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .announcement-container {
@@ -147,18 +134,11 @@ select {
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;
-}
-
-button {
-    width: 80%;
-    max-width: 510px;
-    height: 4vh;
-    max-height: 35px;
-    font-size: 16px;
+    margin-bottom: 20px;
 }
 
 .add-new-announcement-button {
-    border-radius: 100px 100px 100px 100px;
+    margin-bottom: 40px;
     width: 60px;
     height: 35px;
     font-size: 22px;
@@ -167,11 +147,7 @@ button {
 }
 
 @media screen and (max-width: $phoneWidth) {
-      select {
-          font-size: 1.8vh;
-      }
-      button {
-          font-size: 2vh;
-      }
+      
+    
 }
 </style>

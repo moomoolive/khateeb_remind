@@ -1,5 +1,6 @@
 <template>
     <div v-if="showProfileSettings">
+        
         <collapsable-box
             class="user-setting"
             :headline="`Change Username`"
@@ -17,6 +18,7 @@
                 @submitted="updateInfo($event)"
             />
         </collapsable-box>
+        
         <collapsable-box
             class="user-setting"
             :headline="`Change Password`"
@@ -34,6 +36,7 @@
                 @submitted="updateInfo($event)"
             />
         </collapsable-box>
+        
         <collapsable-box
             class="user-setting"
             :headline="`Profile Details`"
@@ -48,29 +51,7 @@
                 @submitted="updateInfo($event)"
             />
         </collapsable-box>
-        <collapsable-box
-            v-if="utils.validAuthentication({ level: 1 })"
-            class="user-setting"
-            :headline="`Available Timings`"
-            :tagDetails="availableTimingsTag"
-        >
-            <selection-picker
-                v-if="availableTimingsSelection.length > 0"
-                :options="availableTimingsSelection"
-                :currentlySelected="availableTimings"
-                @changed="updateInfo({ availableTimings: $event }, false)"
-            />
-        </collapsable-box>
-        <collapsable-box
-            v-if="utils.validAuthentication({ level: 1 })"
-            class="user-setting"
-            :headline="`Unavailable Dates`"
-        >
-            <calendar
-                :originalVal="$store.getters['user/allInfo'].unavailableDates" 
-                @changed="updateInfo($event, false)"
-            />
-        </collapsable-box>
+        
         <collapsable-box
             v-if="utils.validAuthentication({ max: 2 })"
             class="user-setting"
@@ -80,14 +61,13 @@
         >
             <button class="yellow delete-account" @click="deleteAccount()">Delete My Account</button>
         </collapsable-box>
+
     </div>
 </template>
 
 <script>
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
-import selectionPicker from '@/components/general/selectionPicker.vue'
-import calendar from './subviews/calendar.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
 
 export default {
@@ -95,26 +75,20 @@ export default {
     components: {
         collapsableBox,
         formMain,
-        selectionPicker,
-        calendar,
         userFormTemplate
     },
     data() {
         return {
             showProfileSettings: true,
-            locations: [],
-            timings: []
         }
     },
     methods: {
-        async updateInfo($event, rerender=true) {
+        async updateInfo(update={}) {
             try {
-                const res = await this.$API.user.updateInfo($event)
+                const res = await this.$API.user.updateInfo(update)
                 this.storeToken(res.token)
-                if (rerender) {
-                    this.rerenderProfileSettings()
-                    this.utils.alert(`Successfully updated`, 'success')
-                }
+                this.rerenderProfileSettings()
+                this.utils.alert(`Successfully updated`, 'success')
             } catch(err) {
                 console.log(err)
             }
@@ -131,8 +105,7 @@ export default {
                 const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete your account?`)
                 if (!confirm)
                     return
-                const res = await this.$API.user.deleteAccount()
-                console.log(res)
+                await this.$API.user.deleteAccount()
                 this.$store.dispatch('user/logout')
                 this.utils.toHomePage()
                 this.utils.alert(`Successfully delete account`, 'success')
@@ -140,59 +113,12 @@ export default {
                 console.log(err)
             }
         },
-        async getAvailableTimings() {
-            try {
-                const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
-                this.locations = locations
-                this.timings = timings
-            } catch(err) {
-                console.log(err)
-            }
-        },
-        createTimingSelectionOptions(location) {
-            const associatedTimings = this.timings.filter(timing => timing.locationID === location._id)
-            return associatedTimings
-                .map(timing => {
-                    let time = new Date()
-                    time.setHours(timing.hour, timing.minute, 0, 0)
-                    return {
-                        display: [location.name, time.toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' })],
-                        val: timing._id,
-                        extraInfo: `Address: ${location.address}`
-                    }
-                })
-        }
     },
     computed: {
-        availableTimings() {
-            if (this.$store.getters['user/type'] === 'khateeb')
-                return this.$store.getters['user/allInfo'].availableTimings
-            else
-                return []
-
-        },
-        availableTimingsTag() {
-            if (this.availableTimings.length < 1)
-                return [{
-                    words: 'Available for All Times',
-                    symbol: '⌚',
-                    color: 'goodNews'
-                }]
-            else
-                return null
-        },
-        availableTimingsSelection() {
-            if (this.locations.length < 1 || this.timings.length < 1)
-                return []
-            return this.locations
-                .map(location => this.createTimingSelectionOptions(location))
-                .reduce((allOptions, locationOption) => [...allOptions, ...locationOption], [])
-            
-        }
+        
     },
     created() {
-        if (this.utils.validAuthentication({ level: 1 }))
-            this.getAvailableTimings()
+        
     }
 }
 </script>

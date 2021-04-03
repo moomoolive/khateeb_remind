@@ -12,6 +12,13 @@
                 class="khutbah-container"
             >
                 
+                <div class="updated-at-text">
+                    Update: 
+                    <span class="blue">
+                        <b>{{ utils.dynamicDisplayDate(khutbah.updatedAt) }}</b>
+                    </span>
+                </div>
+                
                 <div class="date-text">
                     {{ new Date(khutbah.date).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric' }) }}
                 </div>
@@ -25,7 +32,7 @@
                     <tag-circle
                         class="info-tag role"
                         :info="{ 
-                            words: khutbah.isBackup ? 'Backup' : 'Main',
+                            words: khutbah.isBackup ? 'Backup' : 'Main Khateeb',
                             icon: '👳',
                             color: 'purple'
                         }"
@@ -54,7 +61,9 @@
 
                 <div>
                     <div class="status-header">
-                        <u>Status</u>
+                        <span class="blue">
+                            <u>Status</u>
+                        </span>
                     </div>
                     <div class="status-text">
                         {{ statusText(khutbah) }}
@@ -186,47 +195,45 @@ div {
 }
 
 .status-header {
-    color: getColor("blue");
     font-weight: bold;
     margin-bottom: 5px;
     margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.updated-at-text {
+    font-size: 13px;
+    text-align: left;
+    margin-bottom: 10px;
 }
 
 .no-content-text {
     margin-top: 10px;
     width: 85%;
+    max-width: 430px;
     margin-left: auto;
     margin-right: auto;
     background: getColor("silver");
     border-radius: 7px;
     box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px;
     margin-bottom: 30px;
 }
 
 .status-text {
     background: getColor("grey");
     color: getColor("offWhite");
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 20px;
+    padding-bottom: 20px;
     border-radius: 7px;
     box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
 }
 
 .info-tag {
-    width: 50%;
-    padding-top: 1px;
-    padding-bottom: 6px;
-    margin-bottom: 7px;
     margin-left: 5px;
     margin-right: 5px;
-    &.time {
-        width: 40%;
-    }
-    &.role {
-        width: 40%;
-    }
+    margin-top: 10px;
 }
 
 .location-text {
@@ -239,11 +246,17 @@ div {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 @media screen and (max-width: $phoneWidth) {
     .khutbahs-container {
         flex-direction: column;
+    }
+
+    .updated-at-text {
+        font-size: 11px;
     }
 }
 </style>

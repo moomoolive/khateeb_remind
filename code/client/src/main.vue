@@ -215,13 +215,12 @@ export default {
 }
 
 .footer-popup {
-  position: relative;
-  bottom: 30px;
-  right: 10px;
   z-index: 9;
   position: fixed;
+  bottom: 30px;
+  right: 10px;
   max-width: 200px;
-  max-height: 150px;
+  max-height: 300px;
   padding: 7px 4px 7px 4px;
   border-radius: 7px;
   @include floatingBoxShadow(0.4);

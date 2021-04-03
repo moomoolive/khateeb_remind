@@ -35,13 +35,15 @@
                     </div>
 
                     <div class="viewing-mode-container">
-                        <div class="select-text">
-                            Viewing Mode
+                        <div>
+                            <div class="select-text">
+                                Viewing Mode
+                            </div>
+                            <select v-model="viewingMode" class="viewing-mode-dropdown">
+                                <option value="institutionAdmin">Admin</option>
+                                <option value="khateeb">Khateeb</option>
+                            </select>
                         </div>
-                        <select v-model="viewingMode" class="viewing-mode-dropdown">
-                            <option value="institutionAdmin">Admin</option>
-                            <option value="khateeb">Khateeb</option>
-                        </select>
                     </div>
 
                 </div>
@@ -132,41 +134,42 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.viewing-mode-container {
-    margin-left: auto;
-    width: 53%;
-    padding-bottom: 10px;
-}
-
 .notification-time-container {
-    margin-right: auto;
-    width: 59%;
+    padding-bottom: 10px;
+    width: 83%;
+    @include centerMargin();
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 20px;
 }
 
 .notification-time-button {
-    font-size: 12px;
+    font-size: 15px;
     border-radius: 99999px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     color: black;
 }
 
 .select-text {
-    font-size: 14px;
+    font-size: 17px;
     padding-bottom: 5px;
     font-weight: bold;
 }
 
 .to-locations-timings-button {
-    width: 200px;
-    font-size: 13px;
-    margin-bottom: 20px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    width: 300px;
+    font-size: 17px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 30px;
+    @include floatingBoxShadow();
 }
 
 .viewing-mode-dropdown {
-    width: 90px;
-    height: 25px;
-    font-size: 13px;
+    width: 120px;
+    height: 30px;
+    font-size: 15px;
     color: getColor("offWhite");
     border: none;
     outline: none;
@@ -175,5 +178,42 @@ export default {
         background-color: themeRGBA("grey", 0.5);
     }
     border-radius: 4px;
+}
+
+.viewing-mode-container {
+    padding-bottom: 10px;
+    width: 83%;
+    @include centerMargin();
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+@media screen and (max-width: $phoneWidth) {
+    
+    .to-locations-timings-button {
+        width: 200px;
+        font-size: 13px;
+    }
+
+    .viewing-mode-container, .notification-time-container  {
+        width: 77%;
+    }
+
+    .notification-time-button {
+        font-size: 12px;
+    }
+
+    .viewing-mode-dropdown {
+        width: 90px;
+        height: 25px;
+        font-size: 13px;
+    }
+
+    .select-text {
+        font-size: 14px;
+        padding-bottom: 5px;
+    }
 }
 </style>

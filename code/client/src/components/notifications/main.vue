@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <div v-on-clickaway="close">
+        
         <div class="topAnchor">
             <div class="close-notification-container" @click="close()">
                 <span>
@@ -7,13 +8,15 @@
                 </span>
             </div>
         </div>
-            <div :class="`content ${notificationInfo.options.color || 'yellow'}-background`">
-                <component
-                    :is="notificationInfo.type"
-                    :options="notificationInfo.options"
-                    @close="close()"
-                />
-            </div>
+
+        <div :class="`content ${notificationInfo.options.color || 'yellow'}-background`">
+            <component
+                :is="notificationInfo.type"
+                :options="notificationInfo.options"
+                @close="close()"
+            />
+        </div>
+
     </div>
 </template>
 
@@ -24,6 +27,8 @@ import confirm from './types/confirm.vue'
 import tutorial from './types/tutorial.vue'
 import alert from './types/alert.vue'
 
+import { mixin as clickaway } from 'vue-clickaway'
+
 export default {
     name: "notificationsMain",
     components: {
@@ -33,6 +38,7 @@ export default {
         'notificationScroller': notificationScroller,
         "tutorial": tutorial,
     },
+    mixins: [clickaway],
     methods: {
         close() {
             if (this.notificationInfo.type === 'confirm')
