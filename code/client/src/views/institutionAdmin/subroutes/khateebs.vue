@@ -2,13 +2,17 @@
     <div>
         <loading>
             <div v-if="khateebs.length > 0">
+                
                 <div class="search-tools">
+                    
                     <div>
                         <button class="yellow" @click="showSearchTools = !showSearchTools">
                             🔍 {{ showSearchTools ? 'Close' : 'Open' }} Search Tools
                         </button>
                     </div>
+                    
                     <div v-show="showSearchTools">
+                        
                         <div>
                             <p class="search-results"><u>{{ filteredKhateebs.length }}</u> Search Results</p>
                         </div>
@@ -17,7 +21,9 @@
                                 Reset Search
                             </button>
                         </div>
+                        
                         <div class="input-container">
+                            
                             <div>
                                 <p>Confirmed</p>
                                 <select v-model="query.confirmed">
@@ -26,6 +32,7 @@
                                     <option :value="false">Pending Confirmation</option>
                                 </select>
                             </div>
+
                             <div>
                                 <p>Active</p>
                                 <select v-model="query.active">
@@ -34,22 +41,28 @@
                                     <option :value="false">Inactive</option>
                                 </select>
                             </div>
+
                         </div>
+
                         <div class="input-container">
+                            
                             <div>
                                 <p>First Name</p>
                                 <input type="text" v-model="query.firstName">
                             </div>
+                            
                             <div>
                                 <p>Last Name</p>
                                 <input type="text" v-model="query.lastName">
                             </div>
+
                         </div>
                         <div>
 
                         </div>
                     </div>
                 </div>
+
                 <div v-if="showKhateebs" class="khateebs-container">
                     <div 
                         v-for="(khateeb, khateebNo) in filteredKhateebs"
@@ -286,14 +299,17 @@ button {
     border-radius: 0;
 }
 
+
 .input-container {
-    width: 80%;
+    /*
     display: flex;
     flex-direction: row;
     margin-top: 0;
+    */
+    @include flexboxDefault();
+    width: 80%;
     max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+    @include centerMargin();
 }
 
 p {
@@ -303,13 +319,13 @@ p {
 }
 
 select {
-    width: 90%;
-    max-width: 300px;
+    width: 150px;
+    margin-left: 20px;
+    margin-right: 20px;
     margin: 5px;
     border: none;
     outline: none;
-    height: 4vh;
-    max-height: 40px;
+    height: 40px;
     font-size: 15px;
     color: getColor("offWhite");
     background-color: themeRGBA("grey", 1);
@@ -322,9 +338,10 @@ select {
 input {
     border: none;
     outline: none;
-    width: 80%;
-    height: 4vh;
-    max-height: 40px;
+    width: 200px;
+    height: 40px;
+    margin-left: 10px;
+    margin-right: 10px;
     font-size: 15px;
     color: getColor("offWhite");
     background-color: themeRGBA("grey", 1);
@@ -337,7 +354,7 @@ input {
 button {
     width: 80%;
     max-width: 300px;
-    max-height: 50px;
+    height: 50px;
     font-size: 18px;
     margin-bottom: 20px;
 }
@@ -369,20 +386,23 @@ button {
             margin-left: 2%;
             font-size: 2.4vh;
         }
+        
         button {
-            height: 7vh;
+            height: 40px;
         }
+
         select {
-            font-size: 1.8vh;
-            width: 90%;
-            margin-bottom: 3vh;
+            font-size: 13px;
+            width: 120px;
+            height: 30px;
         }
+        
         input {
-            height: 4vh;
-            width: 90%;
-            font-size: 1.8vh;
-            margin-bottom: 3vh;
+            height: 30px;
+            width: 200px;
+            font-size: 30px;
         }
+
         .input-container {
             margin-top: 1.5vh;
             margin-bottom: 1.5vh;

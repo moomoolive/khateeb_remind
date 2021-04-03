@@ -24,5 +24,13 @@ export default [
         meta: {
             auth: { level: 1 }
         }
+    },
+    {
+        path: '/khateeb/availability',
+        name: 'khateebAvailability',
+        component: () => import('@/views/khateebs/availability.vue'),
+        meta: {
+            auth: { level: 1 }
+        }
     }
 ]

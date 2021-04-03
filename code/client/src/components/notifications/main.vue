@@ -1,17 +1,22 @@
 <template>
-    <div>
+    <div v-on-clickaway="close">
+        
         <div class="topAnchor">
             <div class="close-notification-container" @click="close()">
-                <span>{{ this.notificationInfo.type === 'confirm' ? 'Cancel' : 'Close' }}</span>
+                <span>
+                    {{ this.notificationInfo.type === 'confirm' ? 'Cancel' : 'Close' }}
+                </span>
             </div>
         </div>
-            <div :class="`content ${notificationInfo.options.color || 'yellow'}`">
-                <component
-                    :is="notificationInfo.type"
-                    :options="notificationInfo.options"
-                    @close="close()"
-                />
-            </div>
+
+        <div :class="`content ${notificationInfo.options.color || 'yellow'}-background`">
+            <component
+                :is="notificationInfo.type"
+                :options="notificationInfo.options"
+                @close="close()"
+            />
+        </div>
+
     </div>
 </template>
 
@@ -22,6 +27,8 @@ import confirm from './types/confirm.vue'
 import tutorial from './types/tutorial.vue'
 import alert from './types/alert.vue'
 
+import { mixin as clickaway } from 'vue-clickaway'
+
 export default {
     name: "notificationsMain",
     components: {
@@ -31,6 +38,7 @@ export default {
         'notificationScroller': notificationScroller,
         "tutorial": tutorial,
     },
+    mixins: [clickaway],
     methods: {
         close() {
             if (this.notificationInfo.type === 'confirm')
@@ -61,7 +69,7 @@ export default {
 .topAnchor {
     margin-bottom: 0;
     max-height: 40px;
-    height: 5vh;
+    height: 35px;
     background-color: darken(getColor("silver"), 7%);
 }
 
@@ -76,23 +84,23 @@ export default {
     max-height: 500px;
 }
 
-.green {
+.green-background {
         background: themeRGBA("green", 0.88);
 }
 
-.red {
+.red-background {
         background: themeRGBA("red", 0.88);
 }
 
-.yellow {
+.yellow-background {
         background: themeRGBA("yellow", 0.88);
 }
 
-.blue {
+.blue-background {
     background: themeRGBA("blue", 0.88);
 }
 
-.grey {
+.grey-background {
     background: themeRGBA("grey", 0.88)
 }
 
@@ -101,15 +109,9 @@ span {
     padding: 1px 2px 1px 2px;
     position: absolute;
     border-radius: 3px;
-    color: getColor("grey");
     font-weight: bold;
-    font-size: 19px;
+    font-size: 18px;
     cursor: default;
 }
 
-@media screen and (max-width: $phoneWidth) {
-    span {
-        font-size: 2.5vh;
-    }
-}
 </style>

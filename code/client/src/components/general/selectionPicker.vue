@@ -1,10 +1,12 @@
 <template>
     <div>
+        
         <div>
             <tutorial-prompter
                 :tutorials="[{ category: 'general', number: 1 }]"
             />
         </div>
+        
         <div class="tutorial-container">
             <button
                 @click="tutorial()"
@@ -12,6 +14,7 @@
                 How Does This Work?
             </button>
         </div>
+
         <div 
             v-for="(optionCategory, categoryName) in allOptionsDisplay"
             :key="categoryName"
@@ -41,7 +44,7 @@
                         class="more-info-prompt"
                         @click="moreInfoHere(index, categoryName)"
                     >
-                    {{ showInfoHere(index, categoryName) ? "📖 Less" : "📘 More"}} Info
+                        {{ showInfoHere(index, categoryName) ? "📖 Less" : "📘 More"}} Info
                     </p>
                     <p
                         v-show="showInfoHere(index, categoryName)"

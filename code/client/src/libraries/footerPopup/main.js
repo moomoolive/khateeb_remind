@@ -1,4 +1,5 @@
 import helpers from './helpers.js'
+import store from '@/store/index.js'
 
 const appWillUpdateMessage = () => {
     helpers.createFooterPopup(
@@ -19,10 +20,12 @@ const youAreOffline = () => {
             gif: 'confusedDino', 
             color: 'blue',
             topMessage: "You're offline",
-            bottomMessage: "Some features are unavailable" ,
-            closeAfter: 4
+            bottomMessage: "Some features are unavailable and data has not been synced since your last visit - therefore may be out of date." ,
+            closeAfter: 2
         }
     )
+    const oneSecondInMilliseconds = 1_000
+    window.setTimeout(() => store.commit("app/offlineMode"), oneSecondInMilliseconds)
 }
 
 export default {

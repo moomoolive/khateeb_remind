@@ -17,3 +17,12 @@
   opacity: 0;
   transform: translateY(30px);
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}

@@ -6,7 +6,7 @@ const requests = {
     getJummahs(params={}) {
         return helpers.returnArrayFromRequest("get", extension, { params })
     },
-    createNewPreference(newPreference={}) {
+    createNewJummahPreference(newPreference={}) {
         return helpers.returnEmptyObjectFromRequest("post", extension, newPreference)
     },
     updateJummahPreference(updatedJummah={}) {

@@ -11,7 +11,8 @@
         </div>
 
         <general-popup-container 
-            v-show="showEditDefaultKhateebsContainer" 
+            v-show="showEditDefaultKhateebsContainer"
+            :closeOnClickAway="false" 
             @close="closePopup()"
         >
             <div 
@@ -77,6 +78,7 @@
                     v-for="(location, locationIndex) in locations.filter(l => Object.keys(l).length > 0)"
                     :key="locationIndex"
                     :headline="location.name"
+                    :closeOnClickAway="false"
                 >
                     
                     <p>Location Name</p>
@@ -106,23 +108,28 @@
                             </p>
                             
                             <timing-mutator
+                                class="timing-mutator-container"
                                 :timing="timing"
                                 @changed="incrementTime($event, timing)"
                             />
 
-                            <button 
-                                class="purple edit-default-khateebs-button"
-                                @click="showDefaultKhateebs(timing)"    
-                            >
-                                Edit Default Khateebs
-                            </button>
+                            <div>
+                                <button 
+                                    class="purple edit-default-khateebs-button"
+                                    @click="showDefaultKhateebs(timing)"    
+                                >
+                                    Edit Default Khateebs
+                                </button>
+                            </div>
 
-                            <button 
-                                class="red timing-btns extra-margin"
-                                @click="deleteTiming(timing)"
-                            >
-                                🗑️
-                            </button>
+                            <div>
+                                <button 
+                                    class="red timing-btns extra-margin"
+                                    @click="deleteTiming(timing)"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
 
                         </div>
                     </div>
@@ -355,7 +362,8 @@ p {
     color: getColor("offWhite");
     font-size: 19px;
     font-weight: bold;
-    margin-top: 2vh;
+    margin-top: 15px;
+    margin-bottom: 7px;
     width: 80%;
     margin-left: auto;
     margin-right: auto;
@@ -371,13 +379,14 @@ input {
     color: getColor("offWhite");
     margin-right: auto;
     margin-left: auto;
-    font-size: 1.5vh;
+    font-size: 17px;
     background-color: themeRGBA("grey", 1);
     &:focus {
         background-color: themeRGBA("grey", 0.5);
     }
     position: relative;
     z-index: 0;
+    margin-bottom: 30px;
 }
 
 .prayer-timing {
@@ -386,6 +395,7 @@ input {
     width: 65%;
     margin-left: auto;
     margin-right: auto;
+    max-width: 500px;
     background: getColor("blue");
     border-radius: 7px;
     padding-top: 10px;
@@ -396,6 +406,11 @@ input {
 
 .timing-label {
     color: black;
+    margin-bottom: 20px;
+}
+
+.timing-mutator-container {
+    width: 100%;
 }
 
 button {
@@ -429,6 +444,8 @@ button {
 .default-khateebs-input {
     width: 105px;
     margin-bottom: 12px;
+    margin-left: 8px;
+    margin-right: 8px;
     height: 30px;
     border: none;
     outline: none;
@@ -452,15 +469,12 @@ button {
 }
 
 .timing-btns {
-    max-width: 100px;
     max-height: 42px;
     font-size: 19px;
-    &.large {
-        max-width: 120px;
-    }
     &.extra-margin {
         margin-top: 15px;
     }
+    @include floatingBoxShadow();
 }
 
 .add-location-btn {
@@ -474,22 +488,17 @@ button {
 }
 
 .back-to-schedule {
-    max-width: 200px;
-    font-size: 15px;
-    max-height: 50px;
+    font-size: 20px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 @media screen and (max-width: $phoneWidth) {
      p {
-         font-size: 2.6vh;
-         margin-top: 2vh;
+         font-size: 17px;
      }
 
      .timing-btns {
-        max-width: 70px;
-        max-height: 42px;
-        font-size: 2.5vh;
+        font-size: 16px;
     }
 
     .prayer-timing {
@@ -497,6 +506,14 @@ button {
         margin-bottom: 5vh;
         padding-top: 1.5vh;
         padding-bottom: 1.5vh;
+    }
+
+    input {
+        font-size: 12px;
+    }
+
+    .back-to-schedule {
+        font-size: 15px;
     }
 }
 </style>

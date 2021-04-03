@@ -1,5 +1,5 @@
 <template>
-    <div :class="`tag-container ${info.color}`">
+    <div :class="`tag-container ${info.color} ${square ? 'square' : ''}`">
         <div class="text">{{ info.icon }} {{ info.words }}</div>
     </div>
 </template>
@@ -11,48 +11,61 @@ export default {
         info: {
             type: Object,
             required: true
+        },
+        size: {
+            type: String,
+            required: false,
+            default: "medium"
+        },
+        square: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     }
 }
 </script>
 
 <style lang="scss" scoped>
+
 .tag-container {
     background-color: getColor("green");
-    width: 90%;
-    font-size: 18px;
-    max-height: 45px;
-    border-radius: 100px 100px 100px 100px;
-    box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
+    padding-left: 17px;
+    padding-right: 17px;
+    padding-bottom: 8px;
+    padding-top: 8px;    
+    font-size: 16px;
+    @include completelyRoundBorder();
+    @include floatingBoxShadow(0.4);
+    @include flexboxDefault();
     color: black;
-    &.green {
-        color: black;
-        background-color: getColor("green");
-    }
+    
     &.red {
         color: getColor("offWhite");
-        background-color: getColor("red");
     }
+    
     &.purple {
         color: getColor("offWhite");
-        background-color: getColor("purple");
     }
+    
     &.blue {
-        background-color: getColor("blue");
         color: getColor("offWhite");
     }
-}
 
-.text {
-    margin-top: 5.7%;
+    &.square {
+        border-radius: 0px;
+    }
 }
 
 @media screen and (max-width: $phoneWidth) {
+    
     .tag-container {
-        font-size: 2vh;
+        font-size: 13px;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 5px;
+        padding-top: 5px; 
     }
-    .text {
-        margin-top: 5%;
-    }
+    
 }
 </style>

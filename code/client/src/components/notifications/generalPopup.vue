@@ -1,8 +1,12 @@
 <template>
     <div class="popup-layer">
         <collapse-transition :duration="duration">
-            <div v-show="showContent" class="content-container">
-                <div class="close-content" @click="$emit('close')">Close</div>
+            <div 
+                v-show="showContent" 
+                class="content-container" 
+                v-on-clickaway="clickAwayClose"
+            >
+                <div class="close-content" @click="close()">Close</div>
                 <div class="content">
                     <slot></slot>
                 </div>
@@ -13,9 +17,11 @@
 
 <script>
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+import { mixin as clickaway } from 'vue-clickaway'
 
 export default {
     name: 'generalPopupContainer',
+    mixins: [clickaway],
     components: {
         CollapseTransition
     },
@@ -24,11 +30,25 @@ export default {
             type: Number,
             required: false,
             default: 500
+        },
+        closeOnClickAway: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     },
     data() {
         return {
             showContent: false
+        }
+    },
+    methods: {
+        clickAwayClose() {
+            if (this.closeOnClickAway)
+                this.close()
+        },
+        close() {
+            this.$emit('close')
         }
     },
     mounted() {
@@ -40,6 +60,8 @@ export default {
 <style lang="scss" scoped>
 .popup-layer {
   z-index: 8;
+  height: 100vh;
+  width: 100vw;
   position: fixed;
   background: themeRGBA('grey', 0.3);
   display: flex;
@@ -50,9 +72,7 @@ export default {
 
 .content {
     padding-top: 10px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    max-height: 1500px;
+    padding-bottom: 10px;
 }
 
 .close-content {
@@ -64,6 +84,7 @@ export default {
     justify-content: center;
     font-weight: bold;
 }
+
 .content-container {
     max-height: 350px;
     max-width: 350px;

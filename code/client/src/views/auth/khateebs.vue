@@ -77,10 +77,13 @@ export default {
     },
     computed: {
         filteredInstitutions() {
+            return this.allInstitutions
+            /*
             if (this.showTestInstitution)
                 return this.allInstitutions
             else
                 return this.allInstitutions.filter(inst => inst.name !== "__TEST__")
+            */
         },
         thereAreInstitutionsToSignupFor() {
             return this.filteredInstitutions.length > 0

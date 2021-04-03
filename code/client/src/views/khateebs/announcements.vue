@@ -70,6 +70,7 @@ export default {
     max-height: 300px;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 30px;
     max-width: 1200px;
     align-items: center;
     justify-content: center;
@@ -78,6 +79,9 @@ export default {
 
 .announcement-container {
     width: 45%;
+    margin-bottom: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .content {
@@ -88,21 +92,22 @@ export default {
 
 p {
     margin: 0;
-    margin-left: 5px;
+    margin-left: 10px;
     font-size: 16px;
 }
 
 @media screen and (max-width: $phoneWidth) {
-      .announcements-container {
+        
+        .announcements-container {
             flex-direction: column;
         }
+        
         .announcement-container {
             width: 100%;
         }
+
         p {
-            margin: 0;
-            margin-left: 2%;
-            font-size: 2.3vh;
+            font-size: 13px;
         }
 }
 </style>

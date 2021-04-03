@@ -1,17 +1,20 @@
 <template>
-    <div v-if="options">
+    <div v-if="options" class="alert-container">
         <div>
-            <div class="topAnchor"></div>
+
             <img :src="require(`@/assets/notifications/${graphicType(options.icon)}`)">
+            
             <div :class="`msg ${options.textSize ? options.textSize : 'large'}`">
                 {{ options.msg }}<br>
             </div>
+            
             <button
                 class="grey" 
                 @click="$emit('close')"
             >
                 OK
             </button>
+
         </div>
     </div>
 </template>
@@ -52,16 +55,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-div {
-    margin: 0;
-    padding: 0;
-}
-
 .msg {
-    margin-top: 5%;
+    margin-top: 25px;
     margin-left: auto;
     margin-right: auto;
-    width: 90%;
+    line-height: 23px;
+    width: 85%;
     height: auto;
     color: black;
     &.small {
@@ -78,27 +77,39 @@ div {
 }
 
 img {
+    min-height: 100px;
     height: 18vh;
     max-height: 150px;
+    margin-top: 15px;
 }
 
 
 button {
     margin-top: 4%;
+    font-size: 13px;
     width: 30%;
-    height: 15%;
-    max-height: 40px;
-    margin-bottom: 15px;
+    height: 30px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    @include floatingBoxShadow();
+}
+
+.alert-container {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 350px;
 }
 
 @media screen and (max-width: $phoneWidth) {
+    
     .msg {
-    &.small {
-        font-size: 2vh;
-    }
-    &.large {
-        font-size: 4vh;
-    }
+        line-height: 18px;
+        &.small {
+            font-size: 13px;
+        }
+        &.large {
+            font-size: 26px;
+        }
 }
 }
 

@@ -2,7 +2,7 @@ export default {
     namespaced: true,
     state: () => ({
         wallpaper: 'main',
-        usingOffline: false, // TBD
+        isOffline: false,
         assignedUserPackage: true,
         hasLoggedInViaLoginPage: false
     }),
@@ -15,6 +15,9 @@ export default {
         },
         loggedInViaLoginPage(state) {
             state.hasLoggedInViaLoginPage = true
+        },
+        offlineMode(state) {
+            state.isOffline = true
         }
     },
     actions: {

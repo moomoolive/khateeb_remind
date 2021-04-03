@@ -3,7 +3,7 @@
 
         <div>
             <button 
-                class="add-new-admin-button blue"
+                class="add-new-admin-button blue round"
                 @click="openAddNewAdminForm()"
             >
                 +
@@ -12,18 +12,21 @@
 
         <general-popup-container
             v-if="showAddNewAdminForm"
+            :closeOnClickAway="false"
             @close="closeAddNewAdminForm()"
         >
-            <user-form-template 
-                :userType="`institutionAdmin`"
-                :includeVitals="true"
-                :formProps="{
-                    buttonText: 'Create New Admin',
-                    bindedExts: ['confirms'],
-                    backgroundColor: 'yellow'
-                }"
-                @submitted="submitAdmin($event)"
-            />
+            <div class="popup-container">
+                <user-form-template 
+                    :userType="`institutionAdmin`"
+                    :includeVitals="true"
+                    :formProps="{
+                        buttonText: 'Create New Admin',
+                        bindedExts: ['confirms'],
+                        backgroundColor: 'yellow'
+                    }"
+                    @submitted="submitAdmin($event)"
+                />
+            </div>
         </general-popup-container>
 
         <loading>
@@ -142,13 +145,19 @@ export default {
     margin-right: auto;
 }
 
+.popup-container {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 305px;
+}
+
 .add-new-admin-button {
-    border-radius: 100px 100px 100px 100px;
     width: 60px;
-    height: 35px;
-    font-size: 22px;
+    height: 40px;
+    font-size: 20px;
     font-weight: bold;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin-bottom: 35px;
 }
 
 button {
@@ -166,14 +175,10 @@ button {
         margin-top: 3vh;
         border-bottom: black solid 0.4vh;
     }
+
     .admin-container {
         width: 90%;
     }
-    button {
-        font-size: 2.3vh;
-        margin-bottom: 3vh;
-        padding-bottom: 1vh;
-        padding-top: 1vh;
-    }
+    
 }
 </style>

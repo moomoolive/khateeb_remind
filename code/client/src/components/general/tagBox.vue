@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p :class="`tag ${contentLoader('color')}` ">
+        <p :class="`tag ${contentLoader('color')} ${isInvisible ? 'invisible' : ''}` ">
             <span :class='"icon " + contentLoader("color")'>
                 {{ contentLoader('symbol') }}
             </span>
@@ -19,11 +19,6 @@ export default {
             type: [String, Object],
             required: false
         },
-        isWiggling: {
-            type: Boolean,
-            required: false,
-            default: false
-        }
     },
     data() {
         return {
@@ -56,9 +51,18 @@ export default {
     },
     computed: {
         tagLoader() {
-            if (typeof(this.info) === 'string') return this[this.info]
-            else if (!this.info) return this.important
-            else return this.info
+            if (typeof(this.info) === 'string') 
+                return this[this.info]
+            else if (!this.info) 
+                return this.important
+            else 
+                return this.info
+        },
+        isInvisible() {
+            if (this.info)
+                return this.info.isInvisible
+            else
+                return false
         }
     }
 }
@@ -70,6 +74,10 @@ $tags: (
     "urgent": "yellow", 
     "goodNews": "green"
 );
+
+.invisible {
+    visibility: hidden;
+}
 
 @mixin tagBackground($color) {
     background-color: getColor($color) !important;

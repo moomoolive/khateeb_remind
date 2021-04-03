@@ -16,6 +16,7 @@
 
                     <general-popup-container 
                         v-show="showDefaultKhateebsPopup"
+                        :closeOnClickAway="false"
                         @close="closeDefaultKhateebsPopup()"
                     >
                         <div
@@ -37,7 +38,7 @@
                             </div>
 
                             <div>
-                                Week: {{ khutbah.week + 1 }}{{ khutbah.week === 4 ? ' (if applicable)' : '' }}
+                                Every <span class="red">{{ khutbahWeekText(khutbah.week) }}</span> week of each month{{ khutbah.week === 4 ? ' (if applicable)' : '' }}
                             </div>
 
                         </div>
@@ -151,6 +152,22 @@ export default {
                 $lt
             }
         },
+        khutbahWeekText(index=0) {
+            switch(index + 1) {
+                case 1:
+                    return '1st'
+                case 2:
+                    return '2nd'
+                case 3:
+                    return '3rd'
+                case 4:
+                    return '4th'
+                case 5:
+                    return '5th'
+                default:
+                    return '1st'
+            }
+        }
     },
     computed: {
         allUserJummahsPlusUpcomingJummahUntilTheEndOfNextMonth() {

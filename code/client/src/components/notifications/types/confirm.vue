@@ -1,22 +1,24 @@
 <template>
     <div class="confirm-container">
+        
         <img 
             :src="require(`@/assets/notifications/${options.picture || 'exclamation'}.png`)"
         >
+
         <div class="msg-spacing">
-            <p 
-                v-for="msg in options.msg.split('\n')" :key="msg"
-                :style="`text-align: center;`"
-            >
+            <p v-for="msg in options.msg.split('\n')" :key="msg">
                 {{ msg }}
             </p>
         </div>
+
         <button @click="confirm()">
             {{ options.confirmButtonText || "Yes" }}
         </button>
+        
         <button class="red" @click="reject()">
             {{ options.rejectButtonText || "No" }}
         </button>
+
     </div>
 </template>
 
@@ -44,16 +46,24 @@ export default {
 
 <style lang="scss" scoped>
 img {
+    min-height: 100px;
     height: 18vh;
     max-height: 150px;
-    padding-top: 10px;
+    margin-top: 20px;
+}
+
+.confirm-container {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 375px;
 }
 
 button {
     width: 30%;
     height: 15%;
     font-size: 17px;
-    margin-bottom: 5%;
+    margin-bottom: 30px;
+    @include floatingBoxShadow();
 }
 
 p {
@@ -64,15 +74,18 @@ p {
     margin-bottom: 5px;
     font-size: 16px;
     font-weight: bold;
+    text-align: center;
 }
 
 .msg-spacing {
-    margin-bottom: 15px;
+    margin-bottom: 25px;
+    margin-top: 25px;
 }
 
 @media screen and (max-width: $phoneWidth) {
+    
     button {
-        font-size: 2.3vh;
+        font-size: 14px;
     }
 
     p {

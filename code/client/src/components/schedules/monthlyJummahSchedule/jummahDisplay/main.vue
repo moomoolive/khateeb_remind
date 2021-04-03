@@ -16,13 +16,15 @@
         <div class="jummahPreferences">
             
             <div class="settings-icon-container">
-                <button 
-                    :disabled="viewingWeekIsCurrentPastOrFuture === 'past'" 
-                    class="icon-button blue"
-                    @click="$emit('open-settings', { khateebPreferences, timing, location })"
-                >
-                    ⚙️
-                </button>
+                <div>
+                    <button 
+                        :disabled="viewingWeekIsCurrentPastOrFuture === 'past'" 
+                        class="icon-button blue"
+                        @click="$emit('open-settings', { khateebPreferences, timing, location })"
+                    >
+                        ⚙️
+                    </button>
+                </div>
             </div>
 
             <component
@@ -149,44 +151,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.timing-container {
-    background: getColor("offWhite");
-    height: auto !important;
-    border-top-left-radius: 7px;
-    border-bottom-left-radius: 7px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.settings-icon {
-    width: 100%;
-}
 
 .icon-button {
-    height: 30px;
-    width: 30px;
-    font-size: 15px;
+    height: 40px;
+    width: 40px;
+    font-size: 18px;
     margin: 0 0 0 0;
+    margin-right: 10px;
     padding: 0 0 0 0;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
 }
 
 .settings-icon-container {
-    width: 15%;
-    height: 10px;
     margin-top: 10px;
     margin-left: auto;
-    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .jummah-status-container {
-    height: 40%;
-    width: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-bottom: 25px;
 }
 
 .jummahPreferences {
@@ -194,7 +179,8 @@ export default {
     border-top-right-radius: 7px;
     border-bottom-right-radius: 7px;
     padding-top: 10px;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
+    width: 50%;
 }
 
 .last-updated {
@@ -222,50 +208,50 @@ div {
 
 .timing-container {
     background: getColor("offWhite");
-    height: auto !important;
     border-top-left-radius: 7px;
     border-bottom-left-radius: 7px;
     display: flex;
     flex-direction: column;
+    width: 50%;
     align-items: center;
     justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 10px;
+}
+
+.timing-label {
+    font-size: 25px;
 }
 
 @media screen and (max-width: $phoneWidth) {
-    .timing-container {
-        padding-top: 2vh;
-        padding-bottom: 2vh;
-        background: getColor("offWhite");
-        height: auto !important;
-        border-radius: 0;
-        border-top-left-radius: 7px;
-        border-top-right-radius: 7px;
-    }
-
-    .jummah-status-container {
-        margin-bottom: 2vh;
-        height: 5vh;
-    }
 
     .jummahPreferences {
         border-radius: 0;
         border-bottom-left-radius: 7px;
         border-bottom-right-radius: 7px;
-        padding-top: 2vh;
-        padding-bottom: 2vh;
         padding-top: 0;
+        width: 100%;
     }
+
     .last-updated {
         font-size: 2.2vh;
     }
+
     .timing-container {
-        padding-top: 2vh;
-        padding-bottom: 2vh;
-        background: getColor("offWhite");
-        height: auto !important;
         border-radius: 0;
         border-top-left-radius: 7px;
         border-top-right-radius: 7px;
+        width: 100%;
+    }
+
+    .icon-button {
+        height: 30px;
+        width: 30px;
+        font-size: 15px;
+    }
+
+    .timing-label {
+        font-size: 20px;
     }
 }
 </style>

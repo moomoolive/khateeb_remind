@@ -36,3 +36,13 @@ $themeColors: (
         &.#{$colorName} { @include color($colorName); }
     }
 }
+
+@mixin textColor($color) {
+    color: getColor($color);
+}
+
+@mixin allTextColors($list: $themeColors) {
+    @each $colorName, $color in $list {
+        &.#{$colorName} { @include textColor($colorName); }
+    }
+}

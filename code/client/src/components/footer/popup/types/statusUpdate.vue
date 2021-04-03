@@ -39,7 +39,7 @@ export default {
 }
 
 .gif {
-    height: 50%;
+    height: 125px;
 }
 
 </style>

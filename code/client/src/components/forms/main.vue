@@ -1,6 +1,6 @@
 <template>
     <div v-if="showForm">
-        <div :class="`${backgroundColor} ${ backgroundColor === 'none' ? '' : 'box-shadow'} formContainer`" v-if="data">
+        <div :class="`${backgroundColor}-form ${ backgroundColor === 'none' ? '' : 'box-shadow'} formContainer`" v-if="data">
             
             <div v-if="formTitle" class="formTitle">
                 {{ formTitle }}
@@ -11,16 +11,6 @@
                 <div class="formLabel" :for="fieldName">
                     {{  fieldData.alias || utils.stringFormat(fieldName) }}
                 </div>
-
-                <tag-box
-                    v-if="fieldData.tag && fieldData.tag === 'encrypted'"
-                    class="tag-box"
-                    :info="{
-                            words: 'Fully-Encrypted',
-                            color: 'goodNews',
-                            symbol: '⚔️'
-                    }"
-                />
 
                 <div v-if="extensibleType(readOnly ? 'readOnly' : fieldData.type)">
                     <component 
@@ -184,7 +174,6 @@ export default {
         "textAreaExt": () => import('./extensions/primitives/textArea.vue'),
         "checkboxExt": () => import('./extensions/free/checkbox.vue'),
         "readOnlyExt": () => import('./extensions/primitives/readOnly.vue'),
-        "tagBox": () => import('@/components/general/tagBox.vue'),
         "timingMutatorExt": () => import('./extensions/primitives/timingMutator.vue'),
         defaultExtension
     },
@@ -312,7 +301,6 @@ export default {
     },
     watch: {
         basedOn() {
-            // rerender form
             this.showForm = false
             this.$nextTick(() => { this.showForm = true })
         }
@@ -337,71 +325,51 @@ export default {
 button {
     width: 90%;
     color: black;
-    font-size: 1.8vh;
+    font-size: 17px;
+    @include floatingBoxShadow(0.3);
 }
 
-.tag-box {
-    width: 89%;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-@media screen and (max-width: $phoneWidth) {
-    .tag-box {
-        margin-top: 1vh;
-        margin-bottom: 1.5vh;
-    }
-}
-
-.darkBlue {
+.darkBlue-form {
     background: themeRGBA("darkBlue", 0.5);
 }
 
-.red {
+.red-form {
     background: themeRGBA("red", 0.5);
 }
 
-.yellow {
+.yellow-form {
     background: themeRGBA("yellow", 0.5);
 }
 
 .formContainer {
-    margin-top: 4vh;
-    padding-top: 1vh;
-    padding-bottom: 1vh;
-    border-radius: 7px;
+    margin-top: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    @include normalBorderRounding();
     width: 80%;
     max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    z-index: 0;
-    position: relative;
+    @include centerMargin();
 }
 
 .box-shadow {
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    @include floatingBoxShadow();
 }
 
 .formLabel {
     text-align: left;
-    margin-top: 2.5vh;
-    margin-left: auto;
-    margin-right: auto;
-    font-weight: 500;
-    font-size: 1.9vh;
+    margin-top: 20px;
+    @include centerMargin();
+    font-size: 18px;
     color: black;
     width: 90%;
 }
 
 .errorMsg {
+    margin-top: 10px;
     color: getColor("yellow");
-    font-size: 2vh;
+    font-size: 17px;
     width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+    @include centerMargin();
 }
 
 .formTitle {
@@ -410,12 +378,31 @@ button {
 }
 
 .invalidFeedback {
-    margin-top: 1.3vh;
+    margin-top: 12px;
     color: red;
-    font-size: 1.5vh;
+    font-size: 13px;
     width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+    @include centerMargin();
+}
+
+@media screen and (max-width: $phoneWidth) {
+
+    .formLabel {
+        font-size: 14px;
+    }
+
+    .invalidFeedback {
+        font-size: 11px;
+    }
+
+    .errorMsg {
+        font-size: 13px;
+    }
+
+    button {
+        height: 25px;
+        font-size: 14px;
+    }
 }
 
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="location-container">
             
-        <div>
+        <div class="location-info ">
             <p class="location-label">{{ location.name }}</p>
             <p class="location-label address">{{ location.address }}</p>
         </div>
@@ -128,13 +128,20 @@ export default {
     border-radius: 7px;
 }
 
+.location-info {
+    margin-bottom: 40px;
+}
+
 .location-label {
     font-size: 35px;
     font-weight: bold;
     text-decoration: underline dotted;
+    
     &.address {
         font-size: 25px;
         text-decoration: none;
+        margin-top: 5px;
+        color: getColor("offWhite");
     }
 }
 
@@ -143,8 +150,8 @@ export default {
     width: 80%;
     margin-left: auto;
     margin-right: auto;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 50px;
+    padding-bottom: 50px;
     margin-bottom: 60px;
     border-radius: 7px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
@@ -155,22 +162,29 @@ export default {
 }
 
 .no-entries-text {
-    font-size: 18px;
+    font-size: 25px;
 }
 
 @media screen and (max-width: $phoneWidth) {
+   
    .location-container {
         margin-bottom: 20%;
     }
+    
     .location-label {
         font-size: 3.6vh;
         &.address {
             font-size: 2.6vh;
         }
     }
+    
     .jummah-container {
         display: flex;
         flex-direction: column;
-    } 
+    }
+    
+    .no-entries-text {
+        font-size: 18px;
+    }
 }
 </style>

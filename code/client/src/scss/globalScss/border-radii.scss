@@ -1,0 +1,11 @@
+@mixin lightBorderRounding() {
+    border-radius: 4px;
+}
+
+@mixin normalBorderRounding() {
+    border-radius: 7px;
+}
+
+@mixin completelyRoundBorder() {
+    border-radius: 99999px;
+}
