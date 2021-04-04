@@ -50,6 +50,52 @@
                             </button>
                         </div>
                     </div>
+                    
+                    <div class="unavailable-khateebs-position">
+                        <collapse-transition :dimension="`width`" :duration="450">
+                            <div
+                                v-show="
+                                    viewingWeekIsCurrentPastOrFuture !== 'past' &&
+                                    khateebsUnavailableForSelectedWeek.length > 0
+                                " 
+                                class="unavailable-khateebs-this-week-container silver"
+                            >
+                                
+                                <div class="unavailable-khateebs-this-week-header-container" @click="toggleUnavailableKhateebs()">
+                                    <div>
+                                        <img 
+                                            src="~@/assets/misc/rightArrow.png" 
+                                            :class="`dropdown-arrow ${showingUnavailable ? 'showing': ''}`"
+                                            alt="dropdown arrow"
+                                        >
+                                    </div>
+
+                                    <div class="unavailable-khateebs-this-week-header">
+                                        Unavailable Khateebs
+                                        <span :class="`red ${ showingUnavailable ? 'unavailable-khateeb-count-invisible' : ''}`">
+                                            ({{ khateebsUnavailableForSelectedWeek.length }})
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <collapse-transition :duration="450">
+                                    <div v-show="showingUnavailable" class="unavailable-khateebs-this-week-tag-container">
+                                        <tag-circle
+                                            v-for="(khateeb, khateebIndex) in khateebsUnavailableForSelectedWeek"
+                                            class="unavailable-khateeb-tag"
+                                            :key="khateebIndex"
+                                            :info="{
+                                                words: khateebName(khateeb),
+                                                color: 'grey',
+                                                icon: '👳'
+                                            }"
+                                        />
+                                    </div>
+                                </collapse-transition>
+
+                            </div>
+                        </collapse-transition>
+                    </div>
 
                     <locations-display
                         v-if="showLocations"
@@ -58,7 +104,8 @@
                         :selectedLocation="selectedLocation"
                         :timings="timings"
                         :reciever="reciever"
-                        :khateebs="khateebs"
+                        :completeKhateebsList="khateebs"
+                        :khateebs="khateebsavailableForSelectedWeek"
                         :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                         :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
                         :selectedDate="selectedDate"
@@ -104,9 +151,13 @@ import scheduleStandardControls from './controls/main.vue'
 import locationsDisplay from './locationDisplay/locations-display.vue'
 import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 import jummahSettingsPopup from './jummahSettingsPopup/main.vue'
+import tagCircle from '@/components/general/tagCircle.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
 import jummahHelpers from '@/libraries/jummahs/main.js'
+import khateebHelpers from '@/libraries/khateebs/main.js'
+
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 export default {
     name: "jummahScheduleDisplay",
@@ -117,7 +168,9 @@ export default {
         scheduleStandardControls,
         locationsDisplay,
         generalPopupContainer,
-        jummahSettingsPopup
+        jummahSettingsPopup,
+        CollapseTransition,
+        tagCircle
     },
     props:{
         jummahs: {
@@ -150,10 +203,17 @@ export default {
             selectedLocationQueryKey: 'location',
             showJummahSettings: false,
             showLocations: true,
-            settingsInfo: {}
+            settingsInfo: {},
+            showingUnavailable: false
         }
     },
     methods: {
+        toggleUnavailableKhateebs() {
+            this.showingUnavailable = !this.showingUnavailable
+        },
+        khateebName(khateeb) {
+            return khateebHelpers.khateebName(khateeb)
+        },
         openJummahSettings(jummahAndAssoicatedInfo) {
             this.settingsInfo = jummahAndAssoicatedInfo
             this.showJummahSettings = true
@@ -254,6 +314,18 @@ export default {
                 filterFunc = (location) => location._id === this.selectedLocation
             return this.locationsWithDataThisMonth.filter(filterFunc)
         },
+        khateebsUnavailableForSelectedWeek() {
+            return this.khateebs
+                .filter(k => {
+                    return k.unavailableDates.find(({ date }) => datetime.sameDateMonthAndYear(date, this.selectedDate))
+                })
+        },
+        khateebsavailableForSelectedWeek() {
+            return this.khateebs
+                .filter(k => {
+                    return !k.unavailableDates.find(({ date }) => datetime.sameDateMonthAndYear(date, this.selectedDate))
+                })
+        },
     },
     created() {
         this.initializeSettingsInfo()
@@ -306,11 +378,69 @@ export default {
     margin-right: auto;
 }
 
+.unavailable-khateebs-position {
+    width: 80%;
+    @include centerMargin();
+    margin-top: 40px;
+}
+
+.unavailable-khateebs-this-week-container {
+    width: 75%;
+    max-width: 425px;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    margin-bottom: 30px;
+    padding-left: 10px;
+    padding-right: 10px;
+    @include normalBorderRounding();
+    @include floatingBoxShadow();
+}
+
+.unavailable-khateebs-this-week-header {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.unavailable-khateebs-this-week-header-container {
+    @include flexboxDefault();
+    width: 63%;
+}
+
+.unavailable-khateebs-this-week-tag-container {
+    @include flexboxDefault(row, True);
+    margin-top: 20px;
+}
+
+.unavailable-khateeb-tag {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    max-width: 150px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.unavailable-khateeb-count-invisible {
+    visibility: hidden;
+}
+
+.dropdown-arrow {
+    height: 15px;
+    margin-right: 10px;
+    &.showing {
+        transform: rotate(90deg);
+    }
+}
+
+
 @media screen and (max-width: $phoneWidth) {
     
     .schedule-container {
             background: themeRGBA("darkBlue", 0.5);
             width: 90%;
+    }
+
+    .unavailable-khateebs-this-week-header-container {
+        width: 100%;
     }
 
     .month-indicator-text {
@@ -319,6 +449,14 @@ export default {
         width: 120px;
     }
 
+    .unavailable-khateebs-this-week-header {
+        font-size: 14px;
+    }
+
+    .dropdown-arrow {
+        height: 12px;
+        margin-right: 7px;
+    }
 }
 
 </style>

@@ -48,13 +48,13 @@ location.methods.deleteDependants = async function () {
     return res
 }
 
-location.methods.createAssociatedTiming = async function() {
+location.methods.createAssociatedTiming = async function(minute=30, hour=12) {
     try {
         const saved = await $db.timings({
             institutionID: this.institutionID,
             locationID: this._id.toString(),
-            hour: 12,
-            minute: 30
+            hour,
+            minute
         }).save()
         return saved
     } catch(err) {

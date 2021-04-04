@@ -23,10 +23,19 @@ const appConfig = {
         },
         rootAdmin: {
             username: "testRoot",
-            password: "password123",
+            password: "123456",
             handle: "testMaster",
             firstName: "Mostafa",
             lastName: "Elbannan",
+        },
+        locationCount: 3,
+        timingsPerLocation: 3,
+        khateebCount: 6,
+        khateebs: {
+            // all created khateebs usernames' will use the format 
+            // `${baseUsername}${index + 1}`
+            baseUsername: '__TEST__k',
+            password: '123456',
         }
     },
     network: {

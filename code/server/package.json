@@ -21,6 +21,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.1",
     "nanoid": "^3.1.20",
+    "project-name-generator": "^2.1.9",
     "query-types": "^0.1.4",
     "twilio": "^3.54.0",
     "web-push": "^3.4.4"

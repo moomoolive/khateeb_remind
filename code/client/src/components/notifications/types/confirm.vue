@@ -72,6 +72,7 @@ p {
     margin-right: auto;
     padding-bottom: 0px;
     margin-bottom: 5px;
+    line-height: 25px;
     font-size: 16px;
     font-weight: bold;
     text-align: center;
@@ -89,7 +90,8 @@ p {
     }
 
     p {
-        font-size: 2vh;
+        font-size: 12px;
+        line-height: 20px;
     }
 }
 </style>

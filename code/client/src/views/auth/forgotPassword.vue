@@ -1,6 +1,6 @@
 <template>
-    <div class="form-container">
-        <div>
+    <div>
+        <div class="form-container">
             <form-main
                 v-if="showForm" 
                 :structure="formStructure"
@@ -85,10 +85,9 @@ export default {
 
 <style lang="scss" scoped>
 .form-container {
+    position: relative;
+    top: 23vh;
     margin-left: auto;
     margin-right: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 </style>

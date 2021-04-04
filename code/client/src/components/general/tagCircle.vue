@@ -1,6 +1,9 @@
 <template>
-    <div :class="`tag-container ${info.color} ${square ? 'square' : ''}`">
-        <div class="text">{{ info.icon }} {{ info.words }}</div>
+    <div :class="`tag-container ${info.color} ${square ? 'square' : ''} ${size}`">
+        <div class="text">
+            {{ info.icon }} 
+            <span :class="textColor || ''">{{ info.words }}</span>
+        </div>
     </div>
 </template>
 
@@ -21,6 +24,10 @@ export default {
             type: Boolean,
             required: false,
             default: false
+        },
+        textColor: {
+            type: String,
+            required: false,
         }
     }
 }
@@ -39,6 +46,14 @@ export default {
     @include floatingBoxShadow(0.4);
     @include flexboxDefault();
     color: black;
+
+    &.small {
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 5px;
+        padding-top: 5px;    
+        font-size: 14px;
+    }
     
     &.red {
         color: getColor("offWhite");
@@ -48,7 +63,11 @@ export default {
         color: getColor("offWhite");
     }
     
-    &.blue {
+    &.blue{
+        color: getColor("offWhite");
+    }
+
+    &.grey {
         color: getColor("offWhite");
     }
 
@@ -64,7 +83,15 @@ export default {
         padding-left: 15px;
         padding-right: 15px;
         padding-bottom: 5px;
-        padding-top: 5px; 
+        padding-top: 5px;
+
+        &.small {
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-bottom: 5px;
+            padding-top: 5px;    
+            font-size: 12px;
+        } 
     }
     
 }

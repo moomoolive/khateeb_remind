@@ -39,6 +39,8 @@
 <script>
 import jummahDisplay from '@/components/schedules/monthlyJummahSchedule/jummahDisplay/main.vue'
 
+import datetime from '@/libraries/dateTime/main.js'
+
 export default {
     name: 'monthlyScheduleLocationDisplayer',
     components: {
@@ -76,6 +78,10 @@ export default {
         fridayNumberOfSelectedMonth: {
             type: Number,
             required: true
+        },
+        completeKhateebsList: {
+            type: Array,
+            required: true
         }
     },
     methods: {
@@ -92,7 +98,11 @@ export default {
         findDefaultKhateeb(timing, backup=false) {
             const defaultsForTiming = timing.defaultKhateebs[this.fridayNumberOfSelectedMonth - 1]
             const targetVal = defaultsForTiming[backup ? 'backup' : "mainKhateeb"]
-            if (targetVal === 'none')
+            if (targetVal === 'none' || !targetVal)
+                return null
+            const targetKhateeb = this.completeKhateebsList.find(k => k._id === targetVal)
+            const notAbleToGiveThisKhutbah = targetKhateeb.unavailableDates.find(({ date }) => datetime.sameDateMonthAndYear(date, this.selectedDate))
+            if (notAbleToGiveThisKhutbah)
                 return null
             const date = new Date(this.selectedDate)
             date.setUTCHours(12, 0, 0, 0)

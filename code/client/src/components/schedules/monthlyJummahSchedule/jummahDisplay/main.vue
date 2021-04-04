@@ -30,7 +30,7 @@
             <component
                 :is="reciever"
                 :currentWeek="viewingWeekIsCurrentPastOrFuture"
-                :khateebs="khateebs"
+                :khateebs="khateebsAvailableForThisTiming"
                 :khateebPreferences="khateebPreferences"
                 :location="location"
                 :timing="timing"
@@ -38,6 +38,54 @@
                 @new-preference="$emit('new-preference', $event)"
                 @update-preference="$emit('update-preference', $event)"
             />
+
+            <collapse-transition :dimension="`width`" :duration="450">
+                <div 
+                    v-show="
+                        khateebsUnavailableForThisTiming.length > 0 && 
+                        viewingWeekIsCurrentPastOrFuture !== 'past'
+                    " 
+                    class="unavailable-khateebs-position"
+                >
+                    <div class="unavailable-khateebs-this-timing-header-container" @click="toggleUnavailableKhateebs()">
+                        <div>
+                            <img 
+                                src="~@/assets/misc/rightArrow.png" 
+                                :class="`dropdown-arrow ${showingUnavailable ? 'showing': ''}`"
+                                alt="dropdown arrow"
+                            >
+                        </div>
+
+                        <div class="unavailable-khateebs-this-timing-header">
+                            Unavailable Khateebs
+                        </div>
+
+                        <div :class="showingUnavailable ? 'unavailable-khateeb-count-invisible' : ''">
+                            <span class="red">({{ khateebsUnavailableForThisTiming.length }})</span>
+                        </div>
+
+                    </div>
+                    
+                    <collapse-transition :duration="450">
+                        <div v-show="showingUnavailable">
+                            <tag-circle
+                                v-for="(khateeb, khateebIndex) in khateebsUnavailableForThisTiming"
+                                class="unavailable-khateeb-tag"
+                                :key="khateebIndex"
+                                :info="{
+                                    words: khateebName(khateeb),
+                                    color: 'grey',
+                                    icon: '👳'
+                                }"
+                                :square="true"
+                                :size="`small`"
+                                :textColor="`blue`"
+                            />
+                        </div>
+                    </collapse-transition>
+
+                </div>
+            </collapse-transition>
 
             <div v-if="preferenceEntryExists" class="last-updated">
                 <div class="timing">Last Updated:</div>
@@ -54,13 +102,17 @@ import tagCircle from '@/components/general/tagCircle.vue'
 import jummahStaticTags from './jummahTags.json'
 
 import timingHelpers from '@/libraries/timings/main.js'
+import khateebHelpers from '@/libraries/khateebs/main.js'
+
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 export default {
     name: 'jummahDisplayer',
     components: {
         tagCircle,
         "institutionAdmin": () => import('./khateebInfoCells/adminCells.vue'),
-        "khateeb": () => import("./khateebInfoCells/khateebCells.vue")
+        "khateeb": () => import("./khateebInfoCells/khateebCells.vue"),
+        CollapseTransition
     },
     props: {
         reciever: {
@@ -95,10 +147,17 @@ export default {
     data() {
         return {
             jummahStaticTags,
-            showJummah: true
+            showJummah: true,
+            showingUnavailable: false
         }
     },
     methods: {
+        toggleUnavailableKhateebs() {
+            this.showingUnavailable = !this.showingUnavailable
+        },
+        khateebName(khateeb) {
+            return khateebHelpers.khateebName(khateeb)
+        },
         jummahTiming() {
             return timingHelpers.timingDisplay(this.timing)
         },
@@ -138,6 +197,20 @@ export default {
              })
             return exists
         },
+        khateebsAvailableForThisTiming() {
+            return this.khateebs
+                .filter(k => {
+                    if (k.availableTimings.length < 1)
+                        return true
+                    else 
+                        return k.availableTimings.find(t => t === this.timing._id) 
+                })
+        },
+        khateebsUnavailableForThisTiming() {
+            return this.khateebs.filter(k => {
+                return k.availableTimings.length > 0 && !k.availableTimings.find(t => t === this.timing._id)
+            })
+        }
     },
     watch: {
         khateebPreferences() {
@@ -194,6 +267,7 @@ export default {
     padding-top: 10px;
     padding-bottom: 10px;
     border-radius: 4px;
+    margin-top: 20px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
 }
 
@@ -221,6 +295,39 @@ div {
 
 .timing-label {
     font-size: 25px;
+}
+
+.dropdown-arrow {
+    height: 14px;
+    margin-right: 10px;
+    &.showing {
+        transform: rotate(90deg);
+    }
+}
+
+.unavailable-khateebs-this-timing-header {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.unavailable-khateebs-this-timing-header-container {
+    @include flexboxDefault();
+    width: 95%;
+}
+
+.unavailable-khateebs-position {
+    width: 80%;
+    @include centerMargin();
+    margin-top: 20px;
+}
+
+.unavailable-khateeb-count-invisible {
+    visibility: hidden;
+}
+
+.unavailable-khateeb-tag {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 @media screen and (max-width: $phoneWidth) {
@@ -252,6 +359,15 @@ div {
 
     .timing-label {
         font-size: 20px;
+    }
+
+    .dropdown-arrow {
+        height: 11px;
+        margin-right: 7px;
+    }
+
+    .unavailable-khateebs-this-timing-header {
+        font-size: 12px;
     }
 }
 </style>

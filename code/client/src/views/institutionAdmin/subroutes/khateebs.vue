@@ -146,11 +146,10 @@ export default {
         },
         async getActiveLocationsAndTimings() {
             const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
-            this.locations = locations
             this.timings = timings
+            this.locations = locations
         },
         compileAvailableTimes(availableTimingsIdArray) {
-            console.log(availableTimingsIdArray)
             const locations = {}
             availableTimingsIdArray.forEach(availableTiming => {
                 const { timingInfo, locationInfo } = this.findLocationAndTimingInfo(availableTiming)
@@ -170,7 +169,7 @@ export default {
         },
         createReadableTime(timingInfo) {
             const time = new Date()
-            time.setHour(timingInfo.hour, timingInfo.minute, 0, 0)
+            time.setHours(timingInfo.hour, timingInfo.minute, 0, 0)
             return time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
         },
         findLocationAndTimingInfo(timingId) {
@@ -186,7 +185,9 @@ export default {
         },
         createReadbleUnAvailableDates(khateeb) {
             const copy = { ...khateeb }
-            const unavailableDatesThisMonth = copy.unavailableDates.filter(date => datetime.sameMonthSameYear(new Date(), new Date(date)))
+            const unavailableDatesThisMonth = copy.unavailableDates
+                .map(d => d.date)
+                .filter(date => datetime.sameMonthSameYear(new Date(), new Date(date)))
             const isAvailableForAllDates = unavailableDatesThisMonth.length < 1
             copy.unavailableDates = isAvailableForAllDates ? "👍 Available for all" : this.compileUnavailableDates(unavailableDatesThisMonth)
             return copy
@@ -203,8 +204,6 @@ export default {
         khateebTag(khateeb) {
             if (!khateeb.confirmed)
                 return [{ words: 'Registration Pending', color: 'important', symbol: '⏳' }]
-            else if (!khateeb.active)
-                return [{ words: 'Inactive', color: 'urgent', symbol: '📪' }]
             else
                 return [{ words: `Last Active: ${this.utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
         },
@@ -250,6 +249,10 @@ export default {
             return this.khateebs
                 .map(this.createReadableAvailableTimings)
                 .map(this.createReadbleUnAvailableDates)
+        },
+        timingsLocations() {
+            return this.locations
+                .map(l => this.timings.filter(t => t.locationID === l._id))
         }
     },
     watch: {
@@ -258,11 +261,11 @@ export default {
                 this.resetSearch()
         }
     },
-    created() {
+    async created() {
         this.resetSearch()
+        await this.getActiveLocationsAndTimings()
         this.getAllKhateebs()
-        this.getActiveLocationsAndTimings()
-    }
+    },
 }
 </script>
 

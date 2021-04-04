@@ -50,7 +50,16 @@
                             >
                                 <option value="none">None</option>
                                 <option
-                                    v-for="(khateeb, khateebIndex) in khateebs" 
+                                    v-for="
+                                        (khateeb, khateebIndex) in 
+                                        khateebs
+                                            .filter(k => {
+                                                if (k.availableTimings.length < 1)
+                                                    return true
+                                                else
+                                                    return k.availableTimings.find(t => t === defaultKhateebsInfo)
+                                            })
+                                    " 
                                     :key="khateebIndex"
                                     :value="khateeb._id"
                                 >
@@ -78,7 +87,7 @@
                     v-for="(location, locationIndex) in locations.filter(l => Object.keys(l).length > 0)"
                     :key="locationIndex"
                     :headline="location.name"
-                    :closeOnClickAway="false"
+                    :closeOnClickAway="!showEditDefaultKhateebsContainer"
                 >
                     
                     <p>Location Name</p>
@@ -265,9 +274,12 @@ export default {
             this.showEditDefaultKhateebsContainer = true
         },
         closePopup() {
-            this.showEditDefaultKhateebsContainer = false
-            this.selectedDefaultKhateebsWeek = -1
-            this.defaultKhateebsInfo = 'none'
+            const oneHundredMilliseconds = 100
+            return window.setTimeout(() => {
+                this.showEditDefaultKhateebsContainer = false
+                this.selectedDefaultKhateebsWeek = -1
+                this.defaultKhateebsInfo = 'none'
+            }, oneHundredMilliseconds)
         },
         async addNewLocation() {
             const length = this.locations.length + 1
