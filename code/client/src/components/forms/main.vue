@@ -163,6 +163,11 @@ export default {
             type: Boolean,
             required: false,
             default: false
+        },
+        rerenderOnBasedOnUpdate: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     },
     components: {
@@ -301,8 +306,10 @@ export default {
     },
     watch: {
         basedOn() {
-            this.showForm = false
-            this.$nextTick(() => { this.showForm = true })
+            if (this.rerenderOnBasedOnUpdate) {
+                this.showForm = false
+                this.$nextTick(() => { this.showForm = true })
+            }
         }
     },
     created() {

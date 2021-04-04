@@ -32,10 +32,6 @@
     <request-manager />
      <notifications-manager @toggle-notification-display="toggleNotificationDisplay()" />
 
-    <tutorial-prompter
-      :tutorials="gettingStartedGuide"
-    />
-
     <collapse-transition :duration="600">
         <footer-popup
           v-show="$store.state.footerPopup.show"
@@ -54,7 +50,6 @@ import websiteBanner from '@/components/header/websiteBanner.vue'
 import notificationsManager from '@/components/notifications/notificationsManger.vue'
 import headerNavigation from '@/components/header/navigation/main.vue'
 import requestManager from '@/components/misc/requestManager.vue'
-import tutorialPrompter from '@/components/notifications/tutorialPrompter.vue'
 import footerPopup from '@/components/footer/popup/main.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
@@ -74,7 +69,6 @@ export default {
     notificationsManager,
     headerNavigation,
     requestManager,
-    tutorialPrompter,
     footerPopup
   },
   data() {
@@ -131,13 +125,6 @@ export default {
     userType() {
       return this.$store.getters['user/type'] 
     },
-    gettingStartedGuide() {
-      if (this.isLoggedIn && this.userType === 'khateeb') {
-        return [{ category: 'khateebs', number: 1 }]
-      }
-      else 
-        return []
-    }
   },
   watch: {
     isLoggedIn(newVal) {

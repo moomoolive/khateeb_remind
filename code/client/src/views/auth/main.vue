@@ -13,7 +13,12 @@
                         required:true
                     }
                 }"
+                :basedOn="{
+                    username: userCredentials.username,
+                    password: ''
+                }"
                 :errorMsg="errorMsg"
+                :rerenderOnBasedOnUpdate="false"
                 :showInvalidationMsgs="false"
                 :backgroundColor="`darkBlue`"
                 :buttonText="`Log In`"
@@ -23,7 +28,7 @@
                 
                 <div class="remember-me">
                     <div>
-                        <input type="checkbox" v-model="rememberMe">
+                        <input type="checkbox" v-model="userCredentials.remember">
                     </div>
                     <div>
                         <p>Remember Me</p>
@@ -44,6 +49,8 @@
 import formMain from '@/components/forms/main.vue'
 import notificationHelpers from '@/libraries/notifications/main.js'
 
+import localStorageHelpers from '@/libraries/localStorageManagement/main.js'
+
 export default {
     name: "login",
     components: {
@@ -52,24 +59,24 @@ export default {
     data() {
         return {
             errorMsg: '',
-            rememberMe: !!localStorage.getItem('rememberMe')
+            userCredentials: this.initialRememberMeValue()
         }
     },
     methods: {
         unconfirmedMsg(msg) {
             this.utils.alert(msg, 'caution', { icon: 'locked' })
         },
-        async login($event) {
+        async login(loginInfo={}) {
             try {
                 if (this.$store.getters.tokenExists)
                     return this.utils.alert(`You're already logged in! Logout if you want to login with another account.`)
-                const authRes = await this.$API.auth.getToken($event)
+                const authRes = await this.$API.auth.getToken(loginInfo)
                 if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
                     this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
                 else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
                     this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
                 else if (authRes.token && authRes.msg === 'success') {
-                    this.toApp(authRes.token)
+                    this.toApp(authRes.token, loginInfo)
                     await this.$API.user.checkIn()
                 }
             } catch(err) {
@@ -86,9 +93,23 @@ export default {
             else
                 this.utils.toHomePage()
         },
-        toApp(token) {
-            if (this.rememberMe)
+        initialRememberMeValue() {
+            return {
+                remember: false,
+                username: ''
+            }
+        },
+        getUserCredentials() {
+            if (!localStorageHelpers.get('userCredentials'))
+                localStorageHelpers.commit('userCredentials', this.initialRememberMeValue())
+            this.userCredentials = localStorageHelpers.get('userCredentials')
+        },
+        toApp(token="edafjlfsdfaj.alfdkjaklsf.aldfajlfda", { username="moomoo" }) {
+            if (this.userCredentials.remember) {
                 localStorage.setItem('token', token)
+                this.userCredentials.username = username
+                localStorageHelpers.commit('userCredentials', this.userCredentials)
+            }
             this.$store.dispatch('user/updateToken', token)
             this.$nextTick(() => { this.loginRedirect() })
         },
@@ -101,17 +122,23 @@ export default {
             )
         }
     },
+    computed: {
+        rememberMe() {
+            return this.userCredentials.remember
+        }
+    },
     watch: {
-        rememberMe(newVal) {
-            if (newVal) 
-                localStorage.setItem('rememberMe', true)
-            else
-                localStorage.removeItem('rememberMe')
+        rememberMe(newVal, OldVal) {
+            if (!newVal && OldVal) {
+                this.userCredentials.username = ''
+                localStorageHelpers.commit('userCredentials', this.initialRememberMeValue())
+            }
         }
     },
     created() {
         if (this.$store.getters['user/isLoggedIn'])
             this.utils.toHomePage()
+        this.getUserCredentials()
     }
 }
 </script>

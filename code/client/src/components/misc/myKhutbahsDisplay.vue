@@ -67,6 +67,9 @@
                     </div>
                     <div class="status-text">
                         {{ statusText(khutbah) }}
+                        <span v-if="khutbah.notified">
+                            <br><br>📦 You've Been Notified
+                        </span>
                     </div>
                 </div>
             </div>

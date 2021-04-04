@@ -210,7 +210,8 @@ export default {
                                 date: new Date(this.allFridaysThisMonthAndNext[m][t.week]),
                                 isBackup: t.isBackup,
                                 isGivingKhutbah: !t.isBackup,
-                                fromDefaults: true
+                                fromDefaults: true,
+                                notified: false
                             }
                         })
                         .filter(t => {

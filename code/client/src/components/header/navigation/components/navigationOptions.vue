@@ -45,6 +45,10 @@
 
         </div>
 
+        <div class="menu-item" @click="tutorials()">
+            <p>Tutorials</p>
+        </div>
+
         <div
             v-if="deferredPrompt && !$store.state.user.isBrowsingOnPWA"
             class="menu-item get-the-app" 
@@ -108,6 +112,10 @@ export default {
         },
         redirect(path) {
             this.$emit('redirect', path)
+        },
+        tutorials() {
+            notificationHelpers.tutorial('general', 1)
+            this.close()
         },
         close() {
             if (this.activeMenu && this.firstOpened)
