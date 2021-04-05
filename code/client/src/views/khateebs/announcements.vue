@@ -27,6 +27,7 @@ import msgWithPic from '@/components/general/msgWithPic.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
 
 import announcementHelpers from '@/libraries/announcements/main.js'
+import sessionStorageHelpers from '@/libraries/sessionStorage/main.js'
 
 export default {
     name: 'announcements',
@@ -41,7 +42,11 @@ export default {
     },
     methods: {
         tagLoader(announcement) {
-            return announcementHelpers.tagLoader(announcement, this.$store.state.user.lastLogin)
+            return announcementHelpers.tagLoader(
+                announcement, 
+                this.$store.state.user.lastLogin, 
+                this.wiggleNewTag()
+            )
         },
         headline(announcement) {
             return announcementHelpers.headlineText(announcement)
@@ -53,7 +58,19 @@ export default {
             } catch(err) {
                 console.log(err)
             }
+        },
+        wiggleNewTag() {
+            return !sessionStorageHelpers.get("seenAnnoucements")
+        },
+        setSeenAnnoucements() {
+            sessionStorageHelpers.commit("seenAnnoucements", true)
         }
+    },
+    mounted() {
+        this.$nextTick(() => {
+            const oneSecondInMilliseconds = 1_000
+            window.setTimeout(() => this.setSeenAnnoucements(), oneSecondInMilliseconds)
+        })
     },
     created() {
         this.getAnnouncements()

@@ -1,6 +1,10 @@
 <template>
     <div>
-        <p :class="`tag ${contentLoader('color')} ${isInvisible ? 'invisible' : ''}` ">
+        <p 
+            :class="
+                `tag ${tagLoader.wiggle ? 'wiggle' : ''} ${contentLoader('color')} ${isInvisible ? 'invisible' : ''}`
+            "
+        >
             <span :class='"icon " + contentLoader("color")'>
                 {{ contentLoader('symbol') }}
             </span>
@@ -41,6 +45,12 @@ export default {
                 words: 'New',
                 symbol: '⏲️',
                 color: "default"
+            },
+            new_wiggle: {
+                words: 'New',
+                symbol: '⏲️',
+                color: "default",
+                wiggle: true
             }
         }
     },
@@ -103,8 +113,16 @@ div {
     margin: 0;
 }
 
+@keyframes wiggle {
+    0% { transform: rotate(0deg); }
+   80% { transform: rotate(0deg); }
+   85% { transform: rotate(5deg); }
+   95% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
 .tag {
-    display: inline;
+    display: inline-block;
     font-size: 1.4vh !important;
     pointer-events: none;
     background-color: getColor("blue") !important;
@@ -113,6 +131,11 @@ div {
     margin: 0 1vh 0 0;
     box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 8px;
     @include tag('background');
+
+    &.wiggle {
+        animation: wiggle 2.5s;
+        animation-iteration-count: 8;
+    }
 }
 
 .words {
@@ -129,4 +152,5 @@ div {
     border-radius: 2px;
     @include tag('icon')
 }
+
 </style>

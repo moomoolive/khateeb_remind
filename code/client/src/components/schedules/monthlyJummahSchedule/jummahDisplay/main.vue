@@ -13,7 +13,7 @@
             </span>
         </div>
 
-        <div class="jummahPreferences">
+        <div :class="`jummahPreferences ${userHasSeenJummahYet() ? '' : 'glow'}`">
             
             <div class="settings-icon-container">
                 <div>
@@ -103,6 +103,7 @@ import jummahStaticTags from './jummahTags.json'
 
 import timingHelpers from '@/libraries/timings/main.js'
 import khateebHelpers from '@/libraries/khateebs/main.js'
+import sessionStorageHelpers from '@/libraries/sessionStorage/main.js'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
@@ -171,14 +172,27 @@ export default {
             else
                 return jummahStaticTags.defaultTag
         },
-        updateDisplay() {
+        findLatestUpdate() {
             if (!this.preferenceEntryExists)
-                return 'N/A'
+                return null
             const updates = this.khateebPreferences
                 .map(k => new Date(k.updatedAt).getTime())
                 .filter(unixTime => !isNaN(unixTime))
-            const mostRecentUpdate = new Date(Math.max(...updates))
-            return this.utils.dynamicDisplayDate(mostRecentUpdate)
+            return new Date(Math.max(...updates))
+        },
+        userHasSeenJummahYet() {
+            const latestUpdate = this.findLatestUpdate()
+            if (!latestUpdate)
+                return true
+            const hasSeenLatestUpdate = latestUpdate.getTime() < new Date(this.$store.state.user.lastLogin).getTime()
+            return hasSeenLatestUpdate && this.hasSeenJummahs()
+        },
+        updateDisplay() {
+            const latestUpdate = this.findLatestUpdate()
+            if (!latestUpdate)
+                return 'N/A'
+            else
+                return this.utils.dynamicDisplayDate(latestUpdate)
         },
         oneKhateebWasNotified() {
             return this.khateebPreferences.find(p => p.notified)
@@ -186,6 +200,12 @@ export default {
         rerenderCell() {
             this.showJummah = false
             this.$nextTick(() => this.showJummah = true)
+        },
+        setSeenJummahs() {
+            sessionStorageHelpers.commit("seenJummahs", true)
+        },
+        hasSeenJummahs() {
+            return sessionStorageHelpers.commit("seenJummahs")
         }
     },
     computed: {
@@ -219,6 +239,12 @@ export default {
         selectedDate() {
             this.rerenderCell()
         }
+    },
+    mounted() {
+        this.$nextTick(() => {
+            const twoSecondsInMilliseconds = 2_000
+            window.setTimeout(() => this.setSeenJummahs(), twoSecondsInMilliseconds)
+        })
     }
 }
 </script>
@@ -247,6 +273,12 @@ export default {
     margin-bottom: 25px;
 }
 
+@keyframes glow { 
+    0% { background-color: getColor("silver"); }
+    50% { background-color: getColor("yellow") }
+    100% { background-color: getColor("silver"); } 
+}
+
 .jummahPreferences {
     background: getColor("silver");
     border-top-right-radius: 7px;
@@ -254,6 +286,10 @@ export default {
     padding-top: 10px;
     padding-bottom: 20px;
     width: 50%;
+
+    &.glow {
+        animation: glow linear 3s 8;
+    }
 }
 
 .last-updated {
