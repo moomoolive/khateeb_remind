@@ -215,6 +215,10 @@ export default {
                             }
                         })
                         .filter(t => {
+                            return !this.$store.getters['user/allInfo'].unavailableDates
+                                .find(e => datetime.sameDateMonthAndYear(e.date, t.date))
+                        })
+                        .filter(t => {
                             return !this.allUserJummahsPlusUpcomingJummahUntilTheEndOfNextMonth
                                 .find(k => {
                                     return k.locationID === t.locationID && 
