@@ -214,10 +214,12 @@ export default {
                                 notified: false
                             }
                         })
+                        // filter out unavailable dates
                         .filter(t => {
                             return !this.$store.getters['user/allInfo'].unavailableDates
                                 .find(e => datetime.sameDateMonthAndYear(e.date, t.date))
                         })
+                        // filter out khutbahs already taken by other khateebs
                         .filter(t => {
                             return !this.allUserJummahsPlusUpcomingJummahUntilTheEndOfNextMonth
                                 .find(k => {

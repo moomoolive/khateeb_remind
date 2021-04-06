@@ -19,7 +19,13 @@
                     >
                         <option value="none">None</option>
                         <option
-                            v-for="(khateeb, khateebIndex) in khateebs"
+                            v-for="
+                                (khateeb, khateebIndex) 
+                                in khateebs
+                                    .filter(k => {
+                                        return k._id !== khateebPreferencesMirror[preferenceIndex === 0 ? 1 : 0].khateebID 
+                                    })
+                            "
                             :key="khateebIndex"
                             :value="khateeb._id"
                         >

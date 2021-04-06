@@ -32,7 +32,7 @@
                     </div>
 
                     <div 
-                        v-show="selectedDefaultKhateebsWeek === index" 
+                        v-if="selectedDefaultKhateebsWeek === index" 
                         class="default-khateebs-weekly-container"
                     >
 
@@ -58,6 +58,9 @@
                                                     return true
                                                 else
                                                     return k.availableTimings.find(t => t === defaultKhateebsInfo)
+                                            })
+                                            .filter(k => {
+                                                return k._id !== defaultKhateebsArray[selectedDefaultKhateebsWeek][x === 1 ? 'backup' : 'mainKhateeb']
                                             })
                                     " 
                                     :key="khateebIndex"
