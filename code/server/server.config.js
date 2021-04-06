@@ -34,7 +34,7 @@ const appConfig = {
         khateebs: {
             // all created khateebs usernames' will use the format 
             // `${baseUsername}${index + 1}`
-            baseUsername: '__TEST__k',
+            baseUsername: 'testk',
             password: '123456',
         }
     },

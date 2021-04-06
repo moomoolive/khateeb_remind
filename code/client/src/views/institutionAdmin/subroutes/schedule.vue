@@ -23,14 +23,16 @@
             @khateeb-signup="utils.alert('This feature is only available to khateebs!')"
         >
             <template #above-controls>
-                <div>
+
+                <div class="extra-controls-container">
                     
-                    <div 
-                        v-if="institutionSettings.allowJummahNotifications" 
-                        class="notification-time-container"
-                    >
-                        <button class="notification-time-button turquoise" @click="chronInfo()">
-                            ⏰ {{ chronTiming() }}
+                    <div class="notification-time-container">
+                        <button 
+                            class="notification-time-button turquoise" 
+                            :disabled="!institutionSettings.allowJummahNotifications"
+                            @click="chronInfo()"
+                        >
+                            ⏰ {{ institutionSettings.allowJummahNotifications ? chronTiming() : 'No Notifications' }}
                         </button>
                     </div>
 
@@ -47,6 +49,7 @@
                     </div>
 
                 </div>
+                
             </template>
         </monthly-jummah-schedule>
 
@@ -136,11 +139,6 @@ export default {
 <style lang="scss" scoped>
 .notification-time-container {
     padding-bottom: 10px;
-    width: 83%;
-    @include centerMargin();
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
     margin-bottom: 20px;
 }
 
@@ -182,12 +180,11 @@ export default {
 
 .viewing-mode-container {
     padding-bottom: 10px;
-    width: 83%;
-    @include centerMargin();
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
     margin-bottom: 20px;
+}
+
+.extra-controls-container {
+    @include flexboxDefault(column);
 }
 
 @media screen and (max-width: $phoneWidth) {

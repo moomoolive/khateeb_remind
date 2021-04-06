@@ -13,7 +13,7 @@
             </span>
         </div>
 
-        <div :class="`jummahPreferences ${userHasSeenJummahYet() ? '' : 'glow'}`">
+        <div :class="`jummahPreferences ${userHasSeenJummahs() ? '' : 'glow'}`">
             
             <div class="settings-icon-container">
                 <div>
@@ -39,55 +39,57 @@
                 @update-preference="$emit('update-preference', $event)"
             />
 
-            <collapse-transition :dimension="`width`" :duration="450">
-                <div 
-                    v-show="
-                        khateebsUnavailableForThisTiming.length > 0 && 
-                        viewingWeekIsCurrentPastOrFuture !== 'past'
-                    " 
-                    class="unavailable-khateebs-position"
-                >
-                    <div class="unavailable-khateebs-this-timing-header-container" @click="toggleUnavailableKhateebs()">
-                        <div>
-                            <img 
-                                src="~@/assets/misc/rightArrow.png" 
-                                :class="`dropdown-arrow ${showingUnavailable ? 'showing': ''}`"
-                                alt="dropdown arrow"
-                            >
-                        </div>
+            <div v-if="reciever === 'institutionAdmin'">
+                <collapse-transition :dimension="`width`" :duration="450">
+                    <div 
+                        v-show="
+                            khateebsUnavailableForThisTiming.length > 0 && 
+                            viewingWeekIsCurrentPastOrFuture !== 'past'
+                        " 
+                        class="unavailable-khateebs-position"
+                    >
+                        <div class="unavailable-khateebs-this-timing-header-container" @click="toggleUnavailableKhateebs()">
+                            <div>
+                                <img 
+                                    src="~@/assets/misc/rightArrow.png" 
+                                    :class="`dropdown-arrow ${showingUnavailable ? 'showing': ''}`"
+                                    alt="dropdown arrow"
+                                >
+                            </div>
 
-                        <div class="unavailable-khateebs-this-timing-header">
-                            Unavailable Khateebs
-                        </div>
+                            <div class="unavailable-khateebs-this-timing-header">
+                                Khateebs Unavailable for this Timing
+                            </div>
 
-                        <div :class="showingUnavailable ? 'unavailable-khateeb-count-invisible' : ''">
-                            <span class="red">({{ khateebsUnavailableForThisTiming.length }})</span>
+                            <div :class="showingUnavailable ? 'unavailable-khateeb-count-invisible' : ''">
+                                <span class="red">({{ khateebsUnavailableForThisTiming.length }})</span>
+                            </div>
+
                         </div>
+                        
+                        <collapse-transition :duration="450">
+                            <div v-show="showingUnavailable">
+                                <tag-circle
+                                    v-for="(khateeb, khateebIndex) in khateebsUnavailableForThisTiming"
+                                    class="unavailable-khateeb-tag"
+                                    :key="khateebIndex"
+                                    :info="{
+                                        words: khateebName(khateeb),
+                                        color: 'grey',
+                                        icon: '👳'
+                                    }"
+                                    :square="true"
+                                    :size="`small`"
+                                    :textColor="`blue`"
+                                />
+                            </div>
+                        </collapse-transition>
 
                     </div>
-                    
-                    <collapse-transition :duration="450">
-                        <div v-show="showingUnavailable">
-                            <tag-circle
-                                v-for="(khateeb, khateebIndex) in khateebsUnavailableForThisTiming"
-                                class="unavailable-khateeb-tag"
-                                :key="khateebIndex"
-                                :info="{
-                                    words: khateebName(khateeb),
-                                    color: 'grey',
-                                    icon: '👳'
-                                }"
-                                :square="true"
-                                :size="`small`"
-                                :textColor="`blue`"
-                            />
-                        </div>
-                    </collapse-transition>
+                </collapse-transition>
+            </div>
 
-                </div>
-            </collapse-transition>
-
-            <div v-if="preferenceEntryExists" class="last-updated">
+            <div class="last-updated">
                 <div class="timing">Last Updated:</div>
                 {{ updateDisplay() }}
             </div>
@@ -180,12 +182,14 @@ export default {
                 .filter(unixTime => !isNaN(unixTime))
             return new Date(Math.max(...updates))
         },
-        userHasSeenJummahYet() {
+        userHasSeenJummahs() {
             const latestUpdate = this.findLatestUpdate()
             if (!latestUpdate)
                 return true
-            const hasSeenLatestUpdate = latestUpdate.getTime() < new Date(this.$store.state.user.lastLogin).getTime()
-            return hasSeenLatestUpdate && this.hasSeenJummahs()
+            else if (this.hasSeenJummahs())
+                return true
+            else
+                return latestUpdate.getTime() < new Date(this.$store.state.user.lastLogin).getTime()
         },
         updateDisplay() {
             const latestUpdate = this.findLatestUpdate()
@@ -205,7 +209,7 @@ export default {
             sessionStorageHelpers.commit("seenJummahs", true)
         },
         hasSeenJummahs() {
-            return sessionStorageHelpers.commit("seenJummahs")
+            return sessionStorageHelpers.get("seenJummahs")
         }
     },
     computed: {
@@ -344,6 +348,7 @@ div {
 .unavailable-khateebs-this-timing-header {
     font-size: 15px;
     font-weight: bold;
+    text-align: left;
 }
 
 .unavailable-khateebs-this-timing-header-container {

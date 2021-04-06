@@ -62,40 +62,28 @@ export default {
     padding-bottom: 10px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
     margin-top: 10px;
-}
-
-.external-controls {
-    width: 80%;
-    background: themeRGBA("grey", 0.8);
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 7px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
-    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 40%;
 }
 
 .std-controls-container {
     width: 80%;
+    max-width: 400px;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
 }
 
 @media screen and (max-width: $phoneWidth) {
+    
     .std-controls {
         display: flex;
         flex-direction: column;
         width: 40%;
         height: auto !important;
-    }
-    .std-controls-container {
-        display: flex;
-        flex-direction: row;
-    }
-    .external-controls {
-        width: 73%;
     }
 }
 </style>

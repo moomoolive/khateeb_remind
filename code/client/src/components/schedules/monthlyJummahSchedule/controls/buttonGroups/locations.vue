@@ -46,18 +46,20 @@ export default {
 @import '~@/scss/jummahSchedule/buttons.scss';
 
 .location-btns {
-    width: 30%;
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 10px;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    font-size: 17px;
 }
 
 @media screen and (max-width: $phoneWidth) {
+    
     .location-btns {
-        width: 85%;
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 1vh;
+        font-size: 15px;
     }
 }
 </style>

@@ -20,20 +20,27 @@
         <div class="schedule-container">
             <loading :loadingTime="800">
 
-                <div class="above-controls-container">
-                    <slot name="above-controls"></slot>
+                <div class="controls-position">
+
+                    <div class="above-controls-container">
+                        <slot name="above-controls"></slot>
+                    </div>
+
+                    <div class="buttons-container">
+                        <schedule-standard-controls
+                            v-if="locations.length > 0" 
+                            :locations="locationsWithDataThisMonth"
+                            :selectedLocation="selectedLocation"
+                            :selectedDate="selectedDate"
+                            :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
+                            @change-location="changeViewingLocation($event)"
+                            @change-week="changeViewingWeek($event)"
+                        />
+                    </div>
+
                 </div>
                    
                 <div v-if="locations.length > 0">
-                    
-                    <schedule-standard-controls 
-                        :locations="locationsWithDataThisMonth"
-                        :selectedLocation="selectedLocation"
-                        :selectedDate="selectedDate"
-                        :viewingMonthIsCurrentPastOrFuture="viewingMonthIsCurrentPastOrFuture"
-                        @change-location="changeViewingLocation($event)"
-                        @change-week="changeViewingWeek($event)"
-                    />
 
                     <div class="change-month-buttons-container">
                         <div>
@@ -51,7 +58,7 @@
                         </div>
                     </div>
                     
-                    <div class="unavailable-khateebs-position">
+                    <div v-if="reciever === 'institutionAdmin'" class="unavailable-khateebs-position">
                         <collapse-transition :dimension="`width`" :duration="450">
                             <div
                                 v-show="
@@ -71,11 +78,15 @@
                                     </div>
 
                                     <div class="unavailable-khateebs-this-week-header">
-                                        Unavailable Khateebs
-                                        <span :class="`red ${ showingUnavailable ? 'unavailable-khateeb-count-invisible' : ''}`">
+                                        Khateebs Unavailable for this Date
+                                    </div>
+
+                                    <div class="unavailable-khateebs-this-week-header count">
+                                         <span :class="`red ${ showingUnavailable ? 'unavailable-khateeb-count-invisible' : ''}`">
                                             ({{ khateebsUnavailableForSelectedWeek.length }})
                                         </span>
                                     </div>
+
                                 </div>
                                 
                                 <collapse-transition :duration="450">
@@ -372,11 +383,7 @@ export default {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
-.above-controls-container {
-    width: 95%;
-    margin-left: auto;
-    margin-right: auto;
-}
+
 
 .unavailable-khateebs-position {
     width: 80%;
@@ -399,11 +406,15 @@ export default {
 .unavailable-khateebs-this-week-header {
     font-size: 19px;
     font-weight: bold;
+    
+    &.count {
+        margin-left: 5px;
+    }
 }
 
 .unavailable-khateebs-this-week-header-container {
     @include flexboxDefault();
-    width: 63%;
+    width: 95%;
 }
 
 .unavailable-khateebs-this-week-tag-container {
@@ -431,8 +442,24 @@ export default {
     }
 }
 
+.controls-position {
+    @include flexboxDefault(row-reverse);
+}
+
+.buttons-container {
+    margin-top: 30px;
+}
+
 
 @media screen and (max-width: $phoneWidth) {
+
+    .buttons-container {
+        margin-top: 0px;
+    }
+
+    .controls-position {
+        flex-direction: column;
+    }
     
     .schedule-container {
             background: themeRGBA("darkBlue", 0.5);

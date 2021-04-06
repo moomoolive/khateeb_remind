@@ -53,4 +53,15 @@ export default {
 
 <style lang="scss" scoped>
 @import '~@/scss/jummahSchedule/buttons.scss';
+
+button {
+    font-size: 17px;
+}
+
+@media screen and (max-width: $phoneWidth) {
+    
+    button {
+        font-size: 15px;
+    }
+}
 </style>
