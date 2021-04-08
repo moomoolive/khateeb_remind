@@ -96,7 +96,6 @@ export default {
         },
         async khateebSelectionChanged(change, index) {
             const khateebID = change.target.value
-            const confirm = await this.allowedToMutate(index)
             if (!confirm)
                 return
             if (this.noPreferenceIndicated(index)) {
@@ -114,8 +113,6 @@ export default {
                 })
             }
             else {
-                if (this.khateebPreferences[index].isGivingKhutbah)
-                    this.khateebPreferences[index].isGivingKhutbah = khateebID !== 'none'
                 this.$emit('update-preference', { 
                     ...this.khateebPreferences[index], 
                     khateebID,
@@ -124,11 +121,6 @@ export default {
                 })
             }
             this.cachePreferences()
-        },
-        async allowedToMutate(index) {
-            if (this.khateebPreferencesMirror[0].khateebID === this.khateebPreferencesMirror[1].khateebID && this.khateebPreferencesMirror[index].khateebID !== 'none')
-                return this.reverseChangeAndAlert(index, `Main and backup khateeb cannot be the same`)
-            return true
         },
         setInitialValue() {
             this.khateebPreferences.forEach((preference, index) => {
