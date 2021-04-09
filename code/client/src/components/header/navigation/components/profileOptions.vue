@@ -100,10 +100,12 @@ export default {
         }
     },
     mounted() {
-        this.$nextTick(() => {
-            const oneSecondInMilliseconds = 1_000
-            return window.setTimeout(() => this.getInstitutionLogo(), oneSecondInMilliseconds)
-        })
+        if (this.$store.getters["user/isLoggedIn"]) {
+            this.$nextTick(() => {
+                const oneSecondInMilliseconds = 1_000
+                return window.setTimeout(() => this.getInstitutionLogo(), oneSecondInMilliseconds)
+            })
+        }
     }
 }
 </script>

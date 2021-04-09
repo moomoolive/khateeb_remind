@@ -24,11 +24,6 @@ export default {
             required: false,
             default: false
         },
-        includeIdAppender: {
-            type: Boolean,
-            required: false,
-            default: false
-        },
         userType: {
             type: String,
             required: true
@@ -37,11 +32,6 @@ export default {
             type: Object,
             required: false,
             default: () => {}
-        },
-        institutionIDs: {
-            type: Array,
-            required: false,
-            default: () => []
         },
         editableKhateebFormat: {
             type: Boolean,
@@ -83,16 +73,6 @@ export default {
                 phoneNumber: {
                     type: 'phoneNumber',
                     required: true
-                }
-            },
-            idAppender: {
-                institutionID: {
-                    type: 'dropdown',
-                    required: true,
-                    selectOptions: null,
-                    value: '_id',
-                    display: "name",
-                    alias: 'Institution'
                 }
             },
             editableKhateeb: {
@@ -138,10 +118,6 @@ export default {
                 delete form.title
             if (this.includeVitals)
                 form = { ...this.userVitals , ...form }
-            if (this.includeIdAppender) {
-                form = { ...this.idAppender, ...form }
-                form.institutionID.selectOptions = this.institutionIDs
-            }
             if (this.editableKhateebFormat)
                 form = { ...form, ...this.editableKhateeb  }
             return form

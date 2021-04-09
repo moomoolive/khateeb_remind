@@ -1,30 +1,24 @@
 <template>
     <div>
-        <complex-key-binder 
-            :targetKeyBinds="['t', 'Control', 'Alt']"
-            @all-key-bindings-active="includeTestInstitutionInInstitutionsList()"
-        />
         <loading>
 
             <user-form-template
-                v-if="showForm && thereAreInstitutionsToSignupFor" 
+                v-if="targetInstitution" 
                 :userType="`khateeb`"
                 :includeVitals="true"
-                :includeIdAppender="true"
-                :institutionIDs="filteredInstitutions"
                 :formProps="{
                     bindedExts: ['confirms'],
                     backgroundColor: 'red',
                     buttonColor: 'blue',
                     buttonText: 'Sign up',
-                    formTitle: 'Khateeb Sign Up'
+                    formTitle
                 }"
                 @submitted="signupKhateeb($event)"
             />
 
             <msg-with-pic 
                 v-else
-                :msg="`There was a problem finding institutions to sign up for...`"
+                :msg="`There was a problem finding the institution you're signing up for...`"
                 :gif="`sadCat`"
             /> 
 
@@ -35,7 +29,6 @@
 <script>
 import loading from '@/components/general/loadingScreen.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
-import complexKeyBinder from '@/components/misc/complexKeyBinder.vue'
 import msgWithPic from '@/components/general/msgWithPic.vue'
 
 export default {
@@ -43,20 +36,18 @@ export default {
     components: {
         loading,
         userFormTemplate,
-        complexKeyBinder,
         msgWithPic
     },
     data() {
         return {
             allInstitutions: [],
-            showForm: true,
-            showTestInstitution: false
+            selectedInstitution: "none"
         }
     },
     methods: {
         async signupKhateeb($event) {
             try {
-                const res = await this.$API.auth.createKhateeb($event)
+                const res = await this.$API.auth.createKhateeb({ ...$event, institutionID: this.selectedInstitution})
                 this.utils.alert(res, 'success')
                 this.$router.push('/')
             } catch(err) {
@@ -66,31 +57,25 @@ export default {
         async getAllConfirmedInstitutions() {
             this.allInstitutions = await this.$API.misc.institutionSelection()
         },
-        includeTestInstitutionInInstitutionsList() {
-            this.showTestInstitution = true
-            this.rerenderForm()
-        },
-        rerenderForm() {
-            this.showForm = false
-            this.$nextTick(() => this.showForm = true)
-        }
     },
     computed: {
-        filteredInstitutions() {
-            return this.allInstitutions
-            /*
-            if (this.showTestInstitution)
-                return this.allInstitutions
-            else
-                return this.allInstitutions.filter(inst => inst.name !== "__TEST__")
-            */
+        targetInstitution() {
+            return this.allInstitutions.find(i => i._id === this.selectedInstitution)
         },
-        thereAreInstitutionsToSignupFor() {
-            return this.filteredInstitutions.length > 0
+        formTitle() {
+            if (this.targetInstitution)
+                return `Become a khateeb at ${this.targetInstitution.abbreviatedName}`
+            else
+                return 'Khateeb Sign Up' 
         }
     },
     created() {
         this.getAllConfirmedInstitutions()
+        const institution = this.$route.query.institutionID
+        if (!institution)
+            return this.$router.push({ path: "/institution-selection" })
+        else
+            this.selectedInstitution = institution
     }
 }
 </script>

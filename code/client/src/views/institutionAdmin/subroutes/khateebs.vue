@@ -63,6 +63,23 @@
                     </div>
                 </div>
 
+                <div class="institution-signup-link-container ">
+                    <div class="copy-link-container">
+                        <div class="copy-link-header ">
+                           <u>Khateeb Signup Link</u> 
+                        </div>
+                        <button 
+                            :class="`grey copy-link-button ${copiedLink ? 'copied' : ''}`"
+                            @click="copyLink()"
+                        > 
+                            📋 {{ copiedLink ? "Copied" : 'Copy' }}
+                        </button>
+                        <div>
+                            <input type="text" class="copy-link-text" v-model="signupLink">
+                        </div>
+                    </div>
+                </div>
+
                 <div v-if="showKhateebs" class="khateebs-container">
                     <div 
                         v-for="(khateeb, khateebNo) in filteredKhateebs"
@@ -137,12 +154,18 @@ export default {
             timings: [],
             showKhateebs: true,
             showSearchTools: false,
-            query: {}
+            query: {},
+            signupLink: `http://localhost:8080/create/khateebs?institutionID=${this.$store.state.user.institution._id}`,
+            copiedLink: false
         }
     },
     methods: {
         async getAllKhateebs() {
             this.khateebs = await this.$API.khateebs.getKhateebs()
+        },
+        copyLink() {
+            this.copiedLink = true
+            this.$copyText(this.signupLink)
         },
         async getActiveLocationsAndTimings() {
             const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
@@ -375,6 +398,56 @@ button {
     width: 60%;
     max-width: 240px;
     margin-top: 15px;
+}
+
+.institution-signup-link-container {
+    width: 83%;
+    display: flex;
+    justify-content: flex-end;
+    max-width: 1050px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    @include centerMargin();
+}
+
+.copy-link-container {
+    width: 170px;
+}
+
+.copy-link-text {
+    height: 40px;
+    width: 150px;
+    font-size: 15px;
+    @include floatingBoxShadow();
+
+    &:focus {
+        background: getColor("silver");
+        color: black;
+    }
+}
+
+.copy-link-header {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.copy-link-button {
+    font-size: 13px;
+    color: black;
+    width: 90px;
+    height: 40px;
+    border-radius: 7px;
+    @include floatingBoxShadow();
+    margin-bottom: 10px;
+    color: getColor("blue");
+
+    &.copied {
+        background: getColor("silver");
+        font-weight: bold;
+        color: getColor("green");
+    }
 }
 
 @media screen and (max-width: $phoneWidth) {

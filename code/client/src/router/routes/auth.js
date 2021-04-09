@@ -36,5 +36,11 @@ export default [
         name: "forgotPassword",
         component: () => import('@/views/auth/forgotPassword.vue'),
         ...commonMeta
+    },
+    {
+        path: "/institution-selection",
+        name: "institutionSelection",
+        component: () => import('@/views/auth/institutionSelection.vue'),
+        ...commonMeta
     }
 ]

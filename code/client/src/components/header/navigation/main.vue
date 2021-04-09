@@ -176,7 +176,7 @@ export default {
       signUp() {
         notificationHelpers.redirectionOptions(
           [
-              { text: 'Khateebs', to: '/create/khateebs' },
+              { text: 'Khateebs', to: '/institution-selection' },
               { text: 'Institutions', to: '/create/institutions' }
           ]
         )
