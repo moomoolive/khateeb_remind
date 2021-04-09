@@ -33,7 +33,7 @@ mongoose.connect(DATABASE, dbSettings)
 const db = mongoose.connection
 
 app.use(cors())
-app.use(express.json())
+app.use(express.json({ limit: "50mb" }))
 app.use(globalMiddleWare.generalError)
 app.set('query parser', str => qs.parse(str, { comma: true }))
 app.use(queryType.middleware())
@@ -53,6 +53,7 @@ app.use('/misc', routes.misc)
 app.use('/auth', routes.auth)
 app.use('/sysAdmin', routes.sysAdmin)
 app.use('/user', routes.user)
+app.use('/logos', routes.logos)
 
 db.once('open', () => { 
     const dbType = DATABASE.split(':')[0] === 'mongodb' ? 'Local' : 'Production'

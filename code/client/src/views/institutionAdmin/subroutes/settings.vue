@@ -24,6 +24,47 @@
 
             <collapsable-box
                 class="setting-container"
+                :headline="`Institution Logo`"
+                :tagDetails="customLogoWasAdded ? null : [{
+                    words: `No Logo`,
+                    color: 'important',
+                    symbol: '🖼️' 
+                }]"
+            >
+                <div class="insert-image-container">
+                    <div class="image-info-caption">
+                        <u>Your current logo:</u>
+                    </div>
+                    <img 
+                        :src="institutionImageSrc"
+                        class="institution-image-container" 
+                        alt="institution image"
+                    >
+                    <div class="image-info-caption">
+                        * Recommended size is 500px x 500px or above. <br>
+                        * Equal height and width is recommended.
+                    </div>
+                    <input
+                        class="image-input" 
+                        type="file" 
+                        accept="image/*"
+                        name="logo"
+                        @change="uploadFile($event)"
+                    >
+                    <div class="delete-logo-container">
+                        <button 
+                            :disabled="!customLogoWasAdded"
+                            class="red delete-logo-button" 
+                            @click="deleteLogo()"
+                        >
+                            Delete Logo
+                        </button>
+                    </div>
+                </div>
+            </collapsable-box>
+
+            <collapsable-box
+                class="setting-container"
                 :headline="`Registration`"
                 :tagDetails="institution && institution.settings ? [{
                     words: institution.settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
@@ -142,10 +183,38 @@ export default {
     data() {
         return {
             institution: {},
-            showSettings: true
+            showSettings: true,
+            institutionImageSrc: require('@/assets/logos/genericInstitution.png')
         }
     },
     methods: {
+        uploadFile(fileChanges={}) {
+            const targetFile = fileChanges.target.files[0]
+            const reader = new FileReader()
+            reader.onload = async (e) => {
+                this.institutionImageSrc = e.target.result
+                const base64Img = e.target.result.split("base64,")[1]
+                const binaryString = window.atob(base64Img)
+                const imageArray = []
+                for (let i = 0; i < binaryString.length; i++)
+                    imageArray.push(binaryString.charCodeAt(i))
+                await this.$API.logos.saveInstitutionLogo({ img: imageArray })
+            }
+            reader.readAsDataURL(targetFile)
+        },
+        async deleteLogo() {
+            const confirm = await this.utils.confirm(`Are you sure you want to delete your logo?`)
+            if (!confirm)
+                return
+            const { deleted } = await this.$API.logos.deleteInstitutionLogo()
+            if (deleted)
+                this.institutionImageSrc =  require('@/assets/logos/genericInstitution.png')
+        },
+        async getInstitutionLogo() {
+            this.institutionImageSrc = await this.$API.logos.getInstitutionLogo(
+                { institutionID: this.$store.state.user.institution._id }
+            )
+        },
         async getSettingsAndInstitutionInfo() {
             this.institution = await this.$API.institutions.getInstitution()
         },
@@ -196,9 +265,13 @@ export default {
             const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' })
             const time = date.toLocaleString('en-US', { minute: '2-digit', hour: 'numeric' })
             return `${dayOfWeek}s @ ${time}`
+        },
+        customLogoWasAdded() {
+            return this.institutionImageSrc !== require('@/assets/logos/genericInstitution.png')
         }
     },
     async created() {
+        this.getInstitutionLogo()
         this.getSettingsAndInstitutionInfo()
     }
 }
@@ -230,6 +303,43 @@ export default {
     color: red;
 }
 
+.insert-image-container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.institution-image-container {
+    width: 80%;
+    max-width: 275px;
+}
+
+.image-input {
+    margin-top: 20px;
+}
+
+.image-info-caption {
+    margin-top: 20px;
+    text-align: left;
+    width: 80%;
+    @include centerMargin();
+    font-size: 15px;
+    color: getColor("offWhite");
+    line-height: 25px;
+}
+
+.delete-logo-container {
+    width: 80%;
+    @include centerMargin();
+    display: flex;
+    justify-content: flex-start;
+}
+
+.delete-logo-button {
+    @include floatingBoxShadow();
+    font-size: 17px;
+    margin-top: 30px;
+}
+
 @media screen and (max-width: $phoneWidth) {
     
     .settings-container {
@@ -242,6 +352,18 @@ export default {
 
     .delete-institution {
         font-size: 3vh;
+    }
+    
+    .image-info-caption {
+        font-size: 13px;
+    }
+
+    .delete-logo-container {
+        width: 85%;
+    }
+
+    .delete-logo-button {
+        font-size: 14px;
     }
 }
 </style>

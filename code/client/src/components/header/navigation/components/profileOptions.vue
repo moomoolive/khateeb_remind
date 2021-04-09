@@ -17,7 +17,12 @@
             </span>
         </div>
 
-        <div class="icon-pointer">
+        <div :class="`institution-photo-container ${showInstitutionLogo ? '' : 'invisible'}`">
+            <img 
+                :src="imageSrc"
+                class="institution-logo-frame" 
+                alt="institution logo"
+            >
         </div>
 
         <div class="buttons-container">
@@ -58,7 +63,8 @@ export default {
     },
     data() {
         return {
-            firstOpened: false
+            firstOpened: false,
+            imageSrc: require('@/assets/logos/genericInstitution.png')
         }
     },
     methods: {
@@ -69,11 +75,19 @@ export default {
         redirect(path) {
             this.$emit('redirect', path)
         },
+        async getInstitutionLogo() {
+            this.imageSrc = await this.$API.logos.getInstitutionLogo(
+                { institutionID: this.$store.state.user.institution._id }
+            )
+        },
     },
     computed: {
         userType() {
             return this.$store.getters['user/allInfo'].__t
         },
+        showInstitutionLogo() {
+            return this.imageSrc !== require('@/assets/logos/genericInstitution.png')
+        }
     },
     watch: {
         showProfileDetails(newVal, oldVal) {
@@ -84,6 +98,12 @@ export default {
             else if (!newVal && oldVal)
                 this.firstOpened = false
         }
+    },
+    mounted() {
+        this.$nextTick(() => {
+            const oneSecondInMilliseconds = 1_000
+            return window.setTimeout(() => this.getInstitutionLogo(), oneSecondInMilliseconds)
+        })
     }
 }
 </script>
@@ -96,17 +116,6 @@ export default {
     padding-top: 25px;
     @include floatingBoxShadow();
     @include normalBorderRounding();
-}
-
-.icon-pointer {
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 20px solid getColor("grey");
-    position: absolute;
-    top: 50px;
-    right: 88px;
 }
 
 .buttons-container {
@@ -137,14 +146,28 @@ button {
 .institution-name {
     font-size: 13px;
     text-align: left;
-    margin-bottom: 30px;
+}
+
+.institution-photo-container {
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    bottom: 30px;
+
+    &.invisible {
+        visibility: hidden;
+    }
+}
+
+.institution-logo-frame {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: getColor("blue") solid 2px;
 }
 
 @media screen and (max-width: $phoneWidth) {
-    .icon-pointer {
-        top: 45px;
-        right: 63px;
-    }
+    
 }
 
 </style>

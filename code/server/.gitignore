@@ -13,3 +13,5 @@ TZ_env/
 
 text.json
 vapidKeys.json
+
+uploads/**

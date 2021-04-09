@@ -13,6 +13,7 @@ import chainedRequests from './chainedRequests/main.js'
 import announcements from './routes/announcements.js'
 import institutions from './routes/institutions.js'
 import pwa from './routes/pwa.js'
+import logos from './routes/logos.js'
 
 import axios from 'axios'
 
@@ -35,4 +36,5 @@ export default {
     user,
     misc,
     pwa,
+    logos
 }

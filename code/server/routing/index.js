@@ -9,6 +9,7 @@ const timings = require('./routes/timings.js')
 const khateebs = require('./routes/khateebs.js')
 const announcements = require('./routes/announcements.js')
 const institutions = require('./routes/institutions.js')
+const logos = require('./routes/logos.js')
 
 const routesList = {
     misc,
@@ -22,6 +23,7 @@ const routesList = {
     announcements,
     institutions,
     institutionAdmins,
+    logos
 }
 
 module.exports = routesList
