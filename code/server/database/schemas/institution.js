@@ -99,7 +99,7 @@ institution.methods.deleteDependencies = async function() {
             const model = models[i]
             if (model === 'institutions')
                 continue
-            deleteRes[model] = await $db[model].deleteMany({ institutionID: req.headers.institutionid })
+            deleteRes[model] = await $db[model].deleteMany({ institutionID: this._id.toString() })
         }
     } catch(err) {
         console.log(err)

@@ -1,18 +1,15 @@
-const createRootInstitutionAndUser = require('./jobs/createRootInstitutionAndUser.js')
 const jummahNotifications = require('./jobs/jummahNotifications.js')
 const deleteVerificationCodes = require('./jobs/deleteVerificationCodes.js')
-const createTestInstitution = require('./jobs/createTestInstitution.js')
-const deleteExpiredShortURLs = require('./jobs/deleteShortURLs.js')
+const scripts = require(global.$dir + '/libraries/scripts/main.js')
 
-const start = () => {
+const start = async () => {
     if (process.env.NODE_ENV !== 'production')
         return
-    createRootInstitutionAndUser.start()
-    createTestInstitution.start() 
+    await scripts.createRootInstitutionAndUser()
+    await scripts.createTestInstitution()
     jummahNotifications.start()
     deleteVerificationCodes.start()
-    deleteExpiredShortURLs.start()
-    console.log(`All cron jobs have been scheduled`)
+    return console.log(`All cron jobs have been scheduled`)
 }
 
 module.exports = { start }

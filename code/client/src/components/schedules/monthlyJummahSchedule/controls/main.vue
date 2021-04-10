@@ -53,36 +53,36 @@ export default {
 
 <style lang="scss" scoped>
 .std-controls {
-    width: 98%;
     background: themeRGBA("grey", 0.8);
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 10px;
+    margin-right: 10px;
     border-radius: 7px;
     padding-top: 10px;
+    max-width: 180px;
+    min-width: 100px;
     padding-bottom: 10px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 3px 8px;
     margin-top: 10px;
     display: flex;
     flex-direction: column;
-    width: 40%;
 }
 
 .std-controls-container {
-    width: 80%;
     max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-right: 20px;
     margin-bottom: 10px;
     display: flex;
-    flex-direction: row;
+    justify-content: center;
 }
 
 @media screen and (max-width: $phoneWidth) {
     
     .std-controls {
-        display: flex;
-        flex-direction: column;
         width: 40%;
+    }
+
+    .std-controls-container {
+        margin-right: 0px;
         height: auto !important;
     }
 }

@@ -72,7 +72,7 @@ export default {
         notificationsIconColor() {
             if (this.alertUserAboutUrgentNotifications)
                 return this.colorHEXCodes.yellow
-            else if (this.notificationOnScreen)
+            else if (this.showingNotificationScroller)
                 return this.colorHEXCodes.blue
             else
                 return 'currentColor'

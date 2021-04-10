@@ -7,7 +7,6 @@ const timing = require('./schemas/timing.js')
 const user = require('./schemas/user.js')
 const announcement = require('./schemas/announcement.js')
 const notification = require('./schemas/notification.js')
-const shortenedURL = require('./schemas/shortenedURL.js')
 const verificationCode = require('./schemas/verificationCode.js')
 const jummahPreference = require('./schemas/jummahPreference.js')
 const pwaSubscription = require('./schemas/pwaSubscription.js')
@@ -19,10 +18,10 @@ const models = {
     users: mongoose.model('user', user),
     announcements: mongoose.model('announcement', announcement),
     notifications: mongoose.model('notification', notification),
-    shortenedURLs: mongoose.model('shortenedURL', shortenedURL),
     verificationCodes: mongoose.model('verificationCode', verificationCode),
     jummahPreferences: mongoose.model('jummahPreference', jummahPreference),
-    pwaSubscriptions: mongoose.model('pwaSubscription', pwaSubscription)
+    pwaSubscriptions: mongoose.model('pwaSubscription', pwaSubscription),
+    jummahs: mongoose.model("jummah", new mongoose.Schema({}))
 }
 
 const userTypes = {

@@ -1,14 +1,21 @@
 <template>
     <div class="cell-container">
+        
         <div class="khateeb-role-label">
             Main Khateeb
         </div>
         <div class="khateeb-name-label">
-            <span v-if="khateebPreferences[0].isGivingKhutbah">
-                ⭐ Khateeb<br>
-            </span>
             {{ khateebDisplay(khateebPreferences[0]) }}
         </div>
+        <div 
+            v-if="khateebPreferences[0].isGivingKhutbah && khateebPreferences[0].khateebID !== 'none'"
+            class="is-giving-khutbah-indicator"
+        >
+            <span class="green">
+                📢 {{ currentWeek === 'past' ? 'Gave' : "Is Giving" }} Khutbah
+            </span>
+        </div>
+
         <div v-show="khateebPreferences[1].khateebID" class="khateeb-role-label" @click="toggleBackupDisplay()">
            <span>
                 <img 
@@ -21,12 +28,18 @@
         </div>
         <collapse-transition>
             <div v-show="showBackup" class="khateeb-name-label">
-                <span v-if="khateebPreferences[1].isGivingKhutbah">
-                    ⭐ Khateeb<br>
-                </span>
                 {{ khateebDisplay(khateebPreferences[1]) }}
             </div>
+            <div 
+                v-if="khateebPreferences[1].isGivingKhutbah && khateebPreferences[1].khateebID !== 'none'"
+                class="is-giving-khutbah-indicator" 
+            >
+                <span class="green">
+                    📢 {{ currentWeek === 'past' ? 'Gave' : "Is Giving" }} Khutbah
+                </span>
+            </div>
         </collapse-transition>
+
     </div>
 </template>
 
@@ -48,7 +61,11 @@ export default {
         khateebs: {
             type: Array,
             required: true
-        }
+        },
+        currentWeek: {
+            required: true,
+            type: String
+        },
     },
     data() {
         return {
@@ -84,12 +101,12 @@ div {
 .khateeb-role-label {
     font-weight: bold;
     margin-bottom: 5px;
-    font-size: 16px;
+    margin-top: 5px;
+    font-size: 17px;
 }
 
 .khateeb-name-label {
-    margin-bottom: 15px;
-    font-size: 15px;
+    font-size: 16px;
 }
 
 .show-backup-arrow {
@@ -100,10 +117,6 @@ div {
     }
 }
 
-span {
-    font-size: 14px;
-}
-
 .cell-container {
     margin-top: 20px;
     width: 80%;
@@ -111,8 +124,20 @@ span {
     margin-right: auto;
 }
 
-@media screen and (max-width: $phoneWidth) {
+.is-giving-khutbah-indicator {
+    font-size: 13px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
 
+@media screen and (max-width: $phoneWidth) {
+    .is-giving-khutbah-indicator {
+        font-size: 12px;
+    }
+
+    .khateeb-name-label {
+        font-size: 15px;
+    }
 }
 
 </style>

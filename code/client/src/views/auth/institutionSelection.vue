@@ -9,7 +9,7 @@
         <loading>
             <div v-if="showingInstitutions.length > 0">
                 <button
-                    v-for="(institution, institutionIndex) in allInstitutions"
+                    v-for="(institution, institutionIndex) in showingInstitutions"
                     :key="institutionIndex"
                     class="grey institution-selection-button"
                     @click="$router.push({ path: '/create/khateebs', query: { institutionID: institution._id } })"

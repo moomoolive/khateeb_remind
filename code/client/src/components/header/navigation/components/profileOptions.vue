@@ -80,6 +80,10 @@ export default {
                 { institutionID: this.$store.state.user.institution._id }
             )
         },
+        fetchInstitutionLogo() {
+            const oneSecondInMilliseconds = 1_000
+            return window.setTimeout(() => this.getInstitutionLogo(), oneSecondInMilliseconds)
+        }
     },
     computed: {
         userType() {
@@ -87,6 +91,9 @@ export default {
         },
         showInstitutionLogo() {
             return this.imageSrc !== require('@/assets/logos/genericInstitution.png')
+        },
+        isLoggedIn() {
+            return this.$store.getters['user/isLoggedIn']
         }
     },
     watch: {
@@ -97,14 +104,15 @@ export default {
             }
             else if (!newVal && oldVal)
                 this.firstOpened = false
+        },
+        isLoggedIn(newVal, oldVal) {
+            if (newVal && !oldVal)
+                return this.fetchInstitutionLogo()
         }
     },
     mounted() {
         if (this.$store.getters["user/isLoggedIn"]) {
-            this.$nextTick(() => {
-                const oneSecondInMilliseconds = 1_000
-                return window.setTimeout(() => this.getInstitutionLogo(), oneSecondInMilliseconds)
-            })
+            this.$nextTick(() => this.fetchInstitutionLogo())
         }
     }
 }

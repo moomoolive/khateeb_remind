@@ -17,18 +17,18 @@ const requests = {
     },
     async saveInstitutionLogo(ObjectWithBase64={}) {
         try {
-            const res = await axios.put(extension, ObjectWithBase64)
-            return res
+            const { data={ code: 0 } } = await axios.put(extension, ObjectWithBase64)
+            return data.code
         } catch(err) {
-            return { }
+            return 1
         }
     },
     async deleteInstitutionLogo() {
         try {
-            const { data } = await axios.delete(extension)
-            return data
+            const { data={ code: 0 } } = await axios.delete(extension)
+            return data.code
         } catch {
-            return { deleted: false }
+            return 1
         }
     }
 }

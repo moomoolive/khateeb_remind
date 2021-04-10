@@ -56,6 +56,7 @@ const createTestInstitution = async () => {
             await testInstitution.createRootAdministrator({
                 institutionID: testInstitution._id.toString(),
                 ...global.APP_CONFIG.testInstitutionInitialization.rootAdmin,
+                password: process.env.DEFAULT_TEST_USER_PASS || "123456",
                 phoneNumber: 100_000_0000,
                 confirmed: true
             })
@@ -106,7 +107,7 @@ const createTestInstitution = async () => {
                 try {
                     const khateeb = await new $db.khateebs({
                         username: `${global.APP_CONFIG.testInstitutionInitialization.khateebs.baseUsername}${i + 1}`,
-                        password: global.APP_CONFIG.testInstitutionInitialization.khateebs.password,
+                        password: process.env.DEFAULT_TEST_USER_PASS || "123456",
                         confirmed: true,
                         handle: randomNamegenerate().dashed,
                         firstName: randomNamegenerate().dashed,

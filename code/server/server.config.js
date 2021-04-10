@@ -23,7 +23,6 @@ const appConfig = {
         },
         rootAdmin: {
             username: "testRoot",
-            password: "123456",
             handle: "testMaster",
             firstName: "Mostafa",
             lastName: "Elbannan",

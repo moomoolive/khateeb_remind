@@ -55,10 +55,10 @@ app.use('/sysAdmin', routes.sysAdmin)
 app.use('/user', routes.user)
 app.use('/logos', routes.logos)
 
-db.once('open', () => { 
+db.once('open', async () => { 
     const dbType = DATABASE.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
     console.log(`${dbType} Mongo is listening`)
-    cronJobs.start()
+    await cronJobs.start()
     global.textManager.initializeSettings()
 })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })

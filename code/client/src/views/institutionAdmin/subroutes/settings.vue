@@ -49,7 +49,7 @@
                         type="file" 
                         accept="image/*"
                         name="logo"
-                        @change="uploadFile($event)"
+                        @change="uploadInstitutionLogo($event)"
                     >
                     <div class="delete-logo-container">
                         <button 
@@ -188,17 +188,18 @@ export default {
         }
     },
     methods: {
-        uploadFile(fileChanges={}) {
+        uploadInstitutionLogo(fileChanges={}) {
             const targetFile = fileChanges.target.files[0]
             const reader = new FileReader()
             reader.onload = async (e) => {
-                this.institutionImageSrc = e.target.result
                 const base64Img = e.target.result.split("base64,")[1]
                 const binaryString = window.atob(base64Img)
                 const imageArray = []
                 for (let i = 0; i < binaryString.length; i++)
                     imageArray.push(binaryString.charCodeAt(i))
-                await this.$API.logos.saveInstitutionLogo({ img: imageArray })
+                const resCode = await this.$API.logos.saveInstitutionLogo({ img: imageArray })
+                if (resCode === 0)
+                    return this.institutionImageSrc = e.target.result
             }
             reader.readAsDataURL(targetFile)
         },
@@ -206,9 +207,9 @@ export default {
             const confirm = await this.utils.confirm(`Are you sure you want to delete your logo?`)
             if (!confirm)
                 return
-            const { deleted } = await this.$API.logos.deleteInstitutionLogo()
-            if (deleted)
-                this.institutionImageSrc =  require('@/assets/logos/genericInstitution.png')
+            const resCode = await this.$API.logos.deleteInstitutionLogo()
+            if (resCode === 0)
+                return this.institutionImageSrc =  require('@/assets/logos/genericInstitution.png')
         },
         async getInstitutionLogo() {
             this.institutionImageSrc = await this.$API.logos.getInstitutionLogo(

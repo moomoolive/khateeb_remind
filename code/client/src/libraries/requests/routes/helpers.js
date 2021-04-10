@@ -1,10 +1,9 @@
 import axios from 'axios'
 
-import requestConsts from '@/libraries/requests/consts.js'
 import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
 
 const targetURL = (extension=["misc", "unique-username"]) => {
-    const baseURL = requestConsts.API_URL
+    const baseURL = process.env.VUE_APP_API_SERVER_URL
     if (Array.isArray(extension))
         return  baseURL + extension.reduce((total, e) => `${total}/${e}` , '')
     else

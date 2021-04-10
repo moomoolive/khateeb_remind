@@ -94,7 +94,7 @@ router.delete('/', async (req, res) => {
 router.get('/pwa-subscription', async (req, res) => {
     try {
         const data = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).select(["-subscriptions.browserSubscriptionDetails"]).exec()
-        return res.json({ data: data.subscriptions || [] })
+        return res.json({ data: data ? data.subscriptions : [] })
     } catch(err) {
         console.log(err)
         return res.json({ data: [], msg: `There was an error retrieving your subscriptions. ${err}` })

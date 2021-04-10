@@ -4,7 +4,7 @@ py_scraper/
 timezones/
 
 # scripts for complex database updates
-oneTimeJobs/
+**dbUpdates/
 
 IANNA-TZs.js
 
@@ -12,3 +12,4 @@ IANNA-TZs.js
 .gitignore
 
 *.md
+*.bat

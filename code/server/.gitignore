@@ -3,19 +3,21 @@ node_modules/
 # any mock users, example database entries, etc.
 dummyInfo/
 
+# python scripts
 **/__pycache__
-
 scraper_env/
-
 TZ_env/
 
 .env
-
 text.json
 vapidKeys.json
 
 # storage area for logos currently
 uploads/**
 
-# build script for docker image
+# build and upload scripts for production docker image
 dBuild.bat
+dUpload.bat
+
+# database migration scripts and schema updates
+**dbUpdates/

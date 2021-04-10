@@ -4,8 +4,10 @@ import notificationHelpers from '@/libraries/notifications/main.js'
 const normalResponse = res => res.data
 
 const errorResponse = err => {
-    console.log(err)
     const responseExtenstion = helpers.responseExtenstion(err.response)
+    if (/logos/.test(responseExtenstion) && err.response.config.method === 'get')
+        return
+    console.log(err)
     if (!err.response) {
         notificationHelpers.generalServerError()
         return Promise.reject(err)

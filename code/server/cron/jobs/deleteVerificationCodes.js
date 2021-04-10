@@ -9,7 +9,7 @@ const options = {
                 createdAt: { $lte: expiration }
             }
             const mongooseRes = await $db.verificationCodes.deleteMany(deletedQuery)
-            console.log(`Expired Verification Codes Deleted. Database response: ${mongooseRes}`)
+            console.log(`Expired Verification Codes Deleted. Database response: ${JSON.stringify(mongooseRes)}`)
         } catch(err) {
             console.log(`Couldn't delete verification codes`)
         }

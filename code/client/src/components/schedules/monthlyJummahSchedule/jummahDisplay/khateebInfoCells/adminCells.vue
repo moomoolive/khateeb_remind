@@ -6,9 +6,9 @@
                 {{ preferenceIndex === 0 ? 'Main Khateeb' : 'Backup' }}
             </div>
 
-            <div>
-                <div v-if="currentWeek === 'past'" class="preference-number">
-                    None
+            <div class="preference-container">
+                <div v-if="currentWeek === 'past'" class="preference-number khateeb-name">
+                    {{ readMeKhateebName(preference.khateebID) }}
                 </div>
 
                 <span v-else>
@@ -33,17 +33,25 @@
                         </option>
                     </select>
                 </span>
+                
+                <div v-if="preference.khateebID.toLowerCase() !== 'none'">
 
-            </div>
+                    <div 
+                        v-show="preference.isGivingKhutbah" 
+                        class="current-week-notification"
+                    >
+                        <span class="green">
+                            📢 {{ currentWeek === 'past' ? "Gave" : "Is Giving"}} Khutbah
+                        </span>
+                    </div>
 
-            <div>
+                    <div 
+                        v-show="preference.notified" 
+                        class="current-week-notification"
+                    >
+                       <span class="blue">📦 Notified</span>
+                    </div>
 
-                <div v-show="preference.isGivingKhutbah" class="current-week-notification">
-                    ⭐ Khateeb
-                </div>
-
-                <div v-show="preference.notified" class="current-week-notification">
-                    📦 Notified
                 </div>
 
             </div>
@@ -91,6 +99,15 @@ export default {
         }
     },
     methods: {
+        readMeKhateebName(khateebID="none") {
+            if (khateebID === 'none')
+                return "None"
+            const khateeb = this.khateebs.find(k => k._id === khateebID)
+            if (!khateeb)
+                return "None"
+            else
+                return this.khateebName(khateeb)
+        },
         khateebName(khateeb) {
             return khateebHelpers.khateebName(khateeb)
         },
@@ -188,19 +205,28 @@ select {
     width: 80%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 10px;
+    margin-top: 5px;
     margin-bottom: 0;
     font-weight: bold;
     font-size: 17px;
+
+    &.khateeb-name {
+        font-weight: normal;
+        font-size: 16px;
+    }
 }
 
 .current-week-notification {
-    font-size: 17px;
+    font-size: 13px;
     text-align: left;
     width: 80%;
     margin-right: auto;
     margin-left: auto;
-    font-weight: bold;
+    margin-top: 7px;
+}
+
+.preference-container {
+    margin-bottom: 30px;
 }
 
 button {
@@ -216,12 +242,14 @@ button {
     }
 
     .preference-number { 
-        margin-top: 4vh;
-        font-size: 2.5vh;
+        font-size: 16px;
+        &.khateeb-name {
+            font-size: 15px;
+        }
     }
     
     .current-week-notification {
-        font-size: 2.7vh;
+        font-size: 12px;
     }
 
     button {

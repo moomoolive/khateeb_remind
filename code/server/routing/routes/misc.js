@@ -32,19 +32,4 @@ router.get('/institution-selection', async (req, res) => {
     }
 })
 
-router.get('/redirect/:shortCode', async (req, res) => {
-    const homepage = 'https://app.khateebs.com'
-    try {
-        const url = await $db.shortenedURLs.findOne({ shortURLCode: req.params.shortCode }).exec()
-        const redirect = url ? `https://${url.longURL}` : homepage
-        let msg = null
-        if (!url)
-            msg = `This link doesn't exist or is no longer active! Redirecting you to home.`
-        return res.json({ status: 'all good', url: redirect, msg })
-    } catch(err) {
-        console.log(err)
-        res.json({ status: "err", url: homepage})
-    }
-})
-
 module.exports = router

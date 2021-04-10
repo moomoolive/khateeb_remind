@@ -39,9 +39,9 @@ router.put('/',
         const binaryImg = new Uint8Array(req.body.img)
         fs.writeFile(path.join(global.$dir, "uploads", `${req.headers.institutionid}-logo`), binaryImg, err => {
             if (!err)
-                return res.json({ msg: "successfully uploaded logo" })
+                return res.json({ data: { code: 0 }, msg: "successfully uploaded logo" })
             console.log(err)
-            return res.status(503).json({ msg: `couldn't update institution logo. Err trace: ${err}` })
+            return res.status(503).json({ data: { code: 1 }, msg: `couldn't update institution logo. Err trace: ${err}` })
         })
     }
 )
@@ -51,9 +51,9 @@ router.delete("/",
     (req, res) => {
         fs.unlink(path.join(global.$dir, "uploads", `${req.headers.institutionid}-logo`), err => {
             if (err) {
-                return res.status(503).json({ data: { deleted: false }, msg: `Couldn't delete institution. Err trace: ${err}` })
+                return res.status(503).json({ data: { code: 0 }, msg: `Couldn't delete institution. Err trace: ${err}` })
             }
-            return res.json({ data: { deleted: true } })
+            return res.json({ data: { code: 1 } })
         })
     }
 )
