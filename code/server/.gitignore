@@ -14,4 +14,8 @@ TZ_env/
 text.json
 vapidKeys.json
 
+# storage area for logos currently
 uploads/**
+
+# build script for docker image
+dBuild.bat
