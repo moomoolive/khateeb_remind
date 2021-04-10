@@ -65,18 +65,31 @@
 
                 <div class="institution-signup-link-container ">
                     <div class="copy-link-container">
-                        <div class="copy-link-header ">
-                           <u>Khateeb Signup Link</u> 
+                        <div class="copy-link-header " @click="toggleKhateebLinkContainer()">
+                            <div>
+                                <img 
+                                    src="~@/assets/misc/rightArrow.png" 
+                                    :class="`dropdown-arrow ${showSignupLink ? 'showing': ''}`"
+                                    alt="dropdown arrow"
+                                >
+                            </div>
+                            <div>
+                                {{ $store.state.user.institution.abbreviatedName }} Khateeb Signup Link 
+                            </div>
                         </div>
-                        <button 
-                            :class="`grey copy-link-button ${copiedLink ? 'copied' : ''}`"
-                            @click="copyLink()"
-                        > 
-                            📋 {{ copiedLink ? "Copied" : 'Copy' }}
-                        </button>
-                        <div>
-                            <input type="text" class="copy-link-text" v-model="signupLink">
-                        </div>
+                        <collapse-transition>
+                            <div v-show="showSignupLink">
+                                <button 
+                                    :class="`grey copy-link-button ${copiedLink ? 'copied' : ''}`"
+                                    @click="copyLink()"
+                                > 
+                                    📋 {{ copiedLink ? "Copied" : 'Copy' }}
+                                </button>
+                                <div>
+                                    <input type="text" class="copy-link-text" v-model="signupLink">
+                                </div>
+                            </div>
+                        </collapse-transition>
                     </div>
                 </div>
 
@@ -139,13 +152,16 @@ import userFormTemplate from '@/components/forms/templates/user.vue'
 import datetime from '@/libraries/dateTime/main.js'
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
 
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+
 export default {
     name: 'khateebs',
     components: {
         loading,
         collapsableBox,
         msgWithPic,
-        userFormTemplate
+        userFormTemplate,
+        CollapseTransition
     },
     data() {
         return {
@@ -155,17 +171,23 @@ export default {
             showKhateebs: true,
             showSearchTools: false,
             query: {},
-            signupLink: `http://localhost:8080/create/khateebs?institutionID=${this.$store.state.user.institution._id}`,
-            copiedLink: false
+            signupLink: `https://khateebs.com/create/khateebs?institutionID=${this.$store.state.user.institution._id}`,
+            copiedLink: false,
+            showSignupLink: false
         }
     },
     methods: {
+        toggleKhateebLinkContainer() {
+            this.showSignupLink = !this.showSignupLink
+        },
         async getAllKhateebs() {
             this.khateebs = await this.$API.khateebs.getKhateebs()
         },
         copyLink() {
             this.copiedLink = true
             this.$copyText(this.signupLink)
+            const fiveSecondsInMilliseconds = 5_000
+            window.setTimeout(() => this.copiedLink = false, fiveSecondsInMilliseconds)
         },
         async getActiveLocationsAndTimings() {
             const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
@@ -413,7 +435,14 @@ button {
 }
 
 .copy-link-container {
-    width: 170px;
+    width: 190px;
+    background: getColor("silver");
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    @include normalBorderRounding();
+    @include floatingBoxShadow();
 }
 
 .copy-link-text {
@@ -423,14 +452,16 @@ button {
     @include floatingBoxShadow();
 
     &:focus {
-        background: getColor("silver");
-        color: black;
+        color: getColor("green");
+        background: getColor("grey");
+        font-weight: bold;
     }
 }
 
 .copy-link-header {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: bold;
+    @include flexboxDefault();
 }
 
 .copy-link-button {
@@ -442,13 +473,21 @@ button {
     @include floatingBoxShadow();
     margin-bottom: 10px;
     color: getColor("blue");
+    font-weight: bold;
 
     &.copied {
-        background: getColor("silver");
-        font-weight: bold;
         color: getColor("green");
     }
 }
+
+.dropdown-arrow {
+    height: 14px;
+    margin-right: 10px;
+    &.showing {
+        transform: rotate(90deg);
+    }
+}
+
 
 @media screen and (max-width: $phoneWidth) {
       .khateebs-container {
@@ -492,6 +531,18 @@ button {
         }
         .search-results {
             font-size: 5vh;
+        }
+
+        .copy-link-header {
+            font-size: 14px;
+        }
+
+        .dropdown-arrow {
+            height: 12px;
+        }
+
+        .copy-link-container {
+            width: 170px;
         }
 
 }
