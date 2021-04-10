@@ -349,11 +349,6 @@ button {
 
 
 .input-container {
-    /*
-    display: flex;
-    flex-direction: row;
-    margin-top: 0;
-    */
     @include flexboxDefault();
     width: 80%;
     max-width: 800px;

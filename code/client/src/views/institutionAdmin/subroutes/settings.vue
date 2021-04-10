@@ -1,165 +1,166 @@
 <template>
     <div>
-        <div v-if="showSettings && settingsArePresent" class="settings-container">
-            
-            <collapsable-box
-                class="setting-container"
-                :headline="`Institution Details`"
-                :tagDetails="institution ? [{
-                    words: `${institution.timezone} Timezone`,
-                    color: 'goodNews',
-                    symbol: '🌎' 
-                }] : null"
-            >
-                <institution-form-template 
-                    :formProps="{
-                        basedOn: institution,
-                        bindedExts: ['states'],
-                        backgroundColor: 'none',
-                        buttonText: 'Update Institution'
-                    }"
-                    @submitted="saveInstitutionDetails($event)"
-                />
-            </collapsable-box>
+        <loading :loadingTime="800">
+            <div v-if="showSettings && settingsArePresent" class="settings-container">
+                
+                <collapsable-box
+                    class="setting-container"
+                    :headline="`Institution Details`"
+                    :tagDetails="institution ? [{
+                        words: `${institution.timezone} Timezone`,
+                        color: 'goodNews',
+                        symbol: '🌎' 
+                    }] : null"
+                >
+                    <institution-form-template 
+                        :formProps="{
+                            basedOn: institution,
+                            bindedExts: ['states'],
+                            backgroundColor: 'none',
+                            buttonText: 'Update Institution'
+                        }"
+                        @submitted="saveInstitutionDetails($event)"
+                    />
+                </collapsable-box>
 
-            <collapsable-box
-                class="setting-container"
-                :headline="`Institution Logo`"
-                :tagDetails="customLogoWasAdded ? null : [{
-                    words: `No Logo`,
-                    color: 'important',
-                    symbol: '🖼️' 
-                }]"
-            >
-                <div class="insert-image-container">
-                    <div class="image-info-caption">
-                        <u>Your current logo:</u>
-                    </div>
-                    <img 
-                        :src="institutionImageSrc"
-                        class="institution-image-container" 
-                        alt="institution image"
-                    >
-                    <div class="image-info-caption">
-                        * Recommended size is 500px x 500px or above. <br>
-                        * Equal height and width is recommended.
-                    </div>
-                    <input
-                        class="image-input" 
-                        type="file" 
-                        accept="image/*"
-                        name="logo"
-                        @change="uploadInstitutionLogo($event)"
-                    >
-                    <div class="delete-logo-container">
-                        <button 
-                            :disabled="!customLogoWasAdded"
-                            class="red delete-logo-button" 
-                            @click="deleteLogo()"
+                <collapsable-box
+                    class="setting-container"
+                    :headline="`Institution Logo`"
+                    :tagDetails="customLogoWasAdded ? null : [{
+                        words: `No Logo`,
+                        color: 'important',
+                        symbol: '🖼️' 
+                    }]"
+                >
+                    <div class="insert-image-container">
+                        <div class="image-info-caption">
+                            <u>Your current logo:</u>
+                        </div>
+                        <img 
+                            :src="institutionImageSrc"
+                            class="institution-image-container" 
+                            alt="institution image"
                         >
-                            Delete Logo
-                        </button>
+                        <div class="image-info-caption">
+                            * Recommended size is 500px x 500px or above. <br>
+                            * Equal height and width is recommended.
+                        </div>
+                        <input
+                            class="image-input" 
+                            type="file" 
+                            accept="image/*"
+                            name="logo"
+                            @change="uploadInstitutionLogo($event)"
+                        >
+                        <div class="delete-logo-container">
+                            <button 
+                                :disabled="!customLogoWasAdded"
+                                class="red delete-logo-button" 
+                                @click="deleteLogo()"
+                            >
+                                Delete Logo
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </collapsable-box>
+                </collapsable-box>
 
-            <collapsable-box
-                class="setting-container"
-                :headline="`Registration`"
-                :tagDetails="institution && institution.settings ? [{
-                    words: institution.settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
-                    color: 'default',
-                    symbol: institution.settings.autoConfirmRegistration ? `🤖` : `📜`
-                }] : null"
-            >
-                <form-main
-                    v-if="institution.settings" 
-                    :structure="{
-                        autoConfirmRegistration: {
-                            type: 'checkbox',
-                            required: true
-                        },
-                        allowJummahSignup: {
-                            type: 'checkbox',
-                            required: true
-                        }
-                    }"
-                    :backgroundColor="`none`"
-                    :basedOn="institution.settings"
-                    @submitted="saveInstitutionDetails({ _id: institution._id, settings: $event })"
-                />
-            </collapsable-box>
-
-            <collapsable-box
-                class="setting-container"
-                :headline="`Notifications`"
-                :tagDetails="institution && institution.settings ? [{
-                    words: institution.settings.allowJummahNotifications ? notificationTiming : `Off`,
-                    color: institution.settings.allowJummahNotifications ? `goodNews` : `important`,
-                    symbol: '✉️'
-                }] : null"
-            >
-                <form-main
-                    v-if="institution.settings" 
-                    :structure="{
-                        allowJummahNotifications: {
-                            type: 'checkbox',
-                            required: true
-                        },
-                        dayOfWeek: {
-                            type: 'dropdown',
-                            required: true,
-                            selectOptions: [
-                                { text: 'Tuesday', num: 2 },
-                                { text: 'Wednesday', num: 3 },
-                                { text: 'Thursday', num: 4 },
-                            ],
-                            value: 'num',
-                            display: 'text'
-                        },
-                        timing: {
-                            type: 'timingMutator',
-                            required: true,
-                            textColor: 'white',
-                            size: 'small'
-                        }
-                    }"
-                    :backgroundColor="`none`"
-                    :basedOn="notificationsSettings"
-                    @submitted="saveInstitutionDetails({ 
-                        _id: institution._id,
-                        settings: {
-                            allowJummahNotifications: $event.allowJummahNotifications,
-                            jummahNotificationsTiming: { 
-                                hour: $event.timing.hour,
-                                minute: $event.timing.minute,
-                                dayOfWeek: $event.dayOfWeek
+                <collapsable-box
+                    class="setting-container"
+                    :headline="`Registration`"
+                    :tagDetails="institution && institution.settings ? [{
+                        words: institution.settings.autoConfirmRegistration ? `Auto-Confirm` : `Manual-Confirm`,
+                        color: 'default',
+                        symbol: institution.settings.autoConfirmRegistration ? `🤖` : `📜`
+                    }] : null"
+                >
+                    <form-main
+                        v-if="institution.settings" 
+                        :structure="{
+                            autoConfirmRegistration: {
+                                type: 'checkbox',
+                                required: true
+                            },
+                            allowJummahSignup: {
+                                type: 'checkbox',
+                                required: true
                             }
-                        } 
-                    })"
-                />
-            </collapsable-box>
+                        }"
+                        :backgroundColor="`none`"
+                        :basedOn="institution.settings"
+                        @submitted="saveInstitutionDetails({ _id: institution._id, settings: $event })"
+                    />
+                </collapsable-box>
 
-            <collapsable-box
-                v-if="utils.validAuthentication(3)"
-                class="setting-container"
-                :headline="`Danger Zone`"
-                :buttonColor="`red`"
-                :bodyColor="`silver`"
-            >
-                <button class="yellow delete-institution" @click="deleteInstitution()">
-                    Delete Institution
-                </button>
-            </collapsable-box>
+                <collapsable-box
+                    class="setting-container"
+                    :headline="`Notifications`"
+                    :tagDetails="institution && institution.settings ? [{
+                        words: institution.settings.allowJummahNotifications ? notificationTiming : `Off`,
+                        color: institution.settings.allowJummahNotifications ? `goodNews` : `important`,
+                        symbol: '✉️'
+                    }] : null"
+                >
+                    <form-main
+                        v-if="institution.settings" 
+                        :structure="{
+                            allowJummahNotifications: {
+                                type: 'checkbox',
+                                required: true
+                            },
+                            dayOfWeek: {
+                                type: 'dropdown',
+                                required: true,
+                                selectOptions: [
+                                    { text: 'Tuesday', num: 2 },
+                                    { text: 'Wednesday', num: 3 },
+                                    { text: 'Thursday', num: 4 },
+                                ],
+                                value: 'num',
+                                display: 'text'
+                            },
+                            timing: {
+                                type: 'timingMutator',
+                                required: true,
+                                textColor: 'white',
+                                size: 'small'
+                            }
+                        }"
+                        :backgroundColor="`none`"
+                        :basedOn="notificationsSettings"
+                        @submitted="saveInstitutionDetails({ 
+                            _id: institution._id,
+                            settings: {
+                                allowJummahNotifications: $event.allowJummahNotifications,
+                                jummahNotificationsTiming: { 
+                                    hour: $event.timing.hour,
+                                    minute: $event.timing.minute,
+                                    dayOfWeek: $event.dayOfWeek
+                                }
+                            } 
+                        })"
+                    />
+                </collapsable-box>
 
-        </div>
+                <collapsable-box
+                    v-if="utils.validAuthentication(3)"
+                    class="setting-container"
+                    :headline="`Danger Zone`"
+                    :buttonColor="`red`"
+                    :bodyColor="`silver`"
+                >
+                    <button class="yellow delete-institution" @click="deleteInstitution()">
+                        Delete Institution
+                    </button>
+                </collapsable-box>
 
-        <msg-with-pic 
-            v-else
-            :msg="`Couldn't retrieve settings...`"
-            :gif="`sadCatStanding`"
-        /> 
+            </div>
 
+            <msg-with-pic 
+                v-else
+                :msg="`Couldn't retrieve settings...`"
+                :gif="`sadCatStanding`"
+            /> 
+        </loading>
     </div>
 </template>
 
@@ -168,6 +169,7 @@ import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
 import institutionFormTemplate from '@/components/forms/templates/institution.vue'
 import msgWithPic from '@/components/general/msgWithPic.vue'
+import loading from '@/components/general/loadingScreen.vue'
 
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
 import timingHelpers from '@/libraries/timings/main.js'
@@ -178,7 +180,8 @@ export default {
         collapsableBox,
         formMain,
         institutionFormTemplate,
-        msgWithPic
+        msgWithPic,
+        loading
     },
     data() {
         return {
@@ -272,7 +275,8 @@ export default {
         }
     },
     async created() {
-        this.getInstitutionLogo()
+        const milliseconds = 500
+        window.setTimeout(() => this.getInstitutionLogo(), milliseconds)
         this.getSettingsAndInstitutionInfo()
     }
 }

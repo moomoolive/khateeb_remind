@@ -139,10 +139,10 @@ export default {
             return this.mainKhateebIsScheduled || this.backupKhateebIsScheduled
         },
         mainKhateebIsScheduled() {
-            return this.info.khateebPreferences[0].updatedAt
+            return this.info.khateebPreferences[0].khateebID && this.info.khateebPreferences[0].khateebID !== 'none'
         },
         backupKhateebIsScheduled() {
-            return this.info.khateebPreferences[1].updatedAt
+            return this.info.khateebPreferences[1].khateebID && this.info.khateebPreferences[1].khateebID !== 'none'
         },
         oneKhateebNotified() {
             return this.info.khateebPreferences.find(p => p.notified)
