@@ -2,6 +2,12 @@
     <div>
         <div class="topnav">
             <a 
+                class="green footer-selection" 
+                @click="toUsecasePage()"
+            >
+                Why Use Khateeb Remind?
+            </a>
+            <a 
                 v-show="isLoggedIn"
                 class="green footer-selection"
                 :href="feedbackURL" 
@@ -30,11 +36,17 @@ export default {
             feedbackURL: process.env.VUE_APP_FEEDBACK_FORM_URL || '#'
         }
     },
+    methods: {
+        toUsecasePage() {
+            if (this.$router.currentRoute.fullPath !== '/usecase')
+                return this.$router.push({ path: "/usecase" })
+        }
+    },
     computed: {
         isLoggedIn() {
             return this.$store.getters['user/isLoggedIn']
         }
-    }
+    },
 }
 </script>
 
@@ -93,10 +105,17 @@ span {
 @media screen and (max-width: $phoneWidth) {
     a {
         font-size: 11px;
+        display: block;
+        margin-bottom: 7px;
+
         &.footer-selection {
             top: 7px;
             margin-left: 7px;
         }
+    }
+
+    .contribute-now {
+        margin-top: 13px;
     }
 
 }

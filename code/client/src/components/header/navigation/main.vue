@@ -31,7 +31,7 @@
 
         <div class="right-side-menu">
 
-          <div v-if="!$store.getters['user/isLoggedIn']">
+          <div v-if="!$store.getters['user/isLoggedIn']" class="signup-buttons-container">
 
             <button 
               class="blue signup-buttons pale-hover" 
@@ -226,6 +226,10 @@ export default {
   @include floatingBoxShadow();
 }
 
+.signup-buttons-container {
+  margin-right: 15px;
+}
+
 .icons-container {
   @include flexboxDefault();
   height: 5vh;
@@ -299,5 +303,10 @@ export default {
       .no-wifi {
         left: 45px;
       }
+
+      .signup-buttons-container {
+        margin-right: 0px;
+      }
+
 }
 </style>

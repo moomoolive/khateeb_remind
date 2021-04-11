@@ -40,7 +40,7 @@
                     </div>
 
                     <div class="device-info-text">
-                        {{ utils.stringFormat(subscription.deviceBrand) }}
+                        {{ utils.stringFormat(subscription.deviceBrand) }} {{ /unknown/i.test(subscription.deviceBrand) ? " Brand": "" }}
                     </div>
 
                     <div class="device-info-text">
