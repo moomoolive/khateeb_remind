@@ -1,12 +1,7 @@
 <template>
     <div>
         <div class="topnav">
-            <a 
-                class="green footer-selection" 
-                @click="toUsecasePage()"
-            >
-                Why Use Khateeb Remind?
-            </a>
+            
             <a 
                 v-show="isLoggedIn"
                 class="green footer-selection"
@@ -15,6 +10,14 @@
             >
                 Feedback
             </a>
+
+            <a 
+                class="green footer-selection" 
+                @click="toUsecasePage()"
+            >
+                Why Use Khateeb Remind?
+            </a>
+
         </div>
 
         <div class="contribute-now">
@@ -106,7 +109,7 @@ span {
     a {
         font-size: 11px;
         display: block;
-        margin-bottom: 7px;
+        margin-bottom: 13px;
 
         &.footer-selection {
             top: 7px;
@@ -115,7 +118,7 @@ span {
     }
 
     .contribute-now {
-        margin-top: 13px;
+        margin-top: 15px;
     }
 
 }

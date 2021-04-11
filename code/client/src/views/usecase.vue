@@ -71,9 +71,9 @@
                             Notifications
                         </div>
                         <div class="icons-subheading">
-                            Send khutbah and khateeb updates to your khateebs' laptop, phone, or tablet <br><br>
+                            Send khutbah-related updates to your khateebs' phone, laptop, or tablet <br><br>
                             <span class="icons-subheading-warning red">
-                                * Currently IOS is unsupported
+                                * IOS and older browsers are unsupported
                             </span>
                         </div>
                     </a>
@@ -106,7 +106,7 @@
                             Centralize
                         </div>
                         <div class="icons-subheading">
-                            Have all your khateebs' unavailable dates, available timings, and the
+                            All your khateebs' unavailable dates, timings, and the
                             rest of your khutbah information in one spot
                         </div>
                     </a>
@@ -132,11 +132,10 @@
                                 Your Khateebs Reminded <span class="green">Automatically</span>
                             </div>
                             <div>
-                                You can configure Khateeb Remind to send out notifications
-                                to your khateebs' every week at whatever time works for your
-                                institution. Your khateebs' will be sent a notification to their
-                                devices' and will be reminded about their khutbah if they enter the
-                                app.
+                                You can configure Khateeb Remind to send weekly notifications
+                                to your khateebs' at whatever time works for your
+                                institution. Notifications are sent to devices
+                                and khateebs will be reminded about their khutbahs if they log in.
                             </div>
                         </div>
                     </div>
@@ -147,13 +146,11 @@
                                 <span class="green">99%</span> of Scheduling Done For You
                             </div>
                             <div>
-                                Okay maybe 99% is an exaggeration but Khateeb Remind automates
-                                most of your khutbah scheduling. <br><br>
-                                With Khateeb Remind you can set default khateebs for specific
-                                 timings, so you won't have to figure out your khateeb schedule
+                                Maybe 99% is an exaggeration but, 
+                                with Khateeb Remind you can set default khateebs for specific
+                                 timings - so you won't have to figure out your schedule
                                 every week. You'll also be alerted about which khateebs cannot make
-                                it one certain dates and which khateebs are available for every timing.
-                                Additionally you'll be given useful warnings about scheduling khateebs.
+                                it on certain dates and which ones are available for specific timings.
                             </div>
                         </div>
                         <div class="long-explanation-icon-container">
@@ -178,10 +175,10 @@
                                 Look in <span class="green">One</span> Place for Khutbah Information
                             </div>
                             <div>
-                                No more need to have all your khateebs' schedules, prayer timings, 
+                                No more having your khateebs' schedules, prayer timings, 
                                 and the rest of your khutbah-related information in multiple places.
-                                Khateeb Remind stores them in the cloud so that you and all your khateebs
-                                can have one spot to find all they need to know about khutabhs.
+                                Khateeb Remind stores them in the cloud so that everyone in your
+                                 institution has to only look in one spot for khutbah information.
                             </div>
                         </div>
                     </div>
@@ -217,7 +214,7 @@
                             Downloadable
                         </div>
                         <div class="icons-subheading">
-                            Although Khateeb Remind is a website, it can be downloaded
+                            Khateeb Remind can be downloaded
                             like an app - to your phone, tablet, or computer.
                         </div>
                     </div>
@@ -232,7 +229,8 @@
                             Beautiful Interface
                         </div>
                         <div class="icons-subheading">
-                            It was designed with simplicity and beauty in mind (masha'Allah).
+                            The app was designed to be simple, uncluttered, and generally
+                            has a pleasant interface.
                         </div>
                     </div>
 
@@ -243,13 +241,11 @@
                             alt="linux logo"
                         >
                         <div class="icons-heading">
-                            Built for Function
+                            Practical
                         </div>
                         <div class="icons-subheading">
-                            This app was created by a group of University of Calgary
-                            students who wanted to organize khateeb scheduling in 
-                            a better way. So, it was built by people who actually
-                            use the app and are in the trenches.
+                            Created by khateeb schedulers at the University 
+                            of Calgary for practical use.
                         </div>
                     </div>
 
@@ -264,13 +260,10 @@
                         </div>
                         <div class="icons-subheading">
                             Khateeb Remind's source code is readily 
-                            available to the public. Meaning that you can see exactly
-                            what information we keep on you and how we do it.
+                            available to the public. Meaning you can contribute
+                            to the project, create your own instance, and see exactly
+                            what information we keep on users.
                             <br><br>
-                            That also means you can contribute (extending, or fixing bugs) to the project
-                            if your a developer. Additionally, you are free to
-                            create an instance of Khateeb Remind and tailor it for 
-                            your institution or anything else really. <br><br>
                             <a href="https://github.com/moomoolive/khateeb_remind" target="_blank">
                                 <span class="icons-subheading-warning green">
                                      Click Here to View Source Code
