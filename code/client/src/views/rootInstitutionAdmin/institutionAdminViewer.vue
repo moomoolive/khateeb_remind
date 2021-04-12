@@ -62,7 +62,7 @@
             <div v-else>
                 <msg-with-pic 
                     :msg="`You're currently the only administrator at this institution`"
-                    :gif="`sadCat`"
+                    :gif="`twirlingPlane`"
                 />
             </div>
 

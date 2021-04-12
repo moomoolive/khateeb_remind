@@ -19,7 +19,7 @@
             <msg-with-pic 
                 v-else
                 :msg="`There was a problem finding the institution you're signing up for...`"
-                :gif="`sadCat`"
+                :gif="`twirlingPlane`"
             /> 
 
         </loading>

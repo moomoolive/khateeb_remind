@@ -1,22 +1,7 @@
-import dayjs from 'dayjs'
-import utcDayJs from 'dayjs/plugin/utc.js'
-import timezonesDayJs from 'dayjs/plugin/timezone.js'
-import objectSupportDayJs from 'dayjs/plugin/objectSupport.js'
-dayjs.extend(utcDayJs)
-dayjs.extend(timezonesDayJs)
-dayjs.extend(objectSupportDayJs)
-
 import helpers from './helpers.js'
-
-const localizeToTimezone = (timezone, date) => {
-    const localizeTime = dayjs(new Date(date)).tz(timezone, true)
-    return new Date(localizeTime.toISOString())
-}
 
 const allUpcomingFridays = (input=new Date(), fromBeginningOfMonth=false, options={}) => {
     let inputDate = new Date(input)
-    if (options && options.timezone)
-        inputDate = localizeToTimezone(input, options.timezone)
     const friday = fromBeginningOfMonth ? helpers.findFirstFridayOfMonth(inputDate) :  helpers.findUpcomingFriday(inputDate)
     return helpers.findAllFridaysInMonth(friday)
 }
@@ -67,7 +52,6 @@ export default {
     dateFormatYM,
     findUpcomingFriday: helpers.findUpcomingFriday,
     sameMonthSameYear: helpers.sameMonthSameYear,
-    localizeToTimezone,
     sameDateMonthAndYear,
     findFirstFridayOfMonth: helpers.findFirstFridayOfMonth,
     setDayOfWeek

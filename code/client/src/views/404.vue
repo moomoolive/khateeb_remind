@@ -3,7 +3,7 @@
         <msg-with-pic
             title="Ooops..."
             msg="The page you searched for doesn't exist!"
-            gif="personThrowingPlane"
+            gif="flyingPlanesAllOver"
         />
         <div class="button">
             <button @click="utils.toHomePage()">

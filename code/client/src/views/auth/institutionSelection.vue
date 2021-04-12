@@ -6,7 +6,7 @@
             @all-key-bindings-active="testInstitutionSignup()"
         />
 
-        <loading>
+        <loading :loadingTime="1200">
             <div v-if="showingInstitutions.length > 0">
                 <button
                     v-for="(institution, institutionIndex) in showingInstitutions"
@@ -17,9 +17,9 @@
                     <div class="institution-selection-content-container">
                         <div>
                             <img 
-                                :src="require('@/assets/logos/logo1.jpg')" 
+                                :src="institutionLogosFromRequest.find(i => i.id === institution._id).image" 
                                 class="image-container"
-                                alt=""
+                                :alt="`${institution.name}'s logo`"
                             >
                         </div>
                         <div>
@@ -42,7 +42,7 @@
             <msg-with-pic 
                 v-else
                 :msg="`There was a problem finding institutions to sign up for...`"
-                :gif="`sadCat`"
+                :gif="`twirlingPlane`"
             /> 
             
 
@@ -65,7 +65,8 @@ export default {
     },
     data() {
         return {
-            allInstitutions: []
+            allInstitutions: [],
+            institutionLogosFromRequest : []
         }
     },
     methods: {
@@ -76,6 +77,17 @@ export default {
             const testInstitution = this.allInstitutions.find(i => i.name === "__TEST__")
             if (testInstitution)
                 this.$router.push({ path: '/create/khateebs', query: { institutionID: testInstitution._id } })
+        },
+        getAllInstitutionImages() {
+            this.institutionLogosFromRequest = this.allInstitutions.map(i => {
+                return { id: i._id, image: require('@/assets/logos/genericInstitution.png')  }
+            })
+            this.allInstitutions.forEach(i => this.getInstitutionImage(i._id))
+        },
+        async getInstitutionImage(institutionID="1234") {
+            const image = await this.$API.logos.getInstitutionLogo({ institutionID })
+            const target = this.institutionLogosFromRequest.find(i => i.id === institutionID)
+            target.image = image
         }
     },
     computed: {
@@ -84,6 +96,12 @@ export default {
                 return this.allInstitutions.filter(i => i.name !== "__TEST__")
             else
                 return this.allInstitutions
+        }
+    },
+    watch: {
+        allInstitutions(newVal, oldVal) {
+            if (newVal.length > oldVal.length)
+                this.getAllInstitutionImages()
         }
     },
     created() {

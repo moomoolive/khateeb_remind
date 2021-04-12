@@ -31,7 +31,7 @@
             <div v-else class="empty-notifications-container">
                 <msg-with-pic
                     class="empty-notifications-msg" 
-                    :gif="`sadCat`"
+                    :gif="`twirlingPlane`"
                     :msg="`No notifications to show...`"
                     :textColor="`white`"
                 />

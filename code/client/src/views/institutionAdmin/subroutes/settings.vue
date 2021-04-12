@@ -158,7 +158,7 @@
             <msg-with-pic 
                 v-else
                 :msg="`Couldn't retrieve settings...`"
-                :gif="`sadCatStanding`"
+                :gif="`twirlingPlane`"
             /> 
         </loading>
     </div>

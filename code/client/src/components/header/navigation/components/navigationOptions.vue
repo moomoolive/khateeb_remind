@@ -88,9 +88,7 @@ export default {
     methods: {
         async downloadApp() {
             this.$emit('close-nav')
-            const confirm = await notificationHelpers.downloadAppPrompt()
-            if (confirm)
-                this.promptPwaInstall()
+            this.promptPwaInstall()
         },
         async promptPwaInstall() {
             if (!this.deferredPrompt) {
@@ -102,9 +100,10 @@ export default {
             }
             this.deferredPrompt.prompt()
             const choice = await this.deferredPrompt.userChoice
-            if (choice.outcome === 'accepted')
-            this.utils.alert(`The app has finished downloading!`, 'success')
-            this.deferredPrompt = null
+            if (choice.outcome === 'accepted') {
+                this.utils.alert(`The app has finished downloading!`, 'success')
+                this.deferredPrompt = null
+            }
         },
         stashPwaPrompt(event) {
             event.preventDefault()
