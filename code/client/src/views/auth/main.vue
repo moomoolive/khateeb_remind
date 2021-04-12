@@ -23,6 +23,7 @@
                 :backgroundColor="`darkBlue`"
                 :buttonText="`Log In`"
                 :confirmBeforeSubmit="false"
+                :disableIfSameAsStart="false"
                 @submitted="login($event)"
             >
                 

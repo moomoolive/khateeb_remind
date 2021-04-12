@@ -168,6 +168,11 @@ export default {
             type: Boolean,
             required: false,
             default: true
+        },
+        disableIfSameAsStart: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     },
     components: {
@@ -298,7 +303,10 @@ export default {
             return true
         },
         sameAsOriginal() {
-            return equal(this.data, this.originalData)
+            if (this.disableIfSameAsStart)
+                return equal(this.data, this.originalData)
+            else
+                return false
         },
         validSubmission() {
             return !this.sameAsOriginal && this.allFieldsValid
