@@ -34,7 +34,7 @@ router.post(
         return res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
     } catch(err) {
         console.log(err)
-        res.json(`Couldn't create Institution and Administrator - this is probably a server issue. Please try again later.`)
+        return res.status(503).json(`Couldn't create Institution and Administrator - this is probably a server issue. Please try again later.`)
     }
     }
 )
@@ -68,7 +68,7 @@ router.post(
             return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${instituion.settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
     } catch(err) {
         console.log(err)
-        return res.json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)
+        return res.status(503).json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)
     }
 })
 
@@ -97,7 +97,7 @@ router.post(
             }
         } catch(err) {
             console.log(err)
-            res.json(`Couldn't sign in user - this probably a problem with the server. Please try again later`)
+            return res.status(503).json({ msg: `There was an issue encountered during sign`, token: null })
         }
 })
 
@@ -124,7 +124,7 @@ router.post(
             return res.json({ msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username}'s associated phone number will be recieving a text with a verification code in the next few minutes insha'Allah`, status: 'okay' })
         } catch(err) {
             console.log(err)
-            return res.json({msg: `Something went wrong when sending verification code`, status: "error"})
+            return res.status(503).json({msg: `Something went wrong when sending verification code`, status: "error"})
         }
     }
 )
@@ -154,7 +154,7 @@ router.post(
             return res.json({ msg: `If ${req.body.phoneNumber} is the system, it should be recieving a text shortly insha'Allah`, status: 'okay' })
         } catch(err) {
             console.log(err)
-            return res.json({msg: `An error occured when sending verification text! Try again later`, status: "error"})
+            return res.staus(503).json({msg: `An error occured when sending verification text! Try again later`, status: "error"})
         }
     }
 )
@@ -177,7 +177,7 @@ router.put(
             return res.json({ msg: "Password successfully updated", status: "success" })
         } catch(err) {
             console.log(err)
-            res.json({ msg: `Couldn't verify code`, status: "error" })
+            res.status(503).json({ msg: `Couldn't verify code`, status: "error" })
         }
 })
 

@@ -84,14 +84,12 @@ export default {
     },
     methods: {
         async updateInfo(update={}) {
-            try {
-                const res = await this.$API.user.updateInfo(update)
-                this.storeToken(res.token)
-                this.rerenderProfileSettings()
-                this.utils.alert(`Successfully updated`, 'success')
-            } catch(err) {
-                console.log(err)
-            }
+            const res = await this.$API.user.updateInfo(update)
+            if (!res.token)
+                return this.utils.alert(`There was a problem updating your profile`)
+            this.storeToken(res.token)
+            this.rerenderProfileSettings()
+            this.utils.alert(`Successfully updated`, 'success')
         },
         storeToken(token) {
             this.$store.dispatch('user/updateToken', token)

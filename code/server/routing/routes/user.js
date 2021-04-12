@@ -34,9 +34,7 @@ router.put(
             return res.json({ token, msg: `Successfully updated`, mongooseRes })
         } catch(err) {
             console.log(err)
-            const msg = `Couldn't edit user information`
-            console.log(msg)
-            return res.json(msg)
+            return res.status(503).json({ token: null, msg: `An error occured when updating profile. Err trace: ${err}` })
         }
     }
 )
@@ -51,7 +49,7 @@ router.get('/check-in', async(req, res) => {
         return res.json(userPackage)
     } catch(err) {
         console.log(err)
-        res.json(`Check-in failed`)
+        return res.status(503).json({ msg: `An error fetching user package. Err trace: ${err}` })
     }
 })
 

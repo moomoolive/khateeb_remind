@@ -21,7 +21,6 @@ const models = {
     verificationCodes: mongoose.model('verificationCode', verificationCode),
     jummahPreferences: mongoose.model('jummahPreference', jummahPreference),
     pwaSubscriptions: mongoose.model('pwaSubscription', pwaSubscription),
-    jummahs: mongoose.model("jummah", new mongoose.Schema({}))
 }
 
 const userTypes = {

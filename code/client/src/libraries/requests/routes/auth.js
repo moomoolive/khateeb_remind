@@ -1,12 +1,20 @@
 import helpers from './helpers.js'
+import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
 
 import axios from 'axios'
 
 const extension = helpers.targetURL('auth')
 
 const requests = {
-    getToken(credentials) {
-        return axios.post(extension + '/', credentials)
+    async getToken(credentials) {
+        try {
+            const res = await axios.post(extension + '/', credentials)
+            if (!res || !typeCheckingHelpers.isJWT(res.token))   
+                throw { token: null }
+            return res
+        } catch {
+            return { token: null }
+        }
     },
     createInstitution(institutionAndAdminInfo={}) {
         return axios.post(extension + '/create/institution', institutionAndAdminInfo)

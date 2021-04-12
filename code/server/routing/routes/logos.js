@@ -17,7 +17,7 @@ router.get('/',
     (req, res) => {
         fs.readFile(path.join(global.$dir, "uploads", `${req.query.institutionID}-logo`), (err, f) => {
             if (err)
-                return res.status(422).json({ msg: `Err occured when opening file. Err trace: ${err}` })
+                return res.json({ msg: `Err occured when opening file. Err trace: ${err}` })
             res.setHeader("Content-Type", "image/png")
             return res.send(f)
         })

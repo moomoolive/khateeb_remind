@@ -67,22 +67,17 @@ export default {
             this.utils.alert(msg, 'caution', { icon: 'locked' })
         },
         async login(loginInfo={}) {
-            try {
-                if (this.$store.getters.tokenExists)
-                    return this.utils.alert(`You're already logged in! Logout if you want to login with another account.`)
-                const authRes = await this.$API.auth.getToken(loginInfo)
-                if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
-                    this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
-                else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
-                    this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
-                else if (authRes.token && authRes.msg === 'success') {
-                    this.toApp(authRes.token, loginInfo)
-                    await this.$API.user.checkIn()
-                }
-            } catch(err) {
-                if (err.status === 401)
-                    this.errorMsg = 'Incorrect Username or Password'
+            const authRes = await this.$API.auth.getToken(loginInfo)
+            if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
+                this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
+            else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
+                this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
+            else if (authRes.token && authRes.msg === 'success') {
+                this.toApp(authRes.token, loginInfo)
+                await this.$API.user.checkIn()
             }
+            else
+                this.errorMsg = 'Incorrect Username or Password'
         },
         loginRedirect() {
             const landingPage = this.$store.state.router.landingPage

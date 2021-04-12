@@ -14,8 +14,17 @@ const castToArray = (data) => {
         return data
 }
 
+const isJWT = (candidate="akjfdalsfdjaii32390-1") => {
+    try {
+        return candidate.split('.').length === 3 && window.atob(candidate)
+    } catch(err) {
+        return false
+    }
+}
+
 export default {
     isAnObject,
     isValidDate,
-    castToArray
+    castToArray,
+    isJWT
 }

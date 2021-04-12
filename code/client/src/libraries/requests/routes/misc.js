@@ -5,11 +5,13 @@ import axios from 'axios'
 const extension = helpers.targetURL('misc')
 
 const requests = {
-    uniqueUsername(username) {
-        return axios.post(extension + '/unique-username', { username })
-    },
-    redirect(shortURLExtension) {
-        return axios.get(extension + `/redirect/${shortURLExtension}`)
+    async uniqueUsername(username) {
+        try {
+            const res = await axios.post(extension + '/unique-username', { username })
+            return res
+        } catch {
+            return false
+        }
     },
     institutionSelection() {
         return helpers.returnArrayFromRequest("get", ["misc", "institution-selection"])

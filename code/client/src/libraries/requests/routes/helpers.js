@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import store from '@/store/index.js'
+
 import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
 
 const targetURL = (extension=["misc", "unique-username"]) => {

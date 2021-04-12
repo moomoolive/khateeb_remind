@@ -244,7 +244,7 @@
                             Practical
                         </div>
                         <div class="icons-subheading">
-                            Created by khateeb schedulers at the University 
+                            Originally created by khateeb schedulers at the University 
                             of Calgary for practical use.
                         </div>
                     </div>
