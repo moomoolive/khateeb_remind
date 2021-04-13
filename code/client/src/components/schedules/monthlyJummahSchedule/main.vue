@@ -10,6 +10,7 @@
                 :info="settingsInfo"
                 :selectedDate="selectedDate"
                 :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
+                :maxNotificationLoopRunCount="maxNotificationLoopRunCount"
                 @run-notification-loop="$emit('run-notification-loop', $event)"
                 @clear-notifications="$emit('update-preference', $event)"
                 @khateeb-signup="$emit('khateeb-signup', $event)"
@@ -337,6 +338,15 @@ export default {
                     return !k.unavailableDates.find(({ date }) => datetime.sameDateMonthAndYear(date, this.selectedDate))
                 })
         },
+        totalNotificationLoopRunCount() {
+            return this.jummahs
+                .map(j => j.loopRunCount)
+                .reduce((total, x) => total + x, 0)
+        },
+        maxNotificationLoopRunCount() {
+            // divide by two because backups and main carry the same count (duplicates)
+            return (this.totalNotificationLoopRunCount / 2) > 6
+        }
     },
     created() {
         this.initializeSettingsInfo()

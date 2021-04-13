@@ -117,6 +117,7 @@ export default {
             const { main, backup } = this.fillIdIfEmpty(preprocessedMain, preprocessedBackup)
             const updatedPreferences = await this.$API.jummahs.runNotificationLoop({ main, backup }, isBackup)
             for (const [key, value] of Object.entries(updatedPreferences)) {
+                console.log(key, value)
                 if (value.upsert)
                     this.jummahs.push(value)
                 else if (value._id && value._id !== 'none')

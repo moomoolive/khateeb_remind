@@ -13,25 +13,33 @@
             </div>
         </div>
 
+        <div v-if="notificationRunCountExceeded" class="settings-label center">
+            <span class="red">
+                You've reached the maximum amount of times 
+                you can notify khateebs at 
+                {{ maxNotificationLoopRunCount? "your institution" : "this jummah" }} this week
+            </span>
+        </div>
+
         <div class="action-buttons-container">
                 
             <div v-if="reciever === 'institutionAdmin'">
                 <button
-                    :disabled="!mainKhateebIsScheduled || oneKhateebNotified" 
+                    :disabled="!mainKhateebIsScheduled || oneKhateebNotified || notificationRunCountExceeded" 
                     class="blue"
                     @click="runNotificationLoop()"
                 >
                     {{ info.khateebPreferences[0].notified ? 'Already Notified' : 'Notify Main Khateeb' }}
                 </button>
                 <button
-                    :disabled="!backupKhateebIsScheduled || oneKhateebNotified" 
+                    :disabled="!backupKhateebIsScheduled || oneKhateebNotified || notificationRunCountExceeded" 
                     class="red" 
                     @click="runNotificationLoop(true)"
                 >
                     {{ info.khateebPreferences[1].notified ? 'Already Notified' : 'Notify Backup' }}
                 </button>
                 <button 
-                    :disabled="!jummahHasData || !oneKhateebNotified" 
+                    :disabled="!jummahHasData || !oneKhateebNotified || notificationRunCountExceeded" 
                     class="yellow" 
                     @click="resetNotifications()"
                 >
@@ -85,6 +93,10 @@ export default {
         viewingWeekIsCurrentPastOrFuture: {
             type: String,
             required: true
+        },
+        maxNotificationLoopRunCount: {
+            type: Boolean,
+            required: true
         }
     },
     methods: {
@@ -126,7 +138,18 @@ export default {
         },
         resetNotifications() {
             this.scheduledKhateebs.forEach(p => {
-                this.$emit('clear-notifications', { _id: p._id, notified: false, notificationID: 'none', isGivingKhutbah: !p.isBackup })
+                const meta = { ...p.meta }
+                delete meta.jummahRef
+                this.$emit(
+                    'clear-notifications', 
+                    { 
+                        _id: p._id, 
+                        notified: false, 
+                        notificationID: 'none', 
+                        isGivingKhutbah: !p.isBackup,
+                        meta
+                    }
+                )
             })
             return this.closePopup()
         },
@@ -155,6 +178,13 @@ export default {
         },
         currentUserIsAlreadySignedUpForThisJummah() {
             return this.info.khateebPreferences.find(kp => kp.khateebID === this.currentUser)
+        },
+        notificationLoopRunCount() {
+            const runCount = this.info.khateebPreferences.find(p => p.loopRunCount)
+            return runCount ? runCount.loopRunCount : 0
+        },
+        notificationRunCountExceeded() {
+            return this.notificationLoopRunCount > 3 || this.maxNotificationLoopRunCount
         }
     }
 }
@@ -168,6 +198,10 @@ div {
         padding-bottom: 7px;
         text-align: left;
         margin-left: 7px;
+
+        &.center {
+            text-align: center;
+        }
     }
     &.jummah-settings-title {
         padding-bottom: 10px;
