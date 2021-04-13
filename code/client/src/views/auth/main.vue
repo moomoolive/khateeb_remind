@@ -69,6 +69,7 @@ export default {
         },
         async login(loginInfo={}) {
             const authRes = await this.$API.auth.getToken(loginInfo)
+            console.log(authRes)
             if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
                 this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
             else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')

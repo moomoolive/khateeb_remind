@@ -11,7 +11,7 @@ const requests = {
         try {
             const res = await axios.get(extension, { responseType: "blob", params })
             return window.URL.createObjectURL(res)
-        } catch(err) {
+        } catch {
             return genericInstitutionLogo
         }
     },
@@ -19,7 +19,7 @@ const requests = {
         try {
             const { data={ code: 0 } } = await axios.put(extension, ObjectWithBase64)
             return data.code
-        } catch(err) {
+        } catch {
             return 1
         }
     },
