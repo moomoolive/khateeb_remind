@@ -78,16 +78,10 @@ export default {
                 unavailableDates.push({ vCalendarId: newVCalendarDate.id, date: newVCalendarDate.date.toISOString() })
             this.updateInfo({ unavailableDates })
         },
-        storeToken(token) {
-            this.$store.dispatch('user/updateToken', token)
-        },
         async updateInfo(update={}) {
-            try {
-                const res = await this.$API.user.updateInfo(update)
-                this.storeToken(res.token)
-            } catch(err) {
-                console.log(err)
-            }
+            const res = await this.$API.user.updateInfo(update)
+            if (!res.data)
+                return this.utils.alert(`There was problem make your changes`)
         }
     },
     computed: {

@@ -2,16 +2,30 @@ import auth from '@/libraries/auth/main.js'
 import userIdentification from '@/libraries/userIdentification/main.js'
 
 import axios from 'axios'
-import DeviceDetector from 'device-detector-js'
 
 export default {
     namespaced: true,
     state: () => ({
         jwToken: localStorage.getItem('token') || null,
-        lastLogin: new Date(),
-        institution: { msg: 'No institution' },
+        institution: !localStorage.getItem('token') ? {} : { 
+            name: "random institution", 
+            abbreviatedName: "rand Inst" 
+        },
         isBrowsingOnPWA: userIdentification.deviceBrowsingViaPWA(),
-        browsingDevice: new DeviceDetector().parse(window.navigator.userAgent)
+        userInfo: !localStorage.getItem('token') ? {} : {
+            __t: "khateeb",
+            _id: "1234",
+            confirmed: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            institutionID: "1234",
+            lastLogin: new Date(),
+            firstName: "random",
+            lastName: "random",
+            phoneNumber: 2_000_000_0000,
+            username: "randomUser",
+            handle: "random"
+        }
     }),
     mutations: {
         removeToken(state) {
@@ -20,9 +34,12 @@ export default {
         updateToken(state, updated) {
             state.jwToken = updated
         },
-        storeInfoFromAPI(state, { lastLogin , institution }) {
-            state.lastLogin = new Date(lastLogin)
+        storeInfoFromAPI(state, { institution }) {
             state.institution = institution
+        },
+        updateUserInfo(state, userInfo={}) {
+            userInfo.lastLogin = new Date(userInfo.lastLogin)
+            state.userInfo = userInfo
         }
     },  
     actions: {
@@ -42,7 +59,11 @@ export default {
         isLoggedIn({ jwToken }) {
             return !!jwToken
         },
-        allInfo({ jwToken }, { isLoggedIn }) {
+        // this redundant getter is here for legacy reasons
+        allInfo(state) {
+            return state.userInfo
+        },
+        decodeJWTToken({ jwToken }, { isLoggedIn }) {
             if (!isLoggedIn)
                 return { msg: 'no token' }
             const tokenPayload = jwToken.split('.')[1]
@@ -52,7 +73,7 @@ export default {
         fullName(state, { allInfo }) {
             return `${allInfo.firstName} ${allInfo.lastName}`
         },
-        validAuthentication(state, { isLoggedIn, allInfo: { exp: tokenExpirationInSeconds } }) {
+        validAuthentication(state, { isLoggedIn, decodeJWTToken: { exp: tokenExpirationInSeconds } }) {
             if (!isLoggedIn)
                 return false
             const oneSecondInMilliseconds = 1_000
@@ -72,22 +93,6 @@ export default {
                 return auth.userTypeToAuthLevel(type)
             else
                 return 0
-        },
-        deviceType({ browsingDevice }) {
-            return browsingDevice.device.type
-        },
-        browserBrand({ browsingDevice }) {
-            const brand = browsingDevice.client.name
-            if (browsingDevice.client.type === 'browser')
-                return brand
-            else
-                return 'unknown'
-        },
-        deviceBrand({ browsingDevice }) {
-            if (browsingDevice.device.brand)
-                return browsingDevice.device.brand
-            else
-                return 'unknown'
         }
     } 
 }

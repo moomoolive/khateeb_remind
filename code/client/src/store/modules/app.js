@@ -3,15 +3,11 @@ export default {
     state: () => ({
         wallpaper: 'main',
         isOffline: false,
-        assignedUserPackage: true,
         hasLoggedInViaLoginPage: false
     }),
     mutations: {
         changeWallpaper(state, targetWallpaper) {
             state.wallpaper = targetWallpaper
-        },
-        successfullyAssignedUserPackage(state) {
-            state.assignedUserPackage = true
         },
         loggedInViaLoginPage(state) {
             state.hasLoggedInViaLoginPage = true

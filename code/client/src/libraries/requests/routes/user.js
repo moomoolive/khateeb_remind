@@ -1,6 +1,7 @@
 import helpers from './helpers.js'
 import store from '@/store/index.js'
 import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
+import localStorageHelpers from '@/libraries/localStorageManagement/main.js'
 
 import axios from 'axios'
 
@@ -10,28 +11,45 @@ const requests = {
     async updateInfo(updates) {
         try {
             const res = await axios.put(extension + '/', updates)
-            if (!res || !typeCheckingHelpers.isJWT(res.token))
-                return { token: null }
-            else
-                return res
+            if (!res || !typeCheckingHelpers.isAnObject(res.data))
+                return { data: null }
+            store.commit('user/updateUserInfo', res.data)
+            return res
         } catch {
-            return { token: null }
+            return { data: null }
         }
     },
     async checkIn() {
         let userPackage = { 
             notifications: [],
-            lastLogin: new Date(),
-            institution: { name: "Error institution", abbreviatedName: "Error Inst" }
+            institution: { name: "Random institution", abbreviatedName: "Rand Inst" },
+            userInfo: {
+                __t: "khateeb",
+                _id: "1234",
+                confirmed: true,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                institutionID: "1234",
+                lastLogin: new Date(),
+                firstName: "random",
+                lastName: "random",
+                phoneNumber: 2_000_000_0000,
+                username: "randomUser",
+                handle: "random"
+            }
         }
         try {
             const res = await axios.get(extension + '/check-in')
-            if (res && res.notifications && res.lastLogin && res.institution)
+            if (res && res.notifications && res.institution && res.userInfo) {
                 userPackage = res
-        } catch(err) {
-            console.log(`Couldn't assign user package`)
+                localStorageHelpers.commit('cachedUserCheckIn', res)
+            }
+        } catch {
+            const cachedUserCheckIn = localStorageHelpers.get('cachedUserCheckIn')
+            if (cachedUserCheckIn)
+                userPackage = cachedUserCheckIn
         }
-        store.dispatch('storeUserPackage', userPackage)
+        await store.dispatch('storeUserPackage', userPackage)
     },
     deleteAccount() {
         return axios.delete(extension + '/')

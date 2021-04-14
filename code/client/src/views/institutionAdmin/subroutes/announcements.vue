@@ -89,7 +89,7 @@ export default {
             this.showAddNewAnnouncementForm = true
         },
         tagLoader(announcement) {
-            return announcementHelpers.tagLoader(announcement, this.$store.state.user.lastLogin)
+            return announcementHelpers.tagLoader(announcement, this.$store.state.user.userInfo.lastLogin)
         },
         headline(announcement) {
             return announcementHelpers.headlineText(announcement)

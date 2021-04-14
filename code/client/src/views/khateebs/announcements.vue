@@ -44,7 +44,7 @@ export default {
         tagLoader(announcement) {
             return announcementHelpers.tagLoader(
                 announcement, 
-                this.$store.state.user.lastLogin, 
+                this.$store.state.user.userInfo.lastLogin,
                 this.wiggleNewTag()
             )
         },

@@ -189,7 +189,7 @@ export default {
             else if (this.hasSeenJummahs())
                 return true
             else
-                return latestUpdate.getTime() < new Date(this.$store.state.user.lastLogin).getTime()
+                return latestUpdate.getTime() < new Date(this.$store.state.user.userInfo.lastLogin).getTime()
         },
         updateDisplay() {
             const latestUpdate = this.findLatestUpdate()
