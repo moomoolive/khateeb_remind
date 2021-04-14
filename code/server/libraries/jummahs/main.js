@@ -32,6 +32,7 @@ const twoMonthsAhead = (localTimeNow) => {
     return date
 }
 
+// legacy notification loop
 const sendNotificationToTargetPreference = async (targetPreference={}) => {
     try {
         if (targetPreference.notified)
@@ -103,6 +104,8 @@ const chronNotificationLoop = async (targetPreference={}, institution={}, timing
     return res
 }
 
+// LEGACY NOTIFICATION LOOP ENDS HERE
+
 const cronNotificationTiming = (upcomingFriday=new Date(), chronTimingInfo={}, timezone="America/Edmonton") => {
     const targetDayOfWeek = scheduleHelpers.findDayOfWeek(
         upcomingFriday,
@@ -127,7 +130,7 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
     const upsertType = !!initPreferenceInfo.upsert
 
     const createAndOverwritePreference = async () => {
-        const toBeSavedPreference = global.utils.deepCopy(targetPreference)
+        const toBeSavedPreference = global.utils.deepCopy(preferenceInfo)
         if (toBeSavedPreference._id)
             delete toBeSavedPreference._id
         try {
@@ -186,6 +189,21 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
             return null
         }
     }
+    const createJummahNotification = async (khateeb={}, jummahInfo={ location: {}, timing: {} } ) => {
+        try {
+            const constructorRes = await new notificationConstructors.JummahReminderNotificationConstructor(khateeb, preferenceInfo, jummahInfo ).create()
+            // notifications can create the same type of notification
+            // for multiple users so this is why we do this convoluted
+            // step of check - as it could be invalid at any of these steps  
+            if (constructorRes && constructorRes[0] && constructorRes[0]._id)
+                return constructorRes[0]._id.toString()
+            else
+                return 'none'
+        } catch(err) {
+            console.log(err)
+            return 'none'
+        }
+    }
 
     const canBeMessaged = () => !!preferenceInfo && preferenceInfo._id !== 'none' && !preferenceInfo.notified
     const isUpsertable = () => preferenceInfo.upsert === true
@@ -226,21 +244,13 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
             if (!khateeb)
                 return returnPreferenceInfo()
             
-            if (!targetPreference) {
-                await updateJummahStatusAndSet()
-                return returnPreferenceInfo()
+            let updates = {}
+            if (targetPreference) {
+                const notificationID = await createJummahNotification(khateeb, jummahInfo)
+                updates = { notified: true, notificationID }
             }
 
-            const constructorRes = await new notificationConstructors.JummahReminderNotificationConstructor(
-                khateeb,
-                preferenceInfo,
-                jummahInfo
-            ).create()
-            const notificationID = constructorRes ? constructorRes[0] ? constructorRes[0]._id : 'none' : 'none'            
-            await updateJummahStatusAndSet({
-                notified: true,  
-                notificationID: notificationID ? notificationID.toString() : 'none' 
-            })
+            await updateJummahStatusAndSet(updates)
             return returnPreferenceInfo()
         }
     }

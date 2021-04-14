@@ -216,7 +216,10 @@ export default {
             showJummahSettings: false,
             showLocations: true,
             settingsInfo: {},
-            showingUnavailable: false
+            showingUnavailable: false,
+            maxRunCount: process.env.VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_FOR_WEEK ?
+                parseInt(process.env.VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_FOR_WEEK) :
+                300
         }
     },
     methods: {
@@ -345,7 +348,7 @@ export default {
         },
         maxNotificationLoopRunCount() {
             // divide by two because backups and main carry the same count (duplicates)
-            return (this.totalNotificationLoopRunCount / 2) > 6
+            return (this.totalNotificationLoopRunCount / 2) > this.maxRunCount
         }
     },
     created() {

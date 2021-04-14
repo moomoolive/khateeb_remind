@@ -112,7 +112,10 @@ export default {
                 isGivingKhutbah: !isBackup,
                 khateebID: this.currentUser,
                 notified: false,
-                notificationID: 'none'
+                notificationID: 'none',
+                maxRunCount: process.env.VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_INDIVIDAUL_JUMMAH ?
+                    parseInt(process.env.VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_INDIVIDAUL_JUMMAH) : 
+                    300
             })
             return this.closePopup()
         },
@@ -184,7 +187,7 @@ export default {
             return runCount ? runCount.loopRunCount : 0
         },
         notificationRunCountExceeded() {
-            return this.notificationLoopRunCount > 3 || this.maxNotificationLoopRunCount
+            return this.notificationLoopRunCount > this.maxRunCount || this.maxNotificationLoopRunCount
         }
     }
 }
