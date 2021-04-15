@@ -9,9 +9,11 @@ const authenticate = (authOptions={}) => {
                 return response.status(401).json({ msg: `Invalid authorization check if authorization is present in header` })
             try {
                 const userInfo = await $db.users.findOne({ _id: decoded._id }).exec()
-                if (!userInfo || !authHelpers.validUserAuthentication(userInfo.__t, authOptions))
+                if (!userInfo)
+                    return response.status(503).json({ msg: `There was a problem getting user info` })
+                if (!authHelpers.validUserAuthentication(userInfo.__t, authOptions))
                     return response.status(401).json({ msg: `Invalid authorization to access this resource` })
-                request.headers = authHelpers.mutateHeadersToIncludeUserInfo(request, userInfo)
+                authHelpers.mutateHeadersToIncludeUserInfo(request, userInfo)
                 return next()
             } catch(error) {
                 console.log(error)

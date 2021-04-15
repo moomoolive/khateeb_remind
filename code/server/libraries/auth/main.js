@@ -37,12 +37,10 @@ const validUserAuthentication = (userType, authOptions={}) => {
 }
 
 const mutateHeadersToIncludeUserInfo = (request, decodedToken) => {
-    const newHeader = { ...request.headers }
-    newHeader.institutionid = decodedToken.institutionID
-    newHeader.userid = decodedToken._id
-    newHeader.usertype = decodedToken.__t
-    newHeader.authLevel = userTypeToAuthLevel(decodedToken.__t)
-    return newHeader
+    request.institutionid = decodedToken.institutionID
+    request.userid = decodedToken._id
+    request.usertype = decodedToken.__t
+    request.authLevel = userTypeToAuthLevel(decodedToken.__t)
 } 
 
 module.exports = {

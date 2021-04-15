@@ -58,7 +58,6 @@ import pwaHelpers from './libraries/pwa/main.js'
 import localStorageHelpers from './libraries/localStorageManagement/main.js'
 
 import { nanoid } from 'nanoid'
-import axios from 'axios'
 
 export default {
   components: {
@@ -93,7 +92,8 @@ export default {
       const serviceWorkerReg = await pwaHelpers.getServiceWorkerRegistration()
       if (serviceWorkerReg) {
         const pushSub = await pwaHelpers.subscribeUserToPushNotifications(serviceWorkerReg)
-        await this.$API.pwa.createPWASubscription(pushSub)
+        const resCode = await this.$API.pwa.createPWASubscription(pushSub)
+        return resCode
       } 
     },
     setFirstLogin() {
@@ -102,7 +102,7 @@ export default {
     },
     async executePushNotificationWorkflow() {
       const res = await this.signUserUpForPushNotifications()
-      if (res && Object.keys(res).length > 0)
+      if (res === 0)
         localStorageHelpers.commit("recievingPushNotifications", true)
     },
     isFirstLogin() {

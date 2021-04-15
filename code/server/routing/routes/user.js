@@ -100,20 +100,20 @@ router.post('/pwa-subscription', async (req, res) => {
         if (!subscriptions)
             subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid, institutionID: req.headers.institutionid }).save()
         if (subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid))
-            return res.json({ msg: `This device is already subscribed to notifications` })
+            return res.json({ code: 0, msg: `This device is already subscribed to notifications` })
         const deviceIdentification = new DeviceDetector().parse(req.headers["user-agent"])
         const deviceInfo = {
             deviceId: req.headers.deviceid,
             deviceType: deviceIdentification.device.type,
-            deviceBrand: deviceIdentification.client.type === 'browser' ? deviceIdentification.client.name : "unknown",
-            browserBrand: deviceIdentification.device.brand || 'unknown' 
+            deviceBrand: deviceIdentification.device.brand || 'unknown',
+            browserBrand: deviceIdentification.client.type === 'browser' ? deviceIdentification.client.name : "unknown"
         }
         const newSubscriptionsArray = [...subscriptions.subscriptions, { ...deviceInfo, browserSubscriptionDetails: req.body, } ]
-        const updated = await $db.pwaSubscriptions.findOneAndUpdate({ _id: subscriptions._id.toString() }, { subscriptions: newSubscriptionsArray }, { new: true })
-        return res.json({ data: updated })
+        await $db.pwaSubscriptions.updateOne({ _id: subscriptions._id.toString() }, { subscriptions: newSubscriptionsArray })
+        return res.json({ code: 0 })
     } catch(err) {
         console.log(`Couldn't create subscription`, err)
-        return res.json({ data: {}, msg: `Couldn't create subscription. ${err}` })
+        return res.json({ code: 1, msg: `Couldn't create subscription. ${err}` })
     }
 })
 

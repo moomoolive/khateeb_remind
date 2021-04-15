@@ -1,10 +1,8 @@
 const dayjs = require('dayjs')
 const utc = require('dayjs/plugin/utc')
 const timezone = require('dayjs/plugin/timezone')
-const objectSupport = require('dayjs/plugin/objectSupport')
 dayjs.extend(utc)
 dayjs.extend(timezone)
-dayjs.extend(objectSupport)
 
 const convertDayJsToJSDateObject = (dayJs=dayjs()) => {
     return new Date(
