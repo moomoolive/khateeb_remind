@@ -13,7 +13,7 @@
                     }
                 }"
                 :backgroundColor="`none`"
-                :basedOn="{ username: $store.getters['user/allInfo'].username }"
+                :basedOn="{ username: $store.state.user.userInfo.username }"
                 :buttonText="`Change Username`"
                 @submitted="updateInfo($event)"
             />
@@ -46,7 +46,7 @@
                 :formProps="{
                     backgroundColor: 'none',
                     buttonText: 'Update Profile',
-                    basedOn: $store.getters['user/allInfo']
+                    basedOn: $store.state.user.userInfo
                 }"
                 @submitted="updateInfo($event)"
             />

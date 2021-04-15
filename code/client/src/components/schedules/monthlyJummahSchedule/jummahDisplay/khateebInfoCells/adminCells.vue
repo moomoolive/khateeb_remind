@@ -113,7 +113,7 @@ export default {
         },
         async khateebSelectionChanged(change, index) {
             const khateebID = change.target.value
-            if (this.noPreferenceIndicated(index)) {
+            if (this.noPreferenceIndicated(index) || this.khateebPreferences[index].upsert) {
                 const isBackup = index !== 0
                 this.$emit('new-preference', { 
                     khateebID, 

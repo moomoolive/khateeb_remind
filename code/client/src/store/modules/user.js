@@ -1,5 +1,6 @@
 import auth from '@/libraries/auth/main.js'
 import userIdentification from '@/libraries/userIdentification/main.js'
+import localStorageHelpers from '@/libraries/localStorageManagement/main.js'
 
 import axios from 'axios'
 
@@ -12,7 +13,8 @@ export default {
             abbreviatedName: "rand Inst" 
         },
         isBrowsingOnPWA: userIdentification.deviceBrowsingViaPWA(),
-        userInfo: !localStorage.getItem('token') ? {} : {
+        userInfo: !localStorage.getItem('token') ? {} : 
+        localStorageHelpers.get("cachedUserCheckIn") ? localStorageHelpers.get("cachedUserCheckIn").userInfo : {
             __t: "khateeb",
             _id: "1234",
             confirmed: true,
@@ -59,21 +61,17 @@ export default {
         isLoggedIn({ jwToken }) {
             return !!jwToken
         },
-        // this redundant getter is here for legacy reasons
-        allInfo(state) {
-            return state.userInfo
-        },
-        decodeJWTToken({ jwToken }, { isLoggedIn }) {
+        decodedJWT({ jwToken }, { isLoggedIn }) {
             if (!isLoggedIn)
                 return { msg: 'no token' }
             const tokenPayload = jwToken.split('.')[1]
             const decodedPayload = window.atob(tokenPayload)
             return JSON.parse(decodedPayload)
         },
-        fullName(state, { allInfo }) {
-            return `${allInfo.firstName} ${allInfo.lastName}`
+        fullName(state) {
+            return `${state.userInfo.firstName} ${state.userInfo.lastName}`
         },
-        validAuthentication(state, { isLoggedIn, decodeJWTToken: { exp: tokenExpirationInSeconds } }) {
+        validAuthentication(state, { isLoggedIn, decodedJWT: { exp: tokenExpirationInSeconds } }) {
             if (!isLoggedIn)
                 return false
             const oneSecondInMilliseconds = 1_000
@@ -82,15 +80,15 @@ export default {
             return expirationTimeInUNIXTime > UNIXTimeNow
             
         },
-        type(state, { allInfo: { __t: type }, isLoggedIn }) {
+        type(state, { isLoggedIn }) {
             if (isLoggedIn)
-                return type
+                return state.userInfo.__t
             else
                 return 'none'
         },
-        authLevel(state, { allInfo: { __t: type }, isLoggedIn }) {
+        authLevel(state, { isLoggedIn }) {
             if (isLoggedIn)
-                return auth.userTypeToAuthLevel(type)
+                return auth.userTypeToAuthLevel(state.userInfo.__t)
             else
                 return 0
         }

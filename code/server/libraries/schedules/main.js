@@ -24,7 +24,7 @@ const numberOfJummahThisMonth = (date=new Date()) => {
         date: date.getDate()
     })
     const upcomingFriday = new Date(helpers.findUpcomingFriday(dayjs).toISOString())
-    const firstFriday = findFirstFriday(date.getMonth() + 1, date.getFullYear())
+    const firstFriday = findFirstFriday(date.getMonth(), date.getFullYear())
     let count = 1
     const week = 7
     while (!sameMonthDateAndYear(upcomingFriday, firstFriday)) {
@@ -47,5 +47,6 @@ module.exports = {
     findUpcomingFridayDBFormat,
     findFirstFriday,
     numberOfJummahThisMonth,
-    findDayOfWeek
+    findDayOfWeek,
+    sameMonthDateAndYear
 }

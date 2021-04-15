@@ -189,7 +189,7 @@ export default {
     },
     computed: {
         userType() {
-            return this.$store.getters['user/allInfo'].__t
+            return this.$store.state.user.userInfo.__t
         },
     }
 }

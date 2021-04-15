@@ -177,7 +177,7 @@ export default {
             return this.info.khateebPreferences.filter(p => p.createdAt)
         },
         currentUser() {
-            return this.$store.getters['user/allInfo']._id
+            return this.$store.state.user.userInfo._id
         },
         currentUserIsAlreadySignedUpForThisJummah() {
             return this.info.khateebPreferences.find(kp => kp.khateebID === this.currentUser)

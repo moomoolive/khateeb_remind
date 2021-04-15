@@ -107,6 +107,7 @@ const chronNotificationLoop = async (targetPreference={}, institution={}, timing
 // LEGACY NOTIFICATION LOOP ENDS HERE
 
 const cronNotificationTiming = (upcomingFriday=new Date(), chronTimingInfo={}, timezone="America/Edmonton") => {
+    console.log('hi')
     const targetDayOfWeek = scheduleHelpers.findDayOfWeek(
         upcomingFriday,
         chronTimingInfo.dayOfWeek,
