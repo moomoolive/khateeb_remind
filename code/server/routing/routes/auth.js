@@ -90,11 +90,8 @@ router.post(
                 return res.status(401).json({  msg: 'unauthorized', token: null })
             else if (!user.confirmed && user.__t !== 'root')
                 return res.json({ msg: `un-confirmed-${user.__t}`, token: null })
-            else {
-                const tokenInfo = global.utils.deepCopy(user)
-                delete tokenInfo.password
-                return res.json({ msg: 'success', token: authHelpers.createToken(tokenInfo) }) 
-            }
+            else
+                return res.json({ msg: 'success', token: authHelpers.createToken({ _id: user._id }) })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ msg: `There was an issue encountered during sign`, token: null })

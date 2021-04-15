@@ -77,7 +77,7 @@ export default {
             if (Object.keys(preference).length < 1 || preference.khateebID === 'none')
                 return 'To Be Decided'
             const name = this.khateebName(this.khateebs.find(k => k._id === preference.khateebID))
-            return `${name}${preference.khateebID === this.$store.getters['user/allInfo']._id ? ' (You)' : ''}`
+            return `${name}${preference.khateebID === this.$store.state.user.userInfo._id ? ' (You)' : ''}`
         },
         khateebName(khateeb) {
             return khateebHelpers.khateebName(khateeb)

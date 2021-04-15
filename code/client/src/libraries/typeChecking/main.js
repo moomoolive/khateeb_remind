@@ -16,7 +16,10 @@ const castToArray = (data) => {
 
 const isJWT = (candidate="akjfdalsfdjaii32390-1") => {
     try {
-        return candidate.split('.').length === 3 && window.atob(candidate)
+        if (typeof candidate !== 'string')
+            return false
+        const jwtSections = candidate.split('.')
+        return jwtSections.length === 3 && window.atob(jwtSections[1])
     } catch(err) {
         return false
     }

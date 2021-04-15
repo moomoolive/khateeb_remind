@@ -13,7 +13,7 @@
                     }
                 }"
                 :backgroundColor="`none`"
-                :basedOn="{ username: $store.getters['user/allInfo'].username }"
+                :basedOn="{ username: $store.state.user.userInfo.username }"
                 :buttonText="`Change Username`"
                 @submitted="updateInfo($event)"
             />
@@ -46,7 +46,7 @@
                 :formProps="{
                     backgroundColor: 'none',
                     buttonText: 'Update Profile',
-                    basedOn: $store.getters['user/allInfo']
+                    basedOn: $store.state.user.userInfo
                 }"
                 @submitted="updateInfo($event)"
             />
@@ -85,14 +85,10 @@ export default {
     methods: {
         async updateInfo(update={}) {
             const res = await this.$API.user.updateInfo(update)
-            if (!res.token)
+            if (!res.data)
                 return this.utils.alert(`There was a problem updating your profile`)
-            this.storeToken(res.token)
             this.rerenderProfileSettings()
             this.utils.alert(`Successfully updated`, 'success')
-        },
-        storeToken(token) {
-            this.$store.dispatch('user/updateToken', token)
         },
         rerenderProfileSettings() {
             this.showProfileSettings = false

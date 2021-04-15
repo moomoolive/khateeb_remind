@@ -251,7 +251,7 @@ export default {
     },
     computed: {
         userInfo() {
-            return this.$store.getters['user/allInfo']
+            return this.$store.state.user.userInfo
         }
     },
     async created() {

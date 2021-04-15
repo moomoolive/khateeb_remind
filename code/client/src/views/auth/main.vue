@@ -74,8 +74,9 @@ export default {
             else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
                 this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
             else if (authRes.token && authRes.msg === 'success') {
-                this.toApp(authRes.token, loginInfo)
+                this.$store.dispatch('user/updateToken', authRes.token)
                 await this.$API.user.checkIn()
+                this.$nextTick(() => this.toApp(authRes.token, loginInfo))
             }
             else
                 this.errorMsg = 'Incorrect Username or Password'
@@ -106,7 +107,6 @@ export default {
                 this.userCredentials.username = username
                 localStorageHelpers.commit('userCredentials', this.userCredentials)
             }
-            this.$store.dispatch('user/updateToken', token)
             this.$nextTick(() => { this.loginRedirect() })
         },
         forgotCredentials() {

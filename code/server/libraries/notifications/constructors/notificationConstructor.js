@@ -71,8 +71,6 @@ module.exports = class NotificationConstructor {
 
     async executePWANotifications(userId="1234") {
         const subscriptions = await this.getPWASubscriptions(userId)
-        if (!info)
-            return []
         const pwaRes = await this.sendPWANotifications(subscriptions)
         return pwaRes
     } 
@@ -96,10 +94,21 @@ module.exports = class NotificationConstructor {
     async getPWASubscriptions(userID="1234") {
         try {
             const data = await $db.pwaSubscriptions.findOne({ userID }).exec()
-            return data.subscriptions.filter(s => s.active)
+            if (!data)
+                return []
+            else
+                return data.subscriptions.filter(s => s.active)
         } catch(err) {
             console.log(err)
             return []
+        }
+    }
+
+    // for more pwa message options check the pwaNotifications library
+    pwaMsgObject() {
+        return {
+            title: "default title",
+            body: "default body"
         }
     }
 

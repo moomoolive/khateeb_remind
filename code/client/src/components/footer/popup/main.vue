@@ -29,7 +29,6 @@ export default {
             this.$store.commit('footerPopup/close')
         },
         closeAfter(seconds=4) {
-            console.log('hi')
             const milliSecondsInASecond = 1_000
             window.setTimeout(() => this.close() , seconds * milliSecondsInASecond)
         }

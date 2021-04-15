@@ -2,84 +2,128 @@ const { cronWrapper } = require(global.$dir + '/libraries/cron/main.js')
 const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
 const jummahHelpers = require(global.$dir + '/libraries/jummahs/main.js')
 
-const job = async () => {
-    try {
-        const institutions = await $db.institutions.find({ confirmed: true }).exec()
-        const upcomingFriday = scheduleHelpers.findUpcomingFridayDBFormat()
-        for (let i = 0; i < institutions.length; i++) {
-            const targetInstitution = institutions[i]
-            if (!targetInstitution.settings.allowJummahNotifications)
-                continue
-            const numberOfJummahThisMonth = scheduleHelpers.numberOfJummahThisMonth(targetInstitution.getLocalTime())
-            const activeTimings = await $db.timings.find().activeTimings(targetInstitution._id).exec()
-            const scheduledUpcomingJummahs = await $db.jummahPreferences.find().upcomingJummahsForInstitution(upcomingFriday, targetInstitution._id).exec()
-            for (let x = 0; x < activeTimings.length; x++) {
-                const targetTiming = activeTimings[x]
-                let khateebsScheduledForThisTiming = scheduledUpcomingJummahs.filter(j => j.timingID === targetTiming._id.toString())
-                let mainKhateeb = khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah)
-                let backupKhateeb = khateebsScheduledForThisTiming.find(k => k.isBackup)
-                const institutionKhateebs = await $db.khateebs.find({ institutionID: targetInstitution._id.toString() })
-                console.log(scheduledUpcomingJummahs)
-                if (khateebsScheduledForThisTiming.length < 2) {
-                    const defaultKhateebs = targetTiming.defaultKhateebs[numberOfJummahThisMonth - 1]
-                    if (!mainKhateeb && defaultKhateebs.mainKhateeb !== 'none') {
-                        const mainKhateebObject = institutionKhateebs.find(k => k._id.toString() === defaultKhateebs.mainKhateeb)
-                        const mainKhateebIsAbleToGiveKhutbah = !mainKhateebObject.unavailableDates
-                            .find(({ date }) => scheduleHelpers.sameMonthDateAndYear(date, upcomingFriday))
-                        if (mainKhateebIsAbleToGiveKhutbah) {
-                            const defaultMain = await new $db.jummahPreferences({
-                                locationID: targetTiming.locationID,
-                                institutionID: targetTiming.institutionID,
-                                timingID: targetTiming._id.toString(),
-                                date: upcomingFriday,
-                                khateebID: defaultKhateebs.mainKhateeb,
-                                isGivingKhutbah: true,
-                                isBackup: false
-                            }).save()
-                            khateebsScheduledForThisTiming.push(defaultMain)
-                        }
-                    }
-                    if (!backupKhateeb && defaultKhateebs.backup !== 'none') {
-                        const backupKhateebObject = institutionKhateebs.find(k => k._id.toString() === defaultKhateebs.mainKhateeb)
-                        const backupKhateebIsAbleToGiveKhutbah = !backupKhateebObject.unavailableDates
-                            .find(({ date }) => scheduleHelpers.sameMonthDateAndYear(date, upcomingFriday))
-                        if (backupKhateebIsAbleToGiveKhutbah) {
-                            const defaultBackup = await new $db.jummahPreferences({
-                                locationID: targetTiming.locationID,
-                                institutionID: targetTiming.institutionID,
-                                timingID: targetTiming._id.toString(),
-                                date: scheduleHelpers.findUpcomingFridayDBFormat(),
-                                khateebID: upcomingFriday,
-                                isGivingKhutbah: !khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah),
-                                isBackup: true
-                            }).save()
-                            khateebsScheduledForThisTiming.push(defaultBackup)
-                        }
-                    } 
-                }
-                if (khateebsScheduledForThisTiming.length < 1)
-                    continue
-                mainKhateeb = khateebsScheduledForThisTiming.find(k => k.isGivingKhutbah)
-                if (!mainKhateeb && !khateebsScheduledForThisTiming[0].notified )
-                    mainKhateeb = await $db.jummahPreferences.findOneAndUpdate({ _id: khateebsScheduledForThisTiming[0]._id.toString() }, { isGivingKhutbah: true }, { new: true })
-                console.log('before chron', mainKhateeb)
-                if (!mainKhateeb.notified)    
-                    cronWrapper({
-                        time: jummahHelpers.cronNotificationTiming(
-                            upcomingFriday, 
-                            targetInstitution.settings.jummahNotificationsTiming, 
-                            targetInstitution.timezone
-                        ), 
-                        job: jummahHelpers.chronNotificationLoop(mainKhateeb, targetInstitution, targetTiming)    
-                    }).start()
-            }
+const findDefaultPreferenceForThisWeek = (defaultKhateebID="12345", khateebs=[], upcomingFriday=new Date(), targetTiming={}, isBackup=true) => {
+    const noneScheduled = { _id: "none" }
+    if (!defaultKhateebID || defaultKhateebID === 'none')
+        return noneScheduled
+    const targetKhateeb = khateebs.find(k => k._id.toString() === defaultKhateebID)
+    if (!targetKhateeb)
+        return noneScheduled
+    const isDefaultKhateebUnavailableOnThisDate = targetKhateeb.unavailableDates.find(d => {
+        return scheduleHelpers.sameMonthDateAndYear(new Date(d.date), new Date(upcomingFriday))
+    })
+    if (isDefaultKhateebUnavailableOnThisDate)
+        return noneScheduled
+    else
+        return { 
+            khateebID: defaultKhateebID, 
+            upsert: true,
+            timingID: targetTiming._id.toString(),
+            institutionID: targetTiming.institutionID,
+            locationID: targetTiming.locationID,
+            date: new Date(upcomingFriday),
+            isBackup,
+            isGivingKhutbah: !isBackup,
+            notified: false 
         }
-        console.log(`Set notification cron jobs for institutions!`)
+} 
+
+const job = async () => {
+    let confirmedInstitutions = []
+    try {
+        // get all institutions:
+        // > Are confirmed
+        // > that aren't the root institution (aka "__ROOT__")
+        // > and have jummah notifications turned on
+        const institutions = await $db.institutions.find({ 
+            confirmed: true, 
+            name: { $ne: "__ROOT__" },
+            "settings.allowJummahNotifications": true 
+        }).exec()
+        if (Array.isArray(institutions))
+            confirmedInstitutions = institutions
     } catch(err) {
-        console.log(err)
-        console.log(`Couldn't set notification for all institutions!`)
+        console.log("Couldn't run notification chron ", err)
+        return
+    }
+    const upcomingFriday = scheduleHelpers.findUpcomingFridayDBFormat()
+    const thisIsFridayNumberInCurrentMonth = scheduleHelpers.numberOfJummahThisMonth(upcomingFriday)
+    // loop through institutions that fit above criteria
+    for (let i = 0; i < confirmedInstitutions.length; i++) {
+        const targetInstitution = confirmedInstitutions[i]
+        let activeTimings = []
+        try {
+            const timings = await $db.timings.find().activeTimings(targetInstitution._id.toString()).exec()
+            if (Array.isArray(timings))
+                activeTimings = timings
+        } catch(err) {
+            console.log(`There was a problem finding timings for ${targetInstitution.name} `, err)
+            continue
+        }
+        // loop through all active timings
+        for (let j = 0; j < activeTimings.length; j++) {
+            const targetTiming = activeTimings[j]
+            // find all jummah entries associated with this timing for the upcoming
+            // week
+            let targetTimingJummahPreferences = []
+            try {
+                const jummahPreferences = await $db.jummahPreferences.find({ timingID: targetTiming._id.toString(), date: upcomingFriday }).exec()
+                if (Array.isArray(jummahPreferences))
+                    targetTimingJummahPreferences = jummahPreferences
+            } catch(err) {
+                console.log(`There was a problem finding jummah preferences for timing ${targetTiming._id} at ${targetInstitution.name} `, err)
+            }
+            // compensate for zero indexing
+            const defaultKhateebsForThisWeek = targetTiming.defaultKhateebs[thisIsFridayNumberInCurrentMonth - 1]
+            // identify main and backup khateebs
+            let mainKhateeb = targetTimingJummahPreferences.find(jp => !jp.isBackup)
+            let backupKhateeb = targetTimingJummahPreferences.find(jp => jp.isBackup)
+            // if there is no explicitly stated main khateeb or backup
+            // check default khateebs
+            if (!mainKhateeb || !backupKhateeb) {
+                let khateebsAtThisInstitution = []
+                try {
+                    const khateebs = await $db.khateebs.find({ institutionID: targetInstitution._id.toString() }).exec()
+                    if (Array.isArray(khateebs))
+                        khateebsAtThisInstitution = khateebs
+                } catch(err) {
+                    console.log(`Couldn't find khateebs at ${targetInstitution.name} `, err)
+                }
+                if (!mainKhateeb)
+                    mainKhateeb = findDefaultPreferenceForThisWeek(
+                        defaultKhateebsForThisWeek.mainKhateeb,
+                        khateebsAtThisInstitution,
+                        upcomingFriday,
+                        targetTiming,
+                        false
+                    )
+                if (!backupKhateeb)
+                    backupKhateeb = findDefaultPreferenceForThisWeek(
+                        defaultKhateebsForThisWeek.backup,
+                        khateebsAtThisInstitution,
+                        upcomingFriday,
+                        targetTiming,
+                        true
+                    )
+            }
+            cronWrapper({
+                time: jummahHelpers.cronNotificationTiming(
+                    upcomingFriday, 
+                    targetInstitution.settings.jummahNotificationsTiming, 
+                    targetInstitution.timezone
+                ),
+                job: async () => {
+                    try {
+                        await jummahHelpers.jummahPreferenceNotifier(mainKhateeb, true).sendNotification()
+                        await jummahHelpers.jummahPreferenceNotifier(backupKhateeb, false).sendNotification()
+                    } catch(err) {
+                        console.log(err)
+                    }
+                }
+            }).start()
+        }
     }
 }
 
-// every sunday @ 6AM
+// every sunday @ 6AM MST
 module.exports = cronWrapper({ time: '00 00 6 * * 0' , syncWithTimezone: true, job })

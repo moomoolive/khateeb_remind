@@ -2,12 +2,12 @@
     <div class="grey container" v-on-clickaway="close">
         
         <div class="greeting">
-            Asalam Alikoum {{ $store.getters['user/allInfo'].firstName }},
+            Asalam Alikoum {{ $store.state.user.userInfo.firstName }},
         </div>
 
         <div class="handle">
             <span class="blue">
-                @{{ $store.getters['user/allInfo'].handle }}
+                @{{ $store.state.user.userInfo.handle }}
             </span>
         </div>
         
@@ -87,7 +87,7 @@ export default {
     },
     computed: {
         userType() {
-            return this.$store.getters['user/allInfo'].__t
+            return this.$store.state.user.userInfo.__t
         },
         showInstitutionLogo() {
             return this.imageSrc !== require('@/assets/logos/genericInstitution.png')

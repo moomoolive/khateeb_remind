@@ -1,10 +1,9 @@
 const express = require('express')
 const validator = require('express-validator')
+const DeviceDetector = require('device-detector-js')
 
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
-
-const authHelpers = require(global.$dir + '/libraries/auth/main.js')
 
 const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 1 }))
@@ -27,14 +26,11 @@ router.put(
     async (req, res) => {
         try {
             const userType = `${req.headers.usertype}${req.headers.usertype === 'root' ? '' : 's'}`
-            const mongooseRes = await $db[userType].updateOne({ _id: req.headers.userid }, req.body)
-            // JWT token carries important information needed on the client side
-            // so whenever user information is updated, it should be refreshed
-            const token = await authHelpers.refreshToken(req.headers.userid)
-            return res.json({ token, msg: `Successfully updated`, mongooseRes })
+            const mongooseRes = await $db[userType].findOneAndUpdate({ _id: req.headers.userid }, req.body, { new: true }).select(["-__v", "-password"]).exec()
+            return res.json({ data: mongooseRes, msg: `Successfully updated`, mongooseRes })
         } catch(err) {
             console.log(err)
-            return res.status(503).json({ token: null, msg: `An error occured when updating profile. Err trace: ${err}` })
+            return res.status(503).json({ data: null, msg: `An error occured when updating profile. Err trace: ${err}` })
         }
     }
 )
@@ -42,8 +38,7 @@ router.put(
 router.get('/check-in', async(req, res) => {
     try {
         const userPackage = {}
-        const user = await $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
-        userPackage.lastLogin = user.lastLogin
+        userPackage.userInfo = await $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["-__v", "-password"]).exec()
         userPackage.notifications = await $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
         userPackage.institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
         return res.json(userPackage)
@@ -106,11 +101,12 @@ router.post('/pwa-subscription', async (req, res) => {
             subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid, institutionID: req.headers.institutionid }).save()
         if (subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid))
             return res.json({ msg: `This device is already subscribed to notifications` })
+        const deviceIdentification = new DeviceDetector().parse(req.headers["user-agent"])
         const deviceInfo = {
             deviceId: req.headers.deviceid,
-            deviceType: req.headers.devicetype,
-            deviceBrand: req.headers.devicebrand,
-            browserBrand: req.headers.browserbrand 
+            deviceType: deviceIdentification.device.type,
+            deviceBrand: deviceIdentification.client.type === 'browser' ? deviceIdentification.client.name : "unknown",
+            browserBrand: deviceIdentification.device.brand || 'unknown' 
         }
         const newSubscriptionsArray = [...subscriptions.subscriptions, { ...deviceInfo, browserSubscriptionDetails: req.body, } ]
         const updated = await $db.pwaSubscriptions.findOneAndUpdate({ _id: subscriptions._id.toString() }, { subscriptions: newSubscriptionsArray }, { new: true })

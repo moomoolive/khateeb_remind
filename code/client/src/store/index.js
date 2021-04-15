@@ -18,9 +18,12 @@ export default new Vuex.Store({
   },
   actions: {
     storeUserPackage({ commit }, userPackage) {
+      return new Promise(resolve => {
         commit('user/storeInfoFromAPI', userPackage)
+        commit('user/updateUserInfo', userPackage.userInfo)
         commit('notifications/stashServerNotifications', userPackage)
-        commit('app/successfullyAssignedUserPackage')
+        resolve()
+      })
     }
   },
   getters: {},

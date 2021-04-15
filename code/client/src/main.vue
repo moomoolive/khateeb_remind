@@ -85,12 +85,6 @@ export default {
     setDeviceId() {
       if (!localStorageHelpers.get("deviceId"))
         localStorageHelpers.commit("deviceId", nanoid(24))
-      axios.defaults.headers.common.deviceid = localStorageHelpers.get("deviceId")
-    },
-    setDeviceInfo() {
-      axios.defaults.headers.common.devicetype = this.$store.getters['user/deviceType']
-      axios.defaults.headers.common.browserBrand = this.$store.getters['user/browserBrand']
-      axios.defaults.headers.common.deviceBrand = this.$store.getters['user/deviceBrand']
     },
     toggleNotificationDisplay() {
       this.showNotificationDisplay = !this.showNotificationDisplay
@@ -108,7 +102,7 @@ export default {
     },
     async executePushNotificationWorkflow() {
       const res = await this.signUserUpForPushNotifications()
-      if (Object.keys(res).length > 0)
+      if (res && Object.keys(res).length > 0)
         localStorageHelpers.commit("recievingPushNotifications", true)
     },
     isFirstLogin() {
@@ -143,7 +137,6 @@ export default {
   async created() {
     this.setJWT()
     this.setDeviceId()
-    this.setDeviceInfo()
   }
 }
 </script>

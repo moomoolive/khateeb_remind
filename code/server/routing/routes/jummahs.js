@@ -49,7 +49,8 @@ router.post(
             const duplicateEntry = await $db.jummahPreferences.findOne({ 
                 institutionID: req.body.institutionID, 
                 timingID: req.body.timingID, 
-                locationID: req.body.locationID, 
+                locationID: req.body.locationID,
+                isBackup: req.body.isBackup, 
                 date: req.body.date, 
             }).exec()
             if (duplicateEntry)
@@ -125,18 +126,22 @@ router.put(
     async (req, res) => {
         try {
             let targetPreference = req.body[req.query.backup ? 'backup' : 'main']
-            if (targetPreference.upsert) {
-                if (targetPreference.institutionID !== req.headers.institutionid)
-                    return res.json(403).json({ msg: 'forbidden resource' })
-            } else {
-                targetPreference = await $db.jummahPreferences.findOne({ _id: target._id }).exec()
+            if (targetPreference.institutionID !== req.headers.institutionid)
+                return res.status(403).json({ msg: 'forbidden resource' })
+            
+            if (!targetPreference.upsert) {
+                targetPreference = await $db.jummahPreferences.findOne({ _id: targetPreference._id }).exec()
                 if (!targetPreference)
                     return res.status(422).json({ msg: `Target preference does not exist` })
-                else if (targetPreference.institutionID !== req.headers.institutionid)
-                    return res.status(403).json({ msg: 'forbidden resource' })
             }
-            const updatedPreferences = await jummahHelpers.runNotificationLoop(targetPreference, req.body[!req.query.backup ? 'backup' : 'main'])
-            return res.json({ data: updatedPreferences })
+            
+            let otherPreference = req.body[!req.query.backup ? 'backup' : 'main']
+            if (otherPreference._id && otherPreference._id !== 'none')
+                otherPreference = await $db.jummahPreferences.findOne({ _id: otherPreference._id }) || otherPreference
+            
+            const target = await jummahHelpers.jummahPreferenceNotifier(targetPreference, true).sendNotification()
+            const other = await jummahHelpers.jummahPreferenceNotifier(otherPreference, false).sendNotification()
+            return res.json({ data: { targetPreference: target, otherPreference: other } })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ data: { targetPreference: {}, otherPreference: {} }, msg: `Couldn't run notification loop. Err trace: ${err}` })

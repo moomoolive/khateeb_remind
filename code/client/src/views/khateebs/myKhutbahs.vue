@@ -216,7 +216,7 @@ export default {
                         })
                         // filter out unavailable dates
                         .filter(t => {
-                            return !this.$store.getters['user/allInfo'].unavailableDates
+                            return !this.$store.state.user.userInfo.unavailableDates
                                 .find(e => datetime.sameDateMonthAndYear(e.date, t.date))
                         })
                         // filter out khutbahs already taken by other khateebs
@@ -232,7 +232,7 @@ export default {
                 .reduce((total, m) => [...total, ...m], [])
         },
         currentUserId() {
-            return this.$store.getters['user/allInfo']._id
+            return this.$store.state.user.userInfo._id
         },
         allFridaysThisMonthAndNext() {
             const thisMonth = new Date(this.upcomingFriday)
