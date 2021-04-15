@@ -1,11 +1,6 @@
 const mongoose = require('mongoose')
-const dayjs = require('dayjs')
-const utc = require('dayjs/plugin/utc')
-const timezone = require('dayjs/plugin/timezone')
-const objectSupport = require('dayjs/plugin/objectSupport')
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.extend(objectSupport)
+
+const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
 
 const scripts = require(global.$dir + '/libraries/scripts/main.js')
 
@@ -139,9 +134,8 @@ institution.methods.confirmRootAdmin = async function() {
     }
 }
 
-institution.methods.getLocalTime = function (date=new Date()) {
-    const timeNow = dayjs(date).tz(this.timezone)
-    return new Date(timeNow.toISOString())
+institution.methods.getLocalTime = function () {
+    return scheduleHelpers.getDateInTimezoneNow(this.timezone)
 }
 
 institution.post('deleteOne', async function(institution) {
