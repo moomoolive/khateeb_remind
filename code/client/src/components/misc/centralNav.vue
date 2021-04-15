@@ -7,10 +7,10 @@
             >
                 <button
                     v-if="utils.validAuthentication(link.auth)"
-                    class="admin-nav silver"
+                    :class="`admin-nav silver ${link.blinking ? 'glow' : ''}`"
                     @click="outbound(link.route)"
                 >
-                <p>{{ utils.stringFormat(link.name) }}<span v-if="link.indicator" class="indicator">{{ link.indicator }}</span> 
+                <p>{{ utils.stringFormat(link.name) }}
                     <span class="arrow-icon">></span></p>
                 </button>
             </div>
@@ -74,6 +74,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@keyframes glow { 
+    0% { background-color: getColor("silver"); }
+    50% { background-color: getColor("yellow") }
+    100% { background-color: getColor("silver"); } 
+}
+
 .admin-nav {
     width: 80% !important;
     height: 7.3vh;
@@ -83,6 +89,10 @@ export default {
     @include completelyRoundBorder();
     @include floatingBoxShadow();
     color: black;
+
+    &.glow {
+        animation: glow linear 2s 8;
+    }
 }
 
 p {

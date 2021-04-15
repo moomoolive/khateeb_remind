@@ -178,6 +178,7 @@ span {
         flex-direction: column;
         justify-content: center;
         margin-bottom: 30px;
+        margin-top: 7px;
     }
 
     .footer-links-header-divide {

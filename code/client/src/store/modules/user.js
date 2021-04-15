@@ -8,7 +8,8 @@ export default {
     namespaced: true,
     state: () => ({
         jwToken: localStorage.getItem('token') || null,
-        institution: !localStorage.getItem('token') ? {} : { 
+        institution: !localStorage.getItem('token') ? {} : 
+        localStorageHelpers.get("cachedUserCheckIn") ? localStorageHelpers.get("cachedUserCheckIn").institution : { 
             name: "random institution", 
             abbreviatedName: "rand Inst" 
         },

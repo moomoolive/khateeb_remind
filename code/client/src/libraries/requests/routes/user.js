@@ -40,6 +40,7 @@ const requests = {
         }
         try {
             const res = await axios.get(extension + '/check-in')
+            console.log(res)
             if (res && res.notifications && res.institution && res.userInfo) {
                 userPackage = res
                 localStorageHelpers.commit('cachedUserCheckIn', res)
