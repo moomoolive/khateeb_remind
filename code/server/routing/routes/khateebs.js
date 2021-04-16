@@ -4,6 +4,8 @@ const validator = require('express-validator')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
+const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+
 const router = express.Router()
 
 router.get(
@@ -56,6 +58,30 @@ router.delete(
         } catch(err) {
             console.log(err)
             return res.status(503).json({ data: `Couldn't delete khateeb. Err trace: ${err}` })
+        }
+    }
+)
+
+router.post(
+    '/availability-change/:type',
+    authMiddleware.authenticate({ level: 1 }),
+    validationMiddleware.validateRequest([
+        validator.body("change").exists(),
+        validator.body("msg").isString().isLength({ min: 1 })
+    ]),
+    async (req, res) => {
+        try {
+            const note = new notificationConstructors[req.params.type + 'AvailabilityChangeConstructor']({ 
+                change: req.body.change,
+                khateebID: req.headers.userid,
+                msg: req.body.msg 
+            })
+            await note.setRecipentsToAdmins(req.headers.institutionid)
+            await note.create()
+            return res.json({ code: 0 })
+        } catch(err) {
+            console.log(err)
+            return res.status(503).json({ code: 1, msg: `Couldn't notify admins about availability change. Err trace: ${err}` })
         }
     }
 )

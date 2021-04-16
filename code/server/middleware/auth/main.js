@@ -14,7 +14,6 @@ const authenticate = (authOptions={}) => {
                 if (!authHelpers.validUserAuthentication(userInfo.__t, authOptions))
                     return response.status(401).json({ msg: `Invalid authorization to access this resource` })
                 authHelpers.mutateHeadersToIncludeUserInfo(request, userInfo)
-                console.log(request.headers)
                 return next()
             } catch(error) {
                 console.log(error)

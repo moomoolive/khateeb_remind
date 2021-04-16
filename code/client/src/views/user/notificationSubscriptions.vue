@@ -108,7 +108,6 @@ export default {
             this.subscriptions.splice(index, 1, res)
         },
         browserLogo(name="Chrome mobile") {
-            console.log(name)
             if (/chrome|google/gi.test(name))
                 return 'chrome.png'
             else if (/firefox|mozilla/gi.test(name))

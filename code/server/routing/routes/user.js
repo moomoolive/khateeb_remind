@@ -62,7 +62,7 @@ router.put(
         try {
             const notification = await $db.notifications.findOne({ _id: req.body._id }).exec()
             if (notification.userID !== req.headers.userid)
-                return res.status(403).json(`You're not allowed to edit this notification (id: ${req.body._id})`)
+                return res.status(403).json({ msg: `You're not allowed to edit this notification (id: ${req.body._id})` })
             const updated = await $db.notifications.findOneAndUpdate({_id: req.body._id }, req.body, { new: true })
             return res.json(updated)
         } catch(err) {

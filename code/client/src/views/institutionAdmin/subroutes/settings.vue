@@ -142,6 +142,19 @@
                 </collapsable-box>
 
                 <collapsable-box
+                    class="setting-container"
+                    :headline="`Developer Tools`"
+                    :buttonColor="`darkBlue`"
+                    :tagDetails="restEndPointTokenCreated ? null : [{
+                        words: `None Used`,
+                        color: 'important',
+                        symbol: '📡' 
+                    }]"
+                >
+                    Coming Soon
+                </collapsable-box>
+
+                <collapsable-box
                     v-if="utils.validAuthentication(3)"
                     class="setting-container"
                     :headline="`Danger Zone`"
@@ -272,6 +285,9 @@ export default {
         },
         customLogoWasAdded() {
             return this.institutionImageSrc !== require('@/assets/logos/genericInstitution.png')
+        },
+        restEndPointTokenCreated() {
+            return false // TODO
         }
     },
     async created() {
@@ -298,6 +314,9 @@ export default {
 .setting-container {
     width: 40%;
     max-height: 1500px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-left: 5px;
 }
 
 .delete-institution {
@@ -349,10 +368,13 @@ export default {
     
     .settings-container {
         flex-direction: column;
+        margin-bottom: 40px;
     }
 
     .setting-container {
         width: 100%;
+        margin-right: 0px;
+        margin-left: 0px;
     }
 
     .delete-institution {

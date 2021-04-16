@@ -91,7 +91,7 @@ export default {
     color: black;
 
     &.glow {
-        animation: glow linear 2s 8;
+        animation: glow linear 2s 11;
     }
 }
 

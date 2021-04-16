@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="topnav">
+        <div class="bottom-nav">
             
-            <div class="footer-links-section">
+            <div v-show="isLoggedIn" class="footer-links-section">
                 <div class="footer-links-section-header">
                     Users
                 </div>
@@ -33,9 +33,17 @@
                     class="green" 
                     @click="utils.alert(`This section is coming soon insha'Allah`)"
                 >
-                    Dev Tools
+                    Homepage
                 </a>
 
+            </div>
+
+            <div class="footer-links-section">
+                <div class="footer-links-section-header">
+                    Devs
+                </div>
+                <div class="footer-links-header-divide"></div>
+                
                 <a 
                     class="green" 
                     href="https://github.com/moomoolive/khateeb_remind"
@@ -43,11 +51,19 @@
                 >
                     Contribute to Source Code
                 </a>
+
+                <a 
+                    class="green" 
+                    @click="utils.alert(`This section is coming soon insha'Allah`)"
+                >
+                    Dev Tools
+                </a>
+                
             </div>
 
         </div>
 
-        <div class="footer-logo">
+        <div class="footer-logo" @click="utils.toHomePage()">
             <div>
                 <img 
                     src="@/assets/logos/khateebRemindLogo.svg"
@@ -85,9 +101,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.topnav {
-    width: 95.2vw;
-    min-width: $minimumAppWidth;
+.bottom-nav {
+    width: 65vw;
+    max-width: 950px;
+    min-width: 250px;
     text-align: left;
     display: flex;
     justify-content: flex-start;
@@ -156,6 +173,7 @@ span {
     margin-bottom: 10px;
     margin-left: auto;
     width: 118px;
+    cursor: pointer;
 }
 
 @media screen and (max-width: $phoneWidth) {
@@ -174,7 +192,7 @@ span {
         margin-left: 10px;
     }
 
-    .topnav {
+    .bottom-nav {
         flex-direction: column;
         justify-content: center;
         margin-bottom: 30px;
