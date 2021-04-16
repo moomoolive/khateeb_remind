@@ -15,6 +15,14 @@ const requests = {
     },
     institutionSelection() {
         return helpers.returnArrayFromRequest("get", ["misc", "institution-selection"])
+    },
+    async healthEndpoint() {
+        try {
+            const res = await axios.get(extension + '/health-endpoint')
+            return res
+        } catch {
+            return 0
+        }
     }
 }
 

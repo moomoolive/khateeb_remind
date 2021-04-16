@@ -46,6 +46,9 @@ const appConfig = {
     },
     consts: {
         mongooseIdLength: 24
+    },
+    customHeaders: {
+        serviceWorkerCache: { "khateeb-remind-is-cacheable": "true" }
     }
 }
 

@@ -68,11 +68,12 @@ export default {
     notificationsManager,
     headerNavigation,
     requestManager,
-    footerPopup
+    footerPopup,
   },
   data() {
     return {
-      showNotificationDisplay: false
+      showNotificationDisplay: false,
+      isOffline: false
     }
   },
   methods: {
@@ -134,7 +135,7 @@ export default {
         await this.$API.user.checkIn()
     })
   },
-  async created() {
+  created() {
     this.setJWT()
     this.setDeviceId()
   }

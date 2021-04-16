@@ -19,7 +19,6 @@
         <div v-if="navMode === 'outbound'" class="return-to-central-container">
             <button class="back-to-central silver" @click="toCentral()">
                 <p>
-                    <!-- this isn't a mistake, i'm litterally using a lesser sign here -->
                     <span class="back-arrow"> < </span> 
                     Back
                 </p>

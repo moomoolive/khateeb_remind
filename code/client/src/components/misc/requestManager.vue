@@ -4,6 +4,7 @@
 
 <script>
 import helpers from '@/libraries/requests/requestManager/main.js'
+import footerPopups from '@/libraries/footerPopup/main.js'
 
 export default {
     name: 'requestManager',
@@ -46,12 +47,31 @@ export default {
         deactivateRequestAndDestroyResponse(key) {
             this.$store.commit('requests/removeResponse', key)
             delete this.activeRequests[key]
+        },
+        async pingHealthEndpointPerodically() {
+            const res = await this.$API.misc.healthEndpoint()
+            if (res) {
+                this.$store.commit('app/backOnline')
+                footerPopups.backOnline()
+                const fiveSecondsInMilliseconds = 6_000
+                window.setTimeout(() => window.location.reload(), fiveSecondsInMilliseconds)
+            }
+            else {
+                const tenSecondsInMilliseconds = 10_000
+                window.setTimeout(() => this.pingHealthEndpointPerodically(), tenSecondsInMilliseconds)
+            }
         }
     },
     computed: {
         requestsQueue() {
             return this.$store.state.requests.queue
         },
+        noResponseFromServerRequestsLast30Seconds() {
+            return this.$store.state.requests.noResFromXHRinLast30Seconds
+        },
+        offlineModeIsInitiated() {
+            return this.$store.state.app.isOffline
+        }
     },
     watch: {
         async requestsQueue(newVal) {
@@ -63,6 +83,19 @@ export default {
             if (this.activeRequests[requestKey] !== undefined)
                 this.clearRequest(requestKey)
             this.createActiveRequest(requestKey, request)
+        },
+        noResponseFromServerRequestsLast30Seconds(newVal, oldVal) {
+            const thirtySecondsInMilliseconds = 30_000
+            if (newVal === 1 && oldVal === 0)
+                window.setTimeout(() => this.$store.commit('requests/clearNoResCount'), thirtySecondsInMilliseconds)
+            if (newVal > parseInt(process.env.VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT) && !this.offlineModeIsInitiated) {
+                footerPopups.youAreOffline()
+                this.$store.commit("app/offlineMode")
+            }
+        },
+        offlineModeIsInitiated(newVal, oldVal) {
+            if (newVal && !oldVal)
+                this.pingHealthEndpointPerodically()
         }
     }
 }
