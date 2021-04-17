@@ -13,6 +13,8 @@ import helpers from '@/libraries/router/main.js'
 import beforeNavHooks from '@/libraries/router/beforeNavigationHooks.js'
 import requestQueryHelpers from '@/libraries/requests/queries/main.js'
 
+import homepage from '@/views/homepage.vue'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -25,6 +27,11 @@ const routes = [
     path: "/usecase",
     name: "khateebRemindUsecase",
     component: () => import(/* webpackPrefetch: true */ "@/views/usecase.vue")
+  },
+  {
+    path: '/',
+    name: "homepage",
+    component: homepage
   },
   ...khateebs,
   ...auth,
@@ -68,7 +75,6 @@ router.beforeEach((to, from, next) => {
       return
     }
     else if (!store.getters['user/validAuthentication']) {
-      next('/')
       window.setTimeout(() => {
         utils.alert('Your login has expired. Please sign-in again', "caution", origin)
       }, threeTenthsOfASecond)

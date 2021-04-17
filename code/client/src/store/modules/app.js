@@ -14,6 +14,9 @@ export default {
         },
         offlineMode(state) {
             state.isOffline = true
+        },
+        backOnline(state) {
+            state.isOffline = false
         }
     },
     actions: {

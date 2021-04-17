@@ -2,7 +2,7 @@ const adminRoutes = [
     {
         path: '/institutionAdmin',
         name: 'institutionAdminMain',
-        component: () => import('@/views/institutionAdmin/main.vue'),
+        component: () => import( '@/views/institutionAdmin/main.vue'),
         children: [
               {
                 path: 'schedule',

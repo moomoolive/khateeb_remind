@@ -15,7 +15,10 @@ export default {
     actions: {
         registerLandingPage({ commit }, landingPageFullURL) {
             commit('registerLandingPage', landingPageFullURL)
-            commit('userHasLanded')
+            // I chose fifty milliseconds because it allows me to use the
+            // firstPage variable in created hooks of views
+            const milliseconds = 50
+            window.setTimeout(() => commit('userHasLanded'), milliseconds)
         }
     } 
 }

@@ -59,7 +59,7 @@
                 </div>
             </div>
             
-            <div v-else>
+            <div class="no-sub-container" v-else>
                 <msg-with-pic 
                     :msg="`You aren't recieving notifications for any devices yet`"
                     :gif="`twirlingPlane`"

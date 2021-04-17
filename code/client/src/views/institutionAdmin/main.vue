@@ -36,7 +36,8 @@ export default {
                 {
                     name: 'Khateebs',
                     route: 'khateebs',
-                    indicator: null
+                    blinking: false,
+
                 },
                 {
                     name: 'Other Administrators',
@@ -55,7 +56,7 @@ export default {
             try {
                 const pendingKhateebs = await this.$API.khateebs.getKhateebs({ confirmed: false })
                 const pendingCount = pendingKhateebs.length
-                this.outboundLinks[2].indicator = pendingCount > 0 ? `${pendingCount} Pending` : pendingCount
+                this.outboundLinks[2].blinking = pendingCount > 0
             } catch(err) {
                 console.log(err)
             }

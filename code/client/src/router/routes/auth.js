@@ -8,7 +8,7 @@ const commonMeta = {
 
 export default [
     {
-        path: "/",
+        path: "/login",
         name: "login",
         component: login,
         ...commonMeta

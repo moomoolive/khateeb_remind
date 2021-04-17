@@ -30,7 +30,7 @@ export default {
         },
         closeAfter(seconds=4) {
             const milliSecondsInASecond = 1_000
-            window.setTimeout(() => this.close() , seconds * milliSecondsInASecond)
+            window.setTimeout(() => this.close(), seconds * milliSecondsInASecond)
         }
     },
     computed: {
@@ -40,10 +40,17 @@ export default {
         backgroundColor() {
             return this.componentsInfo.componentsProps.color || 'blue'
         },
+        showInfoFooterPopup() {
+            return this.$store.state.footerPopup.show
+        }
     },
-    created() {
-        if (this.componentsInfo.componentsProps.closeAfter)
-            this.closeAfter(this.componentsInfo.componentsProps.closeAfter)
+    watch: {
+        showInfoFooterPopup(newVal) {
+            if (!newVal)
+                return
+            if (this.componentsInfo.componentsProps.closeAfter)
+                this.closeAfter(this.componentsInfo.componentsProps.closeAfter)
+        }
     }
 }
 </script>

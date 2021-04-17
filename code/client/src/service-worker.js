@@ -1,7 +1,27 @@
-workbox.core.setCacheNameDetails({ prefix: "khateebRemind" });
-
+workbox.core.setCacheNameDetails({ prefix: "khateebRemind" })
 self.__precacheManifest = [].concat(self.__precacheManifest || [])
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
+
+workbox.routing.registerRoute(
+  ({ request }) => request.destination === 'image',
+  new workbox.strategies.CacheFirst({
+    cacheName: 'images',
+    plugins: [
+      new workbox.expiration.Plugin({
+        maxEntries: 60,
+        maxAgeSeconds: 30 * 24 * 60 * 60,
+      }),
+    ],
+  })
+)
+
+workbox.routing.registerRoute(
+  ({ request }) => request.destination === 'script' ||
+                  request.destination === 'style',
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'static-resources',
+  })
+)
 
 self.addEventListener("message", function (msg) {
   if (msg.data.action === 'skipWaiting') {

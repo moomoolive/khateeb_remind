@@ -101,7 +101,6 @@ export default {
                     return
                 await this.$API.user.deleteAccount()
                 this.$store.dispatch('user/logout')
-                this.utils.toHomePage()
                 this.utils.alert(`Successfully delete account`, 'success')
             } catch(err) {
                 console.log(err)

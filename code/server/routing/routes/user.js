@@ -37,11 +37,12 @@ router.put(
 
 router.get('/check-in', async(req, res) => {
     try {
-        const userPackage = {}
-        userPackage.userInfo = await $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["-__v", "-password"]).exec()
-        userPackage.notifications = await $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        userPackage.institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
-        return res.json(userPackage)
+        const [userInfo, notifications, institution] = await Promise.all([
+            $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["-__v", "-password"]).exec(),
+            $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec(),
+            $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
+        ])
+        return res.json({ userInfo, notifications, institution })
     } catch(err) {
         console.log(err)
         return res.status(503).json({ msg: `An error fetching user package. Err trace: ${err}` })
@@ -62,7 +63,7 @@ router.put(
         try {
             const notification = await $db.notifications.findOne({ _id: req.body._id }).exec()
             if (notification.userID !== req.headers.userid)
-                return res.status(403).json(`You're not allowed to edit this notification (id: ${req.body._id})`)
+                return res.status(403).json({ msg: `You're not allowed to edit this notification (id: ${req.body._id})` })
             const updated = await $db.notifications.findOneAndUpdate({_id: req.body._id }, req.body, { new: true })
             return res.json(updated)
         } catch(err) {
@@ -100,20 +101,20 @@ router.post('/pwa-subscription', async (req, res) => {
         if (!subscriptions)
             subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid, institutionID: req.headers.institutionid }).save()
         if (subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid))
-            return res.json({ msg: `This device is already subscribed to notifications` })
+            return res.json({ code: 0, msg: `This device is already subscribed to notifications` })
         const deviceIdentification = new DeviceDetector().parse(req.headers["user-agent"])
         const deviceInfo = {
             deviceId: req.headers.deviceid,
             deviceType: deviceIdentification.device.type,
-            deviceBrand: deviceIdentification.client.type === 'browser' ? deviceIdentification.client.name : "unknown",
-            browserBrand: deviceIdentification.device.brand || 'unknown' 
+            deviceBrand: deviceIdentification.device.brand || 'unknown',
+            browserBrand: deviceIdentification.client.type === 'browser' ? deviceIdentification.client.name : "unknown"
         }
         const newSubscriptionsArray = [...subscriptions.subscriptions, { ...deviceInfo, browserSubscriptionDetails: req.body, } ]
-        const updated = await $db.pwaSubscriptions.findOneAndUpdate({ _id: subscriptions._id.toString() }, { subscriptions: newSubscriptionsArray }, { new: true })
-        return res.json({ data: updated })
+        await $db.pwaSubscriptions.updateOne({ _id: subscriptions._id.toString() }, { subscriptions: newSubscriptionsArray })
+        return res.json({ code: 0 })
     } catch(err) {
         console.log(`Couldn't create subscription`, err)
-        return res.json({ data: {}, msg: `Couldn't create subscription. ${err}` })
+        return res.json({ code: 1, msg: `Couldn't create subscription. ${err}` })
     }
 })
 

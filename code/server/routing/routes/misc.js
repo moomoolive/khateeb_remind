@@ -32,4 +32,8 @@ router.get('/institution-selection', async (req, res) => {
     }
 })
 
+router.get('/health-endpoint', (req, res) => {
+    return res.json(1)
+})
+
 module.exports = router

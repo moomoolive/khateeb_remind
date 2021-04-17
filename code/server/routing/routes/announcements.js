@@ -7,13 +7,13 @@ const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/ma
 
 const router = express.Router()
 
-
 router.get(
     '/',
     authMiddleware.authenticate({ min: 1, max: 3 }),
     async (req, res) => {
         try {
             const data = await $db.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).sort("-updatedAt").limit(20).exec()
+            res.set(global.APP_CONFIG.customHeaders.serviceWorkerCache)
             return res.json({ data })
         } catch(err) {
             console.log(err)

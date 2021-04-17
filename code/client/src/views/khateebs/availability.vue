@@ -10,7 +10,7 @@
             >
                 <selection-picker
                     :options="availableTimingsSelection"
-                    :currentlySelected="userInfo.availableTimings"
+                    :currentlySelected="availableTimings"
                     @changed="updateInfo({ availableTimings: $event })"
                 />
             </collapsable-box>
@@ -48,6 +48,8 @@
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import selectionPicker from '@/components/general/selectionPicker.vue'
 
+import khateebHelpers from '@/libraries/khateebs/main.js'
+
 export default {
     name: "khateebAvailability",
     components: {
@@ -82,11 +84,14 @@ export default {
             const res = await this.$API.user.updateInfo(update)
             if (!res.data)
                 return this.utils.alert(`There was problem make your changes`)
-        }
+        },
     },
     computed: {
         userInfo() {
             return this.$store.state.user.userInfo
+        },
+        availableTimings() {
+            return this.userInfo.availableTimings
         },
         unavailableDates() {
             return this.userInfo.unavailableDates.map(d => new Date(d.date))
@@ -127,6 +132,36 @@ export default {
             else
                 return null
         },
+        usersFullNameWithTitle() {
+            return this.utils.stringFormat(khateebHelpers.khateebName(this.$store.state.user.userInfo))
+        }
+    },
+    watch: {
+        async unavailableDates(newVal, oldVal) {
+            if (newVal.length === oldVal.length)
+                return
+            const longerArray = newVal.length > oldVal.length ? newVal : oldVal
+            const diff = longerArray.slice(-1)[0]
+            const wasDeleted = newVal.length < oldVal.length
+            await this.$API.khateebs.sendAvailabilityUpdateToAdmins("Date", {
+                change: { diff, wasDeleted },
+                msg: `${this.usersFullNameWithTitle} is ${wasDeleted ? 'now available' : 'no longer available'} to give khutbahs on ${new Date(diff).toLocaleDateString('en-US', { month: "long", year: "numeric", day: "numeric" })}${wasDeleted ? ` insha'Allah` : ''}.` 
+            })
+        },
+        async availableTimings(newVal, oldVal) {
+            if (oldVal.length === newVal.length)
+                return
+            const longerArray = newVal.length > oldVal.length ? newVal : oldVal
+            const shorterArray = newVal.length > oldVal.length ? oldVal : newVal
+            const diff = longerArray.filter(e => !shorterArray.find(el => el === e))[0]
+            const lessAvailable = newVal.length === 0 ? 
+                false : newVal.length === 1 ? 
+                true : newVal.length < oldVal.length
+            await this.$API.khateebs.sendAvailabilityUpdateToAdmins("Timing", {
+                change: { diff, lessAvailable },
+                msg: `${this.usersFullNameWithTitle} ${lessAvailable ? `is less available nowadays to give` : `is now available to give more` } khutbahs${lessAvailable ? `.` : ` insha'Allah!`} Check out his profile for more details.` 
+            })
+        }
     },
     created() {
         this.getAvailableTimings()

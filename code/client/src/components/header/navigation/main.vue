@@ -35,7 +35,7 @@
 
             <button 
               class="blue signup-buttons pale-hover" 
-              @click="redirect('/')"
+              @click="redirect('/login')"
             >
               Log In
             </button>
@@ -183,8 +183,7 @@ export default {
       },
       logout() {
         this.$store.dispatch('user/logout')
-        this.closeAllMenus() 
-        this.$nextTick(() => { this.$router.push('/') })
+        this.closeAllMenus()
       }
     },
     computed: {

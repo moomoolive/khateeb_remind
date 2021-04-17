@@ -44,8 +44,6 @@ router.post(
     ]),
     async (req, res) => {
         try {
-            if (jummahHelpers.oneMonthInThePast().getTime() >= new Date(req.body.date).getTime())
-                return res.status(422).json({ data: {}, msg: 'You cannot create entries for the past' })
             const duplicateEntry = await $db.jummahPreferences.findOne({ 
                 institutionID: req.body.institutionID, 
                 timingID: req.body.timingID, 

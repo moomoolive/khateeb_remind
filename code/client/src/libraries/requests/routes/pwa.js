@@ -6,8 +6,15 @@ import axios from 'axios'
 const extension = helpers.targetURL('user') + '/pwa-subscription'
 
 const requests = {
-    createPWASubscription(subscriptionInfo={}) {
-        return axios.post(extension, subscriptionInfo, { headers: { deviceid: localStorageHelpers.get("deviceId") } })
+    async createPWASubscription(subscriptionInfo={}) {
+        try {
+            const res = await axios.post(extension, subscriptionInfo, { headers: { deviceid: localStorageHelpers.get("deviceId") } })
+            if (!res || isNaN(res.code))
+                return 1
+            return res.code
+        } catch {
+            return 1
+        }
     },
     updateSubscriptionStatus(data={}) {
         return helpers.returnEmptyObjectFromRequest('put', ['user', '/pwa-subscription'], data)

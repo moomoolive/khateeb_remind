@@ -5,11 +5,18 @@ export default {
     namespaced: true,
     state: () => ({
         queue: [],
-        responses: {}
+        responses: {},
+        noResFromXHRinLast30Seconds: 0
     }),
     mutations: {
         addToQueue(state, request) {
             state.queue.push(request)
+        },
+        noResFromXHR(state) {
+            state.noResFromXHRinLast30Seconds++
+        },
+        clearNoResCount(state) {
+            state.noResFromXHRinLast30Seconds = 0
         },
         shiftQueue(state) {
             state.queue.shift()

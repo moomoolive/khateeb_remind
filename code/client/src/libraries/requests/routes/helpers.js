@@ -1,11 +1,13 @@
 import axios from 'axios'
 
-import store from '@/store/index.js'
-
 import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
 
+const APIUrl = process.env.VUE_APP_PWA ? 
+    "http://localhost:80" : 
+    process.env.VUE_APP_API_SERVER_URL
+
 const targetURL = (extension=["misc", "unique-username"]) => {
-    const baseURL = process.env.VUE_APP_API_SERVER_URL
+    const baseURL = APIUrl
     if (Array.isArray(extension))
         return  baseURL + extension.reduce((total, e) => `${total}/${e}` , '')
     else
