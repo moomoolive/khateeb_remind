@@ -3,6 +3,7 @@
         <button
             :class="`collapsible ${buttonColor} ${isActive ? `active` : ``} ${boxShadow ? 'box-shadow' : ''}`"
             @click="clicked()"
+            ref="open-dropdown"
         >
             {{ headline }}
             <span style="float: right;" class="icon">

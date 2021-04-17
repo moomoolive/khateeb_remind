@@ -1,6 +1,7 @@
 import auth from '@/libraries/auth/main.js'
 import userIdentification from '@/libraries/userIdentification/main.js'
 import localStorageHelpers from '@/libraries/localStorageManagement/main.js'
+import utils from '@/libraries/globalUtilities.js'
 
 import axios from 'axios'
 
@@ -50,6 +51,7 @@ export default {
             localStorage.removeItem('token')
             delete axios.defaults.headers.common['authorization']
             commit('removeToken')
+            utils.toHomePage()
         },
         updateToken({ commit }, updated) {
             commit('updateToken', updated)

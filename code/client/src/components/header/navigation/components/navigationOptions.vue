@@ -126,7 +126,6 @@ export default {
             if (!confirm)
                 return
             this.$store.dispatch('user/logout')
-            this.$nextTick(() => { this.utils.toHomePage() })
         },
     },
     watch: {

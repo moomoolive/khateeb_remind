@@ -28,9 +28,8 @@
                     
                     <div class="notification-time-container">
                         <button 
-                            class="notification-time-button turquoise" 
-                            :disabled="!institutionSettings.allowJummahNotifications"
-                            @click="chronInfo()"
+                            :class="`notification-time-button ${ !institutionSettings.allowJummahNotifications ? 'yellow' : 'turquoise'}`" 
+                            @click="$router.push({ path: '/institutionAdmin/settings', query: { click: 'chron-timing' } })"
                         >
                             ⏰ {{ institutionSettings.allowJummahNotifications ? chronTiming() : 'No Notifications' }}
                         </button>
@@ -77,13 +76,6 @@ export default {
         }
     },
     methods: {
-        chronInfo() {
-            return this.utils.alert(
-                `Khateeb remind sends notifications to all your scheduled khateebs on ${this.chronTiming('long')}. If you want to change the scheduled time or turn off notifications you can do so by heading to settings.`,
-                "success",
-                { icon: "clock-no-markings" }
-            )
-        },
         async getScheduleBuildingBlocks() {
             const [locations, timings, khateebs, { settings }] = await this.$API.chainedRequests.getScheduleComponents()
             this.locations = locations

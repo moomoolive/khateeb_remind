@@ -11,6 +11,7 @@
                         color: 'goodNews',
                         symbol: '🌎' 
                     }] : null"
+                    ref="institution-details"
                 >
                     <institution-form-template 
                         :formProps="{
@@ -31,6 +32,7 @@
                         color: 'important',
                         symbol: '🖼️' 
                     }]"
+                    ref="logo"
                 >
                     <div class="insert-image-container">
                         <div class="image-info-caption">
@@ -72,6 +74,7 @@
                         color: 'default',
                         symbol: institution.settings.autoConfirmRegistration ? `🤖` : `📜`
                     }] : null"
+                    ref="registration"
                 >
                     <form-main
                         v-if="institution.settings" 
@@ -99,6 +102,7 @@
                         color: institution.settings.allowJummahNotifications ? `goodNews` : `important`,
                         symbol: '✉️'
                     }] : null"
+                    ref="chron-timing"
                 >
                     <form-main
                         v-if="institution.settings" 
@@ -150,8 +154,9 @@
                         color: 'important',
                         symbol: '📡' 
                     }]"
+                    ref="dev-tools"
                 >
-                    Coming Soon
+                    Coming Soon Insha'Allah
                 </collapsable-box>
 
                 <collapsable-box
@@ -249,13 +254,17 @@ export default {
                 if (!requestHelpers.dataWasDeleted(res))
                     return
                 this.utils.alert(`You've successfully deleted your institution`, 'success')
-                this.$router.push('/')
                 this.$store.dispatch('logout')
             }
         },
         rerenderSettings() {
             this.showSettings = false
             this.$nextTick(() => { this.showSettings = true })
+        },
+        openSettingsDropdown(ref="chronTiming") {
+            const el = this.$refs[ref]
+            if (el)
+                el.$refs["open-dropdown"].click()
         }
     },
     computed: {
@@ -289,6 +298,15 @@ export default {
         restEndPointTokenCreated() {
             return false // TODO
         }
+    },
+    mounted() {
+        this.$nextTick(() => {
+            const oneSecondInMilliseconds = 1_000
+            window.setTimeout(() => {
+                if (this.$route.query.click)
+                    this.openSettingsDropdown(this.$route.query.click)
+            }, oneSecondInMilliseconds)
+        })
     },
     async created() {
         const milliseconds = 500

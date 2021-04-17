@@ -37,11 +37,12 @@ router.put(
 
 router.get('/check-in', async(req, res) => {
     try {
-        const userPackage = {}
-        userPackage.userInfo = await $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["-__v", "-password"]).exec()
-        userPackage.notifications = await $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec()
-        userPackage.institution = await $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
-        return res.json(userPackage)
+        const [userInfo, notifications, institution] = await Promise.all([
+            $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["-__v", "-password"]).exec(),
+            $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec(),
+            $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
+        ])
+        return res.json({ userInfo, notifications, institution })
     } catch(err) {
         console.log(err)
         return res.status(503).json({ msg: `An error fetching user package. Err trace: ${err}` })

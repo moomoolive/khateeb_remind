@@ -15,6 +15,8 @@ export default {
     },
     methods: {
         createActiveRequest(requestKey, requestInfo) {
+            if (this.offlineModeIsInitiated)
+                return this.utils.alert(`You cannot make changes when you are in offline mode, try again later!`)
             const key = requestKey
             const targetFunction = this.$API[requestInfo.extension][requestInfo.function]
             const args = requestInfo.arguments

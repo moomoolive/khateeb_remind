@@ -31,7 +31,7 @@
 
                 <a 
                     class="green" 
-                    @click="utils.alert(`This section is coming soon insha'Allah`)"
+                    @click="toHomepage()"
                 >
                     Homepage
                 </a>
@@ -90,6 +90,10 @@ export default {
         toUsecasePage() {
             if (this.$router.currentRoute.fullPath !== '/usecase')
                 return this.$router.push({ path: "/usecase" })
+        },
+        toHomepage() {
+            if (this.$router.currentRoute.fullPath !== '/')
+                return this.$router.push({ path: "/" })
         }
     },
     computed: {

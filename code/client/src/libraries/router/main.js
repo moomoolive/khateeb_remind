@@ -13,7 +13,7 @@ const homepageURL = (userType) => {
     case 'khateeb':
       return '/khateeb'
     default:
-      return '/'
+      return '/login'
   }
 }
 
