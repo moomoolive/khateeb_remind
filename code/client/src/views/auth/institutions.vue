@@ -23,7 +23,7 @@ export default {
                 if (typeof res.status !== "undefined" && res.status === 'reserved')
                     return this.utils.alert(res.msg)
                 this.utils.alert(res, 'success')
-                this.$router.push('/')
+                this.utils.toHomePage()
             } catch(err) {
                 console.log(err)
             }

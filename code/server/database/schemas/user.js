@@ -54,6 +54,22 @@ const user = new mongoose.Schema({
         type: Date,
         required: false,
         default: new Date()
+    },
+    active: {
+        type: Boolean,
+        required: false,
+        default: true
+    },
+    email: {
+        type: String,
+        required: false,
+        default: 'none@khateeb-remind.com',
+        validate: {
+            // look for @ sign with a peroid somewhere after it
+            // followed by at least one letter of the alphabet
+            validator: val => /@.*\..*[a-zA-Z]/g.test(val),
+            message: "incorrect email format"
+        }
     }
 },
 { timestamps: true })

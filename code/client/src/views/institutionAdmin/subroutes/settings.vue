@@ -146,20 +146,6 @@
                 </collapsable-box>
 
                 <collapsable-box
-                    class="setting-container"
-                    :headline="`Developer Tools`"
-                    :buttonColor="`darkBlue`"
-                    :tagDetails="restEndPointTokenCreated ? null : [{
-                        words: `None Used`,
-                        color: 'important',
-                        symbol: '📡' 
-                    }]"
-                    ref="dev-tools"
-                >
-                    Coming Soon Insha'Allah
-                </collapsable-box>
-
-                <collapsable-box
                     v-if="utils.validAuthentication(3)"
                     class="setting-container"
                     :headline="`Danger Zone`"
@@ -295,9 +281,6 @@ export default {
         customLogoWasAdded() {
             return this.institutionImageSrc !== require('@/assets/logos/genericInstitution.png')
         },
-        restEndPointTokenCreated() {
-            return false // TODO
-        }
     },
     mounted() {
         this.$nextTick(() => {

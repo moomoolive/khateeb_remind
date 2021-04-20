@@ -5,24 +5,23 @@ export default [
         component: () => import('@/views/sysAdmin/dashboard.vue'),
         children: [
             {
-                path: 'cli',
-                component: () => import('@/views/sysAdmin/subroutes/cli.vue'),
+                path: 'institutions',
+                name: 'sysAdminInstitutionViewer',
+                component: () => import('@/views/sysAdmin/subroutes/institutions.vue'),
                 meta: {
-                    requireAuthorization: true,
                     auth: { min: 4, max: 5 }
                 }
             },
             {
-                path: 'roaming',
-                component: () => import('@/views/sysAdmin/subroutes/roaming.vue'),
+                path: 'settings',
+                name: 'rootInstitutionSettings',
+                component: () => import('@/views/sysAdmin/subroutes/settings.vue'),
                 meta: {
-                    requireAuthorization: true,
                     auth: { min: 4, max: 5 }
                 }
             }
         ],
         meta: {
-            requireAuthorization: true,
             auth: { min: 4, max: 5 }
         }
     }

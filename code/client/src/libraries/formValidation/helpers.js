@@ -9,6 +9,9 @@ const compoundValidations = {
     username: {
         uniqueUsername: {},
         minLength: { min: 6 }
+    },
+    email: {
+        email: {}
     }
 }
 

@@ -8,15 +8,6 @@ const khateeb = new mongoose.Schema({
         default: 'none',
         minLength: 1
     },
-    active: {
-        type: Boolean,
-        default: true
-    },
-    dropouts: {
-        type: Number,
-        default: 0,
-        min: 0
-    },
     availableTimings: [String],
     unavailableDates: [subDocs.unavailableDate]
 })

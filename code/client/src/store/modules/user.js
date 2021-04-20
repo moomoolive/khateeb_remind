@@ -83,9 +83,9 @@ export default {
             return expirationTimeInUNIXTime > UNIXTimeNow
             
         },
-        type(state, { isLoggedIn }) {
+        type(state, { isLoggedIn, decodedJWT }) {
             if (isLoggedIn)
-                return state.userInfo.__t
+                return decodedJWT.__t
             else
                 return 'none'
         },

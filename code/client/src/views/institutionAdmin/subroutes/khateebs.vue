@@ -118,11 +118,11 @@
                                 <user-form-template 
                                     v-if="khateeb.confirmed"
                                     :userType="`khateeb`"
-                                    :editableKhateebFormat="true"
                                     :formProps="{
                                         basedOn: khateeb,
                                         buttonText: `Edit ${khateeb.firstName}'s Info`,
-                                        backgroundColor: 'none'
+                                        backgroundColor: 'none',
+                                        readOnly: true
                                     }"
                                     @submitted="editKhateeb($event)"
                                 />
