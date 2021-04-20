@@ -4,30 +4,38 @@ const validator = require('express-validator')
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
-const cliResponseTemplates = require(global.$dir + '/libraries/cli/templates/main.js')
-const cliCommandIndex = require(global.$dir + '/libraries/cli/commandsIndex/index.js')
-
 const router = express.Router()
 
 router.use(authMiddleware.authenticate({ min: 4, max: 5 }))
 
-router.post(
-    '/cli',
-    validationMiddleware.validateRequest([ validator.body("command").isArray({ min: 1 })]),
+router.get('/institutions', async (req, res) => {
+    try {
+        const data = await $db.institutions.find(req.query).exec()
+        return res.json({ data })
+    } catch(err) {
+        console.log(err)
+        return res.json({ data: [], msg: `Couldn't retrieve institutions. Err trace: ${err}` })
+    }
+})
+
+router.put('/institutions', 
+    validationMiddleware.validateRequest([ 
+        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("confirmed").isBoolean().optional(),
+        validator.body("settings").optional()
+    ]),
     async (req, res) => {
-        const commandCategory = req.body.command[0]
-        const specificCommand = req.body.command[1]
-        const errOrException = cliResponseTemplates.exceptionAndNonExistentCommandHandling(commandCategory, specificCommand)
-        if (errOrException)
-            return res.json(errOrException)
         try {
-            const commandRes = await new cliCommandIndex[commandCategory][specificCommand](req.body.command, req.headers, req.query).execute()
-            return res.json(commandRes)
+            console.log(req.body)
+            const data = await $db.institutions.findOneAndUpdate({ _id: req.body.institutionID }, req.body, { new: true }).exec()
+            if (data.name === "__ROOT__")
+                global.textManager.refreshSettings(data.settings.textAPIInfo)
+            return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json(cliResponseTemplates.generalErrorResponse(err))
+            return res.json({ data: {}, msg: `there was a problem updating institution status. Err trace: ${err}` })
         }
-    }
-)
+
+})
 
 module.exports = router

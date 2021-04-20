@@ -25,20 +25,18 @@ export default {
         return {
             outboundLinks: [
                 {
-                    name: 'Command Line',
-                    route: 'cli'
+                    name: "Institutions",
+                    route: 'institutions'
                 },
                 {
-                    name: 'Roaming Mode',
-                    route: 'roaming'
+                    name: "Settings",
+                    route: 'settings'
                 }
             ]
         }
     },
     methods: {
-        toCLI() {
-            this.$router.push('/root/cli')
-        }
+        
     }
 }
 </script>
