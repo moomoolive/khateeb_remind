@@ -10,7 +10,7 @@ const requests = {
     async getInstitutionLogo(params={}) {
         try {
             const res = await axios.get(extension, { responseType: "blob", params })
-            if (/json/.test(res.type))
+            if (!/image/.test(res.type))
                 return genericInstitutionLogo
             return window.URL.createObjectURL(res)
         } catch {

@@ -226,11 +226,10 @@
                             alt="camera"
                         >
                         <div class="icons-heading">
-                            Beautiful Interface
+                            Simple Interface
                         </div>
                         <div class="icons-subheading">
-                            The app was designed to be simple, uncluttered, and generally
-                            has a pleasant interface.
+                            The app is designed to be simple, uncluttered, and straightforward to use.
                         </div>
                     </div>
 

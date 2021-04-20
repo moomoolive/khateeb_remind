@@ -93,7 +93,14 @@ router.post(
             else if (!user.confirmed && user.__t !== 'root')
                 return res.json({ msg: `un-confirmed-${user.__t}`, token: null })
             else
-                return res.json({ msg: 'success', token: authHelpers.createToken({ _id: user._id }) })
+                return res.json({ 
+                    msg: 'success', 
+                    token: authHelpers.createToken({ 
+                        _id: user._id, 
+                        __t: user.__t, 
+                        institutionID: user.institutionID  
+                    })
+                })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ msg: `There was an issue encountered during sign`, token: null })
