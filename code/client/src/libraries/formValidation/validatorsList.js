@@ -33,8 +33,16 @@ const uniqueUsername = async (data) => {
     }
 }
 
+const email = (data="a@email.com") => {
+    return {
+        state: /@.*\..*[a-zA-Z]/g.test(data),
+        msg: helpers.validatorMsgPackage(`Invalid email`)
+    }
+}
+
 export default {
     minLength,
     uniqueUsername,
-    noAtSymbolChar0
+    noAtSymbolChar0,
+    email
 }

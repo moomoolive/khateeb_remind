@@ -49,7 +49,7 @@ export default {
             try {
                 const res = await this.$API.auth.createKhateeb({ ...$event, institutionID: this.selectedInstitution})
                 this.utils.alert(res, 'success')
-                this.$router.push('/')
+                this.utils.toHomePage()
             } catch(err) {
                 console.log(err)
             }
