@@ -43,14 +43,6 @@
             </div>
         </div>
 
-        <div class="image-container">
-            <img 
-                class="main-image" 
-                src="~@/assets/misc/insideMasjid.jpg" 
-                alt="picture of masjid"
-            >
-        </div>
-
     </div>
 </template>
 
@@ -68,7 +60,7 @@ export default {
 .hompage-background {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
-    background: getColor("grey") !important;
+    background-size: cover;
 }
 
 .main-image {
@@ -89,10 +81,10 @@ a {
 }
 
 .content-layer {
-    position: absolute;
-    z-index: 2;
-    margin-top: 90px;
-    width: 100vw;
+    width: 90vw;
+    @include centerMargin();
+    min-height: 79vh !important;
+    padding-top: 10vh;
 }
 
 .signup-now-container {
@@ -151,8 +143,9 @@ button {
 }
 
 @media screen and (max-width: $phoneWidth) {
-      .content-layer {
-        margin-top: 70px;
+
+    .content-layer {
+        padding-bottom: 8vh;
     }
 
     button {
@@ -171,9 +164,8 @@ button {
 }
 
 @media screen and (min-width: $desktopWidth) {
-    .main-image {
-        position: relative;
-        top: -110px;
+    .hompage-background {
+        background-position: 0% 15%;
     }
 }
 </style>

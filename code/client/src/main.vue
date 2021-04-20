@@ -159,17 +159,25 @@ export default {
     background-color: getColor("blue");
     margin: auto;
     min-height: 76vh;
+    
     &.main {
       background-image: url('~@/assets/wallpaper/app.jpg');
     }
+    
     &.user {
       background-image: url('~@/assets/wallpaper/user.png');
     }
+    
     &.sysAdmin {
       background-image: url('~@/assets/wallpaper/sysAdmin.jpg');
     }
+    
     &.institutionAdmin {
       background-image: url('~@/assets/wallpaper/institutionAdmin.jpg');
+    }
+
+    &.homepage {
+      background-image: url('~@/assets/misc/insideMasjid.jpg');
     }
 }
 

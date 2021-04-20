@@ -7,6 +7,8 @@ const targetWallpaper = (baseURL) => {
           return 'sysAdmin'
         case 'institutionAdmin':
           return 'institutionAdmin'
+        case '':
+          return 'homepage'
         default:
           return'main'
       }
