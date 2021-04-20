@@ -51,13 +51,6 @@
                 >
                     Contribute to Source Code
                 </a>
-
-                <a 
-                    class="green" 
-                    @click="utils.alert(`This section is coming soon insha'Allah`)"
-                >
-                    Dev Tools
-                </a>
                 
             </div>
 
