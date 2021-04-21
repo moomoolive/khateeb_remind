@@ -1,26 +1,23 @@
 const express = require('express')
 const validator = require('express-validator')
-const fs = require('fs')
-const path = require("path")
 
 const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
 const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
 
-const router = express.Router()
+const cloudStorageHelpers = require(global.$dir + '/libraries/cloudStorage/main.js')
 
-// temporarily logos will be stored in the localstorage system
+const router = express.Router()
 
 router.get('/', 
     validationMiddleware.validateRequest([
         validator.query("institutionID").isString().isLength(global.APP_CONFIG.consts.mongooseIdLength)
     ], "query"),
-    (req, res) => {
-        fs.readFile(path.join(global.$dir, "uploads", `${req.query.institutionID}-logo`), (err, f) => {
-            if (err)
-                return res.json({ msg: `Err occured when opening file. Err trace: ${err}` })
-            res.setHeader("Content-Type", "image/png")
-            return res.send(f)
-        })
+    async (req, res) => {
+        const { file, status, msg="none" } = await cloudStorageHelpers.getFile(`img/logos/${req.query.institutionID}`)
+        if (status !== 200)
+            return res.json({ cloudRes: status, msg })
+        res.setHeader("Content-Type", "image/png")
+        return res.send(file)
 })
 
 router.put('/',
@@ -35,26 +32,20 @@ router.put('/',
             return true
         })
     ]),
-    (req, res) => {
+    async (req, res) => {
         const binaryImg = new Uint8Array(req.body.img)
-        fs.writeFile(path.join(global.$dir, "uploads", `${req.headers.institutionid}-logo`), binaryImg, err => {
-            if (!err)
-                return res.json({ data: { code: 0 }, msg: "successfully uploaded logo" })
-            console.log(err)
-            return res.status(503).json({ data: { code: 1 }, msg: `couldn't update institution logo. Err trace: ${err}` })
-        })
+        // not saving file extension because current cloud provider doesn't support
+        // searching for multiple extensions in one request
+        const { code, msg="successfully uploaded logo" } = await cloudStorageHelpers.uploadFile(binaryImg, `img/logos/${req.headers.institutionid}`)
+        return res.json({ data: { code }, msg })
     }
 )
 
 router.delete("/", 
     authMiddleware.authenticate({ min: 2, max: 3 }),
-    (req, res) => {
-        fs.unlink(path.join(global.$dir, "uploads", `${req.headers.institutionid}-logo`), err => {
-            if (err) {
-                return res.status(503).json({ data: { code: 0 }, msg: `Couldn't delete institution. Err trace: ${err}` })
-            }
-            return res.json({ data: { code: 1 } })
-        })
+    async (req, res) => {
+        const { code, msg="successfully deleted logo" } = await cloudStorageHelpers.deleteFile(`img/logos/${req.headers.institutionid}`)
+        return res.json({ data: { code }, msg })
     }
 )
 
