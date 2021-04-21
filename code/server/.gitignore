@@ -21,3 +21,6 @@ dUpload.bat
 
 # database migration scripts and schema updates
 **dbUpdates/
+
+# email server details
+email.txt
