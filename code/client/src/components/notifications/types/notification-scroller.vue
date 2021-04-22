@@ -110,23 +110,6 @@ export default {
     max-height: 375px;
     overflow-y: scroll;
     overflow-x: hidden;
-
-    ::-webkit-scrollbar {
-        width: 12px;
-    }
-    
-    ::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-        box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-        border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-        box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
-    }
-    
 }
 
 .empty-notifications-container {
