@@ -7,13 +7,15 @@ const pwaSubscription = new mongoose.Schema({
         type: String,
         required: true,
         minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'institution'
     },
     userID: {
         type: String,
         required: true,
         minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'user'
     },
     subscriptions: {
         type: [subDocs.individualPWASubscription],

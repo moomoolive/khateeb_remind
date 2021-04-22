@@ -120,7 +120,7 @@ router.post(
                 return res.json({ msg: `Account recovery is under maintenance right now! Try again later.`, status: "error" })
             const account = await $db.users.findOne(req.body).exec()
             if (account) {
-                const verificationCode = await new $db.verificationCodes({ username: account.username }).save()
+                const verificationCode = await new $db.verificationCodes({ userID: account._id.toString() }).save()
                 await global.textManager.sendRecoveryText(
                     account.phoneNumber,
                     `This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`,

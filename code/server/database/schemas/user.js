@@ -6,7 +6,10 @@ const notificationConstructors = require(global.$dir + '/libraries/notifications
 const user = new mongoose.Schema({
     institutionID: {
         type: String,
-        required: true
+        required: true,
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'institution'
     },
     username: {
         type: String,
@@ -70,9 +73,22 @@ const user = new mongoose.Schema({
             validator: val => /@.*\..*[a-zA-Z]/g.test(val),
             message: "incorrect email format"
         }
+    },
+    settings: {
+        recieveEmailNotifications: {
+            type: Boolean,
+            required: false,
+            default: true
+        }
+    },
+    statuses: {
+        lastEmailWasBounced: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
     }
-},
-{ timestamps: true })
+}, { timestamps: true })
 
 user.pre('save', function(next) {
     const user = this
@@ -94,7 +110,7 @@ user.pre('save', function(next) {
 
 user.post('save', async function(user, next) {
     try {
-        await new notificationConstructors.WelcomeNotificationConstructor(user).create()
+        await notificationConstructors.WelcomeNotificationConstructor(user)
         return next()
     } catch(err) {
         console.log(err)

@@ -9,10 +9,12 @@ const verificationCode = new mongoose.Schema({
         minLength: 11,
         maxLength: 11
     },
-    username: {
+    userID: {
         type: String,
         required: true,
-        minLength: 6
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'user'
     }
 }, { timestamps: true })
 

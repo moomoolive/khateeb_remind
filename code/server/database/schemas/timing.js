@@ -7,13 +7,15 @@ const timing = new mongoose.Schema({
         type: String,
         required: true,
         minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'institution'
     },
     locationID: {
         type: String,
         required: true,
         minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'location'
     },
     hour: {
         type: Number,

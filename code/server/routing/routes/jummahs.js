@@ -7,6 +7,7 @@ const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/ma
 
 const jummahHelpers = require(global.$dir + '/libraries/jummahs/main.js')
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const requestValidationHelpers = require(global.$dir + "/libraries/validation/requests.js")
 
 const router = express.Router()
 
@@ -31,12 +32,8 @@ router.post(
         validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
         validator.body("timingID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
         validator.body("locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
-        validator.body("khateebID").custom(val => {
-            if (val !== 'none' && val.length !== global.APP_CONFIG.consts.mongooseIdLength)
-                throw TypeError('Invalid Khateeb Id')
-            return true
-        }),
-        validator.body("notificationID").isLength({ min: 4 }).isString(),
+        validator.body("khateebID").isString().custom(requestValidationHelpers.validIdOrNullIdInField),
+        validator.body("notificationID").isString().custom(requestValidationHelpers.validIdOrNullIdInField),
         validator.body("date").isLength({ min: 1 }),
         validator.body("notified").isBoolean(),
         validator.body("isBackup").isBoolean(),
@@ -74,12 +71,8 @@ router.put(
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
-        validator.body("khateebID").custom(val => {
-            if (val !== 'none' && val.length !== global.APP_CONFIG.consts.mongooseIdLength)
-                throw TypeError('Invalid Khateeb Id')
-            return true
-        }).optional(),
-        validator.body("notificationID").isLength({ min: 4 }).isString().optional(),
+        validator.body("khateebID").isString().custom(requestValidationHelpers.validIdOrNullIdInField).optional(),
+        validator.body("notificationID").isString().optional().custom(requestValidationHelpers.validIdOrNullIdInField),
         validator.body("notified").isBoolean().optional(),
         validator.body("isGivingKhutbah").isBoolean().optional()
     ]),

@@ -3,7 +3,10 @@ const mongoose = require('mongoose')
 const location = new mongoose.Schema({
     institutionID: {
         type: String,
-        required: true
+        required: true,
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'institution'
     },
     name: {
         type: String,

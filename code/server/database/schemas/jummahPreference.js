@@ -1,9 +1,14 @@
 const mongoose = require('mongoose')
 
+const validationHelpers = require(global.$dir + "/libraries/validation/main.js")
+
 const jummahPreference = new mongoose.Schema({
     institutionID: {
         type: String,
-        required: true
+        required: true,
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'institution'
     },
     date: {
         type: Date,
@@ -11,15 +16,26 @@ const jummahPreference = new mongoose.Schema({
     },
     locationID: {
         type: String,
-        required: true
+        required: true,
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'location'
     },
     timingID: {
         type: String,
-        required: true
+        required: true,
+        minLength: global.APP_CONFIG.consts.mongooseIdLength,
+        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        ref: 'timing'
     },
     khateebID: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: validationHelpers.validIdOrNullId,
+            message: id => `${id} is an invalid format for an ids` 
+        },
+        ref: 'khateeb'
     },
     notified: {
         type: Boolean,
@@ -37,7 +53,12 @@ const jummahPreference = new mongoose.Schema({
     notificationID: {
         type: String,
         required: false,
-        default: 'none'
+        validate: {
+            validator: validationHelpers.validIdOrNullId,
+            message: id => `${id} is an invalid format for an ids` 
+        },
+        default: 'none',
+        ref: 'notification'
     },
     loopRunCount: {
         type: Number,
