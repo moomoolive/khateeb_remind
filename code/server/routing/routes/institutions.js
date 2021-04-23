@@ -24,7 +24,7 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("_id").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
         validator.body("name").isLength({ min: 1 }).isString().optional(),
         validator.body("abbreviatedName").isLength({ min: 1 }).isString().optional(),
         validator.body("timezone").isLength({ min: 1 }).isString().optional(),

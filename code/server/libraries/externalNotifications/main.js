@@ -31,7 +31,7 @@ const sendExternalNotification = async (toAddress="random@random.com", subject="
             Destination: helpers.createRecipentsObject(toAddress, options),
             Message: {
                 Body: {
-                    Text: { Charset, Data: `${msg}${global.APP_CONFIG.notifications.automatedNotificationSignature}` }
+                    Text: { Charset, Data: `${msg}${global.CONFIG.notifications.automatedNotificationSignature}` }
                 },
                 Subject: { Charset, Data: subject },
             },

@@ -8,7 +8,7 @@ import axios from 'axios'
 const extension = helpers.targetURL('user')
 
 const requests = {
-    async updateInfo(updates) {
+    async updateInfo(updates={}) {
         try {
             const res = await axios.put(extension + '/', updates)
             if (!res || !typeCheckingHelpers.isAnObject(res.data))

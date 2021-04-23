@@ -2,50 +2,18 @@ const randomNamegenerate = require('project-name-generator')
 
 const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
 
-const createRootInstitutionAndUser = async () => {
-    try {
-        let rootInstitution = await $db.institutions.findOne({ name: '__ROOT__' }).exec()
-        if (!rootInstitution)
-            rootInstitution = await new $db.institutions({
-                name: "__ROOT__",
-                abbreviatedName: "__ROOT__",
-                timezone: global.APP_CONFIG.cron.timezone,
-                confirmed: true,
-                country: 'none',
-                settings: {
-                    ...global.APP_CONFIG.rootInstitution.settingsInitial
-                }
-            }).save()
-        else
-            console.log(`Root institution already exists`)
-        const rootAdmin = await $db.root.findOne({}).exec()
-        if (!rootAdmin)
-            await rootInstitution.createRootSystemAdmin({
-                ...global.APP_CONFIG.rootUserInitialization,
-                institutionID: rootInstitution._id.toString(),
-                password: process.env.DEFAULT_ROOT_PASS || '123456',
-                confirmed: true,
-                email: "none@khateeb-remind.com"
-            })
-        else
-            console.log(`Root user already exists`)
-    } catch(err) {
-        console.error(`Root user couldn't be created!`, err)
-    }
-}
-
 const createTestInstitution = async () => {
     try {
         
-        let testInstitution = await $db.institutions.findOne({ name: "__TEST__" }).exec()
+        let testInstitution = await $db.institutions.findOne({ name: "test" }).exec()
         if (testInstitution)
             console.log('Test institution already exists')
         else
             testInstitution = await new $db.institutions({
-                name: "__TEST__",
+                name: "test",
                 abbreviatedName: "__TEST__",
                 confirmed: true,
-                ...global.APP_CONFIG.testInstitutionInitialization.institution,
+                ...global.CONFIG.testInstitutionInitialization.institution,
             }).save()
         
         let testInstitutionRootAdmin = await $db.rootInstitutionAdmins.findOne({ institutionID: testInstitution._id.toString() }).exec()
@@ -54,18 +22,18 @@ const createTestInstitution = async () => {
         else
             await testInstitution.createRootAdministrator({
                 institutionID: testInstitution._id.toString(),
-                ...global.APP_CONFIG.testInstitutionInitialization.rootAdmin,
+                ...global.CONFIG.testInstitutionInitialization.rootAdmin,
                 password: process.env.DEFAULT_TEST_USER_PASS || "123456",
                 email: "none@khateeb-remind.com",
                 confirmed: true
             })
         
         let testInstitutionLocations = await $db.locations.find({ institutionID: testInstitution._id.toString() })
-        if (testInstitutionLocations.length === global.APP_CONFIG.testInstitutionInitialization.locationCount)
-            console.log(`Test Institution already has ${global.APP_CONFIG.testInstitutionInitialization.locationCount} locations`)
+        if (testInstitutionLocations.length === global.CONFIG.testInstitutionInitialization.locationCount)
+            console.log(`Test Institution already has ${global.CONFIG.testInstitutionInitialization.locationCount} locations`)
         else {
             const ids = []
-            for (let i = testInstitutionLocations.length; i < global.APP_CONFIG.testInstitutionInitialization.locationCount; i++) {
+            for (let i = testInstitutionLocations.length; i < global.CONFIG.testInstitutionInitialization.locationCount; i++) {
                 try {
                     const location = await new $db.locations({
                         name: randomNamegenerate().dashed,
@@ -77,7 +45,7 @@ const createTestInstitution = async () => {
                     let hour = 13
                     let minute = 20
                     // locations by default create an associated timing, so we'll skip right to index 1
-                    for (let t = 1; t < global.APP_CONFIG.testInstitutionInitialization.timingsPerLocation; t++) {
+                    for (let t = 1; t < global.CONFIG.testInstitutionInitialization.timingsPerLocation; t++) {
                         minute += 10
                         if (minute > 59) {
                             minute = 0
@@ -91,21 +59,21 @@ const createTestInstitution = async () => {
                     ids.push(`Error occured creating khateeb #${i + 1}. Err trace: ${err}`)
                 }
             }
-            console.log(`Created ${global.APP_CONFIG.testInstitutionInitialization.locationCount - testInstitutionLocations.length} locations for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
+            console.log(`Created ${global.CONFIG.testInstitutionInitialization.locationCount - testInstitutionLocations.length} locations for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
         }
 
         let testInstitutionKhateebs = await $db.khateebs.find({ institutionID: testInstitution._id.toString() }).exec()
-        if (testInstitutionKhateebs.length === global.APP_CONFIG.testInstitutionInitialization.khateebCount)
-            return console.log(`Test institution already has ${global.APP_CONFIG.testInstitutionInitialization.khateebCount} khateebs`)
+        if (testInstitutionKhateebs.length === global.CONFIG.testInstitutionInitialization.khateebCount)
+            return console.log(`Test institution already has ${global.CONFIG.testInstitutionInitialization.khateebCount} khateebs`)
         else {
             const ids = []
             const testInstitutionTimings = await $db.timings.find({ institutionID: testInstitution._id.toString() })
             const date = scheduleHelpers.findUpcomingFridayDBFormat()
             const vCalendarId = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-            for (let i = testInstitutionKhateebs.length; i < global.APP_CONFIG.testInstitutionInitialization.khateebCount; i++) {
+            for (let i = testInstitutionKhateebs.length; i < global.CONFIG.testInstitutionInitialization.khateebCount; i++) {
                 try {
                     const khateeb = await new $db.khateebs({
-                        username: `${global.APP_CONFIG.testInstitutionInitialization.khateebs.baseUsername}${i + 1}`,
+                        username: `${global.CONFIG.testInstitutionInitialization.khateebs.baseUsername}${i + 1}`,
                         password: process.env.DEFAULT_TEST_USER_PASS || "123456",
                         confirmed: true,
                         handle: randomNamegenerate().dashed,
@@ -122,7 +90,7 @@ const createTestInstitution = async () => {
                     ids.push(`Error occured creating khateeb #${i + 1}. Err trace: ${err}`)
                 }
             }
-            console.log(`Created ${global.APP_CONFIG.testInstitutionInitialization.khateebCount - testInstitutionKhateebs.length} khateebs for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
+            console.log(`Created ${global.CONFIG.testInstitutionInitialization.khateebCount - testInstitutionKhateebs.length} khateebs for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
         }
     } catch(err) {
         console.log(err)
@@ -130,8 +98,4 @@ const createTestInstitution = async () => {
     }
 }
 
-
-module.exports = {
-    createRootInstitutionAndUser,
-    createTestInstitution
-}
+module.exports = createTestInstitution

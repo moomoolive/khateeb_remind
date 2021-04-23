@@ -170,14 +170,12 @@ export default {
     position: relative;
     z-index: 0;
     background-image: url('~@/assets/wallpaper/app.jpg');
-    background-color: getColor("silver");
     margin: auto;
     min-height: 76vh;
     
     &.main {
       background-image: url('~@/assets/wallpaper/app.jpg');
     }
-    
     &.user {
       background-image: url('~@/assets/wallpaper/user.png');
     }

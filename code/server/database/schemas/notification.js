@@ -4,15 +4,15 @@ const notification = new mongoose.Schema({
     institutionID: {
         type: String,
         required: true,
-        minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        minLength: global.CONFIG.consts.mongooseIdLength,
+        maxLength: global.CONFIG.consts.mongooseIdLength,
         ref: 'institution'
     },
     userID: {
         type: String,
         required: true,
-        minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        minLength: global.CONFIG.consts.mongooseIdLength,
+        maxLength: global.CONFIG.consts.mongooseIdLength,
         ref: 'user'
     },
     msg: {

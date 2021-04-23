@@ -16,11 +16,27 @@ const requests = {
             return { token: null }
         }
     },
-    createInstitution(institutionAndAdminInfo={}) {
-        return axios.post(extension + '/create/institution', institutionAndAdminInfo)
+    async createInstitution(institutionAndAdminInfo={}) {
+        try {
+            const res = await axios.post(extension + '/create/institution', institutionAndAdminInfo)
+            if (!res || isNaN(res.code) || !res.msg)
+                throw TypeError(`Required info is missing`)
+            else
+                return { code: res.code, msg: res.msg }
+        } catch {
+            return { code: 1, msg: `An error occured when creating your institution` }
+        }
     },
-    createKhateeb(khateebInfo={}) {
-        return axios.post(extension + "/create/khateeb", khateebInfo)
+    async createKhateeb(khateebInfo={}) {
+        try {
+            const res = await axios.post(extension + "/create/khateeb", khateebInfo)
+            if (!res || isNaN(res.code) || !res.msg)
+                throw TypeError(`Required info is missing`)
+            else
+                return { code: res.code, msg: res.msg }
+        } catch {
+            return { code: 1, msg: `An error occured when signing you up` }
+        }
     },
     async sendVerificationCode(username="moomoo") {
         try {

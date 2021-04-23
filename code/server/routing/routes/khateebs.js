@@ -26,7 +26,7 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("_id").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
         validator.body("active").isBoolean().optional(),
         validator.body("confirmed").isBoolean().optional()
     ]),
@@ -46,7 +46,7 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
+        validator.query("_id").isLength(global.CONFIG.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "khateebs"),
     async (req, res) => {

@@ -45,14 +45,12 @@ export default {
         }
     },
     methods: {
-        async signupKhateeb($event) {
-            try {
-                const res = await this.$API.auth.createKhateeb({ ...$event, institutionID: this.selectedInstitution})
-                this.utils.alert(res, 'success')
-                this.utils.toHomePage()
-            } catch(err) {
-                console.log(err)
-            }
+        async signupKhateeb(info={}) {
+            const { code, msg } = await this.$API.auth.createKhateeb({ ...info, institutionID: this.selectedInstitution})
+            if (code !== 0)
+                return this.utils.alert(msg)
+            this.utils.alert(msg, 'success')
+            return this.utils.toHomePage()
         },
         async getAllConfirmedInstitutions() {
             this.allInstitutions = await this.$API.misc.institutionSelection()

@@ -6,8 +6,8 @@ const jummahPreference = new mongoose.Schema({
     institutionID: {
         type: String,
         required: true,
-        minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        minLength: global.CONFIG.consts.mongooseIdLength,
+        maxLength: global.CONFIG.consts.mongooseIdLength,
         ref: 'institution'
     },
     date: {
@@ -17,15 +17,15 @@ const jummahPreference = new mongoose.Schema({
     locationID: {
         type: String,
         required: true,
-        minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        minLength: global.CONFIG.consts.mongooseIdLength,
+        maxLength: global.CONFIG.consts.mongooseIdLength,
         ref: 'location'
     },
     timingID: {
         type: String,
         required: true,
-        minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
+        minLength: global.CONFIG.consts.mongooseIdLength,
+        maxLength: global.CONFIG.consts.mongooseIdLength,
         ref: 'timing'
     },
     khateebID: {

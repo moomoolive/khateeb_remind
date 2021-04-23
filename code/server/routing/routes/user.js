@@ -20,13 +20,19 @@ router.put(
             validator.body("lastName").isLength({ min: 1 }).isString().optional(),
             validator.body("availableTimings").isArray().optional(),
             validator.body("unavailableDates").isArray().optional(),
-            validator.body("title").isLength({ min: 1 }).isString().optional()
+            validator.body("title").isLength({ min: 1 }).isString().optional(),
+            validator.body("systemSettings.autoConfirmRegistration").isBoolean().optional(),
+            validator.body("settings.recieveEmailNotifications").isBoolean().optional()
         ]
     ),
     async (req, res) => {
         try {
             const userType = `${req.headers.usertype}${req.headers.usertype === 'root' ? '' : 's'}`
-            const mongooseRes = await $db[userType].findOneAndUpdate({ _id: req.headers.userid }, req.body, { new: true }).select(["-__v", "-password"]).exec()
+            // the reason why I use updateOne and then findOne instead of
+            // findOneAndUpdate is because there are 'pre update' hooks for
+            // the user schema that won't work with findOneAndUpdate
+            await $db[userType].updateOne({ _id: req.headers.userid }, req.body)
+            const mongooseRes = await $db[userType].findOne({ _id: req.headers.userid }).select(["-__v", "-password"]).exec()
             return res.json({ data: mongooseRes, msg: `Successfully updated`, mongooseRes })
         } catch(err) {
             console.log(err)
@@ -38,9 +44,15 @@ router.put(
 router.get('/check-in', async(req, res) => {
     try {
         const [userInfo, notifications, institution] = await Promise.all([
-            $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["-__v", "-password"]).exec(),
+            $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["-__v", "-password", "-statuses"]).exec(),
             $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec(),
-            $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
+            // rootInstitution isn't a real institution
+            // it's just a static value that is passed to the frontend
+            // so that the root admin and system administrators function
+            // exactly like any normal user 
+            req.headers.institutionid === 'root' ? 
+                Promise.resolve(global.CONFIG.rootInstitution) : 
+                $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
         ])
         return res.json({ userInfo, notifications, institution })
     } catch(err) {
@@ -53,7 +65,7 @@ router.put(
     '/notification',
     validationMiddleware.validateRequest(
         [
-            validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+            validator.body("_id").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
             validator.body("seen").isBoolean().optional(),
             validator.body("actionPerformed").isBoolean().optional(),
             validator.body("meta").optional()
@@ -122,7 +134,7 @@ router.put('/pwa-subscription',
     validationMiddleware.validateRequest(
         [
             validator.body("status").isBoolean(),
-            validator.body("deviceId").isString().isLength(global.APP_CONFIG.consts.mongooseIdLength)
+            validator.body("deviceId").isString().isLength(global.CONFIG.consts.mongooseIdLength)
         ]
     ),
     async (req, res) => {

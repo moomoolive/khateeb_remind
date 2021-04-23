@@ -20,14 +20,15 @@ router.get('/institutions', async (req, res) => {
 
 router.put('/institutions', 
     validationMiddleware.validateRequest([ 
-        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("institutionID").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
         validator.body("confirmed").isBoolean().optional(),
         validator.body("settings").optional()
     ]),
     async (req, res) => {
         try {
-            console.log(req.body)
             const data = await $db.institutions.findOneAndUpdate({ _id: req.body.institutionID }, req.body, { new: true }).exec()
+            if (data.confirmed)
+                await data.confirmRootAdmin()
             return res.json({ data })
         } catch(err) {
             console.log(err)

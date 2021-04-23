@@ -8,9 +8,10 @@ const user = new mongoose.Schema({
     institutionID: {
         type: String,
         required: true,
-        minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength,
-        ref: 'institution'
+        validate: {
+            validator: val => val === 'root' || val.length === global.CONFIG.consts.mongooseIdLength,
+            message: "Invalid institution id"
+        }
     },
     username: {
         type: String,

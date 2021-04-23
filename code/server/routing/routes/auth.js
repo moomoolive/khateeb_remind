@@ -28,14 +28,19 @@ router.post(
     ), 
     async (req, res) => {
     try {
-        if (req.body.institution.name === '__TEST__' || req.body.institution.name === '__ROOT__')
-            return res.json({ msg: `You cannot name your institution __TEST__ or __ROOT__. Pick another name please.`, status: "reserved" })
-        const institutionEntry = await new $db.institutions(req.body.institution).save()
-        const rootInstitutionAdminEntry = await institutionEntry.createRootAdministrator(req.body.institutionAdmin)
-        return res.json(`Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}). Please wait a day or two for Khateeb Remind to confirm your institution before logging in.`)
+        if (req.body.institution.name === 'test')
+            return res.json({ msg: `You cannot name your institution 'test'. Pick another name please.`, code: 2 })
+        const rootUser = await $db.root.findOne({}).exec()
+        const autoConfirm = rootUser.systemSettings.autoConfirmRegistration 
+        const institutionEntry = await new $db.institutions({ ...req.body.institution, confirmed: autoConfirm }).save()
+        const rootInstitutionAdminEntry = await institutionEntry.createRootAdministrator(req.body.institutionAdmin, autoConfirm)
+        return res.json({ 
+            code: 0, 
+            msg: `Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}).${ autoConfirm ? '' : ' Please wait a day or two for Khateeb Remind to confirm your institution before logging in.' }`
+        })
     } catch(err) {
-        console.log(err)
-        return res.status(503).json(`Couldn't create Institution and Administrator - this is probably a server issue. Please try again later.`)
+        console.error(err)
+        return res.status(503).json({ msg: `Couldn't create Institution and Administrator - this is probably a server issue. Please try again later.`, code: 1, err })
     }
     }
 )
@@ -45,7 +50,7 @@ router.post(
     '/create/khateeb',
     validationMiddleware.validateRequest(
         [
-            validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+            validator.body("institutionID").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
             validator.body("password").isLength({ min: 6 }).isString(),
             validator.body("username").isLength({ min: 6 }).isString(),
             validator.body("handle").isLength({ min: 1 }).isString(),
@@ -59,17 +64,20 @@ router.post(
         try {
             const instituion = await $db.institutions.findOne({ _id: req.body.institutionID }).exec()
             if (!instituion)
-                return res.status(422).json({ msg: `That institution doesn't exist!` })
+                return res.status(422).json({ msg: `That institution doesn't exist!`, code: 2 })
             if (instituion.settings.autoConfirmRegistration)
                 req.body.confirmed = true
             const khateebEntry = await new $db.khateebs(req.body).save()
             const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, instituion.settings.autoConfirmRegistration)
             await note.setRecipentsToAdmins(req.body.institutionID)
             await note.create()
-            return res.json(`Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${instituion.settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`)
+            return res.json({ 
+                code: 0, 
+                msg: `Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${instituion.settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`
+            })
     } catch(err) {
-        console.log(err)
-        return res.status(503).json(`Couldn't create khateeb - this is probably a server issue. Please try again later`)
+        console.error(err)
+        return res.status(503).json({ msg: `Couldn't create khateeb - this is probably a server issue. Please try again later`, code: 1, err })
     }
 })
 

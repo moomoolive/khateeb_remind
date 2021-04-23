@@ -1,7 +1,7 @@
 <template>
     <div>
         <loading>
-            <div v-if="settingInfoReady">
+            <div v-if="$store.state.user.userInfo.systemSettings && showForm">
                 <form-main
                     :structure="{
                         autoConfirmRegistration: {
@@ -9,7 +9,7 @@
                             required: true
                         }
                     }"
-                    :basedOn="institution.settings"
+                    :basedOn="$store.state.user.userInfo.systemSettings"
                     :backgroundColor="`darkBlue`"
                     @submitted="saveRootSettings($event)"
                 />
@@ -38,33 +38,24 @@ export default {
     },
     data() {
         return {
-            institution: {}
+            showForm: true
         }
     },
     methods: {
-        async getRootInstitution() {
-            const res = await this.$API.sysAdmin.getInstitutions({ name: "__ROOT__" })
-            this.institution = res[0] || {}
-        },
         async saveRootSettings(updates={}) {
-            const res = await this.$API.sysAdmin.updateInstitution({ 
-                institutionID: this.institution._id, 
-                settings: updates 
-            })
-            if (Object.keys(res).length > 0)
-                return this.utils.alert(`Successfully updated`, 'success')
+            const res = await this.$API.user.updateInfo({ systemSettings: updates })
+            if (res.data) {
+                this.utils.alert(`Successfully updated`, 'success')
+                return this.rerenderForm()
+            }
             else
                 return this.utils.alert(`Couldn't update`)
+        },
+        rerenderForm() {
+            this.showForm = false
+            this.$nextTick(() => this.showForm = true)
         }
     },
-    computed: {
-        settingInfoReady() {
-            return Object.keys(this.institution).length > 0
-        }
-    },
-    created() {
-        this.getRootInstitution()
-    }
 }
 </script>
 

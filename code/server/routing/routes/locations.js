@@ -26,7 +26,7 @@ router.post(
     authMiddleware.authenticate({ min: 2, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
-        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("institutionID").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
         validator.body("name").isLength({ min: 1 }).isString(),
         validator.body("address").isLength({ min: 1 }).isString()
     ]),
@@ -46,7 +46,7 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("_id").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
         validator.body("name").isLength({ min: 1 }).isString().optional(),
         validator.body("address").isLength({ min: 1 }).isString().optional()
     ]),
@@ -66,7 +66,7 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
+        validator.query("_id").isLength(global.CONFIG.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "locations"),
     async (req, res) => {

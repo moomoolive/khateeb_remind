@@ -45,16 +45,11 @@
                         <div>
                             👳 Auto-Confirm Registration: {{ institution.settings.autoConfirmRegistration }}
                         </div>
-                        <div v-if="institution.name === '__ROOT__'">
-                            📱 Text Settings: {{ institution.settings.textAPIInfo }}
+                        <div>
+                            🕌 Allow Jummah Signup: {{ institution.settings.allowJummahSignup }} 
                         </div>
-                        <div v-if="institution.name !== '__ROOT__'">
-                            <div>
-                               🕌 Allow Jummah Signup: {{ institution.settings.allowJummahSignup }} 
-                            </div>
-                            <div>
-                                ✉️ Allow Jummah Notifications: {{ institution.settings.allowJummahNotifications }}
-                            </div>
+                        <div>
+                            ✉️ Allow Jummah Notifications: {{ institution.settings.allowJummahNotifications }}
                         </div>
                     </div>
 

@@ -18,9 +18,23 @@ khateeb.query.safelyFindOne = function(_id='none') {
     return this.where({ _id })
 }
 
+const root = new mongoose.Schema({
+    confirmed: {
+        type: Boolean,
+        required: false,
+        default: true
+    },
+    systemSettings: {
+        autoConfirmRegistration: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
+    }
+})
+
 const rootInstitutionAdmin = new mongoose.Schema({})
 const institutionAdmin = new mongoose.Schema({})
-const root = new mongoose.Schema({})
 const sysAdmin = new mongoose.Schema({})
 
 module.exports = {

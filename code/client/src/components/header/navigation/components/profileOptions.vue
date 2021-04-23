@@ -76,9 +76,12 @@ export default {
             this.$emit('redirect', path)
         },
         async getInstitutionLogo() {
-            this.imageSrc = await this.$API.logos.getInstitutionLogo(
-                { institutionID: this.$store.state.user.institution._id }
-            )
+            if (this.$store.state.user.institution._id === 'root')
+                return
+            else
+                return this.imageSrc = await this.$API.logos.getInstitutionLogo(
+                    { institutionID: this.$store.state.user.institution._id }
+                )
         },
         fetchInstitutionLogo() {
             const oneSecondInMilliseconds = 1_000

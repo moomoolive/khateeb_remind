@@ -1,8 +1,7 @@
 const mongoose = require('mongoose')
 
 const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
-
-const scripts = require(global.$dir + '/libraries/scripts/main.js')
+const scripts = require(global.$dir + '/libraries/scripts/index.js')
 
 const institution = new mongoose.Schema({
     name: {
@@ -98,23 +97,11 @@ institution.methods.deleteDependencies = async function() {
     return deleteRes
 }
 
-institution.methods.createRootAdministrator = async function(administratorInfo) {
+institution.methods.createRootAdministrator = async function(administratorInfo={}, confirmed=false) {
     administratorInfo.institutionID = this._id.toString()
     try {
-        const adminEntry = await new $db.rootInstitutionAdmins(administratorInfo).save()
+        const adminEntry = await new $db.rootInstitutionAdmins({ ...administratorInfo, confirmed }).save()
         console.log(`Created root institution admin for inst:${this.name} (id: ${adminEntry._id})`)
-        return adminEntry
-    } catch(err) {
-        console.log(err)
-    }
-}
-
-institution.methods.createRootSystemAdmin = async function(administratorInfo) {
-    try {
-        if (this.name !== '__ROOT__')
-            throw TypeError(`Cannot create root system admin`)
-        const adminEntry = await new $db.root(administratorInfo).save()
-        console.log(`Created root sys admin (inst:${this.name}) (id: ${adminEntry._id})`)
         return adminEntry
     } catch(err) {
         console.log(err)
@@ -135,9 +122,7 @@ institution.methods.getLocalTime = function () {
 }
 
 institution.post('deleteOne', async function(institution) {
-    if (institution.name === '__ROOT__')
-        await scripts.createRootInstitutionAndUser()
-    else if (institution.name === '__TEST__')
+    if (institution.name === 'test')
         await scripts.createTestInstitution()
 })
 

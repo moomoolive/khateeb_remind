@@ -74,7 +74,7 @@ export default {
             this.allInstitutions = await this.$API.misc.institutionSelection()
         },
         testInstitutionSignup() {
-            const testInstitution = this.allInstitutions.find(i => i.name === "__TEST__")
+            const testInstitution = this.allInstitutions.find(i => i.name === "test")
             if (testInstitution)
                 this.$router.push({ path: '/create/khateebs', query: { institutionID: testInstitution._id } })
         },
@@ -93,7 +93,7 @@ export default {
     computed: {
         showingInstitutions() {
             if (this.allInstitutions.length > 1)
-                return this.allInstitutions.filter(i => i.name !== "__TEST__")
+                return this.allInstitutions.filter(i => i.name !== "test")
             else
                 return this.allInstitutions
         }

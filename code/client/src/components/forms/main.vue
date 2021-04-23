@@ -340,7 +340,7 @@ button {
     width: 90%;
     color: black;
     font-size: 17px;
-    @include floatingBoxShadow(0.3);
+    @include floatingBoxShadow(0.5);
 }
 
 .darkBlue-form {

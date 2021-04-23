@@ -1,12 +1,7 @@
 node_modules/
 
-py_scraper/
-timezones/
-
 # scripts for complex database updates
 **dbUpdates/
-
-IANNA-TZs.js
 
 # version control
 .git

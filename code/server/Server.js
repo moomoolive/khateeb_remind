@@ -7,7 +7,7 @@ if (process.env.NODE_ENV === 'production')
     dotenv.config()
 
 global.$dir = path.resolve(__dirname)
-global.APP_CONFIG = require('./server.config.js')
+global.CONFIG = require('./server.config.js')
 const dbSettings = require('./db.config.js')
 
 const express = require('express')
@@ -59,4 +59,4 @@ db.once('open', async () => {
     await cronJobs.start()
 })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
-app.listen(global.APP_CONFIG.network.port, () => { console.log(`App is listening on port ${global.APP_CONFIG.network.port}`) })
+app.listen(global.CONFIG.network.port, () => { console.log(`App is listening on port ${global.CONFIG.network.port}`) })

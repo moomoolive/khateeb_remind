@@ -10,7 +10,7 @@ const router = express.Router()
 
 router.get('/', 
     validationMiddleware.validateRequest([
-        validator.query("institutionID").isString().isLength(global.APP_CONFIG.consts.mongooseIdLength)
+        validator.query("institutionID").isString().isLength(global.CONFIG.consts.mongooseIdLength)
     ], "query"),
     async (req, res) => {
         const { file, status, msg="none" } = await cloudStorageHelpers.getFile(`img/logos/${req.query.institutionID}`)

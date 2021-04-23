@@ -28,8 +28,8 @@ const individualPWASubscription = new mongoose.Schema({
     deviceId: {
         type: String,
         required: true,
-        minLength: global.APP_CONFIG.consts.mongooseIdLength,
-        maxLength: global.APP_CONFIG.consts.mongooseIdLength
+        minLength: global.CONFIG.consts.mongooseIdLength,
+        maxLength: global.CONFIG.consts.mongooseIdLength
     },
     browserSubscriptionDetails: {
         type: Object,

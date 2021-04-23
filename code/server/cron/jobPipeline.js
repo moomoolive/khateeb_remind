@@ -1,11 +1,11 @@
 const jummahNotifications = require('./jobs/jummahNotifications.js')
 const deleteVerificationCodes = require('./jobs/deleteVerificationCodes.js')
-const scripts = require(global.$dir + '/libraries/scripts/main.js')
+const scripts = require(global.$dir + '/libraries/scripts/index.js')
 
 const start = async () => {
     if (process.env.NODE_ENV !== 'production')
         return
-    await scripts.createRootInstitutionAndUser()
+    await scripts.createRootUser()
     await scripts.createTestInstitution()
     jummahNotifications.start()
     deleteVerificationCodes.start()

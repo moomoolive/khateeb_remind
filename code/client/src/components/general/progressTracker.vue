@@ -1,20 +1,26 @@
 <template>
     <div>
         <div class="stepsContainer">
-            <div 
-                class="stepContainer"
+            <div
+                class="stepContainer" 
                 v-for="step in totalSteps" 
                 :key="step"
             >
-                <div class="stepMain">
-                    <p>Step {{ step }}</p>
-                    <div :class="`step ${stepClass(step)}`"></div>
+                <p>Step {{ step }}</p>
+                <div>
+                    <div :class="`step ${stepClass(step)}`">
+                        <span 
+                            v-if="step !== totalSteps" 
+                            class="stepNext"
+                        >
+                                >
+                        </span>
+                    </div>
+                </div>
+                <div>
                     <p class="stepText" v-if="stepNamesSupported()">
                         {{ stepNames[step - 1] }}
                     </p>
-                </div>
-                <div v-if="step !== totalSteps" class="stepNext">
-                    <span>></span>
                 </div>
             </div>
         </div>
@@ -59,52 +65,38 @@ export default {
 .stepsContainer {
     margin-left: auto;
     margin-right: auto;
-    width: 60%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 7vh;
-
+    max-width: 600px;
+    margin-top: 10px;
 }
 
 .stepContainer {
-    margin-left: 2vh;
-    margin-right: 2vh;
-    margin-top: 1vh;
-    width: 4vh;
-    height: 4vh;
+    display: inline-block;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
-.stepMain {
-    float: left;
-    width: 4vh;
-    height: 4vh;
-}
-
-.stepNext {
-    float: right;
-    width: 2vh;
-    height: 4vh;
+.stepText {
+    max-width: 50px;
+    line-height: 13px;
 }
 
 span {
     position: relative;
-    left: 145%;
-    bottom: 50%;
-    font-size: 2.5vh;
+    font-size: 20px;
     font-weight: bold;
+    left: 32px;
 }
 
 .step {
     background: black;
     border-radius: 50%;
-    width: 2vh;
-    height: 2vh;
+    width: 20px;
+    height: 20px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 0.5vh;
-    border: getColor("silver") solid 1px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    @include floatingBoxShadow(0.3);
     &.after {
         background: getColor("red");
     }
@@ -117,13 +109,9 @@ span {
 }
 
 p {
-    font-size: 1.1vh;
+    font-size: 12px;
     color: black;
     line-height: 0;
-}
-
-.stepText {
-    line-height: 1.5vh;
 }
 
 </style>
