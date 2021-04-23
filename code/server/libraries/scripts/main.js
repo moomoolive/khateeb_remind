@@ -25,13 +25,12 @@ const createRootInstitutionAndUser = async () => {
                 institutionID: rootInstitution._id.toString(),
                 password: process.env.DEFAULT_ROOT_PASS || '123456',
                 confirmed: true,
-                phoneNumber: 999_999_9999
+                email: "none@khateeb-remind.com"
             })
         else
             console.log(`Root user already exists`)
     } catch(err) {
-        console.log(err)
-        console.log(`Root user couldn't be created!`)
+        console.error(`Root user couldn't be created!`, err)
     }
 }
 
@@ -57,7 +56,7 @@ const createTestInstitution = async () => {
                 institutionID: testInstitution._id.toString(),
                 ...global.APP_CONFIG.testInstitutionInitialization.rootAdmin,
                 password: process.env.DEFAULT_TEST_USER_PASS || "123456",
-                phoneNumber: 100_000_0000,
+                email: "none@khateeb-remind.com",
                 confirmed: true
             })
         
@@ -112,7 +111,7 @@ const createTestInstitution = async () => {
                         handle: randomNamegenerate().dashed,
                         firstName: randomNamegenerate().dashed,
                         lastName: randomNamegenerate().dashed,
-                        phoneNumber: 100_000_0000,
+                        email: "none@khateeb-remind.com",
                         institutionID: testInstitution._id.toString(),
                         title: i % 3 === 0 ? 'shiekh' : i % 2 === 0 ? 'imam' : 'none',
                         availableTimings: i % 2 === 0 ? [] : testInstitutionTimings[i] ? [testInstitutionTimings[i]._id.toString()] : [],

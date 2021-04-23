@@ -178,7 +178,6 @@ export default {
     components: {
         'statesExt': () => import('./extensions/binded/statesExt.vue'),
         "confirmsExt": () => import('./extensions/binded/confirmExt.vue'),
-        "phoneNumberExt": () => import('./extensions/free/phoneNumberExt.vue'),
         "dropdownExt": () => import('./extensions/primitives/dropdown.vue'),
         "protectedExt": () => import('./extensions/free/protectedExt.vue'),
         "textAreaExt": () => import('./extensions/primitives/textArea.vue'),

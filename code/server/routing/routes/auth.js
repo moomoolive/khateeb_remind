@@ -23,7 +23,6 @@ router.post(
             validator.body("institutionAdmin.handle").isLength({ min: 1 }).isString(),
             validator.body("institutionAdmin.firstName").isLength({ min: 1 }).isString(),
             validator.body("institutionAdmin.lastName").isLength({ min: 1 }).isString(),
-            validator.body("institutionAdmin.phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
             validator.body("institutionAdmin.email").isEmail()
         ]
     ), 
@@ -52,7 +51,6 @@ router.post(
             validator.body("handle").isLength({ min: 1 }).isString(),
             validator.body("firstName").isLength({ min: 1 }).isString(),
             validator.body("lastName").isLength({ min: 1 }).isString(),
-            validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
             validator.body("title").isLength({ min: 1 }).isString(),
             validator.body("email").isEmail()
         ]

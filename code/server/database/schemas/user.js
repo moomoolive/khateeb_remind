@@ -34,8 +34,8 @@ const user = new mongoose.Schema({
         default: "__NO-HANDLE__",
         minLength: 1,
         validate: {
-            validator: (val) => val[0] !== "@",
-            message: "Illegal 'at' symbol in position 0"
+            validator: val => val[0] !== "@",
+            message: "Illegal symbol '@' in position 0"
         }
     },
     firstName: {
@@ -47,12 +47,6 @@ const user = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 1
-    },
-    phoneNumber: {
-        type: Number,
-        required: true,
-        min: 100_000_0000,
-        max: 999_999_9999
     },
     lastLogin: {
         type: Date,

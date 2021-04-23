@@ -32,7 +32,6 @@ router.post("/",
             validator.body("email").isEmail(),
             validator.body("firstName").isLength({ min: 1 }).isString(),
             validator.body("lastName").isLength({ min: 1 }).isString(),
-            validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
         ]
     ),
     async (req, res) => {

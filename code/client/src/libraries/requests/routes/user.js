@@ -33,7 +33,6 @@ const requests = {
                 lastLogin: new Date(),
                 firstName: "random",
                 lastName: "random",
-                phoneNumber: 2_000_000_0000,
                 username: "randomUser",
                 handle: "random"
             }

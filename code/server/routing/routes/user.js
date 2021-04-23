@@ -18,7 +18,6 @@ router.put(
             validator.body("email").isEmail().optional(),
             validator.body("firstName").isLength({ min: 1 }).isString().optional(),
             validator.body("lastName").isLength({ min: 1 }).isString().optional(),
-            validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }).optional(),
             validator.body("availableTimings").isArray().optional(),
             validator.body("unavailableDates").isArray().optional(),
             validator.body("title").isLength({ min: 1 }).isString().optional()
