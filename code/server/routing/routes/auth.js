@@ -5,6 +5,7 @@ const validationMiddleware = require(global.$dir + '/middleware/validation/main.
 
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
 const authHelpers = require(global.$dir + '/libraries/auth/main.js')
+const externalNotificationHelpers = require(global.$dir + '/libraries/externalNotifications/main.js')
 
 const router = express.Router()
 
@@ -108,6 +109,34 @@ router.post(
 })
 
 router.post(
+    '/forgot/username',
+    validationMiddleware.validateRequest(
+        [
+            validator.body("email").isEmail().isString()
+        ]
+    ),
+    async (req, res) => {
+        try {
+            const accounts = await $db.users.find(req.body).exec()
+            if (accounts.length > 0) {
+                const accountsString = accounts
+                    .map(a => a.username)
+                    .reduce((total, a) => `${total}\n- ${a.username}`)
+                await externalNotificationHelpers.sendExternalNotification(
+                    req.body.email, 
+                    `Khateeb Remind Username Recovery`, 
+                    `You're recieving this message because you requested help recovering your username.\n\nAccounts under this email:\n- ${accountsString}`
+                )
+            }
+            return res.json({ msg: `If ${req.body.email} is the system, it should be recieving a email shortly insha'Allah. Make sure to check all your inboxes, including spam.`, code: 0 })
+        } catch(err) {
+            console.error(err)
+            return res.staus(503).json({ msg: `An error occured when sending verification text! Try again later`, code: 1, err })
+        }
+    }
+)
+
+router.post(
     '/forgot/password',
     validationMiddleware.validateRequest(
         [
@@ -116,51 +145,19 @@ router.post(
     ),
     async (req, res) => {
         try {
-            if (!global.textManager.isTextServiceOnline())
-                return res.json({ msg: `Account recovery is under maintenance right now! Try again later.`, status: "error" })
             const account = await $db.users.findOne(req.body).exec()
             if (account) {
-                const verificationCode = await new $db.verificationCodes({ userID: account._id.toString() }).save()
-                await global.textManager.sendRecoveryText(
-                    account.phoneNumber,
-                    `This code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`,
-                    "password"
+                const verificationCode = await new $db.verificationCodes({ username: account.username }).save()
+                await externalNotificationHelpers.sendExternalNotification(
+                    account.email, 
+                    `Khateeb Remind Password Recovery`, 
+                    `You're recieving this message because you requested help recovering your password.\n\nThis code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
                 )
             }
-            return res.json({ msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username}'s associated phone number will be recieving a text with a verification code in the next few minutes insha'Allah`, status: 'okay' })
+            return res.json({ code: 0, msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username}'s will be recieving an email with a verification code in the next few minutes insha'Allah. Make sure to check all inboxes, including spam.` })
         } catch(err) {
-            console.log(err)
-            return res.status(503).json({msg: `Something went wrong when sending verification code`, status: "error"})
-        }
-    }
-)
-
-router.post(
-    '/forgot/username',
-    validationMiddleware.validateRequest(
-        [
-            validator.body("phoneNumber").isNumeric()
-        ]
-    ),
-    async (req, res) => {
-        try {
-            if (!global.textManager.isTextServiceOnline())
-                return res.json({ msg: `Account recovery is under maintenance right now! Try again later.`, status: "error" })
-            const accounts = await $db.users.find(req.body).exec()
-            if (accounts.length > 0) {
-                const accountsString = accounts
-                    .map(a => a.username)
-                    .reduce((total, a) => `${total}\n- ${a.username}`)    
-                await global.textManager.sendRecoveryText(
-                    req.body.phoneNumber,
-                    `Accounts under this phone number:\n- ${accountsString}`,
-                    "username"
-                )
-            }
-            return res.json({ msg: `If ${req.body.phoneNumber} is the system, it should be recieving a text shortly insha'Allah`, status: 'okay' })
-        } catch(err) {
-            console.log(err)
-            return res.staus(503).json({msg: `An error occured when sending verification text! Try again later`, status: "error"})
+            console.error(err)
+            return res.status(503).json({ code: 1, msg: `Something went wrong when sending verification code.`, err })
         }
     }
 )
@@ -178,12 +175,12 @@ router.put(
         try {
             const verificationCode = await $db.verificationCodes.findOne({ code: req.body.code }).exec()
             if (!verificationCode || verificationCode.username !== req.body.username)
-                return res.json({ msg: "Incorrect code", status: "error" })
+                return res.json({ msg: "Incorrect code", code: 2 })
             await $db.users.updateOne({ username: req.body.username }, { password: req.body.newPassword })
-            return res.json({ msg: "Password successfully updated", status: "success" })
+            return res.json({ msg: "Password successfully updated", code: 0 })
         } catch(err) {
-            console.log(err)
-            res.status(503).json({ msg: `Couldn't verify code`, status: "error" })
+            console.error(err)
+            return res.status(503).json({ msg: `Couldn't verify code`, code: 1, err })
         }
 })
 

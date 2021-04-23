@@ -16,13 +16,11 @@ const mongoose = require('mongoose')
 const queryType = require('query-types')
 const qs = require('qs')
 
-const textManager = require('./libraries/text/textManager.js')
 const cronJobs = require('./cron/jobPipeline.js')
 const globalMiddleWare = require('./middleware/global/main.js')
 
 global.utils = require('./libraries/globalUtilities.js')
 global.$db = require('./database/main.js')
-global.textManager = new textManager()
 
 const routes = require('./routing/index.js')
 
@@ -59,7 +57,6 @@ db.once('open', async () => {
     const dbType = DATABASE.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
     console.log(`${dbType} Mongo is listening`)
     await cronJobs.start()
-    global.textManager.initializeSettings()
 })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
 app.listen(global.APP_CONFIG.network.port, () => { console.log(`App is listening on port ${global.APP_CONFIG.network.port}`) })

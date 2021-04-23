@@ -11,7 +11,7 @@ const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = re
 const helpers = require('./helpers.js')
 
 const s3 = new S3Client({ 
-    region: process.env.AWS_S3_HOSTING_REGION, 
+    region: process.env.AWS_HOSTING_REGION, 
     credentials: { 
         secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
         accessKeyId: process.env.AWS_S3_ACCESS_ID   

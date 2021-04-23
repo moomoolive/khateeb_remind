@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="form-container">
+        <div :class="`form-container ${ verificationSent ? 'stage-two-form' : '' }`">
             <form-main
                 v-if="showForm" 
                 :structure="formStructure"
@@ -31,32 +31,25 @@ export default {
         }
     },
     methods: {
-        async sendVerification(data={ username: 'moomoo' }) {
-            try {
-                const { msg, status } = await this.$API.auth.sendVerificationCode(data)
-                this.username = data.username
-                this.utils.alert(msg, status === 'error' ? 'caution' : 'success')
-                if (status !== "error")
-                    this.verificationSent = true
-                this.rerenderForm()
-            } catch(err) {
-                console.log(err)
-            }
+        async sendVerification({ username='moomoo' }) {
+            const { msg, code } = await this.$API.auth.sendVerificationCode(username)
+            if (code !== 0)
+                return this.utils.alert(msg)
+            this.verificationSent = true
+            this.username = username
+            this.utils.alert(msg, 'success')
+            return this.rerenderForm()
         },
         rerenderForm() {
             this.showForm = false
             this.$nextTick(() => this.showForm = true)
         },
         async checkVerificationCode({ code="1234565", newPassword="123445666" }) {
-            try {
-                const { msg, status } = await this.$API.auth.verificationCodeCheck({ code, newPassword, username: this.username })
-                if (status === 'error')
-                    return this.errorMsg = msg
-                this.utils.alert(msg, 'success')
-                this.$router.push('/')
-            } catch(err) {
-                console.log(err)
-            }
+            const { msg, code: resCode } = await this.$API.auth.verificationCodeCheck({ code, newPassword, username: this.username })
+            if (resCode !== 0)
+                return this.utils.alert(msg)
+            this.utils.alert(msg, 'success')
+            return this.utils.toHomePage()
         }
     },
     computed: {
@@ -89,5 +82,9 @@ export default {
     top: 23vh;
     margin-left: auto;
     margin-right: auto;
+}
+
+.stage-two-form {
+    top: 15vh !important;
 }
 </style>

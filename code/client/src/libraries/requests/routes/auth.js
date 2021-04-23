@@ -10,7 +10,7 @@ const requests = {
         try {
             const res = await axios.post(extension + '/', credentials)
             if (!res || !typeCheckingHelpers.isJWT(res.token))   
-                throw { token: null }
+                throw TypeError(`Response didn't include jwt`)
             return res
         } catch {
             return { token: null }
@@ -22,14 +22,38 @@ const requests = {
     createKhateeb(khateebInfo={}) {
         return axios.post(extension + "/create/khateeb", khateebInfo)
     },
-    sendVerificationCode(username={ username: "moomoo" }) {
-        return axios.post(extension + '/forgot/password', username)
+    async sendVerificationCode(username="moomoo") {
+        try {
+            const res = await axios.post(extension + '/forgot/password', { username })
+            if (!res || isNaN(res.code) || !res.msg)
+                throw TypeError(`Required info is missing`)
+            else
+                return { code: res.code, msg: res.msg }
+        } catch {
+            return { code: 1, msg: `An error occurred when attempting to send recovery email to ${username}` }
+        }
     },
-    forgotUsername(phoneNumber={ phoneNumber: 100_000_0000 }) {
-        return axios.post(extension + `/forgot/username`, phoneNumber)
+    async forgotUsername(email="random@random.com") {
+        try {
+            const res = await axios.post(extension + `/forgot/username`, { email })
+            if (!res || isNaN(res.code) || !res.msg)
+                throw TypeError(`Required info is missing`)
+            else
+                return { code: res.code, msg: res.msg }
+        } catch {
+            return { code: 1, msg: `An error occurred when attempting to send recovery email to ${email}` }
+        }
     },
-    verificationCodeCheck(passwordAndCode={}) {
-        return axios.put(extension + '/verification-code', passwordAndCode)
+    async verificationCodeCheck(info={}) {
+        try {
+            const res = await axios.put(extension + '/verification-code', info)
+            if (!res || isNaN(res.code) || !res.msg)
+                throw TypeError(`Required info is missing`)
+            else
+                return { code: res.code, msg: res.msg }
+        } catch {
+            return { msg: `An error occured when verifying code`, code: 1 }
+        }
     }
 }
 

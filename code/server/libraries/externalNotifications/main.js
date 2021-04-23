@@ -12,44 +12,39 @@
 
 const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses')
 
+const helpers = require('./helpers.js')
+
 const ses = new SESClient({
-    // to change
-    region: 'us-east-2',
+    region: process.env.AWS_HOSTING_REGION,
     credentials: {
         secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
         accessKeyId: process.env.AWS_S3_ACCESS_ID 
     }
 })
 
-const params = {
-    Destination: {
-        ToAddresses: [
-            process.env.AWS_SES_EMAIL
-        ],
-    },
-    Message: {
-        Body: {
-            Text: {
-                Charset: "UTF-8",
-                Data: "test infomation",
-            }
-        },
-      Subject: {
-            Charset: "UTF-8",
-            Data: "Test Email",
-      },
-    },
-    Source: process.env.AWS_SES_EMAIL
-}
+const Charset = "UTF-8"
+const Source = process.env.AWS_SES_EMAIL
 
-
-
-const sendExternalNotification = async () => {
+const sendExternalNotification = async (toAddress="random@random.com", subject="Default Subject", msg="Default msg", options={}) => {
     try {
-        const data = await ses.send(new SendEmailCommand(params))
-        console.log(data)
+        const data = await ses.send(new SendEmailCommand({
+            Destination: helpers.createRecipentsObject(toAddress, options),
+            Message: {
+                Body: {
+                    Text: { Charset, Data: `${msg}${global.APP_CONFIG.notifications.automatedNotificationSignature}` }
+                },
+                Subject: { Charset, Data: subject },
+            },
+            Source
+        }))
+        return { code: 0, msgId: data.MessageId }
     } catch(err) {
-        console.log(err)
+        console.error(err)
+        const errorCode = err.$metadata ? err.$metadata.httpStatusCode : 1
+        return {
+            code: errorCode < 1 ? 1 : errorCode,
+            msg: `Problem sending email. ${err}`
+        }
     }
 }
 

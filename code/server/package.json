@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "backend server for khateeb remind",
   "main": "Server.js",
+  "private": true,
   "scripts": {
     "dev": "nodemon Server.js",
-    "server": "node Server.js"
+    "server": "node Server.js",
+    "test:unit": "jest"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",
@@ -27,7 +29,6 @@
     "nanoid": "^3.1.20",
     "project-name-generator": "^2.1.9",
     "query-types": "^0.1.4",
-    "twilio": "^3.54.0",
     "web-push": "^3.4.4"
   },
   "devDependencies": {

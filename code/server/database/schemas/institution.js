@@ -36,10 +36,6 @@ const institution = new mongoose.Schema({
         minLength: 1
     },
     settings: {
-        textAPIInfo: {
-            type: Object,
-            required: false
-        },
         autoConfirmRegistration: {
             type: Boolean,
             required: false,

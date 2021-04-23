@@ -28,8 +28,6 @@ router.put('/institutions',
         try {
             console.log(req.body)
             const data = await $db.institutions.findOneAndUpdate({ _id: req.body.institutionID }, req.body, { new: true }).exec()
-            if (data.name === "__ROOT__")
-                global.textManager.refreshSettings(data.settings.textAPIInfo)
             return res.json({ data })
         } catch(err) {
             console.log(err)

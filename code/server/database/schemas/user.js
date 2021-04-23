@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const bcyrpt = require('bcrypt')
 
 const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const typeCheckingHelpers = require(global.$dir + '/libraries/typeChecking/main.js')
 
 const user = new mongoose.Schema({
     institutionID: {
@@ -65,12 +66,9 @@ const user = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: false,
-        default: 'none@khateeb-remind.com',
+        required: true,
         validate: {
-            // look for @ sign with a peroid somewhere after it
-            // followed by at least one letter of the alphabet
-            validator: val => /@.*\..*[a-zA-Z]/g.test(val),
+            validator: typeCheckingHelpers.isEmail,
             message: "incorrect email format"
         }
     },

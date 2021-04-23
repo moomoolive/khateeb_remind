@@ -11,7 +11,6 @@ const appConfig = {
     },
     rootInstitution: {
         settingsInitial: {
-            textAPIInfo: { textAllowed: false },
             autoConfirmRegistration: false
         }
     },
@@ -49,6 +48,9 @@ const appConfig = {
     },
     customHeaders: {
         serviceWorkerCache: { "khateeb-remind-is-cacheable": "true" }
+    },
+    notifications: {
+        automatedNotificationSignature: "\n\n🤖 From Khateeb Remind Bot 🤖"
     }
 }
 
