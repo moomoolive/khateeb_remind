@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "backend server for khateeb remind",
-  "main": "App.js",
+  "main": "Server.js",
   "scripts": {
-    "dev": "nodemon App.js",
-    "app": "node App.js"
+    "dev": "nodemon Server.js",
+    "server": "node Server.js"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",
@@ -31,6 +31,8 @@
     "web-push": "^3.4.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.6"
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.6",
+    "supertest": "^6.1.3"
   }
 }

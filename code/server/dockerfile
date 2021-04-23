@@ -10,4 +10,4 @@ RUN npm install --only=prod
 
 EXPOSE 80
 
-CMD [ "npm", "run", "app" ]
+CMD [ "npm", "run", "server" ]

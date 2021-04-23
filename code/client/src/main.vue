@@ -1,6 +1,19 @@
 <template>
   <div id="app">
+    
     <div class="big-app-background"></div>
+
+    <div 
+      v-show="$store.state.notifications.display.show" 
+      class="notifications-layer"
+    >
+      <transition name="dropdown">
+        <notifications 
+          v-if="showNotificationDisplay" 
+          class="notifications notifications-size-position"
+        />
+      </transition>
+    </div>
 
     <div class="app-container">
       <div class="header">
@@ -11,18 +24,6 @@
 
         <header-navigation />
 
-      </div>
-
-      <div 
-        v-show="$store.state.notifications.display.show" 
-        class="notifications-layer"
-      >
-        <transition name="dropdown">
-          <notifications 
-            v-if="showNotificationDisplay" 
-            class="notifications notifications-size-position"
-          />
-        </transition>
       </div>
 
       <transition
@@ -236,7 +237,6 @@ export default {
   height: 100vh;
   min-width: $minimumAppWidth;
   @include flexboxDefault();
-  max-width: $maxAppWidth;
 }
 
 .notifications-size-position {

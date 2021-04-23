@@ -8,8 +8,17 @@ timezones/
 
 IANNA-TZs.js
 
+# version control
 .git
 .gitignore
 
+# Any readme or text files
 *.md
+*.txt
+
+# windows scripts
 *.bat
+
+# unit testing
+tests/
+jest.config.js
