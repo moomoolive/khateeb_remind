@@ -1,12 +1,17 @@
 const mongoose = require('mongoose')
 const bcyrpt = require('bcrypt')
 
-const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
+const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
 const user = new mongoose.Schema({
     institutionID: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: val => val === 'root' || val.length === $config.consts.mongooseIdLength,
+            message: "Invalid institution id"
+        }
     },
     username: {
         type: String,
@@ -30,8 +35,8 @@ const user = new mongoose.Schema({
         default: "__NO-HANDLE__",
         minLength: 1,
         validate: {
-            validator: (val) => val[0] !== "@",
-            message: "Illegal 'at' symbol in position 0"
+            validator: val => val[0] !== "@",
+            message: "Illegal symbol '@' in position 0"
         }
     },
     firstName: {
@@ -43,12 +48,6 @@ const user = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 1
-    },
-    phoneNumber: {
-        type: Number,
-        required: true,
-        min: 100_000_0000,
-        max: 999_999_9999
     },
     lastLogin: {
         type: Date,
@@ -62,17 +61,45 @@ const user = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: false,
-        default: 'none@khateeb-remind.com',
+        required: true,
         validate: {
-            // look for @ sign with a peroid somewhere after it
-            // followed by at least one letter of the alphabet
-            validator: val => /@.*\..*[a-zA-Z]/g.test(val),
+            validator: typeCheckingHelpers.isEmail,
             message: "incorrect email format"
         }
+    },
+    settings: {
+        // default external notification is email
+        // but can be swapped out by replacing the externalNotifications
+        // library logic
+        // and then replacing the email field above on both the server and client
+        // side, replacing it with whatever you want such as phone number, 
+        // or any other way you want khateeb remind to communicate with the 
+        // outside world
+        recieveExternalNotification: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
+        recievePWAPush: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
+    },
+    statuses: {
+        lastEmailWasBounced: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
     }
-},
-{ timestamps: true })
+}, { timestamps: true })
+
+user.blah = {
+    type: Boolean,
+    required: false,
+    default: true
+}
 
 user.pre('save', function(next) {
     const user = this
@@ -94,7 +121,7 @@ user.pre('save', function(next) {
 
 user.post('save', async function(user, next) {
     try {
-        await new notificationConstructors.WelcomeNotificationConstructor(user).create()
+        await notificationConstructors.WelcomeNotificationConstructor(user)
         return next()
     } catch(err) {
         console.log(err)

@@ -21,10 +21,27 @@ p {
     margin: 0 0 0 0;
     padding: 0 0 0 0;
 }
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    display: none;
+}
+
+::-webkit-scrollbar-thumb {
+    background: getColor("lightGrey");
+    @include lightBorderRounding();
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: getColor('grey');
+}
   
 body {
     margin: 0 0 0 0;
-    background-color: getColor("grey");
+    background-color: getColor("silver");
     color: getColor("offWhite");
     font-size: 16px;
 }

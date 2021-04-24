@@ -1,16 +1,14 @@
-const NotificationConstructor = require('./notificationConstructor.js')
-
-class WelcomeNotificationConstructor extends NotificationConstructor {
-    
-    constructor(userInfo) {
-        super(userInfo, 'welcome')
+const welcomeNotification = (userInfo={}) => {
+    const info = {
+        tag: 'welcome',
+        msg: `Asalam aliakoum ${userInfo.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. Feel free to take a look around, and ask your administrator if you need any help!`,
+        userID: userInfo._id.toString()
     }
-    
-    msg() {
-        return `Asalam aliakoum ${this.msgInfo.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. Feel free to take a look around, and ask your administrator if you need any help!`
-    }
+    if (userInfo.institutionID !== 'root')
+        info.institutionID = userInfo.institutionID.toString()
+    return new $db.notifications(info).save()
 }
 
-module.exports = WelcomeNotificationConstructor
+module.exports = welcomeNotification
 
 

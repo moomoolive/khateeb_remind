@@ -1,16 +1,16 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
-const cloudStorageHelpers = require(global.$dir + '/libraries/cloudStorage/main.js')
+const cloudStorageHelpers = require($rootDir + '/libraries/cloudStorage/main.js')
 
 const router = express.Router()
 
 router.get('/', 
     validationMiddleware.validateRequest([
-        validator.query("institutionID").isString().isLength(global.APP_CONFIG.consts.mongooseIdLength)
+        validator.query("institutionID").isString().isLength($config.consts.mongooseIdLength)
     ], "query"),
     async (req, res) => {
         const { file, status, msg="none" } = await cloudStorageHelpers.getFile(`img/logos/${req.query.institutionID}`)

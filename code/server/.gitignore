@@ -1,19 +1,10 @@
 node_modules/
 
-# any mock users, example database entries, etc.
-dummyInfo/
+# environmental variables both dev and production
+.env*
 
-# python scripts
-**/__pycache__
-scraper_env/
-TZ_env/
-
-.env
-text.json
+# although keys are already in env I keep original copy in case of emergency
 vapidKeys.json
-
-# storage area for logos currently
-uploads/**
 
 # build and upload scripts for production docker image
 dBuild.bat
@@ -21,3 +12,6 @@ dUpload.bat
 
 # database migration scripts and schema updates
 **dbUpdates/
+
+# email server details
+email.txt

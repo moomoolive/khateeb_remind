@@ -1,7 +1,13 @@
 const webpush = require('web-push')
-const { subject, privateKey, publicKey } = require(global.$dir + "/vapidKeys.json")
-webpush.setVapidDetails(subject, publicKey, privateKey)
 const { nanoid } = require('nanoid')
+
+const { securityConfig } = require($rootDir + '/server.config.js')
+
+webpush.setVapidDetails(
+    securityConfig.vapid.subject,
+    securityConfig.vapid.publicKey,
+    securityConfig.vapid.privateKey
+)
 
 const sendPushMessage = async (subscription={}, dataToSend={}) => {
     try {

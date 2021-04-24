@@ -1,8 +1,8 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
@@ -20,16 +20,15 @@ router.get('/institutions', async (req, res) => {
 
 router.put('/institutions', 
     validationMiddleware.validateRequest([ 
-        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("confirmed").isBoolean().optional(),
         validator.body("settings").optional()
     ]),
     async (req, res) => {
         try {
-            console.log(req.body)
             const data = await $db.institutions.findOneAndUpdate({ _id: req.body.institutionID }, req.body, { new: true }).exec()
-            if (data.name === "__ROOT__")
-                global.textManager.refreshSettings(data.settings.textAPIInfo)
+            if (data.confirmed)
+                await data.confirmRootAdmin()
             return res.json({ data })
         } catch(err) {
             console.log(err)

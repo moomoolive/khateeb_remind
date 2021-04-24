@@ -1,6 +1,5 @@
 {
     "freeExts": [
-        "phoneNumber",
         "dropdown", 
         "default", 
         "protected",

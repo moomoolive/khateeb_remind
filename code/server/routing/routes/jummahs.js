@@ -1,12 +1,13 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
-const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
+const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.js')
 
-const jummahHelpers = require(global.$dir + '/libraries/jummahs/main.js')
-const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
+const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
+const requestValidationHelpers = require($rootDir + "/libraries/requestValidation/main.js")
 
 const router = express.Router()
 
@@ -28,15 +29,11 @@ router.post(
     authMiddleware.authenticate({ min: 1, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
-        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
-        validator.body("timingID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
-        validator.body("locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
-        validator.body("khateebID").custom(val => {
-            if (val !== 'none' && val.length !== global.APP_CONFIG.consts.mongooseIdLength)
-                throw TypeError('Invalid Khateeb Id')
-            return true
-        }),
-        validator.body("notificationID").isLength({ min: 4 }).isString(),
+        validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
+        validator.body("timingID").isLength($config.consts.mongooseIdLength).isString(),
+        validator.body("locationID").isLength($config.consts.mongooseIdLength).isString(),
+        validator.body("khateebID").isString().custom(requestValidationHelpers.validIdOrNullIdInField),
+        validator.body("notificationID").isString().custom(requestValidationHelpers.validIdOrNullIdInField),
         validator.body("date").isLength({ min: 1 }),
         validator.body("notified").isBoolean(),
         validator.body("isBackup").isBoolean(),
@@ -73,13 +70,9 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
-        validator.body("khateebID").custom(val => {
-            if (val !== 'none' && val.length !== global.APP_CONFIG.consts.mongooseIdLength)
-                throw TypeError('Invalid Khateeb Id')
-            return true
-        }).optional(),
-        validator.body("notificationID").isLength({ min: 4 }).isString().optional(),
+        validator.body("_id").isLength($config.consts.mongooseIdLength).isString().optional(),
+        validator.body("khateebID").isString().custom(requestValidationHelpers.validIdOrNullIdInField).optional(),
+        validator.body("notificationID").isString().optional().custom(requestValidationHelpers.validIdOrNullIdInField),
         validator.body("notified").isBoolean().optional(),
         validator.body("isGivingKhutbah").isBoolean().optional()
     ]),
@@ -99,26 +92,26 @@ router.put(
     '/run-loop',
     validationMiddleware.validateRequest([
         validator.body("main._id").isLength({ min: 4 }).isString(),
-        validator.body("main.khateebID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("main.khateebID").isLength($config.consts.mongooseIdLength).isString().optional(),
         validator.body("main.isGivingKhutbah").isBoolean().optional(),
         validator.body("main.isBackup").isBoolean().optional(),
         validator.body("main.notified").isBoolean().optional(),
         validator.body("main.upsert").isBoolean().optional(),
         validator.body("main.date").isISO8601().optional(),
-        validator.body("main.institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
-        validator.body("main.timingID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
-        validator.body("main.locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("main.institutionID").isLength($config.consts.mongooseIdLength).isString().optional(),
+        validator.body("main.timingID").isLength($config.consts.mongooseIdLength).isString().optional(),
+        validator.body("main.locationID").isLength($config.consts.mongooseIdLength).isString().optional(),
 
         validator.body("backup._id").isLength({ min: 4 }).isString(),
-        validator.body("backup.khateebID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("backup.khateebID").isLength($config.consts.mongooseIdLength).isString().optional(),
         validator.body("backup.isGivingKhutbah").isBoolean().optional(),
         validator.body("backup.isBackup").isBoolean().optional(),
         validator.body("backup.notified").isBoolean().optional(),
         validator.body("backup.upsert").isBoolean().optional(),
         validator.body("backup.date").isISO8601().optional(),
-        validator.body("backup.institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
-        validator.body("backup.timingID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
-        validator.body("backup.locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString().optional(),
+        validator.body("backup.institutionID").isLength($config.consts.mongooseIdLength).isString().optional(),
+        validator.body("backup.timingID").isLength($config.consts.mongooseIdLength).isString().optional(),
+        validator.body("backup.locationID").isLength($config.consts.mongooseIdLength).isString().optional(),
     ]),
     authMiddleware.authenticate({ min: 2, max: 3 }),
     async (req, res) => {

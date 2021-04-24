@@ -1,9 +1,9 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
-const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
+const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.js')
 
 const router = express.Router()
 
@@ -13,7 +13,7 @@ router.get(
     async (req, res) => {
         try {
             const data = await $db.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).sort("-updatedAt").limit(20).exec()
-            res.set(global.APP_CONFIG.customHeaders.serviceWorkerCache)
+            res.set($config.customHeaders.serviceWorkerCache)
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -27,7 +27,7 @@ router.post(
     authMiddleware.authenticate({ min: 2, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
-        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("headline").isLength({ min: 1 }).isString(),
         validator.body("content").isLength({ min: 1 }).isString(),
         validator.body("important").isBoolean(),
@@ -48,7 +48,7 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("headline").isLength({ min: 1 }).isString().optional(),
         validator.body("content").isLength({ min: 1 }).isString().optional(),
         validator.body("important").isBoolean().optional(),
@@ -70,7 +70,7 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
+        validator.query("_id").isLength($config.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "announcements"),
     async (req, res) => {

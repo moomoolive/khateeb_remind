@@ -1,15 +1,22 @@
 node_modules/
 
-py_scraper/
-timezones/
+# ignore development enviromental variable
+.env.development
 
 # scripts for complex database updates
 **dbUpdates/
 
-IANNA-TZs.js
-
+# version control
 .git
 .gitignore
 
+# Any readme or text files
 *.md
+*.txt
+
+# windows scripts
 *.bat
+
+# unit testing
+tests/
+jest.config.js

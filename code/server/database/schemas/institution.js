@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
 
-const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
-
-const scripts = require(global.$dir + '/libraries/scripts/main.js')
+const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
+const scripts = require($rootDir + '/libraries/scripts/index.js')
+const cloudStorageHelpers = require($rootDir + '/libraries/cloudStorage/main.js')
 
 const institution = new mongoose.Schema({
     name: {
@@ -36,10 +36,6 @@ const institution = new mongoose.Schema({
         minLength: 1
     },
     settings: {
-        textAPIInfo: {
-            type: Object,
-            required: false
-        },
         autoConfirmRegistration: {
             type: Boolean,
             required: false,
@@ -96,29 +92,18 @@ institution.methods.deleteDependencies = async function() {
                 continue
             deleteRes[model] = await $db[model].deleteMany({ institutionID: this._id.toString() })
         }
+        deleteRes.cloudStorage = await cloudStorageHelpers.deleteFile(`img/logos/${this._id}`)
     } catch(err) {
         console.log(err)
     }
     return deleteRes
 }
 
-institution.methods.createRootAdministrator = async function(administratorInfo) {
+institution.methods.createRootAdministrator = async function(administratorInfo={}, confirmed=false) {
     administratorInfo.institutionID = this._id.toString()
     try {
-        const adminEntry = await new $db.rootInstitutionAdmins(administratorInfo).save()
+        const adminEntry = await new $db.rootInstitutionAdmins({ ...administratorInfo, confirmed }).save()
         console.log(`Created root institution admin for inst:${this.name} (id: ${adminEntry._id})`)
-        return adminEntry
-    } catch(err) {
-        console.log(err)
-    }
-}
-
-institution.methods.createRootSystemAdmin = async function(administratorInfo) {
-    try {
-        if (this.name !== '__ROOT__')
-            throw TypeError(`Cannot create root system admin`)
-        const adminEntry = await new $db.root(administratorInfo).save()
-        console.log(`Created root sys admin (inst:${this.name}) (id: ${adminEntry._id})`)
         return adminEntry
     } catch(err) {
         console.log(err)
@@ -138,11 +123,9 @@ institution.methods.getLocalTime = function () {
     return scheduleHelpers.getDateInTimezoneNow(this.timezone)
 }
 
-institution.post('deleteOne', async function(institution) {
-    if (institution.name === '__ROOT__')
-        await scripts.createRootInstitutionAndUser()
-    else if (institution.name === '__TEST__')
-        await scripts.createTestInstitution()
+institution.post('deleteOne', async function() {
+    const threeSecondsInMilliseconds = 3_000
+    global.setTimeout(async () => { await scripts.createTestInstitution() }, threeSecondsInMilliseconds)
 })
 
 module.exports = institution

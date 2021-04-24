@@ -68,10 +68,6 @@ export default {
                 lastName: {
                     required: true
                 },
-                phoneNumber: {
-                    type: 'phoneNumber',
-                    required: true
-                },
                 email: {
                     validators: 'email',
                     required: true

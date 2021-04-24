@@ -11,6 +11,7 @@ module.exports = class JummahReminderNotificationConstructor extends Notificatio
                 urgent: true, 
                 meta: { jummahRef: jummah._id.toString() } 
             }, 
+            true,
             true
         )
     }
@@ -27,7 +28,14 @@ module.exports = class JummahReminderNotificationConstructor extends Notificatio
 
     pwaMsgObject() {
         return {
-            title: `${global.utils.capitalize(this.msgInfo.location.name)} khutbah @ ${this.timing}`,
+            title: `${$utils.capitalize(this.msgInfo.location.name)} khutbah @ ${this.timing}`,
+            body: this.msg()
+        }
+    }
+
+    externalNotificationMsg() {
+        return {
+            subject: "Your Giving a Khutbah this Week",
             body: this.msg()
         }
     }

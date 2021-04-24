@@ -17,16 +17,12 @@ export default {
         institutionSignupFormTemplate
     },
     methods: {
-        async toAPI(formData) {
-            try {
-                const res = await this.$API.auth.createInstitution(formData)
-                if (typeof res.status !== "undefined" && res.status === 'reserved')
-                    return this.utils.alert(res.msg)
-                this.utils.alert(res, 'success')
-                this.utils.toHomePage()
-            } catch(err) {
-                console.log(err)
-            }
+        async toAPI(formData={}) {
+            const { code, msg } = await this.$API.auth.createInstitution(formData)
+            if (code !== 0)
+                return this.utils.alert(msg)
+            this.utils.alert(msg, 'success')
+            return this.utils.toHomePage()
         },
     }
 }

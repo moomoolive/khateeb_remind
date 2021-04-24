@@ -1,10 +1,12 @@
-const authHelpers = require(global.$dir + '/libraries/auth/main.js')
+const authHelpers = require($rootDir + '/libraries/auth/main.js')
 
 const jwt = require('jsonwebtoken')
 
+const { securityConfig } = require($rootDir + "/server.config.js")
+
 const authenticate = (authOptions={}) => {
     return (request, response, next) => {
-        jwt.verify(request.headers.authorization, process.env.JWT_SECRET || 'secret', (err, decoded) => {
+        jwt.verify(request.headers.authorization, securityConfig.jwtSecret, (err, decoded) => {
             if (err || !authHelpers.validUserAuthentication(decoded.__t, authOptions))
                 return response.status(401).json({ msg: `Invalid authorization check if authorization is present in header` })
             authHelpers.mutateHeadersToIncludeUserInfo(request, decoded)

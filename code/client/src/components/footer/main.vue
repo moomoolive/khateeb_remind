@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="footer-container">
         <div class="bottom-nav">
             
             <div v-show="isLoggedIn" class="footer-links-section">
@@ -98,6 +98,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.footer-container {
+    background: getColor('grey');
+    padding-bottom: 2px;
+}
+
 .bottom-nav {
     width: 65vw;
     max-width: 950px;
@@ -192,8 +197,8 @@ span {
     .bottom-nav {
         flex-direction: column;
         justify-content: center;
-        margin-bottom: 30px;
-        margin-top: 7px;
+        padding-top: 7px;
+        padding-bottom: 30px;
     }
 
     .footer-links-header-divide {

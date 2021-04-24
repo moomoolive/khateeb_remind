@@ -1,14 +1,16 @@
-const pwaNotifications = require(global.$dir + '/libraries/pwaNotifications/main.js')
+const pwaNotifications = require($rootDir + '/libraries/pwaNotifications/main.js')
+const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
 module.exports = class NotificationConstructor {
 
-    constructor(userInfo, tag='none', options={}, PWAMessages=false) {
+    constructor(userInfo, tag='none', options={}, PWAMessages=false, email=false) {
         this.setRecipents(userInfo)
         this.msgInfo = options.msgInfo || userInfo,
         this.tag = tag
         this.meta = options.meta || {}
         this.additionalInfo = options
-        this.PWAMessages = PWAMessages
+        this.sendPWAPush = PWAMessages
+        this.sendEmail = email
     }
 
     setRecipents(recipents) {
@@ -20,11 +22,16 @@ module.exports = class NotificationConstructor {
     async create() {
         const msgsInfo = []
         for (let i = 0; i < this.userInfo.length; i++) {
-            const savedNotification = await this.saveNotificationToDatabase(this.compileNotificationInfo(this.userInfo[i]))
+            const user = this.userInfo[i]
+            const savedNotification = await this.saveNotificationToDatabase(this.compileNotificationInfo(user))
             msgsInfo.push(savedNotification)
-            if (this.PWAMessages && this.pwaMsgObject()) {
-                const pwaRes = await this.executePWANotifications(this.userInfo[i]._id.toString())
+            if (this.sendPWAPush && user.settings.recievePWAPush && this.pwaMsgObject) {
+                const pwaRes = await this.executePWANotifications(user._id.toString())
                 msgsInfo.push(pwaRes)
+            }
+            if (this.sendEmail && user.settings.recieveExternalNotification && this.externalNotificationMsg) {
+                const externalNotificationRes = await this.executeExternalNotification(user)
+                msgsInfo.push(externalNotificationRes)
             }
         }
         return msgsInfo
@@ -110,6 +117,21 @@ module.exports = class NotificationConstructor {
             title: "default title",
             body: "default body"
         }
+    }
+
+    externalNotificationMsg() {
+        return {
+            subject: "default subject",
+            body: "default body"
+        }
+    }
+
+    async executeExternalNotification(user={}) {
+        const res = await externalNotificationHelpers.sendExternalNotificationFromNotificationConstructor(
+            user,
+            this.externalNotificationMsg()
+        )
+        return res
     }
 
 }

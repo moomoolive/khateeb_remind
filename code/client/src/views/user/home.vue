@@ -53,7 +53,7 @@
         </collapsable-box>
         
         <collapsable-box
-            v-if="utils.validAuthentication({ max: 2 })"
+            v-if="$store.getters['user/authLevel'] !== 3"
             class="user-setting"
             :headline="`Danger Zone`"
             :buttonColor="`red`"

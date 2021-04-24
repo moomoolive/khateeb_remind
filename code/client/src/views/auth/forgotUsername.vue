@@ -1,20 +1,22 @@
 <template>
-    <div class="form-container">
-        <div>
-            <form-main 
-                :structure="{
-                    phoneNumber: { 
-                        required: true,
-                        type: 'phoneNumber',
-                        alias: `Enter Your Account's Phone Number` 
-                    }
-                }"
-                :buttonText="`Recover Username`"
-                :backgroundColor="`darkBlue`"
-                :showInvalidationMsgs="false"
-                :confirmBeforeSubmit="false"
-                @submitted="recoverUsername($event)"
-            />
+    <div>
+        <div class="form-container">
+            <div>
+                <form-main 
+                    :structure="{
+                        email: { 
+                            required: true,
+                            validators: 'email',
+                            alias: `Enter Your Account's Email` 
+                        }
+                    }"
+                    :buttonText="`Recover Username`"
+                    :backgroundColor="`darkBlue`"
+                    :showInvalidationMsgs="false"
+                    :confirmBeforeSubmit="false"
+                    @submitted="recoverUsername($event)"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -28,15 +30,12 @@ export default {
         formMain
     },
     methods: {
-        async recoverUsername(phoneNumber=100_000_0000) {
-            try {
-                const { msg, status } = await this.$API.auth.forgotUsername(phoneNumber)
-                this.utils.alert(msg, status === 'error' ? 'caution' : 'success')
-                if (status !== "error")
-                    this.$router.push('/')
-            } catch(err) {
-                console.log(err)
-            }
+        async recoverUsername({ email="random@random.com" }) {
+            const { msg, code } = await this.$API.auth.forgotUsername(email)
+            if (code !== 0)
+                return this.utils.alert(msg)
+            this.utils.alert(msg, 'success')
+            return this.utils.toHomePage()
         }
     }
 }
@@ -44,10 +43,8 @@ export default {
 
 <style lang="scss" scoped>
 .form-container {
+    margin-top: 23vh;
     margin-left: auto;
     margin-right: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 </style>

@@ -1,17 +1,12 @@
 <template>
   <div id="app">
+    
+    <div class="big-app-background"></div>
 
-    <div class="header">
-
-      <collapse-transition>
-        <website-banner v-show="$store.state.websiteBanner.show" />
-      </collapse-transition>
-
-      <header-navigation />
-
-    </div>
-
-    <div v-show="$store.state.notifications.display.show" class="notifications-layer">
+    <div 
+      v-show="$store.state.notifications.display.show" 
+      class="notifications-layer"
+    >
       <transition name="dropdown">
         <notifications 
           v-if="showNotificationDisplay" 
@@ -20,26 +15,38 @@
       </transition>
     </div>
 
-    <transition
-      name="fade"
-      mode="out-in"
-    >
-      <router-view 
-        :class="`displayed-page page-padding ${$store.state.app.wallpaper}`"
-      />
-    </transition>
+    <div class="app-container">
+      <div class="header">
 
-    <request-manager />
-     <notifications-manager @toggle-notification-display="toggleNotificationDisplay()" />
+        <collapse-transition>
+          <website-banner v-show="$store.state.websiteBanner.show" />
+        </collapse-transition>
 
-    <collapse-transition :duration="600">
-        <footer-popup
-          v-show="$store.state.footerPopup.show"
-          class="footer-popup" 
+        <header-navigation />
+
+      </div>
+
+      <transition
+        name="fade"
+        mode="out-in"
+      >
+        <router-view 
+          :class="`displayed-page page-padding ${$store.state.app.wallpaper}`"
         />
-    </collapse-transition>
+      </transition>
 
-    <Footer />
+      <request-manager />
+      <notifications-manager @toggle-notification-display="toggleNotificationDisplay()" />
+
+      <collapse-transition :duration="600">
+          <footer-popup
+            v-show="$store.state.footerPopup.show"
+            class="footer-popup" 
+          />
+      </collapse-transition>
+
+      <Footer />
+    </div>
   </div>
 </template>
 
@@ -149,21 +156,26 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    min-width: $minimumAppWidth;
+    overflow-x: hidden;
+}
+
+.app-container {
+  max-width: $maxAppWidth;
+  min-width: $minimumAppWidth;
+  @include centerMargin();
+  @include floatingBoxShadow(0.6);
 }
 
 .displayed-page {
     position: relative;
     z-index: 0;
     background-image: url('~@/assets/wallpaper/app.jpg');
-    background-color: getColor("blue");
     margin: auto;
     min-height: 76vh;
     
     &.main {
       background-image: url('~@/assets/wallpaper/app.jpg');
     }
-    
     &.user {
       background-image: url('~@/assets/wallpaper/user.png');
     }
@@ -233,10 +245,26 @@ export default {
   @include floatingBoxShadow(0.4);
 }
 
+.big-app-background {
+  background: getColor("green");
+  height: 250px;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -2;
+}
+
 @media screen and (max-width: $phoneWidth) {
       .page-padding {
         padding-bottom: 5%;
         padding-top: 13% !important;
       }
+}
+
+@media screen and (min-width: $maxAppWidth) {
+    .app-container {
+      margin-top: 50px;
+      margin-bottom: 50px;
+    }
 }
 </style>

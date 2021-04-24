@@ -2,15 +2,18 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "backend server for khateeb remind",
-  "main": "App.js",
+  "main": "Server.js",
+  "private": true,
   "scripts": {
-    "dev": "nodemon App.js",
-    "app": "node App.js"
+    "dev": "nodemon Server.js",
+    "server": "node Server.js",
+    "test:unit": "jest"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.13.0",
+    "@aws-sdk/client-ses": "^3.13.0",
     "@aws-sdk/node-http-handler": "^3.12.0",
     "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
@@ -26,10 +29,11 @@
     "nanoid": "^3.1.20",
     "project-name-generator": "^2.1.9",
     "query-types": "^0.1.4",
-    "twilio": "^3.54.0",
     "web-push": "^3.4.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.6"
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.6",
+    "supertest": "^6.1.3"
   }
 }

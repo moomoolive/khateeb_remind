@@ -1,10 +1,10 @@
-const { cronWrapper } = require(global.$dir + '/libraries/cron/main.js')
-const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
-const jummahHelpers = require(global.$dir + '/libraries/jummahs/main.js')
+const { cronWrapper } = require($rootDir + '/libraries/cron/main.js')
+const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
+const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
 
 const findDefaultPreferenceForThisWeek = (defaultKhateebID="12345", khateebs=[], upcomingFriday=new Date(), targetTiming={}, isBackup=true) => {
-    const noneScheduled = { _id: "none" }
-    if (!defaultKhateebID || defaultKhateebID === 'none')
+    const noneScheduled = { _id: $config.consts.nullId }
+    if (!defaultKhateebID || defaultKhateebID === $config.consts.nullId)
         return noneScheduled
     const targetKhateeb = khateebs.find(k => k._id.toString() === defaultKhateebID)
     if (!targetKhateeb)

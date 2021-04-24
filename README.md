@@ -2,18 +2,21 @@
 
 ## بسم الله الرحمن الرحيم
 
-Khateeb Remind: An app to organize jummah khateeb communication - once and for all.
+Khateeb Remind is a __*free* and *open-source*__, web-app designed to ease jummah khateeb scheduling and communication. 
 
-You can start using the app by visiting this [website](https://app.khateebs.com) and creating an institution. Khateeb Remind intends to stay free forever insha'Allah and the app does not share any of your data with 3rd parties.
+Some highlights of the app:
+* Sends notifications to users via push-notifications
+* Centralizes all khateeb information in one place
+* Alert whoever is scheduling khateebs about availablity changes
 
-If you're not satisified with the official app please leave an issue under the 'issues' tab for this repository - Jazakum Allah Khair.
+The official Khateeb Remind instance is currently hosted @ https://khateebs.com.
 
-As Khateeb Remind is an open-source project feel free to pull this project, make the changes you want, and host it independantly - with or without attributing credit.
+If you'd like to signup your institution to use Khateeb Remind click [here](https://khateebs.com).
+If your interested in seeing more reasons to use the app click [here](https://khateebs.com/usecase).
+
+As the project is open-sourced, anyone may contribute to source code by opening a pull request or make their own instance of the app and host it wherever they want. If you intend to make your own instance of the app please read *ALL* the readme files in the 'code' folder, it includes all the environment variables required for the app to function correctly and recommendations. It may also be useful to take a look at the design document found under the 'systemDesign' folder.
 
 ### Credits and Licenses
 * A special thanks to the University of Calgary MSA's previous khateeb managers for their valuable input on this project. In particular, Jazakum Allah khair to Mohamed Ghanduri who helped extensively test the app and provided an incredible amount of useful feedback.
-* Logo and navigation icons are provided by Font-Awesome under [license](https://fontawesome.com/license/free).
-* Database, mobile, and clock icons on "usecase" page are created by [Anu Rocks](https://freeicons.io/profile/730). Icons are hosted @ https://freeicons.io
-* Cloud, notification, and calendar icons on "usecase" page are created by [Gayrat Muminov](https://freeicons.io/profile/3277). Icons are hosted @ https://freeicons.io
-* Multiple-device, camera, linux, and clipboard icons on "usecase" page are created by [Free Preloaders](https://freeicons.io/profile/726). Icons are hosted @ https://freeicons.io
-                                             
+* All icons on "usecase" page are hosted on @ https://freeicons.io. Database, mobile, and clock icons on "usecase" page are created by [Anu Rocks](https://freeicons.io/profile/730). Cloud, notification, and calendar icons on "usecase" page are created by [Gayrat Muminov](https://freeicons.io/profile/3277). Multiple-device, camera, linux, and clipboard icons on "usecase" page are created by [Free Preloaders](https://freeicons.io/profile/726).
+* Khateeb Remind logo and navigation icons are provided by Font-Awesome under [license](https://fontawesome.com/license/free).                                    

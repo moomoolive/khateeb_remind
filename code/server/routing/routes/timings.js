@@ -1,9 +1,9 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
-const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
+const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.js')
 
 const router = express.Router()
 
@@ -26,8 +26,8 @@ router.post(
     authMiddleware.authenticate({ min: 2, max: 3 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
-        validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
-        validator.body("locationID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
+        validator.body("locationID").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("hour").isInt({ min: 0, max: 23 }),
         validator.body("minute").isInt({ min: 0, max: 59 })
     ]),
@@ -46,7 +46,7 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("hour").isInt({ min: 0, max: 23 }).optional(),
         validator.body("minute").isInt({ min: 0, max: 59 }).optional(),
         validator.body("defaultKhateebs").isArray().isLength(5).optional()
@@ -67,7 +67,7 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
+        validator.query("_id").isLength($config.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "timings"),
     async (req, res) => {

@@ -1,9 +1,14 @@
 const mongoose = require('mongoose')
 
+const typeCheckingHelpers = require($rootDir + "/libraries/typeChecking/main.js")
+
 const jummahPreference = new mongoose.Schema({
     institutionID: {
         type: String,
-        required: true
+        required: true,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
+        ref: 'institution'
     },
     date: {
         type: Date,
@@ -11,15 +16,26 @@ const jummahPreference = new mongoose.Schema({
     },
     locationID: {
         type: String,
-        required: true
+        required: true,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
+        ref: 'location'
     },
     timingID: {
         type: String,
-        required: true
+        required: true,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
+        ref: 'timing'
     },
     khateebID: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: typeCheckingHelpers.validIdOrNullId,
+            message: id => `${id} is an invalid format for an ids` 
+        },
+        ref: 'khateeb'
     },
     notified: {
         type: Boolean,
@@ -37,7 +53,12 @@ const jummahPreference = new mongoose.Schema({
     notificationID: {
         type: String,
         required: false,
-        default: 'none'
+        validate: {
+            validator: typeCheckingHelpers.validIdOrNullId,
+            message: id => `${id} is an invalid format for an ids` 
+        },
+        default: $config.consts.nullId,
+        ref: 'notification'
     },
     loopRunCount: {
         type: Number,
@@ -63,12 +84,12 @@ jummahPreference.methods.gatherMeta = async function() {
 
 jummahPreference.query.upcomingJummahsForInstitution = function (date=new Date(), institutionID='none') {
     institutionID = institutionID.toString()
-    if (!institutionID || institutionID === 'none')
+    if (!institutionID || institutionID === $config.consts.nullId)
         throw TypeError(`You must provide a valid institution id`)
     return this.where({
         institutionID,
         date,
-        khateebID: { $ne: 'none' }
+        khateebID: { $ne: $config.consts.nullId }
     })
 }
 

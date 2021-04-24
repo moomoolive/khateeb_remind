@@ -3,12 +3,17 @@ const mongoose = require('mongoose')
 const notification = new mongoose.Schema({
     institutionID: {
         type: String,
-        required: true
+        required: false,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
+        ref: 'institution'
     },
     userID: {
         type: String,
         required: true,
-        minLength: 1
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
+        ref: 'user'
     },
     msg: {
         type: String,
@@ -34,8 +39,9 @@ const notification = new mongoose.Schema({
     },
     meta: {
         type: Object,
-        required: true
+        required: false,
+        default: () => {}
     }
-}, { timestamps: true })
+}, { timestamps: true, minimize: false })
 
 module.exports = notification

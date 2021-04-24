@@ -1,10 +1,10 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
-const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
+const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 
 const router = express.Router()
 
@@ -26,7 +26,7 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("active").isBoolean().optional(),
         validator.body("confirmed").isBoolean().optional()
     ]),
@@ -46,7 +46,7 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
+        validator.query("_id").isLength($config.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "khateebs"),
     async (req, res) => {

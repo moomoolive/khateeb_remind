@@ -1,9 +1,9 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
-const postRequestMiddleware = require(global.$dir + '/middleware/postRequests/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
+const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.js')
 
 const router = express.Router()
 
@@ -25,14 +25,13 @@ router.post("/",
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest(
         [
-            validator.body("institutionID").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString(),
+            validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
             validator.body("password").isLength({ min: 6 }).isString(),
             validator.body("username").isLength({ min: 6 }).isString(),
             validator.body("handle").isLength({ min: 1 }).isString(),
             validator.body("email").isEmail(),
             validator.body("firstName").isLength({ min: 1 }).isString(),
             validator.body("lastName").isLength({ min: 1 }).isString(),
-            validator.body("phoneNumber").isInt({ min: 100_000_0000, max: 999_999_9999 }),
         ]
     ),
     async (req, res) => {
@@ -48,7 +47,7 @@ router.post("/",
 router.delete(
     "/",
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength(global.APP_CONFIG.consts.mongooseIdLength).isString()
+        validator.query("_id").isLength($config.consts.mongooseIdLength).isString()
     ], "query"),
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "institutionAdmins"), 
     async (req, res) => {
