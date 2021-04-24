@@ -1,5 +1,8 @@
 node_modules/
 
+# ignore development enviromental variable
+.env.development
+
 # scripts for complex database updates
 **dbUpdates/
 

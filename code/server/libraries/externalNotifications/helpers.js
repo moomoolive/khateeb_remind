@@ -1,7 +1,7 @@
-const typeCheckingHelpers = require(global.$dir + "/libraries/typeChecking/main.js")
+const typeCheckingHelpers = require($rootDir + "/libraries/typeChecking/main.js")
 
 const castToCorrectEmailValueType = (data="hi") => {
-    if (!typeCheckingHelpers.isArrayOrString(data))
+    if (!typeCheckingHelpers.isEmail(data) || data === $config.consts.randomEmail || !Array.isArray(data))
         throw TypeError(`Email addresses must be an array or string`)
     else
         return typeof data === 'string' ? [data] : data

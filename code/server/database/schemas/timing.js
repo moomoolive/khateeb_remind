@@ -1,20 +1,24 @@
 const mongoose = require('mongoose')
 
-const subDocs = require(global.$dir + "/database/subDocuments/main.js")
+const subDocs = require($rootDir + "/database/subDocuments/main.js")
+
+const defaultKhateebsDefaultValue = new Array(5).fill(
+    { mainKhateeb: $config.consts.nullId, backup: $config.consts.nullId }
+)
 
 const timing = new mongoose.Schema({
     institutionID: {
         type: String,
         required: true,
-        minLength: global.CONFIG.consts.mongooseIdLength,
-        maxLength: global.CONFIG.consts.mongooseIdLength,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
         ref: 'institution'
     },
     locationID: {
         type: String,
         required: true,
-        minLength: global.CONFIG.consts.mongooseIdLength,
-        maxLength: global.CONFIG.consts.mongooseIdLength,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
         ref: 'location'
     },
     hour: {
@@ -37,16 +41,10 @@ const timing = new mongoose.Schema({
     defaultKhateebs: {
         type: [subDocs.defaultKhateebForWeek],
         required: false,
-        default: () => [
-            { mainKhateeb: 'none', backup: 'none' },
-            { mainKhateeb: 'none', backup: 'none' },
-            { mainKhateeb: 'none', backup: 'none' },
-            { mainKhateeb: 'none', backup: 'none' },
-            { mainKhateeb: 'none', backup: 'none' },
-        ],
+        default: () => defaultKhateebsDefaultValue,
         validate: {
             validator: function(t) {
-                return t.length === 5
+                return t.length === defaultKhateebsDefaultValue.length
             },
             message: t => `Default khateebs array must have five entries. Got ${t.length}`
         }
@@ -79,7 +77,7 @@ timing.methods.deleteDependants = async function() {
 
 timing.query.activeTimings = function(institutionID='none') {
     institutionID = institutionID.toString()
-    if (!institutionID || institutionID.toLowerCase() === 'none')
+    if (!institutionID || institutionID.toLowerCase() === $config.consts.nullId)
         throw TypeError(`please provide a valid institution id`)
     return this.where({ active: true, institutionID })
 }

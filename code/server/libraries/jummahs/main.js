@@ -1,5 +1,5 @@
-const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
-const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
+const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
+const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 
 const cronNotificationTiming = (upcomingFriday=new Date(), chronTimingInfo={}, timezone="America/Edmonton") => {
     const targetDayOfWeek = scheduleHelpers.findDayOfWeek(
@@ -25,7 +25,7 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
     const upsertType = !!initPreferenceInfo.upsert
 
     const createAndOverwritePreference = async () => {
-        const toBeSavedPreference = global.utils.deepCopy(preferenceInfo)
+        const toBeSavedPreference = $utils.deepCopy(preferenceInfo)
         if (toBeSavedPreference._id)
             delete toBeSavedPreference._id
         try {
@@ -93,18 +93,18 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
             if (constructorRes && constructorRes[0] && constructorRes[0]._id)
                 return constructorRes[0]._id.toString()
             else
-                return 'none'
+                return $config.consts.nullId
         } catch(err) {
             console.log(err)
-            return 'none'
+            return $config.consts.nullId
         }
     }
 
-    const canBeMessaged = () => !!preferenceInfo && preferenceInfo._id !== 'none' && !preferenceInfo.notified
+    const canBeMessaged = () => !!preferenceInfo && preferenceInfo._id !== $config.consts.nullId && !preferenceInfo.notified
     const isUpsertable = () => preferenceInfo.upsert === true
     const setPreferenceInfo = (value={}) => preferenceInfo = value
     const returnPreferenceInfo = () => {
-        const returnVal = global.utils.deepCopy(preferenceInfo)
+        const returnVal = $utils.deepCopy(preferenceInfo)
         // upsert type is here because it will push it onto the preferences
         // array on the frontend instead of replacing if it was 'upserted'
         if (upsertType)

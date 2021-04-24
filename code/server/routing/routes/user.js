@@ -2,8 +2,8 @@ const express = require('express')
 const validator = require('express-validator')
 const DeviceDetector = require('device-detector-js')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
 const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 1 }))
@@ -22,17 +22,17 @@ router.put(
             validator.body("unavailableDates").isArray().optional(),
             validator.body("title").isLength({ min: 1 }).isString().optional(),
             validator.body("systemSettings.autoConfirmRegistration").isBoolean().optional(),
-            validator.body("settings.recieveEmailNotifications").isBoolean().optional()
+            validator.body("settings.recieveExternalNotification").isBoolean().optional(),
+            validator.body("settings.recievePWAPush").isBoolean().optional(),
         ]
     ),
     async (req, res) => {
         try {
-            const userType = `${req.headers.usertype}${req.headers.usertype === 'root' ? '' : 's'}`
             // the reason why I use updateOne and then findOne instead of
             // findOneAndUpdate is because there are 'pre update' hooks for
             // the user schema that won't work with findOneAndUpdate
-            await $db[userType].updateOne({ _id: req.headers.userid }, req.body)
-            const mongooseRes = await $db[userType].findOne({ _id: req.headers.userid }).select(["-__v", "-password"]).exec()
+            await $db[req.headers.targetusermodel].updateOne({ _id: req.headers.userid }, req.body)
+            const mongooseRes = await $db[req.headers.targetusermodel].findOne({ _id: req.headers.userid }).select(["-__v", "-password"]).exec()
             return res.json({ data: mongooseRes, msg: `Successfully updated`, mongooseRes })
         } catch(err) {
             console.log(err)
@@ -51,7 +51,7 @@ router.get('/check-in', async(req, res) => {
             // so that the root admin and system administrators function
             // exactly like any normal user 
             req.headers.institutionid === 'root' ? 
-                Promise.resolve(global.CONFIG.rootInstitution) : 
+                Promise.resolve($config.rootInstitution) : 
                 $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
         ])
         return res.json({ userInfo, notifications, institution })
@@ -65,7 +65,7 @@ router.put(
     '/notification',
     validationMiddleware.validateRequest(
         [
-            validator.body("_id").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
+            validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
             validator.body("seen").isBoolean().optional(),
             validator.body("actionPerformed").isBoolean().optional(),
             validator.body("meta").optional()
@@ -87,9 +87,9 @@ router.put(
 
 router.delete('/', async (req, res) => {
     try {
-        const user = await $db.users.findOne({ _id: req.headers.userid }).exec()
+        const user = await $db[req.headers.targetusermodel].findOne({ _id: req.headers.userid }).exec()
         const notificationRes = await user.deleteNotifications()
-        await db.models.users.deleteOne({ _id: user._id.toString() })
+        await $db[req.headers.targetusermodel].deleteOne({ _id: user._id.toString() })
         return res.json({ msg: 'Successfully deleted account', notificationRes })
     } catch(err) {
         console.log(err)
@@ -134,7 +134,7 @@ router.put('/pwa-subscription',
     validationMiddleware.validateRequest(
         [
             validator.body("status").isBoolean(),
-            validator.body("deviceId").isString().isLength(global.CONFIG.consts.mongooseIdLength)
+            validator.body("deviceId").isString().isLength($config.consts.mongooseIdLength)
         ]
     ),
     async (req, res) => {

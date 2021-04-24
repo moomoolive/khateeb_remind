@@ -1,7 +1,9 @@
 node_modules/
 
-.env
-text.json
+# environmental variables both dev and production
+.env*
+
+# although keys are already in env I keep original copy in case of emergency
 vapidKeys.json
 
 # build and upload scripts for production docker image

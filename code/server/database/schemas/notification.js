@@ -3,16 +3,16 @@ const mongoose = require('mongoose')
 const notification = new mongoose.Schema({
     institutionID: {
         type: String,
-        required: true,
-        minLength: global.CONFIG.consts.mongooseIdLength,
-        maxLength: global.CONFIG.consts.mongooseIdLength,
+        required: false,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
         ref: 'institution'
     },
     userID: {
         type: String,
         required: true,
-        minLength: global.CONFIG.consts.mongooseIdLength,
-        maxLength: global.CONFIG.consts.mongooseIdLength,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
         ref: 'user'
     },
     msg: {

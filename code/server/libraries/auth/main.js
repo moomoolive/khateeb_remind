@@ -2,12 +2,13 @@ const jwt = require('jsonwebtoken')
 
 const helpers = require('./helpers.js')
 const resourceOwnershipValidation = require('./resourceOwnerChecking/main.js')
-const typeCheckingHelpers = require(global.$dir + '/libraries/typeChecking/main.js')
+const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
+
+const { securityConfig } = require($rootDir + "/server.config.js")
 
 const createToken = (info={}, expiresAfter='60-days') => {
-    const secret = process.env.JWT_SECRET || 'secret'
     const expiration = helpers.expirationDate(expiresAfter)
-    return jwt.sign(info, secret, { expiresIn: expiration })
+    return jwt.sign(info, securityConfig.jwtSecret, { expiresIn: expiration })
 }
 
 const refreshToken = async (userId) => {
@@ -40,6 +41,7 @@ const mutateHeadersToIncludeUserInfo = (request, decodedToken) => {
     request.headers.institutionid = decodedToken.institutionID
     request.headers.userid = decodedToken._id
     request.headers.usertype = decodedToken.__t
+    request.headers.targetusermodel = `${decodedToken.__t}${decodedToken.__t === 'root' ? '' : 's'}`
     request.headers.authLevel = userTypeToAuthLevel(decodedToken.__t)
 } 
 

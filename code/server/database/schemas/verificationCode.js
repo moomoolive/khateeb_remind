@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const mathHelpers = require(global.$dir + '/libraries/math/main.js')
+const mathHelpers = require($rootDir + '/libraries/math/main.js')
 
 const verificationCode = new mongoose.Schema({
     code: {

@@ -8,17 +8,13 @@
 
 const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3')
 
+const { securityConfig, thirdPartyServicesConfig } = require($rootDir + '/server.config.js')
+
 const helpers = require('./helpers.js')
 
-const s3 = new S3Client({ 
-    region: process.env.AWS_HOSTING_REGION, 
-    credentials: { 
-        secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
-        accessKeyId: process.env.AWS_S3_ACCESS_ID   
-    } 
-})
+const s3 = new S3Client(securityConfig.thirdPartyServices.AWSAuthCredentials)
 
-const Bucket = process.env.NODE_ENV === 'production' ? "khateeb-remind-storage" : "khateeb-remind-storage-test"
+const Bucket = thirdPartyServicesConfig.AWS.cloudStorageBucketName
 
 const getFile = async (filePath="img/filename.png") => {
     try {

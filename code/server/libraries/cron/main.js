@@ -15,7 +15,7 @@ const cronWrapper = (options={}) => {
     if (cronOptions.syncWithTimezone && !cronOptions.timeZone) {
         if (cronOptions.cronTime instanceof Date || typeof cronOptions.cronTime !== 'string')
             throw TypeError(`You must provide a valid cron.js timing string to use 'on schedule' option`)
-        cronOptions.timeZone = global.CONFIG.cron.timezone
+        cronOptions.timeZone = $config.cron.timezone
     }
     const cronJob = require('cron').CronJob
     return new cronJob(cronOptions)

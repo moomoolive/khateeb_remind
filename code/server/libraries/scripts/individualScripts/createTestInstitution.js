@@ -1,20 +1,20 @@
 const randomNamegenerate = require('project-name-generator')
 
-const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
+const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
+const { initConfig } = require($rootDir + '/server.config.js')
 
 const createTestInstitution = async () => {
     try {
         
-        let testInstitution = await $db.institutions.findOne({ name: "test" }).exec()
+        let testInstitution = await $db.institutions.findOne({ 
+            name: initConfig.testInstitution.institution.name 
+        }).exec()
         if (testInstitution)
             console.log('Test institution already exists')
         else
-            testInstitution = await new $db.institutions({
-                name: "test",
-                abbreviatedName: "__TEST__",
-                confirmed: true,
-                ...global.CONFIG.testInstitutionInitialization.institution,
-            }).save()
+            testInstitution = await new $db.institutions(
+                initConfig.testInstitution.institution
+            ).save()
         
         let testInstitutionRootAdmin = await $db.rootInstitutionAdmins.findOne({ institutionID: testInstitution._id.toString() }).exec()
         if (testInstitutionRootAdmin)
@@ -22,18 +22,15 @@ const createTestInstitution = async () => {
         else
             await testInstitution.createRootAdministrator({
                 institutionID: testInstitution._id.toString(),
-                ...global.CONFIG.testInstitutionInitialization.rootAdmin,
-                password: process.env.DEFAULT_TEST_USER_PASS || "123456",
-                email: "none@khateeb-remind.com",
-                confirmed: true
-            })
+                ...initConfig.testInstitution.rootAdmin,
+            }, true)
         
         let testInstitutionLocations = await $db.locations.find({ institutionID: testInstitution._id.toString() })
-        if (testInstitutionLocations.length === global.CONFIG.testInstitutionInitialization.locationCount)
-            console.log(`Test Institution already has ${global.CONFIG.testInstitutionInitialization.locationCount} locations`)
+        if (testInstitutionLocations.length === initConfig.testInstitution.locationCount)
+            console.log(`Test Institution already has ${initConfig.testInstitution.locationCount} locations`)
         else {
             const ids = []
-            for (let i = testInstitutionLocations.length; i < global.CONFIG.testInstitutionInitialization.locationCount; i++) {
+            for (let i = testInstitutionLocations.length; i < initConfig.testInstitution.locationCount; i++) {
                 try {
                     const location = await new $db.locations({
                         name: randomNamegenerate().dashed,
@@ -45,7 +42,7 @@ const createTestInstitution = async () => {
                     let hour = 13
                     let minute = 20
                     // locations by default create an associated timing, so we'll skip right to index 1
-                    for (let t = 1; t < global.CONFIG.testInstitutionInitialization.timingsPerLocation; t++) {
+                    for (let t = 1; t < initConfig.testInstitution.timingsPerLocation; t++) {
                         minute += 10
                         if (minute > 59) {
                             minute = 0
@@ -59,27 +56,25 @@ const createTestInstitution = async () => {
                     ids.push(`Error occured creating khateeb #${i + 1}. Err trace: ${err}`)
                 }
             }
-            console.log(`Created ${global.CONFIG.testInstitutionInitialization.locationCount - testInstitutionLocations.length} locations for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
+            console.log(`Created ${initConfig.testInstitution.locationCount - testInstitutionLocations.length} locations for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
         }
 
         let testInstitutionKhateebs = await $db.khateebs.find({ institutionID: testInstitution._id.toString() }).exec()
-        if (testInstitutionKhateebs.length === global.CONFIG.testInstitutionInitialization.khateebCount)
-            return console.log(`Test institution already has ${global.CONFIG.testInstitutionInitialization.khateebCount} khateebs`)
+        if (testInstitutionKhateebs.length === initConfig.testInstitution.khateebCount)
+            return console.log(`Test institution already has ${initConfig.testInstitution.khateebCount} khateebs`)
         else {
             const ids = []
             const testInstitutionTimings = await $db.timings.find({ institutionID: testInstitution._id.toString() })
             const date = scheduleHelpers.findUpcomingFridayDBFormat()
             const vCalendarId = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-            for (let i = testInstitutionKhateebs.length; i < global.CONFIG.testInstitutionInitialization.khateebCount; i++) {
+            for (let i = testInstitutionKhateebs.length; i < initConfig.testInstitution.khateebCount; i++) {
                 try {
                     const khateeb = await new $db.khateebs({
-                        username: `${global.CONFIG.testInstitutionInitialization.khateebs.baseUsername}${i + 1}`,
-                        password: process.env.DEFAULT_TEST_USER_PASS || "123456",
-                        confirmed: true,
+                        username: `${initConfig.testInstitution.khateebs.baseUsername}${i + 1}`,
+                        ...initConfig.testInstitution.khateebs.info,
                         handle: randomNamegenerate().dashed,
                         firstName: randomNamegenerate().dashed,
                         lastName: randomNamegenerate().dashed,
-                        email: "none@khateeb-remind.com",
                         institutionID: testInstitution._id.toString(),
                         title: i % 3 === 0 ? 'shiekh' : i % 2 === 0 ? 'imam' : 'none',
                         availableTimings: i % 2 === 0 ? [] : testInstitutionTimings[i] ? [testInstitutionTimings[i]._id.toString()] : [],
@@ -90,7 +85,7 @@ const createTestInstitution = async () => {
                     ids.push(`Error occured creating khateeb #${i + 1}. Err trace: ${err}`)
                 }
             }
-            console.log(`Created ${global.CONFIG.testInstitutionInitialization.khateebCount - testInstitutionKhateebs.length} khateebs for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
+            console.log(`Created ${initConfig.testInstitution.khateebCount - testInstitutionKhateebs.length} khateebs for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
         }
     } catch(err) {
         console.log(err)

@@ -1,8 +1,8 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
@@ -24,7 +24,7 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 2, max: 3 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("name").isLength({ min: 1 }).isString().optional(),
         validator.body("abbreviatedName").isLength({ min: 1 }).isString().optional(),
         validator.body("timezone").isLength({ min: 1 }).isString().optional(),

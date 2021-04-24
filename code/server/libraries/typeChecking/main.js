@@ -1,3 +1,5 @@
+const helpers = require('./helpers.js')
+
 // meaning not an 'array' or 'null'
 const isAnObject = (candidate={}) => {
     return candidate !== null && !Array.isArray(candidate) && typeof candidate === 'object'
@@ -17,9 +19,15 @@ const isEmail = (candidate="randome@random") => {
     return /@.*\..*[a-zA-Z]/g.test(candidate)
 }
 
+// 'TBD' is only here for legacy reasons
+const validIdOrNullId = (candidate="none") => {
+    return candidate && (candidate === $config.consts.nullId || candidate === 'TBD' || helpers.validId(candidate) ) 
+}
+
 module.exports = {
     isAnObject,
     isValidDate,
     isArrayOrString,
-    isEmail
+    isEmail,
+    validIdOrNullId
 }

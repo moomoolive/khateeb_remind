@@ -14,7 +14,7 @@ const subscribeUserToPushNotifications = async (serviceWorkerReg={}) => {
 
 const getServiceWorkerRegistration = async () => {
     try {
-        if (('serviceWorker' in window.navigator) && ('PushManager' in window)) {
+        if ('serviceWorker' in window.navigator) {
             const registration = await window.navigator.serviceWorker.getRegistration()
             return registration
         }

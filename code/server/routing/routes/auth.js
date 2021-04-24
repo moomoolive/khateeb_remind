@@ -1,11 +1,11 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
-const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
-const authHelpers = require(global.$dir + '/libraries/auth/main.js')
-const externalNotificationHelpers = require(global.$dir + '/libraries/externalNotifications/main.js')
+const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
+const authHelpers = require($rootDir + '/libraries/auth/main.js')
+const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
 const router = express.Router()
 
@@ -50,7 +50,7 @@ router.post(
     '/create/khateeb',
     validationMiddleware.validateRequest(
         [
-            validator.body("institutionID").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
+            validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
             validator.body("password").isLength({ min: 6 }).isString(),
             validator.body("username").isLength({ min: 6 }).isString(),
             validator.body("handle").isLength({ min: 1 }).isString(),

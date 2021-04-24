@@ -1,7 +1,3 @@
-const isNumeric = (value) => {
-    return /^\d+$/.test(value)
-}
-
 const capitalize = (string) => {
     if (typeof string !== 'string')
         throw TypeError(`You must provide a string`)
@@ -14,6 +10,5 @@ const deepCopy = (object) => {
 
 module.exports = {
     deepCopy,
-    capitalize,
-    isNumeric
+    capitalize
 }

@@ -1,8 +1,8 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const authMiddleware = require(global.$dir + '/middleware/auth/main.js')
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
 const router = express.Router()
 
@@ -20,7 +20,7 @@ router.get('/institutions', async (req, res) => {
 
 router.put('/institutions', 
     validationMiddleware.validateRequest([ 
-        validator.body("institutionID").isLength(global.CONFIG.consts.mongooseIdLength).isString(),
+        validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("confirmed").isBoolean().optional(),
         validator.body("settings").optional()
     ]),

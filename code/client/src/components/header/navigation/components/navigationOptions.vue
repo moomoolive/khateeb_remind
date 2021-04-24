@@ -38,10 +38,6 @@
             <div class="menu-item" @click="redirect('/sysAdmin')">
                 <p>Admin Central</p>
             </div>
-            
-            <div class="menu-item" @click="redirect('/root/roaming')">
-                <p>Roaming Mode</p>
-            </div>
 
         </div>
 

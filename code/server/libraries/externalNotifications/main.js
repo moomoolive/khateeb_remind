@@ -12,18 +12,13 @@
 
 const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses')
 
+const { securityConfig, thirdPartyServicesConfig } = require($rootDir + '/server.config.js')
+
 const helpers = require('./helpers.js')
 
-const ses = new SESClient({
-    region: process.env.AWS_HOSTING_REGION,
-    credentials: {
-        secretAccessKey: process.env.AWS_S3_ACCESS_KEY,
-        accessKeyId: process.env.AWS_S3_ACCESS_ID 
-    }
-})
+const ses = new SESClient(securityConfig.thirdPartyServices.AWSAuthCredentials)
 
 const Charset = "UTF-8"
-const Source = process.env.AWS_SES_EMAIL
 
 const sendExternalNotification = async (toAddress="random@random.com", subject="Default Subject", msg="Default msg", options={}) => {
     try {
@@ -31,11 +26,11 @@ const sendExternalNotification = async (toAddress="random@random.com", subject="
             Destination: helpers.createRecipentsObject(toAddress, options),
             Message: {
                 Body: {
-                    Text: { Charset, Data: `${msg}${global.CONFIG.notifications.automatedNotificationSignature}` }
+                    Text: { Charset, Data: `${msg}${$config.notifications.automatedNotificationSignature}` }
                 },
                 Subject: { Charset, Data: subject },
             },
-            Source
+            Source: thirdPartyServicesConfig.AWS.email
         }))
         return { code: 0, msgId: data.MessageId }
     } catch(err) {
@@ -48,6 +43,15 @@ const sendExternalNotification = async (toAddress="random@random.com", subject="
     }
 }
 
+// msgInfo field here must be configured for each notification constructor
+// if you are to change the default external notification implementation
+const sendExternalNotificationFromNotificationConstructor = async (userInfo={}, msgInfo={}) => {
+    const targetUserField = userInfo[$config.consts.externalNotificationKeyNameInUserSchema]
+    const res = await sendExternalNotification(targetUserField, msgInfo.subject, msgInfo.body)
+    return res
+}
+
 module.exports = {
-    sendExternalNotification
+    sendExternalNotification,
+    sendExternalNotificationFromNotificationConstructor
 }

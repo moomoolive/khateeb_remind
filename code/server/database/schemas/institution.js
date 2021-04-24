@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
 
-const scheduleHelpers = require(global.$dir + '/libraries/schedules/main.js')
-const scripts = require(global.$dir + '/libraries/scripts/index.js')
+const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
+const scripts = require($rootDir + '/libraries/scripts/index.js')
+const cloudStorageHelpers = require($rootDir + '/libraries/cloudStorage/main.js')
 
 const institution = new mongoose.Schema({
     name: {
@@ -91,6 +92,7 @@ institution.methods.deleteDependencies = async function() {
                 continue
             deleteRes[model] = await $db[model].deleteMany({ institutionID: this._id.toString() })
         }
+        deleteRes.cloudStorage = await cloudStorageHelpers.deleteFile(`img/logos/${this._id}`)
     } catch(err) {
         console.log(err)
     }
@@ -121,9 +123,9 @@ institution.methods.getLocalTime = function () {
     return scheduleHelpers.getDateInTimezoneNow(this.timezone)
 }
 
-institution.post('deleteOne', async function(institution) {
-    if (institution.name === 'test')
-        await scripts.createTestInstitution()
+institution.post('deleteOne', async function() {
+    const threeSecondsInMilliseconds = 3_000
+    global.setTimeout(async () => { await scripts.createTestInstitution() }, threeSecondsInMilliseconds)
 })
 
 module.exports = institution

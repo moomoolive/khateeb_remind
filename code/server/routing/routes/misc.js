@@ -1,7 +1,7 @@
 const express = require('express')
 const validator = require('express-validator')
 
-const validationMiddleware = require(global.$dir + '/middleware/validation/main.js')
+const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
 const router = express.Router()
 

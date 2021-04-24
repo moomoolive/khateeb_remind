@@ -1,7 +1,7 @@
-const validationHelpers = require('./main.js')
+const typeCheckingHelpers = require($rootDir + "/libraries/typeChecking/main.js")
 
 const validIdOrNullIdInField = (val="none") => {
-    if (!validationHelpers.validIdOrNullId(val))
+    if (!typeCheckingHelpers.validIdOrNullId(val))
         throw TypeError(`Invalid id format`)
     return true
 }

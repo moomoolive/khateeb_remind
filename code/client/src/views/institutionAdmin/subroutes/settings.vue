@@ -240,7 +240,7 @@ export default {
                 if (!requestHelpers.dataWasDeleted(res))
                     return
                 this.utils.alert(`You've successfully deleted your institution`, 'success')
-                this.$store.dispatch('logout')
+                this.$store.dispatch('user/logout')
             }
         },
         rerenderSettings() {

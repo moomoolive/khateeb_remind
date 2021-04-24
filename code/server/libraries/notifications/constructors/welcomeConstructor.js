@@ -1,10 +1,12 @@
 const welcomeNotification = (userInfo={}) => {
-    return new $db.notifications({
+    const info = {
         tag: 'welcome',
         msg: `Asalam aliakoum ${userInfo.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. Feel free to take a look around, and ask your administrator if you need any help!`,
-        institutionID: userInfo.institutionID.toString(),
         userID: userInfo._id.toString()
-    }).save()
+    }
+    if (userInfo.institutionID !== 'root')
+        info.institutionID = userInfo.institutionID.toString()
+    return new $db.notifications(info).save()
 }
 
 module.exports = welcomeNotification

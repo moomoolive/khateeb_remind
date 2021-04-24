@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
-const subDocs = require(global.$dir + '/database/subDocuments/main.js')
+const subDocs = require($rootDir + '/database/subDocuments/main.js')
+const scripts = require($rootDir + '/libraries/scripts/index.js')
 
 const khateeb = new mongoose.Schema({
     title: {
@@ -13,7 +14,7 @@ const khateeb = new mongoose.Schema({
 })
 
 khateeb.query.safelyFindOne = function(_id='none') {
-    if (!_id || _id.toLocaleLowerCase() === 'none')
+    if (!_id || _id.toLocaleLowerCase() === $config.consts.nullId)
         throw TypeError('Please provide a valid khateeb id')
     return this.where({ _id })
 }
@@ -31,6 +32,11 @@ const root = new mongoose.Schema({
             default: false
         }
     }
+})
+
+root.post("deleteOne", function() {
+    const threeSecondsInMilliseconds = 3_000
+    global.setTimeout(async () => { await scripts.createRootUser() }, threeSecondsInMilliseconds)
 })
 
 const rootInstitutionAdmin = new mongoose.Schema({})

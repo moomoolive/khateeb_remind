@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
 
-const validationHelpers = require(global.$dir + "/libraries/validation/main.js")
+const typeCheckingHelpers = require($rootDir + "/libraries/typeChecking/main.js")
 
 const jummahPreference = new mongoose.Schema({
     institutionID: {
         type: String,
         required: true,
-        minLength: global.CONFIG.consts.mongooseIdLength,
-        maxLength: global.CONFIG.consts.mongooseIdLength,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
         ref: 'institution'
     },
     date: {
@@ -17,22 +17,22 @@ const jummahPreference = new mongoose.Schema({
     locationID: {
         type: String,
         required: true,
-        minLength: global.CONFIG.consts.mongooseIdLength,
-        maxLength: global.CONFIG.consts.mongooseIdLength,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
         ref: 'location'
     },
     timingID: {
         type: String,
         required: true,
-        minLength: global.CONFIG.consts.mongooseIdLength,
-        maxLength: global.CONFIG.consts.mongooseIdLength,
+        minLength: $config.consts.mongooseIdLength,
+        maxLength: $config.consts.mongooseIdLength,
         ref: 'timing'
     },
     khateebID: {
         type: String,
         required: true,
         validate: {
-            validator: validationHelpers.validIdOrNullId,
+            validator: typeCheckingHelpers.validIdOrNullId,
             message: id => `${id} is an invalid format for an ids` 
         },
         ref: 'khateeb'
@@ -54,10 +54,10 @@ const jummahPreference = new mongoose.Schema({
         type: String,
         required: false,
         validate: {
-            validator: validationHelpers.validIdOrNullId,
+            validator: typeCheckingHelpers.validIdOrNullId,
             message: id => `${id} is an invalid format for an ids` 
         },
-        default: 'none',
+        default: $config.consts.nullId,
         ref: 'notification'
     },
     loopRunCount: {
@@ -84,12 +84,12 @@ jummahPreference.methods.gatherMeta = async function() {
 
 jummahPreference.query.upcomingJummahsForInstitution = function (date=new Date(), institutionID='none') {
     institutionID = institutionID.toString()
-    if (!institutionID || institutionID === 'none')
+    if (!institutionID || institutionID === $config.consts.nullId)
         throw TypeError(`You must provide a valid institution id`)
     return this.where({
         institutionID,
         date,
-        khateebID: { $ne: 'none' }
+        khateebID: { $ne: $config.consts.nullId }
     })
 }
 

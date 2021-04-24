@@ -1,15 +1,15 @@
 const mongoose = require('mongoose')
 const bcyrpt = require('bcrypt')
 
-const notificationConstructors = require(global.$dir + '/libraries/notifications/index.js')
-const typeCheckingHelpers = require(global.$dir + '/libraries/typeChecking/main.js')
+const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
+const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
 const user = new mongoose.Schema({
     institutionID: {
         type: String,
         required: true,
         validate: {
-            validator: val => val === 'root' || val.length === global.CONFIG.consts.mongooseIdLength,
+            validator: val => val === 'root' || val.length === $config.consts.mongooseIdLength,
             message: "Invalid institution id"
         }
     },
@@ -68,11 +68,23 @@ const user = new mongoose.Schema({
         }
     },
     settings: {
-        recieveEmailNotifications: {
+        // default external notification is email
+        // but can be swapped out by replacing the externalNotifications
+        // library logic
+        // and then replacing the email field above on both the server and client
+        // side, replacing it with whatever you want such as phone number, 
+        // or any other way you want khateeb remind to communicate with the 
+        // outside world
+        recieveExternalNotification: {
             type: Boolean,
             required: false,
             default: true
-        }
+        },
+        recievePWAPush: {
+            type: Boolean,
+            required: false,
+            default: true
+        },
     },
     statuses: {
         lastEmailWasBounced: {
@@ -82,6 +94,12 @@ const user = new mongoose.Schema({
         }
     }
 }, { timestamps: true })
+
+user.blah = {
+    type: Boolean,
+    required: false,
+    default: true
+}
 
 user.pre('save', function(next) {
     const user = this
