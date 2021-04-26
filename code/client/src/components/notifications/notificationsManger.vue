@@ -20,7 +20,7 @@ export default {
             window.setTimeout(() => { this.$emit('toggle-notification-display') }, threeTenthsOfASecondInMilliSeconds)
         },
         async markNotificationAsSeen(_id) {
-            const updated =  await this.$API.user.updateNotification({ _id, seen: true })
+            const updated =  await this._api.user.updateNotification({ _id, seen: true })
             this.$store.dispatch('notifications/updateOne', updated)
         },
         defaultServerNotification(notification) {

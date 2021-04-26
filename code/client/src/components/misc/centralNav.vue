@@ -6,11 +6,11 @@
                 v-for="(link, index) in outboundLinks" :key="index"
             >
                 <button
-                    v-if="utils.validAuthentication(link.auth)"
+                    v-if="_utils.validAuthentication(link.auth)"
                     :class="`admin-nav silver ${link.blinking ? 'glow' : ''}`"
                     @click="outbound(link.route)"
                 >
-                <p>{{ utils.stringFormat(link.name) }}
+                <p>{{ _utils.stringFormat(link.name) }}
                     <span class="arrow-icon">></span></p>
                 </button>
             </div>
@@ -65,7 +65,7 @@ export default {
         }
     },
     watch: {
-        $route (to, from) {
+        $route (to) {
             this.currentRoute = to.path
         }
     }      

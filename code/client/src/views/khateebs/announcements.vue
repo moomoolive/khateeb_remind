@@ -53,7 +53,7 @@ export default {
         },
         async getAnnouncements() {
             try {
-                const data = await this.$API.announcements.getAnnouncements()
+                const data = await this._api.announcements.getAnnouncements()
                 this.announcements = data || []
             } catch(err) {
                 console.log(err)

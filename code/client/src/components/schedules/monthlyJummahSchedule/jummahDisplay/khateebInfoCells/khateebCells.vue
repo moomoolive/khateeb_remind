@@ -8,7 +8,7 @@
             {{ khateebDisplay(khateebPreferences[0]) }}
         </div>
         <div 
-            v-if="khateebPreferences[0].isGivingKhutbah && khateebPreferences[0].khateebID !== 'none'"
+            v-if="khateebPreferences[0].isGivingKhutbah && khateebPreferences[0].khateebID !== _config.nullId"
             class="is-giving-khutbah-indicator"
         >
             <span class="green">
@@ -31,7 +31,7 @@
                 {{ khateebDisplay(khateebPreferences[1]) }}
             </div>
             <div 
-                v-if="khateebPreferences[1].isGivingKhutbah && khateebPreferences[1].khateebID !== 'none'"
+                v-if="khateebPreferences[1].isGivingKhutbah && khateebPreferences[1].khateebID !== _config.nullId"
                 class="is-giving-khutbah-indicator" 
             >
                 <span class="green">
@@ -74,7 +74,7 @@ export default {
     },
     methods: {
         khateebDisplay(preference) {
-            if (Object.keys(preference).length < 1 || preference.khateebID === 'none')
+            if (Object.keys(preference).length < 1 || preference.khateebID === this._config.nullId)
                 return 'To Be Decided'
             const name = this.khateebName(this.khateebs.find(k => k._id === preference.khateebID))
             return `${name}${preference.khateebID === this.$store.state.user.userInfo._id ? ' (You)' : ''}`

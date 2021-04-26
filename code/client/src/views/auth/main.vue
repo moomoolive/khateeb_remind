@@ -65,17 +65,17 @@ export default {
     },
     methods: {
         unconfirmedMsg(msg) {
-            this.utils.alert(msg, 'caution', { icon: 'locked' })
+            this._utils.alert(msg, 'caution', { icon: 'locked' })
         },
         async login(loginInfo={}) {
-            const authRes = await this.$API.auth.getToken(loginInfo)
+            const authRes = await this._api.auth.getToken(loginInfo)
             if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
                 this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
             else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
                 this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
             else if (authRes.token && authRes.msg === 'success') {
                 this.$store.dispatch('user/updateToken', authRes.token)
-                await this.$API.user.checkIn()
+                await this._api.user.checkIn()
                 this.$nextTick(() => this.toApp(authRes.token, loginInfo))
             }
             else
@@ -88,7 +88,7 @@ export default {
                 this.$store.commit('app/loggedInViaLoginPage')
             }
             else
-                this.utils.toHomePage()
+                this._utils.toHomePage()
         },
         initialRememberMeValue() {
             return {
@@ -133,7 +133,7 @@ export default {
     },
     created() {
         if (this.$store.getters['user/isLoggedIn'])
-            this.utils.toHomePage()
+            this._utils.toHomePage()
         this.getUserCredentials()
     }
 }

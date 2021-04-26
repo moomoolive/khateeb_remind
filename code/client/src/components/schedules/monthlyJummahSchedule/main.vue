@@ -171,6 +171,8 @@ import khateebHelpers from '@/libraries/khateebs/main.js'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
+import Config from '@/App.config.js'
+
 export default {
     name: "jummahScheduleDisplay",
     components: {
@@ -217,9 +219,7 @@ export default {
             showLocations: true,
             settingsInfo: {},
             showingUnavailable: false,
-            maxRunCount: process.env.VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_FOR_WEEK ?
-                parseInt(process.env.VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_FOR_WEEK) :
-                300
+            maxRunCount: Config.userRestrictionsConfig.notificationLoopMaxRunCountPerWeek
         }
     },
     methods: {

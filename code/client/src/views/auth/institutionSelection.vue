@@ -71,7 +71,7 @@ export default {
     },
     methods: {
         async getAllConfirmedInstitutions() {
-            this.allInstitutions = await this.$API.misc.institutionSelection()
+            this.allInstitutions = await this._api.misc.institutionSelection()
         },
         testInstitutionSignup() {
             const testInstitution = this.allInstitutions.find(i => i.name === "test")
@@ -85,7 +85,7 @@ export default {
             this.allInstitutions.forEach(i => this.getInstitutionImage(i._id))
         },
         async getInstitutionImage(institutionID="1234") {
-            const image = await this.$API.logos.getInstitutionLogo({ institutionID })
+            const image = await this._api.logos.getInstitutionLogo({ institutionID })
             const target = this.institutionLogosFromRequest.find(i => i.id === institutionID)
             target.image = image
         }

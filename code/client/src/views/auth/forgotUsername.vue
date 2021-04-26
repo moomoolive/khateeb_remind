@@ -31,11 +31,11 @@ export default {
     },
     methods: {
         async recoverUsername({ email="random@random.com" }) {
-            const { msg, code } = await this.$API.auth.forgotUsername(email)
+            const { msg, code } = await this._api.auth.forgotUsername(email)
             if (code !== 0)
-                return this.utils.alert(msg)
-            this.utils.alert(msg, 'success')
-            return this.utils.toHomePage()
+                return this._utils.alert(msg)
+            this._utils.alert(msg, 'success')
+            return this._utils.toHomePage()
         }
     }
 }

@@ -43,13 +43,13 @@ export default {
     },
     methods: {
         async saveRootSettings(updates={}) {
-            const res = await this.$API.user.updateInfo({ systemSettings: updates })
+            const res = await this._api.user.updateInfo({ systemSettings: updates })
             if (res.data) {
-                this.utils.alert(`Successfully updated`, 'success')
+                this._utils.alert(`Successfully updated`, 'success')
                 return this.rerenderForm()
             }
             else
-                return this.utils.alert(`Couldn't update`)
+                return this._utils.alert(`Couldn't update`)
         },
         rerenderForm() {
             this.showForm = false

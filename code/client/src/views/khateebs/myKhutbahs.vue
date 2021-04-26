@@ -2,7 +2,7 @@
     <div>
         <loading class="content-container">
 
-            <button class="purple back-to-home-button" @click="utils.toHomePage()">
+            <button class="purple back-to-home-button" @click="_utils.toHomePage()">
                 Back to Home
             </button>
 
@@ -125,7 +125,7 @@ export default {
             this.khutbahs = await this.requestJummahs({ khateebID: this.currentUserId })
         }, 
         async requestJummahs(query={}) {
-            const data = await this.$API.jummahs.getJummahs(query)
+            const data = await this._api.jummahs.getJummahs(query)
             return data 
         },
         async requestJummahsUpUntilTheEndOfNextMonth() {
@@ -135,7 +135,7 @@ export default {
             })
         },
         async getAllLocationsAndTimings() {
-            const [locations, timings] = await this.$API.chainedRequests.getAllLocationsAndTimings()
+            const [locations, timings] = await this._api.chainedRequests.getAllLocationsAndTimings()
             this.timings = timings
             this.locations = locations
         },

@@ -64,13 +64,13 @@ export default {
     },
     methods: {
         async getAvailableTimings() {
-            const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+            const [locations, timings] = await this._api.chainedRequests.getActiveLocationsAndTimings()
             this.locations = locations
             this.timings = timings
         },
         addToUnavailableDays(newVCalendarDate={}) {
             const friday = 5
-            const unavailableDates = this.utils.deepCopy(this.userInfo.unavailableDates)
+            const unavailableDates = this._utils.deepCopy(this.userInfo.unavailableDates)
             if (newVCalendarDate.date.getDay() !== friday)
                 return
             const found = unavailableDates.findIndex(date => date.vCalendarId === newVCalendarDate.id)
@@ -81,9 +81,9 @@ export default {
             this.updateInfo({ unavailableDates })
         },
         async updateInfo(update={}) {
-            const res = await this.$API.user.updateInfo(update)
+            const res = await this._api.user.updateInfo(update)
             if (!res.data)
-                return this.utils.alert(`There was problem make your changes`)
+                return this._utils.alert(`There was problem make your changes`)
         },
     },
     computed: {
@@ -133,7 +133,7 @@ export default {
                 return null
         },
         usersFullNameWithTitle() {
-            return this.utils.stringFormat(khateebHelpers.khateebName(this.$store.state.user.userInfo))
+            return this._utils.stringFormat(khateebHelpers.khateebName(this.$store.state.user.userInfo))
         }
     },
     watch: {
@@ -143,7 +143,7 @@ export default {
             const longerArray = newVal.length > oldVal.length ? newVal : oldVal
             const diff = longerArray.slice(-1)[0]
             const wasDeleted = newVal.length < oldVal.length
-            await this.$API.khateebs.sendAvailabilityUpdateToAdmins("Date", {
+            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Date", {
                 change: { diff, wasDeleted },
                 msg: `${this.usersFullNameWithTitle} is ${wasDeleted ? 'now available' : 'no longer available'} to give khutbahs on ${new Date(diff).toLocaleDateString('en-US', { month: "long", year: "numeric", day: "numeric" })}${wasDeleted ? ` insha'Allah` : ''}.` 
             })
@@ -157,7 +157,7 @@ export default {
             const lessAvailable = newVal.length === 0 ? 
                 false : newVal.length === 1 ? 
                 true : newVal.length < oldVal.length
-            await this.$API.khateebs.sendAvailabilityUpdateToAdmins("Timing", {
+            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Timing", {
                 change: { diff, lessAvailable },
                 msg: `${this.usersFullNameWithTitle} ${lessAvailable ? `is less available nowadays to give` : `is now available to give more` } khutbahs${lessAvailable ? `.` : ` insha'Allah!`} Check out his profile for more details.` 
             })

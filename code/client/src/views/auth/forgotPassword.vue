@@ -32,12 +32,12 @@ export default {
     },
     methods: {
         async sendVerification({ username='moomoo' }) {
-            const { msg, code } = await this.$API.auth.sendVerificationCode(username)
+            const { msg, code } = await this._api.auth.sendVerificationCode(username)
             if (code !== 0)
-                return this.utils.alert(msg)
+                return this._utils.alert(msg)
             this.verificationSent = true
             this.username = username
-            this.utils.alert(msg, 'success')
+            this._utils.alert(msg, 'success')
             return this.rerenderForm()
         },
         rerenderForm() {
@@ -45,11 +45,11 @@ export default {
             this.$nextTick(() => this.showForm = true)
         },
         async checkVerificationCode({ code="1234565", newPassword="123445666" }) {
-            const { msg, code: resCode } = await this.$API.auth.verificationCodeCheck({ code, newPassword, username: this.username })
+            const { msg, code: resCode } = await this._api.auth.verificationCodeCheck({ code, newPassword, username: this.username })
             if (resCode !== 0)
-                return this.utils.alert(msg)
-            this.utils.alert(msg, 'success')
-            return this.utils.toHomePage()
+                return this._utils.alert(msg)
+            this._utils.alert(msg, 'success')
+            return this._utils.toHomePage()
         }
     },
     computed: {

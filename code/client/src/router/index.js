@@ -8,7 +8,7 @@ import auth from './routes/auth.js'
 import user from './routes/user.js'
 import sysAdmin from './routes/sysAdmin.js'
 
-import utils from '@/libraries/globalUtilities.js'
+import _utils from '@/libraries/globalUtilities.js'
 import helpers from '@/libraries/router/main.js'
 import beforeNavHooks from '@/libraries/router/beforeNavigationHooks.js'
 import requestQueryHelpers from '@/libraries/requests/queries/main.js'
@@ -70,18 +70,18 @@ router.beforeEach((to, from, next) => {
     if (!store.getters['user/isLoggedIn']) {
       next('/')
       window.setTimeout(() => { 
-        utils.alert('Please login to view this page', "caution", origin) 
+        _utils.alert('Please login to view this page', "caution", origin) 
         }, threeTenthsOfASecond)
       return
     }
     else if (!store.getters['user/validAuthentication']) {
       window.setTimeout(() => {
-        utils.alert('Your login has expired. Please sign-in again', "caution", origin)
+        _utils.alert('Your login has expired. Please sign-in again', "caution", origin)
       }, threeTenthsOfASecond)
       store.dispatch('logout')
       return
     }
-    else if (!utils.validAuthentication(to.meta.auth)) {
+    else if (!_utils.validAuthentication(to.meta.auth)) {
       const options = {
         color: "red",
         icon: "locked",

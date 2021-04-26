@@ -9,7 +9,7 @@
             <div v-for="(fieldData, fieldName) in structureCopy" :key="fieldName">
                 
                 <div class="formLabel" :for="fieldName">
-                    {{  fieldData.alias || utils.stringFormat(fieldName) }}
+                    {{  fieldData.alias || _utils.stringFormat(fieldName) }}
                 </div>
 
                 <div v-if="extensibleType(readOnly ? 'readOnly' : fieldData.type)">
@@ -59,7 +59,7 @@
                         >
                             <template #default>
                                 <div class="formLabel">
-                                    {{ utils.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
+                                    {{ _utils.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
                                 </div>
                             </template>
                             <template #invalidMsgs>
@@ -245,15 +245,15 @@ export default {
             else if (this.validations[fieldName])
                 return this.validations[fieldName].msgs
             else
-                return `Invalid ${this.utils.stringFormat(fieldName)}`
+                return `Invalid ${this._utils.stringFormat(fieldName)}`
         },
         setData(inputData) {
-            this.data = this.utils.deepCopy(inputData)
-            this.originalData = this.utils.deepCopy(inputData)
+            this.data = this._utils.deepCopy(inputData)
+            this.originalData = this._utils.deepCopy(inputData)
         },
         async submit() {
             if (this.confirmBeforeSubmit) {
-                const confirm = await this.utils.confirm(`Are you sure you want to submit?`)
+                const confirm = await this._utils.confirm(`Are you sure you want to submit?`)
                 if (confirm)
                     this.$emit('submitted', this.data)
             } else
@@ -285,8 +285,9 @@ export default {
             return data.length >= min
         },
         fillDefaultsWithBasedOn(basedOn) {
-            const copy = this.utils.deepCopy(basedOn)
-            for (let [fieldName, currentVal] of Object.entries(this.structureCopy)) {
+            const copy = this._utils.deepCopy(basedOn)
+            // eslint-disable-next-line no-unused-vars
+            for (let [fieldName, _] of Object.entries(this.structureCopy)) {
                 this.structureCopy[fieldName].default = copy[fieldName]
             }
         }
@@ -295,7 +296,8 @@ export default {
         allFieldsValid() {
             if (!this.validations)
                 return false
-            for (let [fieldName, validationInfo] of Object.entries(this.validations)) {
+            // eslint-disable-next-line no-unused-vars
+            for (let [_, validationInfo] of Object.entries(this.validations)) {  
                 if (!validationInfo.state)
                     return false
             }
@@ -320,7 +322,7 @@ export default {
         }
     },
     created() {
-        this.structureCopy = this.utils.deepCopy(this.structure)
+        this.structureCopy = this._utils.deepCopy(this.structure)
         if (this.basedOn) {
             this.fillDefaultsWithBasedOn(this.basedOn)
             this.setData(this.basedOn)

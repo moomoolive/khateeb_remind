@@ -50,24 +50,24 @@ export default {
   },
   methods: {
       async getScheduleBuildingBlocks() {
-        const [locations, timings, khateebs, { settings }] = await this.$API.chainedRequests.getScheduleComponents()
+        const [locations, timings, khateebs, { settings }] = await this._api.chainedRequests.getScheduleComponents()
         this.locations = locations
         this.timings = timings
         this.khateebs = khateebs
         this.institutionSettings = settings
       },
       async requestJummahs(jummahDateRange={}) {
-        this.jummahs = await this.$API.jummahs.getJummahs({ date: jummahDateRange })
+        this.jummahs = await this._api.jummahs.getJummahs({ date: jummahDateRange })
       },
       async khateebSignup(newJummahPreference={}) {
         if (!this.institutionSettings.allowJummahSignup)
-          return this.utils.alert(`Unfortunately your administrator has not allowed jummah signups! If you want this feature please talk to your administrator.`)
-        const newPreference = await this.$API.jummahs.createNewPreference(newJummahPreference)
+          return this._utils.alert(`Unfortunately your administrator has not allowed jummah signups! If you want this feature please talk to your administrator.`)
+        const newPreference = await this._api.jummahs.createNewPreference(newJummahPreference)
         if (Object.keys(newPreference).length > 0)
           this.jummahs.push(newPreference)
       },
       async getInstitutionLogo() {
-          this.imgSrc = await this.$API.logos.getInstitutionLogo(
+          this.imgSrc = await this._api.logos.getInstitutionLogo(
               { institutionID: this.$store.state.user.institution._id }
           )
       },

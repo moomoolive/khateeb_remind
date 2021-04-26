@@ -55,7 +55,7 @@
 
                     <div class="created-at-text">
                         <span class="purple">
-                            Created: {{ utils.dynamicDisplayDate(institution.createdAt) }}
+                            Created: {{ _utils.dynamicDisplayDate(institution.createdAt) }}
                         </span>
                     </div>
                 </div>
@@ -87,10 +87,10 @@ export default {
     },
     methods: {
         async getAllInstitutions() {
-            this.institutions = await this.$API.sysAdmin.getInstitutions()
+            this.institutions = await this._api.sysAdmin.getInstitutions()
         },
         async confirmInstitution(institutionID="1234") {
-            const res = await this.$API.sysAdmin.updateInstitution({ institutionID, confirmed: true })
+            const res = await this._api.sysAdmin.updateInstitution({ institutionID, confirmed: true })
             const index = this.institutions.findIndex(i => i._id === res._id)
             this.institutions.splice(index, 1, res)
         }

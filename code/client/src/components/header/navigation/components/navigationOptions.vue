@@ -1,7 +1,7 @@
 <template>
     <div v-on-clickaway="close">
         
-        <div v-if="utils.validAuthentication({ level: 1 })">
+        <div v-if="_utils.validAuthentication({ level: 1 })">
             
             <div class="menu-item" @click="redirect('/khateeb/')">
                 <p>Schedule</p>
@@ -17,7 +17,7 @@
 
         </div>
 
-        <div v-if="utils.validAuthentication({ min: 2, max: 3 })">
+        <div v-if="_utils.validAuthentication({ min: 2, max: 3 })">
             
             <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
                 <p>Set Schedule</p>
@@ -33,7 +33,7 @@
 
         </div>
 
-        <div v-if="utils.validAuthentication({ min: 4 })" >
+        <div v-if="_utils.validAuthentication({ min: 4 })" >
             
             <div class="menu-item" @click="redirect('/sysAdmin')">
                 <p>Admin Central</p>
@@ -92,12 +92,12 @@ export default {
                 window.setTimeout(() => {
                     window.open("https://mobilesyrup.com/2020/05/24/how-install-progressive-web-app-pwa-android-ios-pc-mac/", "_blank")
                 }, sixSecondsInMilliseconds)
-                return this.utils.alert(`It looks like you've missed the prompt to download the app, already declined to download the app, or your browser doesn't support web-applications. In a moment, you'll be redirected to a link which shows you how to manually download the app.`)
+                return this._utils.alert(`It looks like you've missed the prompt to download the app, already declined to download the app, or your browser doesn't support web-applications. In a moment, you'll be redirected to a link which shows you how to manually download the app.`)
             }
             this.deferredPrompt.prompt()
             const choice = await this.deferredPrompt.userChoice
             if (choice.outcome === 'accepted') {
-                this.utils.alert(`The app has finished downloading!`, 'success')
+                this._utils.alert(`The app has finished downloading!`, 'success')
                 this.deferredPrompt = null
             }
         },
@@ -118,7 +118,7 @@ export default {
         },
         async logout() {
             this.close()
-            const confirm = await this.utils.confirm(`Are you sure you want to logout?`)
+            const confirm = await this._utils.confirm(`Are you sure you want to logout?`)
             if (!confirm)
                 return
             this.$store.dispatch('user/logout')

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import store from '@/store/index.js'
-import utils from '@/libraries/globalUtilities.js'
+import _utils from '@/libraries/globalUtilities.js'
 
 const offlineModeRequestCanceler = axios.CancelToken
 
@@ -12,7 +12,7 @@ const normalRequest = (config ={}) => {
         const cancelToken = offlineModeRequestCanceler.source()
         config.cancelToken = cancelToken
         cancelToken.cancel(`Only get requests are allowed when app is offline!`)
-        utils.alert(`You cannot make changes during offline mode, try again when your internet reconnects!`)
+        _utils.alert(`You cannot make changes during offline mode, try again when your internet reconnects!`)
     }
     return config
 }

@@ -56,7 +56,7 @@
 
         </div>
 
-        <div class="footer-logo" @click="utils.toHomePage()">
+        <div class="footer-logo" @click="_utils.toHomePage()">
             <div>
                 <img 
                     src="@/assets/logos/khateebRemindLogo.svg"
@@ -72,11 +72,13 @@
 </template>
 
 <script>
+import Config from '@/App.config.js'
+
 export default {
     name: 'Footer',
     data() {
         return {
-            feedbackURL: process.env.VUE_APP_FEEDBACK_FORM_URL || '#'
+            feedbackURL: Config.thirdPartyServicesConfig.feedbackFormURL
         }
     },
     methods: {

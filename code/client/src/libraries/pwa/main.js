@@ -1,10 +1,12 @@
 import helpers from './helpers.js'
 
+import Config from '@/App.config.js'
+
 const subscribeUserToPushNotifications = async (serviceWorkerReg={}) => {
     try {
         const pushSubscription = await serviceWorkerReg.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: helpers.urlB64ToUint8Array(process.env.VUE_APP_PUBLIC_VAPID_KEY)
+            applicationServerKey: helpers.urlB64ToUint8Array(Config.securityConfig.vapidPublicKey)
         })
         return pushSubscription
     } catch(err) {

@@ -6,7 +6,7 @@
             gif="flyingPlanesAllOver"
         />
         <div class="button">
-            <button @click="utils.toHomePage()">
+            <button @click="_utils.toHomePage()">
                 Go to Home
             </button>
         </div>

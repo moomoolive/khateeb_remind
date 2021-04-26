@@ -79,7 +79,7 @@ export default {
             if (this.$store.state.user.institution._id === 'root')
                 return
             else
-                return this.imageSrc = await this.$API.logos.getInstitutionLogo(
+                return this.imageSrc = await this._api.logos.getInstitutionLogo(
                     { institutionID: this.$store.state.user.institution._id }
                 )
         },

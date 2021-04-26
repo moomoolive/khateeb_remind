@@ -18,10 +18,10 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 * Babel - javascript transpiler
 
 #### Development Tools
-* Crossenv - javascript library for enviromental variable injection
-* Serve - a javascript library for running webservers
+* Serve - a javascript library for running webservers (used for testing PWA)
 * ESLint - a linting tool
 * Jest - testing framework
+* VueCLI - managing webpack, dev server, etc.
 
 ### Server (Backend) - Javascript
 * Expressjs - a node server framework
@@ -37,3 +37,4 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 
 #### Development Tools
 * Nodemon - hot reload of server
+* Jest - testing framework

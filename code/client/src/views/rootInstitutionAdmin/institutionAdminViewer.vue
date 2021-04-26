@@ -38,7 +38,7 @@
                     <collapsable-box
                         :headline="`${admin.firstName} ${admin.lastName}`"
                         :tagDetails="[{
-                            words: `Last Active: ${utils.dynamicDisplayDate(admin.lastLogin)}`,
+                            words: `Last Active: ${_utils.dynamicDisplayDate(admin.lastLogin)}`,
                             color: `goodNews`,
                             symbol: `☀️`
                         }]"
@@ -103,21 +103,21 @@ export default {
             this.showAddNewAdminForm = false
         },
         async submitAdmin(newAdmin={}) {
-            const newlySavedAdmin = await this.$API.institutionAdmins.createNewAdmin(newAdmin)
+            const newlySavedAdmin = await this._api.institutionAdmins.createNewAdmin(newAdmin)
             this.admins.push(newlySavedAdmin)
             this.closeAddNewAdminForm()
-            this.utils.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
+            this._utils.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
         },
         async deleteAdmin(id, index) {
-            const confirm = await this.utils.confirm(`Do you really want to permenantly delete this administrator?`)
+            const confirm = await this._utils.confirm(`Do you really want to permenantly delete this administrator?`)
             if (confirm) {
-                const res = await this.$API.institutionAdmins.deleteAdmin(id)
+                const res = await this._api.institutionAdmins.deleteAdmin(id)
                 if (requestHelpers.dataWasDeleted(res))
                     this.admins.splice(index, 1)
             }
         },
         async getOtherAdmins() {
-            this.admins = await this.$API.institutionAdmins.getOtherAdmins()
+            this.admins = await this._api.institutionAdmins.getOtherAdmins()
         }
     },
     created() {

@@ -46,14 +46,14 @@ export default {
     },
     methods: {
         async signupKhateeb(info={}) {
-            const { code, msg } = await this.$API.auth.createKhateeb({ ...info, institutionID: this.selectedInstitution})
+            const { code, msg } = await this._api.auth.createKhateeb({ ...info, institutionID: this.selectedInstitution})
             if (code !== 0)
-                return this.utils.alert(msg)
-            this.utils.alert(msg, 'success')
-            return this.utils.toHomePage()
+                return this._utils.alert(msg)
+            this._utils.alert(msg, 'success')
+            return this._utils.toHomePage()
         },
         async getAllConfirmedInstitutions() {
-            this.allInstitutions = await this.$API.misc.institutionSelection()
+            this.allInstitutions = await this._api.misc.institutionSelection()
         },
     },
     computed: {

@@ -17,7 +17,7 @@
                         v-model="preference.khateebID" 
                         @change="khateebSelectionChanged($event, preferenceIndex)"
                     >
-                        <option value="none">None</option>
+                        <option :value="_config.nullId">None</option>
                         <option
                             v-for="
                                 (khateeb, khateebIndex) 
@@ -34,7 +34,7 @@
                     </select>
                 </span>
                 
-                <div v-if="preference.khateebID.toLowerCase() !== 'none'">
+                <div v-if="preference.khateebID.toLowerCase() !== _config.nullId">
 
                     <div 
                         v-show="preference.isGivingKhutbah" 
@@ -93,14 +93,14 @@ export default {
     },
     data() {
         return {
-            cachedKhateebPreferencesMirror: [{ khateebID: 'none' }, { khateebID: 'none' }],
-            khateebPreferencesMirror: [{ khateebID: 'none' }, { khateebID: 'none' }],
+            cachedKhateebPreferencesMirror: new Array.from(2).fill({ khateebID: this._config.nullId }),
+            khateebPreferencesMirror: new Array.from(2).fill({ khateebID: this._config.nullId }),
             showDropdown: true
         }
     },
     methods: {
         readMeKhateebName(khateebID="none") {
-            if (khateebID === 'none')
+            if (khateebID === this._config.nullId)
                 return "None"
             const khateeb = this.khateebs.find(k => k._id === khateebID)
             if (!khateeb)
@@ -120,7 +120,7 @@ export default {
                     isBackup, 
                     isGivingKhutbah: !isBackup,
                     notified: false,
-                    notificationID: 'none',
+                    notificationID: this._config.nullId,
                     timingID: this.timing._id,
                     institutionID: this.location.institutionID,
                     locationID: this.location._id,
@@ -132,7 +132,7 @@ export default {
                     ...this.khateebPreferences[index], 
                     khateebID,
                     notified: false,
-                    notificationID: 'none' 
+                    notificationID: this._config.nullId 
                 })
             }
             this.cachePreferences()
@@ -147,7 +147,7 @@ export default {
             this.cachePreferences()
         },
         reverseChangeAndAlert(index, msg) {
-            this.utils.alert(msg)
+            this._utils.alert(msg)
             this.reverseChanges(index)
             return false
         },

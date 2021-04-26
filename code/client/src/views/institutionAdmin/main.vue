@@ -54,7 +54,7 @@ export default {
     methods: {
         async verifyPending() {
             try {
-                const pendingKhateebs = await this.$API.khateebs.getKhateebs({ confirmed: false })
+                const pendingKhateebs = await this._api.khateebs.getKhateebs({ confirmed: false })
                 const pendingCount = pendingKhateebs.length
                 this.outboundLinks[2].blinking = pendingCount > 0
             } catch(err) {

@@ -78,7 +78,7 @@ export default {
     },
     methods: {
         async submit(newAnnouncement={}) {
-            const newlySavedAnnouncement = await this.$API.announcements.createNewAnnouncement(newAnnouncement)
+            const newlySavedAnnouncement = await this._api.announcements.createNewAnnouncement(newAnnouncement)
             this.announcements.push(newlySavedAnnouncement)
             this.showAddNewAnnouncementForm = false
         },
@@ -99,19 +99,19 @@ export default {
             this.$nextTick(() => this.showAnnouncements = true)
         },
         async updateAnnouncement($event) {
-            const updated = await this.$API.announcements.updateAnnouncement($event)
+            const updated = await this._api.announcements.updateAnnouncement($event)
             const index = this.announcements.findIndex(a => a._id === updated._id)
             this.announcements.splice(index, 1, updated)
             this.rerenderAnnouncements()
         },
         async getAnnouncements() {
-            this.announcements = await this.$API.announcements.getAnnouncements()
+            this.announcements = await this._api.announcements.getAnnouncements()
         },
         async deleteAnnouncement(id, index) {
-            const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this announcement?`)
+            const confirm = await this._utils.confirm(`Are you sure you want to permenantly delete this announcement?`)
             if (!confirm)
                 return
-            const res = await this.$API.announcements.deleteAnnouncement(id)
+            const res = await this._api.announcements.deleteAnnouncement(id)
             if (requestHelpers.dataWasDeleted(res))
                 this.announcements.splice(index, 1)
         },

@@ -15,7 +15,7 @@
                 <div class="updated-at-text">
                     Update: 
                     <span class="blue">
-                        <b>{{ utils.dynamicDisplayDate(khutbah.updatedAt) }}</b>
+                        <b>{{ _utils.dynamicDisplayDate(khutbah.updatedAt) }}</b>
                     </span>
                 </div>
                 

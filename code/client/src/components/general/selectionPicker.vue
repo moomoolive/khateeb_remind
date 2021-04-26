@@ -20,7 +20,7 @@
             :key="categoryName"
             :class="`category-container ${categoryName}`"
         >
-            <h1>{{ utils.stringFormat(categoryName) }} Options</h1>
+            <h1>{{ _utils.stringFormat(categoryName) }} Options</h1>
             <div
                 class="options-container"
             >
@@ -110,7 +110,7 @@ export default {
         },
         switchCategory(categoryName, index, option) {
             if (!option.val)
-                return this.utils.alert(`You cannot unselect the default option. If you want your administrator to know that you're free for only certain jummahs, pick them from the selection below.`)
+                return this._utils.alert(`You cannot unselect the default option. If you want your administrator to know that you're free for only certain jummahs, pick them from the selection below.`)
             if (categoryName === 'selected')
                 this.selected.splice(index, 1)
             else
@@ -141,7 +141,7 @@ export default {
         }
     },
     created() {
-        this.selected = this.utils.deepCopy(this.currentlySelected)
+        this.selected = this._utils.deepCopy(this.currentlySelected)
     }
 }
 </script>

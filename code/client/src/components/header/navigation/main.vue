@@ -5,7 +5,7 @@
         <img 
             class="logo" 
             :src="require('@/assets/logos/khateebRemindLogo.svg')"
-            @click="utils.toHomePage()"
+            @click="_utils.toHomePage()"
         >
         
         <collapse-transition :duration="400" :dimension="`width`">

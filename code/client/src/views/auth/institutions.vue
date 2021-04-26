@@ -18,11 +18,11 @@ export default {
     },
     methods: {
         async toAPI(formData={}) {
-            const { code, msg } = await this.$API.auth.createInstitution(formData)
+            const { code, msg } = await this._api.auth.createInstitution(formData)
             if (code !== 0)
-                return this.utils.alert(msg)
-            this.utils.alert(msg, 'success')
-            return this.utils.toHomePage()
+                return this._utils.alert(msg)
+            this._utils.alert(msg, 'success')
+            return this._utils.toHomePage()
         },
     }
 }

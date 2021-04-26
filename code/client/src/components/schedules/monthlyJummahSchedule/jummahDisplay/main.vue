@@ -196,7 +196,7 @@ export default {
             if (!latestUpdate)
                 return 'N/A'
             else
-                return this.utils.dynamicDisplayDate(latestUpdate)
+                return this._utils.dynamicDisplayDate(latestUpdate)
         },
         oneKhateebWasNotified() {
             return this.khateebPreferences.find(p => p.notified)

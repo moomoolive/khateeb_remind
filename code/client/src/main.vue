@@ -100,7 +100,7 @@ export default {
       const serviceWorkerReg = await pwaHelpers.getServiceWorkerRegistration()
       if (serviceWorkerReg) {
         const pushSub = await pwaHelpers.subscribeUserToPushNotifications(serviceWorkerReg)
-        const resCode = await this.$API.pwa.createPWASubscription(pushSub)
+        const resCode = await this._api.pwa.createPWASubscription(pushSub)
         return resCode
       } 
     },
@@ -139,7 +139,7 @@ export default {
   mounted() {
     this.$nextTick(async () => {
       if (this.$store.getters['user/isLoggedIn'])
-        await this.$API.user.checkIn()
+        await this._api.user.checkIn()
     })
   },
   created() {

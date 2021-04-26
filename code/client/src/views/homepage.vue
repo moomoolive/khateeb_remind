@@ -51,7 +51,7 @@ export default {
     name: "khateebRemindHomepage",
     created() {
         if (this.$store.state.router.firstPage && this.$store.getters['user/isLoggedIn'])
-            this.utils.toHomePage()
+            this._utils.toHomePage()
     }
 }
 </script>

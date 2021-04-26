@@ -146,7 +146,7 @@
                 </collapsable-box>
 
                 <collapsable-box
-                    v-if="utils.validAuthentication(3)"
+                    v-if="_utils.validAuthentication(3)"
                     class="setting-container"
                     :headline="`Danger Zone`"
                     :buttonColor="`red`"
@@ -204,42 +204,42 @@ export default {
                 const imageArray = []
                 for (let i = 0; i < binaryString.length; i++)
                     imageArray.push(binaryString.charCodeAt(i))
-                const resCode = await this.$API.logos.saveInstitutionLogo({ img: imageArray })
+                const resCode = await this._api.logos.saveInstitutionLogo({ img: imageArray })
                 if (resCode === 0)
                     return this.institutionImageSrc = e.target.result
             }
             reader.readAsDataURL(targetFile)
         },
         async deleteLogo() {
-            const confirm = await this.utils.confirm(`Are you sure you want to delete your logo?`)
+            const confirm = await this._utils.confirm(`Are you sure you want to delete your logo?`)
             if (!confirm)
                 return
-            const resCode = await this.$API.logos.deleteInstitutionLogo()
+            const resCode = await this._api.logos.deleteInstitutionLogo()
             if (resCode === 0)
                 return this.institutionImageSrc =  require('@/assets/logos/genericInstitution.png')
         },
         async getInstitutionLogo() {
-            this.institutionImageSrc = await this.$API.logos.getInstitutionLogo(
+            this.institutionImageSrc = await this._api.logos.getInstitutionLogo(
                 { institutionID: this.$store.state.user.institution._id }
             )
         },
         async getSettingsAndInstitutionInfo() {
-            this.institution = await this.$API.institutions.getInstitution()
+            this.institution = await this._api.institutions.getInstitution()
         },
         async saveInstitutionDetails(newChanges={}) {
-            const updated = await this.$API.institutions.updateInstitution(newChanges)
+            const updated = await this._api.institutions.updateInstitution(newChanges)
             if (Object.keys(updated).length < 1)
                 return
             this.institution = updated
             this.rerenderSettings()
         },
         async deleteInstitution() {
-            const confirm = await this.utils.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
+            const confirm = await this._utils.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
             if (confirm) {
-                const res = await this.$API.institutions.deleteInstitution()
+                const res = await this._api.institutions.deleteInstitution()
                 if (!requestHelpers.dataWasDeleted(res))
                     return
-                this.utils.alert(`You've successfully deleted your institution`, 'success')
+                this._utils.alert(`You've successfully deleted your institution`, 'success')
                 this.$store.dispatch('user/logout')
             }
         },

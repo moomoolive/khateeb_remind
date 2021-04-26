@@ -84,11 +84,11 @@ export default {
     },
     methods: {
         async updateInfo(update={}) {
-            const res = await this.$API.user.updateInfo(update)
+            const res = await this._api.user.updateInfo(update)
             if (!res.data)
-                return this.utils.alert(`There was a problem updating your profile`)
+                return this._utils.alert(`There was a problem updating your profile`)
             this.rerenderProfileSettings()
-            this.utils.alert(`Successfully updated`, 'success')
+            this._utils.alert(`Successfully updated`, 'success')
         },
         rerenderProfileSettings() {
             this.showProfileSettings = false
@@ -96,12 +96,12 @@ export default {
         },
         async deleteAccount() {
             try {
-                const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete your account?`)
+                const confirm = await this._utils.confirm(`Are you sure you want to permenantly delete your account?`)
                 if (!confirm)
                     return
-                await this.$API.user.deleteAccount()
+                await this._api.user.deleteAccount()
                 this.$store.dispatch('user/logout')
-                this.utils.alert(`Successfully delete account`, 'success')
+                this._utils.alert(`Successfully delete account`, 'success')
             } catch(err) {
                 console.log(err)
             }

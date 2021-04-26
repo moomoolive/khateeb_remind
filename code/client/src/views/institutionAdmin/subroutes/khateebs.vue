@@ -181,7 +181,7 @@ export default {
             this.showSignupLink = !this.showSignupLink
         },
         async getAllKhateebs() {
-            this.khateebs = await this.$API.khateebs.getKhateebs()
+            this.khateebs = await this._api.khateebs.getKhateebs()
         },
         copyLink() {
             this.copiedLink = true
@@ -190,7 +190,7 @@ export default {
             window.setTimeout(() => this.copiedLink = false, fiveSecondsInMilliseconds)
         },
         async getActiveLocationsAndTimings() {
-            const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+            const [locations, timings] = await this._api.chainedRequests.getActiveLocationsAndTimings()
             this.timings = timings
             this.locations = locations
         },
@@ -206,7 +206,8 @@ export default {
         },
         compileAllLocationMsgsIntoOne(locationMsgObject) {
             let msg = ''
-            for (const [location, msgs] of Object.entries(locationMsgObject)) {
+            // eslint-disable-next-line no-unused-vars
+            for (const [_, msgs] of Object.entries(locationMsgObject)) {
                 msgs.push('\n')
                 msg += msgs.reduce((total, msg) => `${total}\n${msg}`)
             }
@@ -250,10 +251,10 @@ export default {
             if (!khateeb.confirmed)
                 return [{ words: 'Registration Pending', color: 'important', symbol: '⏳' }]
             else
-                return [{ words: `Last Active: ${this.utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
+                return [{ words: `Last Active: ${this._utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
         },
         async editKhateeb($event) {
-            const res = await this.$API.khateebs.updateExistingKhateeb($event)
+            const res = await this._api.khateebs.updateExistingKhateeb($event)
             this.khateebs.splice(this.findKhateebIndex(res._id), 1, res)
             this.rerenderView()
         },
@@ -265,10 +266,10 @@ export default {
             this.$nextTick(() => { this.showKhateebs = true })
         },
         async deleteKhateeb(id) {
-            const confirm = await this.utils.confirm(`Are you sure you want to permenantly delete this khateeb?`)
+            const confirm = await this._utils.confirm(`Are you sure you want to permenantly delete this khateeb?`)
             if (!confirm)
                 return
-            const res = await this.$API.khateebs.deleteKhateeb(id)
+            const res = await this._api.khateebs.deleteKhateeb(id)
             if (requestHelpers.dataWasDeleted(res))
                 this.khateebs.splice(this.findKhateebIndex(id), 1)
         },

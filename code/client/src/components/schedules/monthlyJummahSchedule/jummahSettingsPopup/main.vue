@@ -75,6 +75,8 @@
 <script>
 import jummahHelpers from '@/libraries/jummahs/main.js'
 
+import Config from '@/App.config.js'
+
 export default {
     name: "jummahSettingsPopup",
     props: {
@@ -102,7 +104,7 @@ export default {
     methods: {
         signupKhateeb(isBackup=false) {
             if (this.currentUserIsAlreadySignedUpForThisJummah)
-                return this.utils.alert(`You're already signed up for this jummah!`)
+                return this._utils.alert(`You're already signed up for this jummah!`)
             this.$emit('khateeb-signup', {
                 date: jummahHelpers.fridayToFridayDBFormat(new Date(this.selectedDate)),
                 timingID: this.info.timing._id,
@@ -112,10 +114,8 @@ export default {
                 isGivingKhutbah: !isBackup,
                 khateebID: this.currentUser,
                 notified: false,
-                notificationID: 'none',
-                maxRunCount: process.env.VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_INDIVIDAUL_JUMMAH ?
-                    parseInt(process.env.VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_INDIVIDAUL_JUMMAH) : 
-                    300
+                notificationID: this._config.nullId,
+                maxRunCount: Config.userRestrictionsConfig.notificationLoopMaxRunCountPerJummah
             })
             return this.closePopup()
         },
@@ -135,7 +135,7 @@ export default {
         runNotificationLoop(isBackup=false) {
             const target = this.getTargetPreference(isBackup) 
             if (target.notified)
-                return this.utils.alert(`Khateeb has already been notified. Click 'Reset Notifications' to allow another notification to be sent.`)
+                return this._utils.alert(`Khateeb has already been notified. Click 'Reset Notifications' to allow another notification to be sent.`)
             this.$emit("run-notification-loop", { isBackup, main: this.info.khateebPreferences[0], backup: this.info.khateebPreferences[1] })
             return this.closePopup()
         },
@@ -148,7 +148,7 @@ export default {
                     { 
                         _id: p._id, 
                         notified: false, 
-                        notificationID: 'none', 
+                        notificationID: this._config.nullId, 
                         isGivingKhutbah: !p.isBackup,
                         meta
                     }

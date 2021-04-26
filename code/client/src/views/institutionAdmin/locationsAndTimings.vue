@@ -48,7 +48,7 @@
                                 class="default-khateebs-input"
                                 @change="defaultKhateebChanged(x === 1 ? 'mainKhateeb' : 'backup')"
                             >
-                                <option value="none">None</option>
+                                <option :value="_config.nullId">None</option>
                                 <option
                                     v-for="
                                         (khateeb, khateebIndex) in 
@@ -204,7 +204,7 @@ export default {
             timings: [],
             khateebs: [],
             showEditDefaultKhateebsContainer: false,
-            defaultKhateebsInfo: 'none',
+            defaultKhateebsInfo: this._config.nullId,
             selectedDefaultKhateebsWeek: -1,
             cachedTimings: []
         }
@@ -223,22 +223,22 @@ export default {
             
         },
         overwriteTimingsWithCache() {
-            this.timings = this.utils.deepCopy(this.cachedTimings)
+            this.timings = this._utils.deepCopy(this.cachedTimings)
         },
         newPreferenceChangeIsAllowed(newPreferences={}, role="mainKhateeb") {
-            if (newPreferences.mainKhateeb === newPreferences.backup && newPreferences[role] !== 'none') {
-                this.utils.alert(`Main and backup khateeb cannot be the same`)
+            if (newPreferences.mainKhateeb === newPreferences.backup && newPreferences[role] !== this._config.nullId) {
+                this._utils.alert(`Main and backup khateeb cannot be the same`)
                 return false
             }
             const khateeb = this.khateebs.find(k => k._id === newPreferences[role])
             if (khateeb && khateeb.availableTimings.length > 0 && !khateeb.availableTimings.find(t => t === this.defaultKhateebsTiming._id)) {
-                this.utils.alert(`${khateeb.firstName} has specified that he is not available for this timing. You are not allowed to schedule him as a default khateeb here.`)
+                this._utils.alert(`${khateeb.firstName} has specified that he is not available for this timing. You are not allowed to schedule him as a default khateeb here.`)
                 return false
             }
             return true
         },
         async updateTiming(updatedTiming={}) {
-            const res = await this.$API.timings.updateTiming(updatedTiming)
+            const res = await this._api.timings.updateTiming(updatedTiming)
             if (Object.keys(res).length > 0)
                 this.timings.splice(this.findIndexById(res._id, "timings"), 1, res)
             else
@@ -251,7 +251,7 @@ export default {
                 this.selectedDefaultKhateebsWeek = -1
         },
         async updateLocation(location, index) {
-            await this.utils.delayedRequest(
+            await this._utils.delayedRequest(
                 'locations',
                 'updateLocation',
                 { 
@@ -263,7 +263,7 @@ export default {
         async incrementTime(incrementInfo={}, timing={}) {
             const index = this.findIndexById(timing._id)
             this.timings[index][incrementInfo.type] += incrementInfo.increment
-            await this.utils.delayedRequest(
+            await this._utils.delayedRequest(
                 'timings', 
                 'updateTiming', 
                 { 
@@ -281,18 +281,18 @@ export default {
             return window.setTimeout(() => {
                 this.showEditDefaultKhateebsContainer = false
                 this.selectedDefaultKhateebsWeek = -1
-                this.defaultKhateebsInfo = 'none'
+                this.defaultKhateebsInfo = this._config.nullId
             }, oneHundredMilliseconds)
         },
         async addNewLocation() {
             const length = this.locations.length + 1
-            const { location, timing } = await this.$API.locations.createNewLocation({ name: `Unknown Location ${length}`, address: `Unknown Address ${length}` })
+            const { location, timing } = await this._api.locations.createNewLocation({ name: `Unknown Location ${length}`, address: `Unknown Address ${length}` })
             this.timings.push(timing)
             this.locations.push(location)
         },
         async addTiming(location) {
             const target = this.timings.find(t => t.locationID === location._id) || { hour: 12, minute: 29 }
-            const newTiming = await this.$API.timings.createNewTiming({ 
+            const newTiming = await this._api.timings.createNewTiming({ 
                 locationID: location._id,
                 minute: target.minute === 59 ? 0 : target.minute + 1,
                 hour: target.minute === 59 ? target.hour + 1 : target.hour
@@ -301,20 +301,20 @@ export default {
         },
         async deleteTiming(timing) {
             if (this.timings.filter(t => timing.locationID === t.locationID).length < 2)
-                return this.utils.alert(`You must have at least one timing per location!`)
-            const confirm = await this.utils.confirm(`Are you sure you want delete this timing?`)
+                return this._utils.alert(`You must have at least one timing per location!`)
+            const confirm = await this._utils.confirm(`Are you sure you want delete this timing?`)
             if (confirm) {
-                const res = await this.$API.timings.deleteTiming(timing._id)
+                const res = await this._api.timings.deleteTiming(timing._id)
                 if (requestHelpers.dataWasDeleted(res)) 
                     this.timings.splice(this.findIndexById(timing._id), 1)
             }
         },
         async deleteLocation(location) {
             if (this.locations.length < 2)
-                return this.utils.alert(`You must have at least one location`)
-            const confirm = await this.utils.confirm(`Are you sure you want to delete this location?`)
+                return this._utils.alert(`You must have at least one location`)
+            const confirm = await this._utils.confirm(`Are you sure you want to delete this location?`)
             if (confirm) {
-                const res = await this.$API.locations.deleteLocation(location._id)
+                const res = await this._api.locations.deleteLocation(location._id)
                 if (requestHelpers.dataWasDeleted(res)) {
                     this.locations.splice(this.findIndexById(location._id, 'locations'), 1)
                     this.timings = this.timings.filter(t => t.locationID === location._id)
@@ -325,17 +325,17 @@ export default {
             return this[data].findIndex(d => d._id === id)
         },
         async getLocationsAndTimings() {
-            const [locations, timings] = await this.$API.chainedRequests.getActiveLocationsAndTimings()
+            const [locations, timings] = await this._api.chainedRequests.getActiveLocationsAndTimings()
             this.locations = locations
             this.timings = timings
         },
         async getKhateebs() {
-            this.khateebs = await this.$API.khateebs.getKhateebs()
+            this.khateebs = await this._api.khateebs.getKhateebs()
         }
     },
     computed: {
         defaultKhateebsTiming() {
-            if (this.defaultKhateebsInfo !== 'none')
+            if (this.defaultKhateebsInfo !== this._config.nullId)
                 return this.timings[this.findIndexById(this.defaultKhateebsInfo, "timings")]
             else
                 return {}
@@ -349,7 +349,7 @@ export default {
     },
     watch: {
         timings(newVal) {
-            this.cachedTimings = this.utils.deepCopy(newVal)
+            this.cachedTimings = this._utils.deepCopy(newVal)
         }
     },
     created() {

@@ -6,6 +6,8 @@
 import helpers from '@/libraries/requests/requestManager/main.js'
 import footerPopups from '@/libraries/footerPopup/main.js'
 
+import Config from '@/App.config.js'
+
 export default {
     name: 'requestManager',
     data() {
@@ -16,9 +18,9 @@ export default {
     methods: {
         createActiveRequest(requestKey, requestInfo) {
             if (this.offlineModeIsInitiated)
-                return this.utils.alert(`You cannot make changes when you are in offline mode, try again later!`)
+                return this._utils.alert(`You cannot make changes when you are in offline mode, try again later!`)
             const key = requestKey
-            const targetFunction = this.$API[requestInfo.extension][requestInfo.function]
+            const targetFunction = this._api[requestInfo.extension][requestInfo.function]
             const args = requestInfo.arguments
             const millisecondsInASecond = 1_000
             const timeInMilliseconds = requestInfo.requestAfterSeconds * millisecondsInASecond
@@ -51,7 +53,7 @@ export default {
             delete this.activeRequests[key]
         },
         async pingHealthEndpointPerodically() {
-            const res = await this.$API.misc.healthEndpoint()
+            const res = await this._api.misc.healthEndpoint()
             if (res) {
                 this.$store.commit('app/backOnline')
                 footerPopups.backOnline()
@@ -90,7 +92,7 @@ export default {
             const thirtySecondsInMilliseconds = 30_000
             if (newVal === 1 && oldVal === 0)
                 window.setTimeout(() => this.$store.commit('requests/clearNoResCount'), thirtySecondsInMilliseconds)
-            if (newVal > parseInt(process.env.VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT) && !this.offlineModeIsInitiated) {
+            if (newVal > Config.networkConfig.offlineModeRequestCountThreshold && !this.offlineModeIsInitiated) {
                 footerPopups.youAreOffline()
                 this.$store.commit("app/offlineMode")
             }

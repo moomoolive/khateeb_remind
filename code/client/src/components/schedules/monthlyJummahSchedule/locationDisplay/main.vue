@@ -98,7 +98,7 @@ export default {
         findDefaultKhateeb(timing, backup=false) {
             const defaultsForTiming = timing.defaultKhateebs[this.fridayNumberOfSelectedMonth - 1]
             const targetVal = defaultsForTiming[backup ? 'backup' : "mainKhateeb"]
-            if (targetVal === 'none' || !targetVal)
+            if (targetVal === this._config.nullId || !targetVal)
                 return null
             const targetKhateeb = this.completeKhateebsList.find(k => k._id === targetVal)
             const notAbleToGiveThisKhutbah = targetKhateeb.unavailableDates.find(({ date }) => datetime.sameDateMonthAndYear(date, this.selectedDate))
