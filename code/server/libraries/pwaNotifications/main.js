@@ -1,7 +1,7 @@
 const webpush = require('web-push')
 const { nanoid } = require('nanoid')
 
-const { securityConfig } = require($rootDir + '/server.config.js')
+const { securityConfig } = require($rootDir + '/Server.config.js')
 
 webpush.setVapidDetails(
     securityConfig.vapid.subject,

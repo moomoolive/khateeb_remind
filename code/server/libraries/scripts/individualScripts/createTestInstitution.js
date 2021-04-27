@@ -1,7 +1,7 @@
 const randomNamegenerate = require('project-name-generator')
 
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
-const { initConfig } = require($rootDir + '/server.config.js')
+const { initConfig } = require($rootDir + '/Server.config.js')
 
 const createTestInstitution = async () => {
     try {

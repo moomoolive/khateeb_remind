@@ -8,7 +8,7 @@
 
 const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3')
 
-const { securityConfig, thirdPartyServicesConfig } = require($rootDir + '/server.config.js')
+const { securityConfig, thirdPartyServicesConfig } = require($rootDir + '/Server.config.js')
 
 const helpers = require('./helpers.js')
 

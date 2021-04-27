@@ -96,7 +96,11 @@ export default {
         },
         async deleteAccount() {
             try {
-                const confirm = await this._utils.confirm(`Are you sure you want to permenantly delete your account?`)
+                const confirm = await this._utils.confirm(
+                    `Are you sure you want to permenantly delete your account?`,
+                    "yellow",
+                    { hard: true, confirmationText: "Delete My Account" }
+                )
                 if (!confirm)
                     return
                 await this._api.user.deleteAccount()

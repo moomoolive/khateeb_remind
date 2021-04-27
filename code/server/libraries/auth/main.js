@@ -4,7 +4,7 @@ const helpers = require('./helpers.js')
 const resourceOwnershipValidation = require('./resourceOwnerChecking/main.js')
 const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
-const { securityConfig } = require($rootDir + "/server.config.js")
+const { securityConfig } = require($rootDir + "/Server.config.js")
 
 const createToken = (info={}, expiresAfter='60-days') => {
     const expiration = helpers.expirationDate(expiresAfter)

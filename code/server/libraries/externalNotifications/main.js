@@ -12,7 +12,7 @@
 
 const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses')
 
-const { securityConfig, thirdPartyServicesConfig } = require($rootDir + '/server.config.js')
+const { securityConfig, thirdPartyServicesConfig } = require($rootDir + '/Server.config.js')
 
 const helpers = require('./helpers.js')
 

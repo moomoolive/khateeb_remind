@@ -234,7 +234,11 @@ export default {
             this.rerenderSettings()
         },
         async deleteInstitution() {
-            const confirm = await this._utils.confirm(`Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`)
+            const confirm = await this._utils.confirm(
+                `Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`,
+                "yellow",
+                { hard: true, confirmationText: 'Delete My Institution' }
+            )
             if (confirm) {
                 const res = await this._api.institutions.deleteInstitution()
                 if (!requestHelpers.dataWasDeleted(res))

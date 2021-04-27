@@ -2,7 +2,7 @@ const authHelpers = require($rootDir + '/libraries/auth/main.js')
 
 const jwt = require('jsonwebtoken')
 
-const { securityConfig } = require($rootDir + "/server.config.js")
+const { securityConfig } = require($rootDir + "/Server.config.js")
 
 const authenticate = (authOptions={}) => {
     return (request, response, next) => {

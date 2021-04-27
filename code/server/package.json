@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "nodemon Server.js",
     "server": "node Server.js",
-    "test:unit": "jest"
+    "test:unit": "jest",
+    "test:integration": "jest"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",

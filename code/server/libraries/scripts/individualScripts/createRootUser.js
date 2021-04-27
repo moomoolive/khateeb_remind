@@ -1,4 +1,4 @@
-const { initConfig } = require($rootDir + '/server.config.js')
+const { initConfig } = require($rootDir + '/Server.config.js')
 
 const createRootUser = async () => {
     try {

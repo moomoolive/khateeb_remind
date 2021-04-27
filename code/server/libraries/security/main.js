@@ -1,6 +1,6 @@
 const crypto = require('crypto')
 
-const { securityConfig } = require($rootDir + "/server.config.js")
+const { securityConfig } = require($rootDir + "/Server.config.js")
 
 const encrypt = (value) => {
     const key =  crypto.createCipher('aes-128-cbc', securityConfig.encryptionKey)

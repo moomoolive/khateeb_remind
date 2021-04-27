@@ -1,4 +1,4 @@
-const { globalConfig, databaseConfig, networkConfig } = require('./server.config.js')
+const { globalConfig, databaseConfig, networkConfig } = require('./Server.config.js')
 
 const express = require('express')
 const cors = require('cors')
