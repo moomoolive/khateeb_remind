@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import Config from '@/App.config.js'
+import Config from '$config'
 
 export default {
     name: 'Footer',

@@ -43,7 +43,8 @@ export default {
             targetKeyBinds.forEach(binding => this.keyBindingIsActive[binding] = false)
         },
         allKeyTargetKeyBindingAreActive() {
-            for (const [key, value] of Object.entries(this.keyBindingIsActive)) {
+            // eslint-disable-next-line
+            for (const [_, value] of Object.entries(this.keyBindingIsActive)) {
                 if (!value)
                     return false
             }

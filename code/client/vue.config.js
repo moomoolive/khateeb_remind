@@ -1,6 +1,19 @@
+const path = require('path')
+
 module.exports = {
+    // if building for pwa testing include source maps
+    // else don't include them
+    productionSourceMap: !!process.env.VUE_APP_PWA,
+    configureWebpack: {
+        resolve: {
+            alias: {
+                '$config': path.resolve(__dirname, 'App.config.js')
+            }
+        }
+    },
     css: {
         loaderOptions : {
+            // import _index.scss style sheet into each vue component
             scss: {
                 prependData: `
                     @import "@/scss/_index.scss";
@@ -9,9 +22,7 @@ module.exports = {
         }
     },
     pages: {
-        index: {
-            entry: 'src/App.js'
-        }
+        index: { entry: 'src/App.js' }
     },
     pwa: {
         name: 'Khateeb Remind',
@@ -26,5 +37,15 @@ module.exports = {
             swSrc: 'src/service-worker.js',
             swDest: "service-worker.js"
         }
+    },
+    // remove all comments from build files
+    chainWebpack: config => {
+        config.optimization.minimizer('terser').tap(args => {
+            args[0].terserOptions.output = {
+                ...args[0].terserOptions.output,
+                comments: false
+            }
+            return args
+        })
     }
 }

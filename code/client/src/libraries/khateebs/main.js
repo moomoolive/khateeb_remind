@@ -1,4 +1,4 @@
-import Config from '@/App.config.js'
+import Config from '$config'
 
 const khateebName = (khateeb={}) => {
     let base = `${khateeb.firstName} ${khateeb.lastName}`

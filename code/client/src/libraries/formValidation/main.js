@@ -10,12 +10,7 @@ const getValidators = async (validatorName, data, fieldName) => {
     }
     validatorName = helpers.includeValidationParams(validatorName)
     for (let [validationName, options] of Object.entries(validatorName)) {
-        let validation
-        try {
-            validation = await validators[validationName](data, fieldName, options)
-        } catch(err) {
-            console.log(err)
-        }
+        const validation = await validators[validationName](data, fieldName, options)
         if (typeof validation === 'undefined') {
             validationInfo.state = false
             validationInfo.msgs.push(`Error during validation, try refreshing the page or come back later`)

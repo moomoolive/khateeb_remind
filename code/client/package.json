@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "pwa": "cross-env VUE_APP_PWA=1 vue-cli-service build --dest dist_test --report-json && serve dist_test -l 1240"
+    "pwa": "cross-env VUE_APP_PWA=1 vue-cli-service build --dest pwa_test --report-json && serve pwa_test -l 1240"
   },
   "dependencies": {
     "@ivanv/vue-collapse-transition": "^1.0.0",

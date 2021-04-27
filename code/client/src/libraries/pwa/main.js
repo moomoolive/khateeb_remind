@@ -1,6 +1,6 @@
 import helpers from './helpers.js'
 
-import Config from '@/App.config.js'
+import Config from '$config'
 
 const subscribeUserToPushNotifications = async (serviceWorkerReg={}) => {
     try {
@@ -9,8 +9,8 @@ const subscribeUserToPushNotifications = async (serviceWorkerReg={}) => {
             applicationServerKey: helpers.urlB64ToUint8Array(Config.securityConfig.vapidPublicKey)
         })
         return pushSubscription
-    } catch(err) {
-        console.log(err)
+    } catch {
+        return null
     }
 }
 
@@ -22,6 +22,7 @@ const getServiceWorkerRegistration = async () => {
         }
         return null     
     } catch(err) {
+        // eslint-disable-next-line
         console.log(`Couldn't get service worker registration. `, err)
         return null
     }

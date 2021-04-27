@@ -100,6 +100,8 @@ export default {
       const serviceWorkerReg = await pwaHelpers.getServiceWorkerRegistration()
       if (serviceWorkerReg) {
         const pushSub = await pwaHelpers.subscribeUserToPushNotifications(serviceWorkerReg)
+        if (!pushSub)
+          return
         const resCode = await this._api.pwa.createPWASubscription(pushSub)
         return resCode
       } 

@@ -52,12 +52,8 @@ export default {
             return announcementHelpers.headlineText(announcement)
         },
         async getAnnouncements() {
-            try {
-                const data = await this._api.announcements.getAnnouncements()
-                this.announcements = data || []
-            } catch(err) {
-                console.log(err)
-            }
+            const data = await this._api.announcements.getAnnouncements()
+            this.announcements = data || []
         },
         wiggleNewTag() {
             return !sessionStorageHelpers.get("seenAnnoucements")

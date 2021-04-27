@@ -70,6 +70,8 @@ import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
 
+import requestHelpers from '@/libraries/requests/helperLib/main.js'
+
 export default {
     name: 'userHome',
     components: {
@@ -95,20 +97,18 @@ export default {
             this.$nextTick(() => { this.showProfileSettings = true })
         },
         async deleteAccount() {
-            try {
-                const confirm = await this._utils.confirm(
-                    `Are you sure you want to permenantly delete your account?`,
-                    "yellow",
-                    { hard: true, confirmationText: "Delete My Account" }
-                )
-                if (!confirm)
-                    return
-                await this._api.user.deleteAccount()
-                this.$store.dispatch('user/logout')
-                this._utils.alert(`Successfully delete account`, 'success')
-            } catch(err) {
-                console.log(err)
-            }
+            const confirm = await this._utils.confirm(
+                `Are you sure you want to permenantly delete your account?`,
+                "yellow",
+                { hard: true, confirmationText: "Delete My Account" }
+            )
+            if (!confirm)
+                return
+            const res = await this._api.user.deleteAccount()
+            if (!requestHelpers.dataWasDeleted(res))
+                return
+            this.$store.dispatch('user/logout')
+            this._utils.alert(`Successfully deleted account`, 'success')
         },
     },
     computed: {

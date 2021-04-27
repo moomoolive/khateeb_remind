@@ -6,7 +6,7 @@
 import helpers from '@/libraries/requests/requestManager/main.js'
 import footerPopups from '@/libraries/footerPopup/main.js'
 
-import Config from '@/App.config.js'
+import Config from '$config'
 
 export default {
     name: 'requestManager',
@@ -37,7 +37,6 @@ export default {
                     resolve(res)
                     fullfilledResponseCallback.func(fullfilledResponseCallback.key)
                 } catch(err) {
-                    console.log(err)
                     reject(err)
                 }
             }, timeInMilliseconds || fiveSecondsInMilliseconds)

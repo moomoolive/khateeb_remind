@@ -19,6 +19,7 @@
         <div v-if="navMode === 'outbound'" class="return-to-central-container">
             <button class="back-to-central silver" @click="toCentral()">
                 <p>
+                    <!-- eslint-disable-next-line -->
                     <span class="back-arrow"> < </span> 
                     Back
                 </p>

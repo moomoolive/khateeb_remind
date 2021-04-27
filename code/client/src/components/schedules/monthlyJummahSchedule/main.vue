@@ -46,6 +46,7 @@
                     <div class="change-month-buttons-container">
                         <div>
                             <button class="yellow change-month-buttons" @click="changeViewingMonth(-1)">
+                                <!-- eslint-disable-next-line -->
                                 <
                             </button>
                         </div>
@@ -171,7 +172,7 @@ import khateebHelpers from '@/libraries/khateebs/main.js'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
-import Config from '@/App.config.js'
+import Config from '$config'
 
 export default {
     name: "jummahScheduleDisplay",

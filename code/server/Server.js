@@ -7,7 +7,7 @@ const queryType = require('query-types')
 const qs = require('qs')
 const path = require('path')
 
-// all global variables are prepended with a '$'
+// all added global variables are prepended with a '$'
 global.$rootDir = path.resolve(__dirname)
 global.$config = globalConfig
 global.$utils = require('./libraries/globalUtilities.js')
@@ -18,32 +18,32 @@ const globalMiddleWare = require('./middleware/global/main.js')
 
 const routes = require('./routing/index.js')
 
-const app = express()
+const server = express()
 mongoose.connect(databaseConfig.URI, databaseConfig.mongoose)
 const db = mongoose.connection
 
-app.use(cors())
-app.use(express.json({ limit: networkConfig.maxJSONSize }))
-app.use(globalMiddleWare.generalError)
-app.set('query parser', str => qs.parse(str, { comma: true }))
-app.use(queryType.middleware())
+server.use(cors())
+server.use(express.json({ limit: networkConfig.maxJSONSize }))
+server.use(globalMiddleWare.generalError)
+server.set('query parser', str => qs.parse(str, { comma: true }))
+server.use(queryType.middleware())
 
-app.options('*', cors())
-app.post('*', globalMiddleWare.noEmptyBody)
-app.put('*', globalMiddleWare.noEmptyBody)
+server.options('*', cors())
+server.post('*', globalMiddleWare.noEmptyBody)
+server.put('*', globalMiddleWare.noEmptyBody)
 
-app.use('/jummahs', routes.jummahs)
-app.use('/locations', routes.locations)
-app.use('/timings', routes.timings)
-app.use('/khateebs', routes.khateebs)
-app.use('/announcements', routes.announcements)
-app.use('/institutions', routes.institutions)
-app.use('/institutionAdmins', routes.institutionAdmins)
-app.use('/misc', routes.misc)
-app.use('/auth', routes.auth)
-app.use('/sysAdmin', routes.sysAdmin)
-app.use('/user', routes.user)
-app.use('/logos', routes.logos)
+server.use('/jummahs', routes.jummahs)
+server.use('/locations', routes.locations)
+server.use('/timings', routes.timings)
+server.use('/khateebs', routes.khateebs)
+server.use('/announcements', routes.announcements)
+server.use('/institutions', routes.institutions)
+server.use('/institutionAdmins', routes.institutionAdmins)
+server.use('/misc', routes.misc)
+server.use('/auth', routes.auth)
+server.use('/sysAdmin', routes.sysAdmin)
+server.use('/user', routes.user)
+server.use('/logos', routes.logos)
 
 db.once('open', async () => { 
     const dbType = databaseConfig.URI.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
@@ -51,4 +51,4 @@ db.once('open', async () => {
     await cronJobs.start()
 })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
-app.listen(networkConfig.port, () => { console.log(`App is listening on port ${networkConfig.port}`) })
+server.listen(networkConfig.port, () => { console.log(`server is listening on port ${networkConfig.port}`) })

@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
 
-import Config from '@/App.config.js'
+import Config from '$config'
 
 const APIUrl = process.env.VUE_APP_PWA ? 
     Config.networkConfig.pwaTestingServerURL : Config.networkConfig.serverURL

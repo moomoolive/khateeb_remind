@@ -1,8 +1,9 @@
 .DS_Store
 node_modules
 /dist
-/dist_test
 
+# for testing pwa on local machine
+pwa_test/
 
 # local env files
 .env.local

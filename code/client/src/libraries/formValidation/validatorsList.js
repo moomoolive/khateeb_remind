@@ -21,12 +21,7 @@ const noAtSymbolChar0 = (data, name) => {
 }
 
 const uniqueUsername = async (data) => {
-    let state
-    try {
-        state = await _api.misc.uniqueUsername(data)
-    } catch(err) {
-        console.log(err)
-    }
+    let state = await _api.misc.uniqueUsername(data)
     return {
         state,
         msg: helpers.validatorMsgPackage(`Username is already taken`, state)

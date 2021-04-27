@@ -10,7 +10,6 @@ const errorResponse = err => {
     const responseExtenstion = helpers.responseExtenstion(err.response)
     if (/logos/.test(responseExtenstion) && err.response.config.method === 'get')
         return
-    console.log(err)
     if (!err.response) {
         notificationHelpers.generalServerError()
         return Promise.reject(err)

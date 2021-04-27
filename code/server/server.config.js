@@ -92,7 +92,6 @@ const initializationConfig = {
 
 const securityConfig = {
     jwtSecret: process.env.JWT_SECRET,
-    encryptionKey: process.env.ENCRYPTION_KEY,
     thirdPartyServices: {
         AWSAuthCredentials: {
             region: process.env.AWS_HOSTING_REGION,

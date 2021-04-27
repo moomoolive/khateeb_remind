@@ -51,7 +51,7 @@ const requests = {
         await store.dispatch('storeUserPackage', userPackage)
     },
     deleteAccount() {
-        return axios.delete(extension + '/')
+        return helpers.returnEmptyObjectFromRequest("delete", "user")
     },
     updateNotification(updatedNotification) {
         return axios.put(extension + '/notification', updatedNotification)

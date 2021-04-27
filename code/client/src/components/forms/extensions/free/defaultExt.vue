@@ -32,19 +32,8 @@ export default {
     },
     methods: {
         async process($event) {
-            let info = { ...$event }
-            try {
-                const validationInfo = await this.validators($event.val)
-                info = {
-                    ...$event,
-                    ...validationInfo
-                }
-            } catch(err) {
-                console.log(err)
-                this.$router.push('/')
-                this._utils.alert(`There was a problem with our servers, try signing up later`)
-            }
-            this.$emit('changed', info)
+            const validationInfo = await this.validators($event.val)
+            this.$emit('changed', { ...$event, ...validationInfo })
         }
     }
 }

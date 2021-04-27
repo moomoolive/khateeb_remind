@@ -1,6 +1,6 @@
 import helpers from './helpers.js'
 
-const allUpcomingFridays = (input=new Date(), fromBeginningOfMonth=false, options={}) => {
+const allUpcomingFridays = (input=new Date(), fromBeginningOfMonth=false) => {
     let inputDate = new Date(input)
     const friday = fromBeginningOfMonth ? helpers.findFirstFridayOfMonth(inputDate) :  helpers.findUpcomingFriday(inputDate)
     return helpers.findAllFridaysInMonth(friday)
