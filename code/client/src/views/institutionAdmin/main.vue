@@ -42,7 +42,7 @@ export default {
                 {
                     name: 'Other Administrators',
                     route: 'create-others',
-                    auth: { level: 3 }
+                    auth: { level: 4 }
                 },
                 {
                     name: 'Settings',

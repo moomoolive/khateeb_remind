@@ -21,7 +21,7 @@ router.get('/',
 })
 
 router.put('/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
         // an array of bytes
         validator.body("img").isArray({ min: 2 }).custom(value => {
@@ -42,7 +42,7 @@ router.put('/',
 )
 
 router.delete("/", 
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     async (req, res) => {
         const { code, msg="successfully deleted logo" } = await cloudStorageHelpers.deleteFile(`img/logos/${req.headers.institutionid}`)
         return res.json({ data: { code }, msg })

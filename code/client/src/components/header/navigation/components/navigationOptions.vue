@@ -1,7 +1,7 @@
 <template>
     <div v-on-clickaway="close">
         
-        <div v-if="_utils.validAuthentication({ level: 1 })">
+        <div v-if="_utils.validAuthentication({ level: 2 })">
             
             <div class="menu-item" @click="redirect('/khateeb/')">
                 <p>Schedule</p>
@@ -17,7 +17,7 @@
 
         </div>
 
-        <div v-if="_utils.validAuthentication({ min: 2, max: 3 })">
+        <div v-if="_utils.validAuthentication({ min: 3, max: 4 })">
             
             <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
                 <p>Set Schedule</p>
@@ -33,7 +33,7 @@
 
         </div>
 
-        <div v-if="_utils.validAuthentication({ min: 4 })" >
+        <div v-if="_utils.validAuthentication({ min: 5 })" >
             
             <div class="menu-item" @click="redirect('/sysAdmin')">
                 <p>Admin Central</p>

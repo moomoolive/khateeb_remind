@@ -1,5 +1,6 @@
 const authLevels = [
-    "khateeb", "institutionAdmin", "rootInstitutionAdmin",
+    'user', "khateeb", 
+    "institutionAdmin", "rootInstitutionAdmin",
     "sysAdmin", "root"
 ]
 

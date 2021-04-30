@@ -41,7 +41,12 @@ const mutateHeadersToIncludeUserInfo = (request, decodedToken) => {
     request.headers.institutionid = decodedToken.institutionID
     request.headers.userid = decodedToken._id
     request.headers.usertype = decodedToken.__t
-    request.headers.targetusermodel = `${decodedToken.__t}${decodedToken.__t === 'root' ? '' : 's'}`
+    request.headers.targetusermodel = decodedToken.specialStatus ?
+        decodedToken.specialStatus === 'sysAdmin' ? 'sysAdmins': 'root' :
+        'users'
+    if (decodedToken.specialStatus) {
+        request.headers.specialStatus = decodedToken.specialStatus
+    }
     request.headers.authLevel = userTypeToAuthLevel(decodedToken.__t)
 } 
 

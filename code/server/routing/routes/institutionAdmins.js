@@ -7,7 +7,7 @@ const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.
 
 const router = express.Router()
 
-router.use(authMiddleware.authenticate(3))
+router.use(authMiddleware.authenticate({ level: 4 }))
 
 router.get(
     "/", 

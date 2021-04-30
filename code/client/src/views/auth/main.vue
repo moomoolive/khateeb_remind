@@ -25,18 +25,7 @@
                 :confirmBeforeSubmit="false"
                 :disableIfSameAsStart="false"
                 @submitted="login($event)"
-            >
-                
-                <div class="remember-me">
-                    <div>
-                        <input type="checkbox" v-model="userCredentials.remember">
-                    </div>
-                    <div>
-                        <p>Remember Me</p>
-                    </div>
-                </div>
-
-            </form-main>
+            />
 
             <div>
                 <a @click="forgotCredentials()">Forgot Username or Password?</a>
@@ -60,54 +49,18 @@ export default {
     data() {
         return {
             errorMsg: '',
-            userCredentials: this.initialRememberMeValue()
+            userCredentials: localStorageHelpers.get(this.userCredentialKey) || { username: '' },
+            userCredentialKey: "userCredentials"
         }
     },
     methods: {
-        unconfirmedMsg(msg) {
-            this._utils.alert(msg, 'caution', { icon: 'locked' })
-        },
         async login(loginInfo={}) {
             const authRes = await this._api.auth.getToken(loginInfo)
-            if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
-                this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
-            else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
-                this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
-            else if (authRes.token && authRes.msg === 'success') {
-                this.$store.dispatch('user/updateToken', authRes.token)
-                await this._api.user.checkIn()
-                this.$nextTick(() => this.toApp(authRes.token, loginInfo))
-            }
-            else
-                this.errorMsg = 'Incorrect Username or Password'
-        },
-        loginRedirect() {
-            const landingPage = this.$store.state.router.landingPage
-            if (!this.$store.state.app.hasLoggedInViaLoginPage && landingPage !== this.$route.path) {
-                this.$router.push(landingPage)
-                this.$store.commit('app/loggedInViaLoginPage')
-            }
-            else
-                this._utils.toHomePage()
-        },
-        initialRememberMeValue() {
-            return {
-                remember: false,
-                username: ''
-            }
-        },
-        getUserCredentials() {
-            if (!localStorageHelpers.get('userCredentials'))
-                localStorageHelpers.commit('userCredentials', this.initialRememberMeValue())
-            this.userCredentials = localStorageHelpers.get('userCredentials')
-        },
-        toApp(token="edafjlfsdfaj.alfdkjaklsf.aldfajlfda", { username="moomoo" }) {
-            if (this.userCredentials.remember) {
-                localStorage.setItem('token', token)
-                this.userCredentials.username = username
-                localStorageHelpers.commit('userCredentials', this.userCredentials)
-            }
-            this.$nextTick(() => { this.loginRedirect() })
+            if (!authRes.token || authRes.msg !== 'success')
+                return this.errorMsg = 'Incorrect Username or Password'
+            this.$store.dispatch('user/updateToken', authRes.token)
+            localStorageHelpers.commit(this.userCredentialKey, { username: loginInfo.username })
+            return this._utils.toHomePage()
         },
         forgotCredentials() {
             notificationHelpers.redirectionOptions(
@@ -118,23 +71,10 @@ export default {
             )
         }
     },
-    computed: {
-        rememberMe() {
-            return this.userCredentials.remember
-        }
-    },
-    watch: {
-        rememberMe(newVal, OldVal) {
-            if (!newVal && OldVal) {
-                this.userCredentials.username = ''
-                localStorageHelpers.commit('userCredentials', this.initialRememberMeValue())
-            }
-        }
-    },
     created() {
-        if (this.$store.getters['user/isLoggedIn'])
+        if (this.$store.getters['user/isLoggedIn']) {
             this._utils.toHomePage()
-        this.getUserCredentials()
+        }
     }
 }
 </script>
@@ -153,15 +93,6 @@ input {
     margin-right: 6px;
 }
 
-.remember-me {
-    margin-top: 5px;
-    font-size: 15px;
-    font-weight: bold;
-    @include flexboxDefault();
-    width: 40%;
-    @include centerMargin();
-}
-
 p {
     margin-top: 0;
     color: getColor("offWhite");
@@ -177,15 +108,6 @@ a {
 }
 
 @media screen and (max-width: $phoneWidth) {
-      
-      .remember-me {
-        font-size: 1.8vh;
-      }
-
-      input {
-          width: 2vh;
-          height: 2vh;
-      }
 
       a {
         font-size: 15px;

@@ -13,7 +13,7 @@ const router = express.Router()
 
 router.get(
     '/',
-    authMiddleware.authenticate({ min: 1, max: 3 }), 
+    authMiddleware.authenticate({ min: 2, max: 4 }), 
     async (req, res) => {
         try {
             const data = await $db.jummahPreferences.find({ institutionID: req.headers.institutionid, ...req.query }).sort("-date").exec()
@@ -26,7 +26,7 @@ router.get(
 
 router.post(
     '/',
-    authMiddleware.authenticate({ min: 1, max: 3 }),
+    authMiddleware.authenticate({ min: 2, max: 4 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
         validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
@@ -68,7 +68,7 @@ router.post(
 
 router.put(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength($config.consts.mongooseIdLength).isString().optional(),
         validator.body("khateebID").isString().custom(requestValidationHelpers.validIdOrNullIdInField).optional(),
@@ -113,7 +113,7 @@ router.put(
         validator.body("backup.timingID").isLength($config.consts.mongooseIdLength).isString().optional(),
         validator.body("backup.locationID").isLength($config.consts.mongooseIdLength).isString().optional(),
     ]),
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     async (req, res) => {
         try {
             let targetPreference = req.body[req.query.backup ? 'backup' : 'main']

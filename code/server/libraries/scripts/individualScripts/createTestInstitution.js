@@ -24,10 +24,10 @@ const createTestInstitution = async () => {
         if (testInstitutionRootAdmin)
             console.log('Test institution admin already exists')
         else
-            await testInstitution.createRootAdministrator({
+            await new $db.users({
                 ...initConfig.testInstitution.rootAdmin,
                 authorizations: [authorizations.find(a => a.role === 'rootInstitutionAdmin')]
-            }, true)
+            }).save()
         
         // check if test institution has as many locations as specified in
         // "Server.config.js" file, if not create enough to fulfill that

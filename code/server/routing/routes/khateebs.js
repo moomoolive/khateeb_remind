@@ -10,7 +10,7 @@ const router = express.Router()
 
 router.get(
     '/',
-    authMiddleware.authenticate({ min: 1, max: 3 }),
+    authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
             const data = await $db.khateebs.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
@@ -24,7 +24,7 @@ router.get(
 
 router.put(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("active").isBoolean().optional(),
@@ -44,7 +44,7 @@ router.put(
 
 router.delete(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
         validator.query("_id").isLength($config.consts.mongooseIdLength).isString()
     ], "query"),
@@ -64,7 +64,7 @@ router.delete(
 
 router.post(
     '/availability-change/:type',
-    authMiddleware.authenticate({ level: 1 }),
+    authMiddleware.authenticate({ level: 2 }),
     validationMiddleware.validateRequest([
         validator.body("change").exists(),
         validator.body("msg").isString().isLength({ min: 1 })

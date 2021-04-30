@@ -11,7 +11,7 @@
             </span>
         </div>
         
-        <div class="institution-name">
+        <div v-if="!isLoggedInAsGenericUser" class="institution-name">
             <span class="purple">
                 {{ $store.state.user.institution.abbreviatedName }}
             </span>
@@ -36,6 +36,12 @@
             <div>
                 <button @click="redirect('/notification-subscriptions')">
                     Notifications
+                </button>
+            </div>
+
+            <div v-if="!isLoggedInAsGenericUser">
+                <button @click="downgradeUserAuthorization()">
+                    Exit Institution
                 </button>
             </div>
 
@@ -72,6 +78,10 @@ export default {
             if (this.showProfileDetails && this.firstOpened)
                 this.$emit('close')
         },
+        downgradeUserAuthorization() {
+            this.$store.dispatch('user/downgradeUserAuthorization')
+            return this.close()
+        },
         redirect(path) {
             this.$emit('redirect', path)
         },
@@ -93,10 +103,10 @@ export default {
             return this.$store.state.user.userInfo.__t
         },
         showInstitutionLogo() {
-            return this.imageSrc !== require('@/assets/logos/genericInstitution.png')
+            return this.imageSrc !== require('@/assets/logos/genericInstitution.png') && !this.isLoggedInAsGenericUser
         },
-        isLoggedIn() {
-            return this.$store.getters['user/isLoggedIn']
+        isLoggedInAsGenericUser() {
+            return this.$store.getters['user/isLoggedInAsGenericUser']
         }
     },
     watch: {
@@ -108,13 +118,13 @@ export default {
             else if (!newVal && oldVal)
                 this.firstOpened = false
         },
-        isLoggedIn(newVal, oldVal) {
-            if (newVal && !oldVal)
+        isLoggedInAsGenericUser(newVal, oldVal) {
+            if (!newVal && oldVal)
                 return this.fetchInstitutionLogo()
         }
     },
     mounted() {
-        if (this.$store.getters["user/isLoggedIn"]) {
+        if (!this.isLoggedInAsGenericUser) {
             this.$nextTick(() => this.fetchInstitutionLogo())
         }
     }

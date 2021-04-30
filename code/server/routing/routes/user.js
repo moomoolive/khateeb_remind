@@ -5,6 +5,8 @@ const DeviceDetector = require('device-detector-js')
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
+const authHelpers = require($rootDir + '/libraries/auth/main.js')
+
 const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 1 }))
 
@@ -41,6 +43,30 @@ router.put(
     }
 )
 
+router.get('/authorizations', async (req, res) => {
+    try {
+        const data = await $db.users
+            .findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
+            .populate({ 
+                path: 'authorizations',
+                select: { __v: 0 },
+                populate: {
+                    path: 'institution',
+                    select: {
+                        settings: 0,
+                        __v: 0
+                    }
+                }
+            })
+            .select(["-__v", "-statuses", "-password"])
+            .exec()
+        return res.json({ data })
+    } catch(err) {
+        console.error(err)
+        return res.status(503).json({ data: [], msg: `There was a problem retrieving authorizations ${err}` })
+    }
+})
+
 router.get('/check-in', async(req, res) => {
     try {
         const [userInfo, notifications, institution] = await Promise.all([
@@ -58,6 +84,54 @@ router.get('/check-in', async(req, res) => {
     } catch(err) {
         console.log(err)
         return res.status(503).json({ msg: `An error fetching user package. Err trace: ${err}` })
+    }
+})
+
+router.post(
+    '/upgrade-auth',
+    validationMiddleware.validateRequest(
+        [
+            validator.body("authId").isLength($config.consts.mongooseIdLength).isString(),
+            validator.body("role").isString().isLength({ min: 1 }),
+            validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString()
+        ]
+    ),
+    async (req, res) => {
+        try {
+            const user = await $db.users.findOne({ _id: req.headers.userid }).exec()
+            const userHasRequestedAuthorization = user.authorizations
+                .map(a => a.toString())
+                .find(a => a === req.body.authId)
+            if (!userHasRequestedAuthorization) {
+                return res.status(403).json({ token: null })
+            }
+            const tokenInfo = {
+                institutionID: req.body.institutionID,
+                __t: req.body.role,
+                authId: req.body.authId,
+                _id: req.headers.userid,
+            }
+            if (req.headers.specialStatus) {
+                tokenInfo.specialStatus = req.headers.specialStatus
+            }
+            return res.json({ token: authHelpers.createToken(tokenInfo) })
+        } catch(err) {
+            console.error(err)
+            return res.status(503).json({ token: null, msg: `Couldn't upgrade authorization ${err}` })
+        }
+    }
+)
+
+router.get('/downgrade-auth', async (req, res) => {
+    try {
+        const tokenInfo = { _id: req.headers.userid, __t: 'user' }
+        if (req.headers.specialStatus) {
+            tokenInfo.specialStatus = req.headers.specialStatus
+        }
+        return res.json({ token: authHelpers.createToken(tokenInfo) })
+    } catch(err) {
+        console.error(err)
+        return res.status(503).json({ token: null, msg: `Couldn't downgrade authorization ${err}` })
     }
 })
 

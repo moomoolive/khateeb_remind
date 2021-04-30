@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.get(
     '/',
-    authMiddleware.authenticate({ min: 1, max: 3 }),
+    authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
             const data = await $db.institutions.findOne({ _id: req.headers.institutionid }).exec()
@@ -22,7 +22,7 @@ router.get(
 
 router.put(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("name").isLength({ min: 1 }).isString().optional(),
@@ -46,7 +46,7 @@ router.put(
 
 router.delete(
     '/',
-    authMiddleware.authenticate({ level: 3 }),
+    authMiddleware.authenticate({ level: 4 }),
     async (req, res) => {
         try {
             const query = { _id: req.headers.institutionid }

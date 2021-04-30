@@ -53,6 +53,33 @@ const requests = {
     deleteAccount() {
         return helpers.returnEmptyObjectFromRequest("delete", "user")
     },
+    async upgradeAuthorization(info={}) {
+        try {
+            const res = await axios.post(extension + '/upgrade-auth', info)
+            if (!res || !typeCheckingHelpers.isJWT(res.token)) {
+                throw TypeError(`Server didn't respond with JWT`)
+            } else {
+                return res
+            }
+        } catch {
+            return { token: null }
+        }
+    },
+    async downgradeAuthorization() {
+        try {
+            const res = await axios.get(extension + '/downgrade-auth')
+            if (!res || !typeCheckingHelpers.isJWT(res.token)) {
+                throw TypeError(`Server didn't respond with JWT`)
+            } else {
+                return res
+            }
+        } catch {
+            return { token: null }
+        }
+    },
+    getUserAuthorizations() {
+        return helpers.returnEmptyObjectFromRequest('get', ['user', 'authorizations'])
+    },
     updateNotification(updatedNotification) {
         return axios.put(extension + '/notification', updatedNotification)
     }

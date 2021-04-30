@@ -6,7 +6,7 @@ const validationMiddleware = require($rootDir + '/middleware/validation/main.js'
 
 const router = express.Router()
 
-router.use(authMiddleware.authenticate({ min: 4, max: 5 }))
+router.use(authMiddleware.authenticate({ min: 5, max: 6 }))
 
 router.get('/institutions', async (req, res) => {
     try {

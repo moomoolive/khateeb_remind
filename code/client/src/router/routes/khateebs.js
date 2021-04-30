@@ -6,7 +6,7 @@ export default [
         name: 'khateebHome',
         component: home,
         meta: {
-            auth: { level: 1 }
+            auth: { level: 2 }
         }
     },
     {
@@ -14,7 +14,7 @@ export default [
         name: 'khateebAnnouncements',
         component: () => import('@/views/khateebs/announcements.vue'),
         meta: {
-            auth: { level: 1 }
+            auth: { level: 2 }
         }
     },
     {
@@ -22,7 +22,7 @@ export default [
         name: 'myKhutbahs',
         component: () => import('@/views/khateebs/myKhutbahs.vue'),
         meta: {
-            auth: { level: 1 }
+            auth: { level: 2 }
         }
     },
     {
@@ -30,7 +30,7 @@ export default [
         name: 'khateebAvailability',
         component: () => import('@/views/khateebs/availability.vue'),
         meta: {
-            auth: { level: 1 }
+            auth: { level: 2 }
         }
     }
 ]
