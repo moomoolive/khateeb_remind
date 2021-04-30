@@ -1,6 +1,17 @@
 const mongoose = require('mongoose')
 
-const subDocs = require($rootDir + "/database/subDocuments/main.js")
+const defaultKhateebForWeek = new mongoose.Schema({
+    mainKhateeb: {
+        type: String,
+        required: true,
+        minLength: 1
+    },
+    backup: {
+        type: String,
+        required: true,
+        minLength: 1
+    },
+}, { timestamps: true })
 
 const defaultKhateebsDefaultValue = new Array(5).fill(
     { mainKhateeb: $config.consts.nullId, backup: $config.consts.nullId }
@@ -39,7 +50,7 @@ const timing = new mongoose.Schema({
         default: true
     },
     defaultKhateebs: {
-        type: [subDocs.defaultKhateebForWeek],
+        type: [defaultKhateebForWeek],
         required: false,
         default: () => defaultKhateebsDefaultValue,
         validate: {

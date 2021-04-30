@@ -10,6 +10,8 @@ const notification = require('./schemas/notification.js')
 const verificationCode = require('./schemas/verificationCode.js')
 const jummahPreference = require('./schemas/jummahPreference.js')
 const pwaSubscription = require('./schemas/pwaSubscription.js')
+const authorization = require('./schemas/authorizations.js')
+const userScheduleRestriction = require('./schemas/userScheduleRestrictions.js')
 
 const models = {
     institutions: mongoose.model('institution', institution),
@@ -21,14 +23,19 @@ const models = {
     verificationCodes: mongoose.model('verificationCode', verificationCode),
     jummahPreferences: mongoose.model('jummahPreference', jummahPreference),
     pwaSubscriptions: mongoose.model('pwaSubscription', pwaSubscription),
+    authorizations: mongoose.model('authorization', authorization),
+    userScheduleRestrictions: mongoose.model('userScheduleRestriction', userScheduleRestriction)
 }
 
 const userTypes = {
-    khateebs: models.users.discriminator('khateeb', discriminators.khateeb),
     root: models.users.discriminator('root', discriminators.root),
-    institutionAdmins: models.users.discriminator('institutionAdmin', discriminators.institutionAdmin),
     sysAdmins: models.users.discriminator('sysAdmin', discriminators.sysAdmin),
-    rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', discriminators.rootInstitutionAdmin)
+
+    // legacy structures
+    rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', discriminators.rootInstitutionAdmin),
+    khateebs: models.users.discriminator('khateeb', discriminators.khateeb),
+    institutionAdmins: models.users.discriminator('institutionAdmin', discriminators.institutionAdmin),
+    // to be phased out
 }
 
 module.exports = { 

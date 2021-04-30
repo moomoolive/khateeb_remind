@@ -78,9 +78,23 @@ const institution = new mongoose.Schema({
 },
 { timestamps: true, minimize: false })
 
-institution.post('save', function(institution) {
+institution.post('save', async function(institution) {
     console.log(`Created institution ${institution.name} with id:`, institution._id)
+    await institution.createStandardAuthorizations()
 })
+
+institution.methods.createStandardAuthorizations = async function() {
+    const standardAuthorizationRoles = ['khateeb', 'institutionAdmin', 'rootInstitutionAdmin']
+    const id = this._id.toString()
+    for (const role of standardAuthorizationRoles) {
+        try {
+            const auth = await new $db.authorizations({ institution: id, role }).save()
+            console.log(`create authorization `, auth)
+        } catch(err) {
+            console.error(`Couldn't create standard authorizations for ${this.name} `, err)
+        }
+    }
+}
 
 institution.methods.deleteDependencies = async function() {
     const deleteRes = {}

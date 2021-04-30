@@ -1,16 +1,23 @@
 const mongoose = require('mongoose')
 
-const subDocs = require($rootDir + '/database/subDocuments/main.js')
 const scripts = require($rootDir + '/libraries/scripts/index.js')
 
-const khateeb = new mongoose.Schema({
-    title: {
+// legacy structure
+
+const unavailableDate = new mongoose.Schema({
+    vCalendarId: {
         type: String,
-        default: 'none',
-        minLength: 1
-    },
+        required: true
+    }, 
+    date: {
+        type: Date,
+        required: true
+    }
+}, { timestamps: true })
+
+const khateeb = new mongoose.Schema({
     availableTimings: [String],
-    unavailableDates: [subDocs.unavailableDate]
+    unavailableDates: [unavailableDate]
 })
 
 khateeb.query.safelyFindOne = function(_id='none') {
@@ -18,13 +25,9 @@ khateeb.query.safelyFindOne = function(_id='none') {
         throw TypeError('Please provide a valid khateeb id')
     return this.where({ _id })
 }
+// to be phased out
 
 const root = new mongoose.Schema({
-    confirmed: {
-        type: Boolean,
-        required: false,
-        default: true
-    },
     systemSettings: {
         autoConfirmRegistration: {
             type: Boolean,
@@ -39,8 +42,11 @@ root.post("deleteOne", function() {
     global.setTimeout(async () => { await scripts.createRootUser() }, threeSecondsInMilliseconds)
 })
 
+// legacy structures
 const rootInstitutionAdmin = new mongoose.Schema({})
 const institutionAdmin = new mongoose.Schema({})
+// to be phased out
+
 const sysAdmin = new mongoose.Schema({})
 
 module.exports = {

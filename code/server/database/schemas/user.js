@@ -5,14 +5,6 @@ const notificationConstructors = require($rootDir + '/libraries/notifications/in
 const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
 const user = new mongoose.Schema({
-    institutionID: {
-        type: String,
-        required: true,
-        validate: {
-            validator: val => val === 'root' || val.length === $config.consts.mongooseIdLength,
-            message: "Invalid institution id"
-        }
-    },
     username: {
         type: String,
         required: true,
@@ -23,11 +15,6 @@ const user = new mongoose.Schema({
         type: String,
         default: 'password',
         minLength: 6
-    },
-    confirmed: {
-        type: Boolean,
-        required: false,
-        default: false
     },
     handle: {
         type: String,
@@ -66,6 +53,16 @@ const user = new mongoose.Schema({
             validator: typeCheckingHelpers.isEmail,
             message: "incorrect email format"
         }
+    },
+    title: {
+        type: String,
+        default: $config.consts.nullId,
+        minLength: 1
+    },
+    authorizations:{
+        type: [{ type: mongoose.Types.ObjectId, ref: 'authorization' }],
+        required: false,
+        default: () => []
     },
     settings: {
         // default external notification is email
