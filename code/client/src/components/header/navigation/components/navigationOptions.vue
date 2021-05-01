@@ -52,8 +52,16 @@
         >
             <p class="alternate-text-color">Download the App</p>
         </div>
+
+        <div
+            v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
+            class="menu-item caution" 
+            @click="downgradeUserAuthorization()"
+        >
+            <p class="alternate-text-color">Exit Institution</p>
+        </div>
         
-        <div class="menu-item caution" @click="logout()">
+        <div class="menu-item caution-alternate" @click="logout()">
             <p class="alternate-text-color">Logout</p>
         </div>
 
@@ -123,6 +131,11 @@ export default {
                 return
             this.$store.dispatch('user/logout')
         },
+        downgradeUserAuthorization() {
+            this.$emit('close-nav')
+            this.$store.dispatch('user/downgradeUserAuthorization')
+            return this.close()
+        },
     },
     watch: {
         activeMenu(newVal, oldVal) {
@@ -182,6 +195,15 @@ p {
     border-bottom-right-radius: 4px;
     &:hover {
       background-color: lighten(themeRGBA("yellow", 1), 20%) !important;
+    }
+}
+
+.caution-alternate {
+    background-color: themeRGBA("red", 0.9) !important;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    &:hover {
+      background-color: lighten(themeRGBA("red", 1), 20%) !important;
     }
 }
 

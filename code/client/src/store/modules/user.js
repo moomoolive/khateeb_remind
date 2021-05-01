@@ -64,7 +64,7 @@ export default {
         },
         updateInstitutionInfo({ commit }, institution) {
             localStorageHelpers.commit(institutionKey, institution)
-            commit('updateInstitutionInfo')
+            commit('updateInstitutionInfo', institution)
         },
         async downgradeUserAuthorization({ dispatch, commit }) {
             try {

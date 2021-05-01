@@ -1,14 +1,20 @@
 <template>
     <div>
         <loading>
-            <institution-signup-form-template @submitted="toAPI($event)"/>
+            <institution-signup-form-template 
+                :formProps="{
+                    formTitle: 'Create an Institution'
+                }"
+                @submitted="toAPI($event)"
+            />
         </loading>
     </div>
 </template>
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
-import institutionSignupFormTemplate from '@/components/forms/multiTieredForm/templates/institutionSignup.vue'
+// import institutionSignupFormTemplate from '@/components/forms/multiTieredForm/templates/institutionSignup.vue'
+import institutionSignupFormTemplate from '@/components/forms/templates/institution.vue'
 
 export default {
     name: "institutionSignUp",

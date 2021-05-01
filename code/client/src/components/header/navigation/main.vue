@@ -42,7 +42,7 @@
 
             <button 
               class="green signup-buttons pale-hover"
-              @click="signUp()"
+              @click="redirect('/create/user')"
             >
               Sign Up
             </button>
@@ -127,7 +127,6 @@ import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 import notificationIcon from './components/notificationIcon.vue'
 import navigationOptions from './components/navigationOptions.vue'
-import notificationHelpers from '@/libraries/notifications/main.js'
 import profileOptions from './components/profileOptions.vue'
 
 export default {
@@ -172,14 +171,6 @@ export default {
         if (path !== this.$router.currentRoute.fullPath)
           this.$router.push(path)
         this.closeAllMenus()
-      },
-      signUp() {
-        notificationHelpers.redirectionOptions(
-          [
-              { text: 'Khateebs', to: '/institution-selection' },
-              { text: 'Institutions', to: '/create/institutions' }
-          ]
-        )
       },
       logout() {
         this.$store.dispatch('user/logout')

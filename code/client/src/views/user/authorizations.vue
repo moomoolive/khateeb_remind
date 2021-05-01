@@ -23,7 +23,7 @@
                     </div>
                 </div>
 
-                <div class="all-authorizations">
+                <div v-if="userInfo.authorizations.length > 0" class="all-authorizations">
                     <div
                         v-for="(authorization, authIndex) in userInfo.authorizations"
                         :key="authIndex" 
@@ -51,7 +51,14 @@
                                 </span>
                             </div>
                         </button>
+                        <!-- 
+                            root users and system administrators a little more unique than
+                            normal users, as their authorization for going to system
+                            administrator pages aren't actaully logged to the database 
+                            check the backend for more info 
+                        -->
                         <button 
+                            :disabled="authorization._id === 'root' || authorization._id === 'sysAdmin'"
                             class="delete-auth-button yellow"
                             @click="removeAuthorization(authorization, authIndex)"
                         >
@@ -59,6 +66,12 @@
                         </button>
                     </div>
                 </div>
+
+                <msg-with-pic 
+                    v-else
+                    :msg="`You haven't signed up to any institutions yet`"
+                    :gif="`twirlingPlane`"
+                />
 
             </div>
 
@@ -124,7 +137,11 @@ export default {
             )
             if (!confirm)
                 return
-            const code = await this._api.user.removeAuthorization(authorization._id)
+            const code = await this._api.user.removeAuthorization({ 
+                id: authorization._id, 
+                institution: authorization.authId.institution._id,
+                role: authorization.authId.role 
+            })
             if (code === 0)
                 return this.userInfo.authorizations.splice(authIndex, 1)
                 

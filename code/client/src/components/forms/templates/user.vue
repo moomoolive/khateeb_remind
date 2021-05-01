@@ -24,20 +24,11 @@ export default {
             required: false,
             default: false
         },
-        userType: {
-            type: String,
-            required: true
-        },
         formProps: {
             type: Object,
             required: false,
             default: () => {}
         },
-        editableKhateebFormat: {
-            type: Boolean,
-            required: false,
-            default: false
-        }
     },
     data() {
         return {
@@ -81,8 +72,6 @@ export default {
     computed: {
         formStructure() {
             let form = { ...this.baseUser }
-            if (this.userType !== 'khateeb')
-                delete form.title
             if (this.includeVitals)
                 form = { ...this.userVitals , ...form }
             return form

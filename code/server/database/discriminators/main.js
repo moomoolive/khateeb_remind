@@ -29,17 +29,24 @@ khateeb.query.safelyFindOne = function(_id='none') {
 
 const root = new mongoose.Schema({
     systemSettings: {
-        autoConfirmRegistration: {
+        autoConfirmInstitutionRegistration: {
             type: Boolean,
             required: false,
             default: false
+        },
+        autoConfirmUserRegistration: {
+            type: Boolean,
+            required: false,
+            default: true
         }
     }
 })
 
 root.post("deleteOne", function() {
     const threeSecondsInMilliseconds = 3_000
-    global.setTimeout(async () => { await scripts.createRootUser() }, threeSecondsInMilliseconds)
+    global.setTimeout(async () => { 
+        await scripts.createRootUser() 
+    }, threeSecondsInMilliseconds)
 })
 
 // legacy structures

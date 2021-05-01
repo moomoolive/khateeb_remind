@@ -4,7 +4,11 @@
             <div v-if="$store.state.user.userInfo.systemSettings && showForm">
                 <form-main
                     :structure="{
-                        autoConfirmRegistration: {
+                        autoConfirmInstitutionRegistration: {
+                            type: 'checkbox',
+                            required: true
+                        },
+                        autoConfirmUserRegistration: {
                             type: 'checkbox',
                             required: true
                         }

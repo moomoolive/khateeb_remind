@@ -17,12 +17,15 @@ export default [
         path: "/create/institutions",
         name: "institutionSignup",
         component: () => import('@/views/auth/institutions.vue'),
-        ...commonMeta
+        meta: {
+            noSiteBanner: true,
+            auth: { level: 1 }
+        }
     },
     {
-        path: "/create/khateebs",
+        path: "/create/user",
         name: "khateebsSignup",
-        component: () => import('@/views/auth/khateebs.vue'),
+        component: () => import('@/views/auth/users.vue'),
         ...commonMeta
     },
     {
@@ -41,6 +44,9 @@ export default [
         path: "/institution-selection",
         name: "institutionSelection",
         component: () => import('@/views/auth/institutionSelection.vue'),
-        ...commonMeta
+        meta: {
+            noSiteBanner: true,
+            auth: { level: 1 }
+        }
     }
 ]

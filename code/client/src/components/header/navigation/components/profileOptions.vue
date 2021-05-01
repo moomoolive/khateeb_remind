@@ -39,12 +39,6 @@
                 </button>
             </div>
 
-            <div v-if="!isLoggedInAsGenericUser">
-                <button @click="downgradeUserAuthorization()">
-                    Exit Institution
-                </button>
-            </div>
-
             <div v-if="userType === 'khateeb'">
                 <button @click="redirect('/khateeb/availability')">
                     Availability
@@ -77,10 +71,6 @@ export default {
         close() {
             if (this.showProfileDetails && this.firstOpened)
                 this.$emit('close')
-        },
-        downgradeUserAuthorization() {
-            this.$store.dispatch('user/downgradeUserAuthorization')
-            return this.close()
         },
         redirect(path) {
             this.$emit('redirect', path)

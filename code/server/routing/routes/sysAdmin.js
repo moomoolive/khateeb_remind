@@ -14,7 +14,7 @@ router.get('/institutions', async (req, res) => {
         return res.json({ data })
     } catch(err) {
         console.log(err)
-        return res.json({ data: [], msg: `Couldn't retrieve institutions. Err trace: ${err}` })
+        return res.status(503).json({ data: [], msg: `Couldn't retrieve institutions. Err trace: ${err}` })
     }
 })
 
@@ -27,12 +27,17 @@ router.put('/institutions',
     async (req, res) => {
         try {
             const data = await $db.institutions.findOneAndUpdate({ _id: req.body.institutionID }, req.body, { new: true }).exec()
-            if (data.confirmed)
-                await data.confirmRootAdmin()
+            if (data.confirmed) {
+                const authorizations = await $db.authorizations.find({ institution: data._id.toString() }).exec()
+                await $db.users.update(
+                    { "authorizations.authId": authorizations.find(a => a.role === 'rootInstitutionAdmin')._id.toString() },
+                    { $set: { "authorizations.$.confirmed": true } }
+                )
+            }
             return res.json({ data })
         } catch(err) {
             console.log(err)
-            return res.json({ data: {}, msg: `there was a problem updating institution status. Err trace: ${err}` })
+            return res.status(503).json({ data: {}, msg: `there was a problem updating institution status. Err trace: ${err}` })
         }
 
 })

@@ -1,12 +1,12 @@
 const express = require('express')
 const validator = require('express-validator')
 const DeviceDetector = require('device-detector-js')
-const mongoose = require('mongoose')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
+const requestValidationHelpers = require($rootDir + '/libraries/requestValidation/main.js')
 
 const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 1 }))
@@ -46,7 +46,7 @@ router.put(
 
 router.get('/authorizations', async (req, res) => {
     try {
-        const data = await $db.users
+        let data = await $db.users
             .findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
             .populate({ 
                 path: 'authorizations.authId',
@@ -61,6 +61,24 @@ router.get('/authorizations', async (req, res) => {
             })
             .select(["-__v", "-statuses", "-password"])
             .exec()
+        if (req.headers.specialStatus) {
+            // special status is reserved for the root user
+            // and any system administrators
+            // rootInstitution isn't a real institution
+            // it's just a static value that is passed to the frontend
+            // so that the root admin and system administrators function
+            // exactly like any normal user
+            data = $utils.deepCopy(data)
+            data.authorizations.push({
+                _id: req.headers.specialStatus,
+                confirmed: true,
+                authId: {
+                    _id: req.headers.specialStatus,
+                    role: req.headers.specialStatus,
+                    institution: $config.rootInstitution
+                }
+            })
+        }
         return res.json({ data })
     } catch(err) {
         console.error(err)
@@ -107,26 +125,24 @@ router.post(
     '/upgrade-auth',
     validationMiddleware.validateRequest(
         [
-            validator.body("authId").isLength($config.consts.mongooseIdLength).isString(),
+            validator.body("authId").isString().custom(requestValidationHelpers.validInstitutionId),
             validator.body("role").isString().isLength({ min: 1 }),
-            validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString()
+            validator.body("institutionID").isString().custom(requestValidationHelpers.validInstitutionId)
         ]
     ),
     async (req, res) => {
         try {
-            console.log(req.body)
             const user = await $db.users.findOne({ _id: req.headers.userid }).exec()
-            console.log(user.authorizations.map(a => a.authId))
             const userHasRequestedAuthorization = user.authorizations
                 .map(a => a.authId)
                 .find(id => id.toString() === req.body.authId)
-            if (!userHasRequestedAuthorization) {
+            if (!userHasRequestedAuthorization && !req.headers.specialStatus) {
                 return res.status(403).json({ token: null })
             }
             const tokenInfo = {
                 institutionID: req.body.institutionID,
-                __t: req.body.role,
-                authId: req.body.authId,
+                __t: req.headers.specialStatus || req.body.role,
+                authId: req.headers.specialStatus || req.body.authId,
                 _id: req.headers.userid,
             }
             if (req.headers.specialStatus) {
@@ -182,6 +198,12 @@ router.post(
                     } 
                 }
             )
+            if (req.body.role === 'khateeb') {
+                await new $db.userScheduleRestrictions({ 
+                    user: req.headers.userid, 
+                    institution: req.body.institution 
+                }).save()
+            }
             return res.json({ code: 0 })
         } catch(err) {
             console.log(err)
@@ -194,11 +216,14 @@ router.post(
     '/remove-auth',
     validationMiddleware.validateRequest(
         [
-            validator.body("id").isLength($config.consts.mongooseIdLength).isString()
+            validator.body("id").isLength($config.consts.mongooseIdLength).isString(),
+            validator.body("institution").isLength($config.consts.mongooseIdLength).isString(),
+            validator.body("role").isString().isLength({ min: 1 })
         ]
     ),
     async (req, res) => {
         try {
+            console.log(req.body)
             await $db.users.updateOne(
                 { _id: req.headers.userid }, 
                 { 
@@ -206,6 +231,12 @@ router.post(
                 },
                 { new: true }
             )
+            if (req.body.role === 'khateeb') {
+                await $db.userScheduleRestrictions.deleteMany({ 
+                    user: req.headers.userid, 
+                    institution: req.body.institution 
+                })
+            }   
             return res.json({ code: 0 })
         } catch(err) {
             console.error(err)

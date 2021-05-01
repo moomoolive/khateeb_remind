@@ -33,7 +33,8 @@ const institution = new mongoose.Schema({
     state: {
         type: String,
         required: false,
-        minLength: 1
+        minLength: 1,
+        default: $config.consts.nullId
     },
     settings: {
         autoConfirmRegistration: {

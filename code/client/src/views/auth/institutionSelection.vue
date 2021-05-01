@@ -23,14 +23,17 @@
                         </div>
                         <div>
                             <div class="institution-text">
-                                {{ institution.name }}
+                                {{ _utils.stringFormat(institution.name) }}
                             </div>
                             <div class="institution-text small">
                                 <span class="blue">({{ institution.abbreviatedName }})</span>
                             </div>
                             <div class="institution-text">
                                 <span class="purple">
-                                    {{ institution.state }}, {{ institution.country }}
+                                    <span v-if="institution.state !== _config.nullId">
+                                        {{ institution.state }},
+                                    </span>
+                                     {{ institution.country }}
                                 </span>
                             </div>
                         </div>
@@ -120,6 +123,9 @@ export default {
         },
         async addAuthorization(institutionInfo={}, role="khateeb") {
             const res = await this._api.user.addAuthorization({ institution: institutionInfo._id, role })
+            if (res === 0) {
+                this._utils.toHomePage()
+            }
             // eslint-disable-next-line
             console.log(res)
         }
@@ -132,8 +138,6 @@ export default {
                 return this.allInstitutions
         },
         userPermissions() {
-            if (!this.$store.getters['user/isLoggedIn'])
-                return {}
             const permissions = this.$store.state.user.userInfo.authorizations
             return permissions
                 .map(p => ({ institution: p.authId.institution._id, role: p.authId.role }))

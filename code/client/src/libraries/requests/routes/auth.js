@@ -27,9 +27,9 @@ const requests = {
             return { code: 1, msg: `An error occured when creating your institution` }
         }
     },
-    async createKhateeb(khateebInfo={}) {
+    async createUser(khateebInfo={}) {
         try {
-            const res = await axios.post(extension + "/create/khateeb", khateebInfo)
+            const res = await axios.post(extension + "/create/user", khateebInfo)
             if (!res || isNaN(res.code) || !res.msg)
                 throw TypeError(`Required info is missing`)
             else

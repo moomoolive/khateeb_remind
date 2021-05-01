@@ -98,9 +98,9 @@ const requests = {
             return 1
         }
     },
-    async removeAuthorization(id="1234") {
+    async removeAuthorization(info={}) {
         try {
-            const res = await axios.post(extension + '/remove-auth', { id })
+            const res = await axios.post(extension + '/remove-auth', info)
             if (!res || isNaN(res.code)) {
                 return 2
             }
