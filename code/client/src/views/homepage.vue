@@ -23,11 +23,8 @@
                     </div>
                 </div>
                 <div class="buttons-container">
-                    <button class="purple" @click="$router.push({ path: '/create/institutions' })">
-                        Signup My Institution
-                    </button>
-                    <button class="green" @click="$router.push({ path: '/institution-selection' })">
-                        Signup as a Khateeb
+                    <button class="purple" @click="$router.push({ path: '/create/user' })">
+                        Get Started
                     </button>
                 </div>
                 <div class="credits">

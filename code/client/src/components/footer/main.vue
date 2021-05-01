@@ -57,14 +57,10 @@
         </div>
 
         <div class="footer-logo" @click="_utils.toHomePage()">
-            <div>
-                <img 
-                    src="@/assets/logos/khateebRemindLogo.svg"
-                    class="khateeb-remind-logo" 
-                    alt="khateeb remind logo"
-                >
-            </div>
             <div class="khateeb-remind-name">
+                <span class="green bottom-logo">
+                    <fa-icon :icon="['far', 'paper-plane']" />
+                </span>
                 Khateeb Remind
             </div>
         </div>
@@ -103,6 +99,8 @@ export default {
 .footer-container {
     background: getColor('grey');
     padding-bottom: 2px;
+    position: relative;
+    z-index: 1;
 }
 
 .bottom-nav {
@@ -135,10 +133,8 @@ a {
     }
 }
 
-span {
-    &:hover {
-        color: getColor("blue") !important;
-    }
+.bottom-logo {
+    margin-right: 3px;
 }
 
 .footer-links-section {
@@ -170,6 +166,10 @@ span {
 .khateeb-remind-name {
     font-size: 11px;
     color: getColor("offWhite");
+
+    &:hover {
+        color: getColor("blue") !important;
+    }
 }
 
 .footer-logo {

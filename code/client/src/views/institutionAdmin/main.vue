@@ -4,12 +4,9 @@
             :baseLink="`institutionAdmin`"
             :outboundLinks="outboundLinks"
         />
-        <transition
-        name="fade"
-        mode="out-in"
-        >
+        <vue-page-transition name="fade-in-down">
             <router-view class="pages"></router-view>
-        </transition>
+        </vue-page-transition>
     </div>
 </template>
 

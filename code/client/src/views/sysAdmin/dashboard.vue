@@ -4,12 +4,9 @@
             :outboundLinks="outboundLinks"
             :baseLink="`sysAdmin`"
         />
-        <transition
-            name="fade"
-            mode="out-in"
-        >
+        <vue-page-transition name="fade-in-down">
             <router-view></router-view>
-        </transition>
+        </vue-page-transition>
     </div>
 </template>
 

@@ -56,10 +56,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (store.state.router.firstPage)
     store.dispatch('router/registerLandingPage', helpers.fullPath(to))
-  const baseURL = helpers.baseURL(to)
-  const targetWallpaper = beforeNavHooks.targetWallpaper(baseURL)
-  if (store.state.wallpaper !== targetWallpaper)
-    store.commit('app/changeWallpaper', targetWallpaper)
+  
   if (to.matched.some(record => record.meta.noSiteBanner)) {
     if (store.state.websiteBanner.show)
       store.commit("websiteBanner/show")

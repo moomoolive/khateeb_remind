@@ -17,6 +17,13 @@ img {
     min-height: 0px;
 }
 
+body {
+    margin: 0 0 0 0;
+    background-color: getColor("silver");
+    color: getColor("offWhite");
+    font-size: 16px;
+}
+
 p {
     margin: 0 0 0 0;
     padding: 0 0 0 0;
@@ -37,13 +44,6 @@ p {
 
 ::-webkit-scrollbar-thumb:hover {
     background: getColor('grey');
-}
-  
-body {
-    margin: 0 0 0 0;
-    background-color: getColor("silver");
-    color: getColor("offWhite");
-    font-size: 16px;
 }
 
 h2 {

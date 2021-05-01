@@ -36,7 +36,7 @@
                     <div class="signup-button-container">
                         <button 
                             class="blue signup-button" 
-                            @click="$router.push({ path: '/create/institutions' })"
+                            @click="$router.push({ path: '/create/user' })"
                         >
                             Sign Up Your Institution
                         </button>
@@ -185,7 +185,7 @@
                 </div>
 
                 <div>
-                    <button class="purple signup-button last-button">
+                    <button class="purple signup-button last-button" @click="$router.push({ path: '/create/user' })">
                         I'm Ready to Sign Up
                     </button>
                     <div class="signup-button-caption">
@@ -274,7 +274,7 @@
                 </div>
 
                 <div>
-                    <button class="green signup-button last-button">
+                    <button class="green signup-button last-button" @click="$router.push({ path: '/create/user' })">
                         I Want to Sign Up
                     </button>
                     <div class="signup-button-caption">
