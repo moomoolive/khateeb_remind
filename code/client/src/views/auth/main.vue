@@ -60,6 +60,7 @@ export default {
                 return this.errorMsg = 'Incorrect Username or Password'
             this.$store.dispatch('user/updateToken', authRes.token)
             localStorageHelpers.commit(this.userCredentialKey, { username: loginInfo.username })
+            this._api.user.getNotifications()
             return this._utils.toHomePage()
         },
         forgotCredentials() {

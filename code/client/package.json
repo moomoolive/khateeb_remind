@@ -10,6 +10,11 @@
     "pwa": "cross-env VUE_APP_PWA=1 vue-cli-service build --dest pwa_test --report-json && serve pwa_test -l 1240"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-brands-svg-icons": "^5.15.3",
+    "@fortawesome/free-regular-svg-icons": "^5.15.3",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/vue-fontawesome": "^2.0.2",
     "@ivanv/vue-collapse-transition": "^1.0.0",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",

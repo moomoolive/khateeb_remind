@@ -82,15 +82,16 @@ router.beforeEach((to, from, next) => {
       return
     }
     else if (!_utils.validAuthentication(to.meta.auth)) {
-      const options = {
-        color: "red",
-        icon: "locked",
-        msg: "Unauthorized",
-        ...origin
+      if (!store.state.router.firstPage) {
+        window.setTimeout(() => {
+          store.dispatch('notifications/create', { type: 'alert', options: {
+            color: "red",
+            icon: "locked",
+            msg: "Unauthorized",
+            ...origin
+          }})
+        }, threeTenthsOfASecond)
       }
-      window.setTimeout(() => {
-        store.dispatch('notifications/create', { type: 'alert', options})
-      }, threeTenthsOfASecond)
       next(helpers.homepageURL(store.getters.userType))
     }
     next() 

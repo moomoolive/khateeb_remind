@@ -77,11 +77,37 @@ const requests = {
             return { token: null }
         }
     },
+    async getNotifications() {
+        const notifications = await helpers.returnArrayFromRequest('get', ['user', 'notifications'])
+        return store.commit('notifications/stashServerNotifications', notifications)
+    },
     getUserAuthorizations() {
         return helpers.returnEmptyObjectFromRequest('get', ['user', 'authorizations'])
     },
     updateNotification(updatedNotification) {
         return axios.put(extension + '/notification', updatedNotification)
+    },
+    async addAuthorization(info={}) {
+        try {
+            const res = await axios.post(extension + '/add-auth', info)
+            if (!res || isNaN(res.code)) {
+                return 2
+            }
+            return res.code
+        } catch {
+            return 1
+        }
+    },
+    async removeAuthorization(id="1234") {
+        try {
+            const res = await axios.post(extension + '/remove-auth', { id })
+            if (!res || isNaN(res.code)) {
+                return 2
+            }
+            return res.code
+        } catch {
+            return 1
+        }
     }
 }
 

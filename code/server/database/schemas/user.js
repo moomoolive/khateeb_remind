@@ -4,6 +4,19 @@ const bcyrpt = require('bcrypt')
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
+const authorization = new mongoose.Schema({
+    authId: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref: 'authorization'
+    },
+    confirmed: {
+        type: Boolean,
+        required: false,
+        default: false
+    }
+}, { timestamps: true })
+
 const user = new mongoose.Schema({
     username: {
         type: String,
@@ -60,7 +73,7 @@ const user = new mongoose.Schema({
         minLength: 1
     },
     authorizations:{
-        type: [{ type: mongoose.Types.ObjectId, ref: 'authorization' }],
+        type: [authorization],
         required: false,
         default: () => []
     },

@@ -140,8 +140,9 @@ export default {
   },
   mounted() {
     this.$nextTick(async () => {
-      //if (this.$store.getters['user/isLoggedIn'])
-      //  await this._api.user.checkIn()
+      if (this.$store.getters['user/isLoggedIn']) {
+        this._api.user.getNotifications()
+      }
     })
   },
   created() {

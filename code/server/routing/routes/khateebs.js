@@ -1,5 +1,6 @@
 const express = require('express')
 const validator = require('express-validator')
+const mongoose = require('mongoose')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
@@ -13,7 +14,56 @@ router.get(
     authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
-            const data = await $db.khateebs.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
+            const data = await $db.userScheduleRestrictions
+                .aggregate([
+                    { 
+                        $match: { 
+                            institution: mongoose.Types.ObjectId(req.headers.institutionid) 
+                        } 
+                    },
+                    { 
+                        $lookup: { 
+                            from: "users",
+                            localField: "user",
+                            foreignField: "_id",
+                            as: "khateeb"
+                        } 
+                    },
+                    { $unwind: '$khateeb' },
+                    {
+                        $lookup: {
+                            from: "authorizations",
+                            localField: "khateeb.authorizations",
+                            foreignField: "_id",
+                            as: "khateeb.authorizations"
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: "$khateeb._id",
+                            handle: "$khateeb.handle",
+                            email: "$khateeb.email",
+                            statuses: "$khateeb.statuses",
+                            title: "$khateeb.title",
+                            firstName: "$khateeb.firstName",
+                            lastName: "$khateeb.lastName",
+                            lastLogin: "$khateeb.lastLogin",
+                            createdAt: "$khateeb.createdAt",
+                            updatedAt: "$khateeb.updatedAt",
+                            availableTimings: "$availableTimings",
+                            unavailableDates: "$unavailableDates",
+                            authRef: {
+                                $filter: {
+                                    input: "$khateeb.authorizations",
+                                    as: "authRef",
+                                    cond: { $eq: ["$$authRef.institution", req.headers.institutionid] } 
+                                }
+                            }
+                        },
+                    },
+                    { $unwind: "$authRef" },
+                ])
+                .exec()
             return res.json({ data })
         } catch(err) {
             console.log(err)

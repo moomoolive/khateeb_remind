@@ -13,7 +13,8 @@ router.get(
     "/", 
     async (req, res) => {
         try {
-            const data = await $db.institutionAdmins.find({ institutionID: req.headers.institutionid }).select(['-updatedAt', "-__v", "-password"]).exec()
+            const institutionAdminAuthorization = await $db.authorizations.findOne({ institution: req.headers.institutionid, role: "institutionAdmin" }).exec()
+            const data = await $db.users.find({ authorizations: institutionAdminAuthorization._id.toString() }).select(['-updatedAt', "-__v", "-password"]).exec()
             return res.json({ data })
         } catch(err) {
             console.log(err)

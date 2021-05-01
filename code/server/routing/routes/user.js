@@ -1,6 +1,7 @@
 const express = require('express')
 const validator = require('express-validator')
 const DeviceDetector = require('device-detector-js')
+const mongoose = require('mongoose')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
@@ -48,7 +49,7 @@ router.get('/authorizations', async (req, res) => {
         const data = await $db.users
             .findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
             .populate({ 
-                path: 'authorizations',
+                path: 'authorizations.authId',
                 select: { __v: 0 },
                 populate: {
                     path: 'institution',
@@ -64,6 +65,21 @@ router.get('/authorizations', async (req, res) => {
     } catch(err) {
         console.error(err)
         return res.status(503).json({ data: [], msg: `There was a problem retrieving authorizations ${err}` })
+    }
+})
+
+router.get('/notifications', async (req, res) => {
+    try {
+        const data = await $db.notifications
+            .find({ userID: req.headers.userid })
+            .populate('institutionID')
+            .sort('-createdAt')
+            .limit(10)
+            .exec()
+        return res.json({ data })
+    } catch(err) {
+        console.error(err)
+        return res.json({ data: [], msg: `Couldn't get notifications ${err}` })
     }
 })
 
@@ -98,10 +114,12 @@ router.post(
     ),
     async (req, res) => {
         try {
+            console.log(req.body)
             const user = await $db.users.findOne({ _id: req.headers.userid }).exec()
+            console.log(user.authorizations.map(a => a.authId))
             const userHasRequestedAuthorization = user.authorizations
-                .map(a => a.toString())
-                .find(a => a === req.body.authId)
+                .map(a => a.authId)
+                .find(id => id.toString() === req.body.authId)
             if (!userHasRequestedAuthorization) {
                 return res.status(403).json({ token: null })
             }
@@ -135,6 +153,67 @@ router.get('/downgrade-auth', async (req, res) => {
     }
 })
 
+router.post(
+    '/add-auth',
+    validationMiddleware.validateRequest(
+        [
+            validator.body("institution").isLength($config.consts.mongooseIdLength).isString(),
+            validator.body("role").isString().isLength({ min: 1 })
+        ]
+    ),
+    async (req, res) => {
+        try {
+            const [authInfo, userInfo] = await Promise.all([
+                $db.authorizations.findOne(req.body).populate('institution').exec(),
+                $db.users.findOne({ _id: req.headers.userid }).exec()
+            ])
+            if (!authInfo || !userInfo)
+                return res.status(422).json({ code: 2, msg: `Couldn't find requested authorization or user` })
+            await $db.users.update(
+                { _id: userInfo._id.toString() },
+                { 
+                    $push: { 
+                        authorizations: { 
+                            authId: authInfo._id.toString(), 
+                            // system administrators can never be autoconfirmed
+                            // only khateebs can be if administrator turns on that setting
+                            confirmed: req.body.role !== 'khateeb' ? false : authInfo.institution.settings.autoConfirmRegistration
+                        } 
+                    } 
+                }
+            )
+            return res.json({ code: 0 })
+        } catch(err) {
+            console.log(err)
+            return res.json(503).json({ code: 1, msg: `Couldn't add authorization ${err}` })
+        }
+    }
+)
+
+router.post(
+    '/remove-auth',
+    validationMiddleware.validateRequest(
+        [
+            validator.body("id").isLength($config.consts.mongooseIdLength).isString()
+        ]
+    ),
+    async (req, res) => {
+        try {
+            await $db.users.updateOne(
+                { _id: req.headers.userid }, 
+                { 
+                    $pull: { "authorizations": { "_id": req.body.id } } 
+                },
+                { new: true }
+            )
+            return res.json({ code: 0 })
+        } catch(err) {
+            console.error(err)
+            return res.status(503).json({ code: 1, msg: `Couldn't remove authorization ${err}` })
+        }
+    }
+)
+
 router.put(
     '/notification',
     validationMiddleware.validateRequest(
@@ -147,8 +226,9 @@ router.put(
     ),
     async (req, res) => {
         try {
+            console.log(req.headers)
             const notification = await $db.notifications.findOne({ _id: req.body._id }).exec()
-            if (notification.userID !== req.headers.userid)
+            if (notification.userID.toString() !== req.headers.userid)
                 return res.status(403).json({ msg: `You're not allowed to edit this notification (id: ${req.body._id})` })
             const updated = await $db.notifications.findOneAndUpdate({_id: req.body._id }, req.body, { new: true })
             return res.json(updated)

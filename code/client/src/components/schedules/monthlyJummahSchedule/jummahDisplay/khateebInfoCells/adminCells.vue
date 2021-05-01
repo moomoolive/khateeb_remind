@@ -93,8 +93,8 @@ export default {
     },
     data() {
         return {
-            cachedKhateebPreferencesMirror: new Array.from(2).fill({ khateebID: this._config.nullId }),
-            khateebPreferencesMirror: new Array.from(2).fill({ khateebID: this._config.nullId }),
+            cachedKhateebPreferencesMirror: new Array(2).fill({ khateebID: this._config.nullId }),
+            khateebPreferencesMirror: new Array(2).fill({ khateebID: this._config.nullId }),
             showDropdown: true
         }
     },

@@ -23,11 +23,13 @@ const createTestInstitution = async () => {
         let testInstitutionRootAdmin = await $db.rootInstitutionAdmins.findOne({ institutionID: testInstitution._id.toString() }).exec()
         if (testInstitutionRootAdmin)
             console.log('Test institution admin already exists')
-        else
+        else {
+            const target = authorizations.find(a => a.role === 'rootInstitutionAdmin')
             await new $db.users({
                 ...initConfig.testInstitution.rootAdmin,
-                authorizations: [authorizations.find(a => a.role === 'rootInstitutionAdmin')]
+                authorizations: [{ authId: target._id.toString(), confirmed: true }]
             }).save()
+        }
         
         // check if test institution has as many locations as specified in
         // "Server.config.js" file, if not create enough to fulfill that
@@ -88,7 +90,7 @@ const createTestInstitution = async () => {
                         firstName: randomNamegenerate().dashed,
                         lastName: randomNamegenerate().dashed,
                         title: i % 3 === 0 ? 'shiekh' : i % 2 === 0 ? 'imam' : 'none',
-                        authorizations: [khateebAuthorization]
+                        authorizations: [{ authId: khateebAuthorization._id.toString(), confirmed: true }]
                     }).save()
                     ids.push(khateeb._id)
 
