@@ -67,11 +67,11 @@
                     <div class="copy-link-container">
                         <div class="copy-link-header " @click="toggleKhateebLinkContainer()">
                             <div>
-                                <img 
-                                    src="~@/assets/misc/rightArrow.png" 
-                                    :class="`dropdown-arrow ${showSignupLink ? 'showing': ''}`"
-                                    alt="dropdown arrow"
-                                >
+                                <dropdown-arrow 
+                                    :fontSize="13"
+                                    :faceDown="showSignupLink"
+                                    class="dropdown-arrow"
+                                />
                             </div>
                             <div>
                                 {{ $store.state.user.institution.abbreviatedName }} Khateeb Signup Link 
@@ -133,10 +133,10 @@
                 </div>
             </div>
 
-            <msg-with-pic 
+            <general-message
                 v-else
-                :msg="`No khateebs have signed up to your institution yet`"
-                :gif="`twirlingPlane`"
+                :message="`No khateebs have signed up to your institution yet`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
             />
 
         </loading>
@@ -145,9 +145,10 @@
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
+import dropdownArrow from '@/components/misc/dropdownArrow.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
@@ -159,9 +160,10 @@ export default {
     components: {
         loading,
         collapsableBox,
-        msgWithPic,
         userFormTemplate,
-        CollapseTransition
+        CollapseTransition,
+        generalMessage,
+        dropdownArrow
     },
     data() {
         return {
@@ -477,11 +479,7 @@ button {
 }
 
 .dropdown-arrow {
-    height: 14px;
     margin-right: 10px;
-    &.showing {
-        transform: rotate(90deg);
-    }
 }
 
 

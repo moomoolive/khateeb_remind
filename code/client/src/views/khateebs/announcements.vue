@@ -13,17 +13,18 @@
                 </div>
             </collapsable-box>
         </div>
-        <msg-with-pic
+        
+        <general-message
             v-else
-            msg="There are currently no announcements"
-            gif="twirlingPlane"
-            title="Your administrator doesn't seem to be the talkative type..."
+            :message="`No announcements yet`"
+            :fontAwesomeIcon="['fas', 'comment-alt']"
         />
+
     </div>
 </template>
 
 <script>
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
 
 import announcementHelpers from '@/libraries/announcements/main.js'
@@ -32,7 +33,7 @@ import sessionStorageHelpers from '@/libraries/sessionStorage/main.js'
 export default {
     name: 'announcements',
     components: {
-        msgWithPic,
+        generalMessage,
         collapsableBox
     },
     data() {

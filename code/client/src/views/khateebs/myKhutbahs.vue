@@ -72,18 +72,18 @@
 
             </div>
 
-            <msg-with-pic
-                v-else 
-                :msg="`You haven't been scheduled for a khutbah yet`"
-                :gif="`flyingPlanesAllOver`"
-            /> 
+            <general-message
+                v-else
+                :message="`You haven't been scheduled for a khutbah yet`"
+                :fontAwesomeIcon="['fas', 'calendar-times']"
+            />
 
         </loading>
     </div>
 </template>
 
 <script>
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import myKhutbahsDisplay from '@/components/misc/myKhutbahsDisplay.vue'
 import loading from '@/components/general/loadingScreen.vue'
 import generalPopupContainer from '@/components/notifications/generalPopup.vue'
@@ -95,7 +95,7 @@ import timingHelpers from '@/libraries/timings/main.js'
 export default {
     name: "myKhutbahs",
     components: {
-        msgWithPic,
+        generalMessage,
         myKhutbahsDisplay,
         loading,
         generalPopupContainer

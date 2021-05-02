@@ -274,6 +274,7 @@ export default {
     .app-container {
       margin-top: 50px;
       margin-bottom: 50px;
+      width: 1400px;
     }
 }
 </style>

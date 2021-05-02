@@ -26,25 +26,27 @@
 
         </span> 
 
-        <div v-else>
-            <img src="~@/assets/misc/emptyCalendar.png" class="no-entries-picture" />
-            <div class="no-entries-text">
-                No Entries for this Week
-            </div>
-        </div>
+        <general-message
+            v-else
+            :message="`No Entries for this Week`"
+            :fontAwesomeIcon="['fas', 'calendar-alt']"
+            iconColor="darkBlue"
+        />
 
     </div>
 </template>
 
 <script>
 import jummahDisplay from '@/components/schedules/monthlyJummahSchedule/jummahDisplay/main.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
 
 export default {
     name: 'monthlyScheduleLocationDisplayer',
     components: {
-        jummahDisplay
+        jummahDisplay,
+        generalMessage
     },
     props: {
         location: {

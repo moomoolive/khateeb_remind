@@ -29,11 +29,12 @@
             </div>
 
             <div v-else class="empty-notifications-container">
-                <msg-with-pic
-                    class="empty-notifications-msg" 
-                    :gif="`twirlingPlane`"
-                    :msg="`No notifications to show...`"
-                    :textColor="`white`"
+                <general-message
+                    class="empty-notifications-msg"
+                    :message="`No notifications to show...`"
+                    textColor="offWhite"
+                    iconColor="blue"
+                    :fontAwesomeIcon="['fas', 'inbox']"
                 />
             </div>
 
@@ -44,14 +45,14 @@
 <script>
 import tagCircle from '@/components/general/tagCircle.vue'
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 
 export default {
     name: "notificationScroller",
     components: {
         tagCircle,
         loading,
-        msgWithPic
+        generalMessage
     },
     props: {
         options: {
@@ -113,8 +114,7 @@ export default {
 }
 
 .empty-notifications-container {
-    background-color: getColor("grey");
-    padding-bottom: 10px;
+    padding-bottom: 40px;
 }
 
 .notification-container {
@@ -141,8 +141,8 @@ export default {
     width: 85%;
     @include centerMargin();
     text-align: left;
-    padding-top: 6px;
     font-size: 16px;
+    margin-top: 0 !important;
     padding-bottom: 12px;
     color: getColor("offWhite");
 }

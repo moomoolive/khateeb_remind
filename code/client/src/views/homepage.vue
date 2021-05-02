@@ -4,10 +4,7 @@
         <div class="content-layer">
             <div class="signup-now-container">
                 <div class="main-header">
-                    Take the Stress Out of Khateeb Scheduling
-                </div>
-                <div class="main-features">
-                   <i>Free. Automated. Simple.</i>
+                    Stress-free Khateeb Scheduling
                 </div>
                 <div class="description-container">
                     <div class="description">
@@ -23,19 +20,12 @@
                     </div>
                 </div>
                 <div class="buttons-container">
-                    <button class="purple" @click="$router.push({ path: '/create/user' })">
+                    <button 
+                        class="purple" 
+                        @click="$router.push({ path: '/create/user' })"
+                    >
                         Get Started
                     </button>
-                </div>
-                <div class="credits">
-                    Photo by 
-                    <a href="https://unsplash.com/@fatihyurur?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank">
-                        <span class="green">Fatih Yürür</span>
-                    </a>
-                    , hosted @
-                    <a href="https://unsplash.com/@fatihyurur?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank">
-                        <span class="purple">Unsplash</span>
-                    </a> 
                 </div>
             </div>
         </div>
@@ -122,7 +112,7 @@ a {
 
 .usecase-text {
     font-size: 14px;
-    margin-top: 15px;
+    margin-top: 25px;
 }
 
 .description-container {
@@ -136,6 +126,7 @@ a {
 button {
     padding-top: 10px;
     padding-bottom: 10px;
+    margin-left: 0;
     @include floatingBoxShadow(0.3);
 }
 

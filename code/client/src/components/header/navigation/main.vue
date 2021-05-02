@@ -4,7 +4,7 @@
 
         <img 
             class="logo" 
-            :src="require('@/assets/logos/khateebRemindLogo.svg')"
+            :src="`${pathToPublicFolder}khateebRemind.png`"
             @click="_utils.toHomePage()"
         >
 
@@ -108,7 +108,8 @@ export default {
     data() {
       return {
         activeMenu: false,
-        showProfileDetails: false
+        showProfileDetails: false,
+        pathToPublicFolder: process.env.BASE_URL
       }
     },
     methods: {

@@ -17,7 +17,7 @@
         </div>
 
         <div v-if="!customLogoExists" class="institution-description">
-          {{ $store.state.user.institution.name }}
+          {{ _utils.stringFormat($store.state.user.institution.name) }}
         </div>
 
         <div class="institution-description">

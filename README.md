@@ -18,5 +18,4 @@ As the project is open-sourced, anyone may contribute to source code by opening 
 
 ### Credits and Licenses
 * A special thanks to the University of Calgary MSA's previous khateeb managers for their valuable input on this project. In particular, Jazakum Allah khair to Mohamed Ghanduri who helped extensively test the app and provided an incredible amount of useful feedback.
-* All icons on "usecase" page are hosted on @ https://freeicons.io. Database, mobile, and clock icons on "usecase" page are created by [Anu Rocks](https://freeicons.io/profile/730). Cloud, notification, and calendar icons on "usecase" page are created by [Gayrat Muminov](https://freeicons.io/profile/3277). Multiple-device, camera, linux, and clipboard icons on "usecase" page are created by [Free Preloaders](https://freeicons.io/profile/726).
-* Khateeb Remind logo and navigation icons are provided by Font-Awesome under [license](https://fontawesome.com/license/free).                                    
+* Khateeb Remind logo, navigation icons, and most other icons are provided by Font-Awesome under [license](https://fontawesome.com/license/free).                                    

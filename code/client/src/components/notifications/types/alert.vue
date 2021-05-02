@@ -2,8 +2,14 @@
     <div v-if="options" class="alert-container">
         <div>
 
-            <img :src="require(`@/assets/notifications/${graphicType(options.icon)}`)">
+            <span :class="options.iconColor || 'grey'">
+                <fa-icon 
+                    class="icon"
+                    :icon="options.icon || `exclamation-triangle`" 
+                />
+            </span>
             
+
             <div :class="`msg ${options.textSize ? options.textSize : 'large'}`">
                 {{ options.msg }}<br>
             </div>
@@ -81,6 +87,11 @@ img {
     height: 18vh;
     max-height: 150px;
     margin-top: 15px;
+}
+
+.icon {
+    margin-top: 20px;
+    font-size: 110px;
 }
 
 

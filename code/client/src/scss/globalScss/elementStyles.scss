@@ -19,7 +19,7 @@ img {
 
 body, html {
     margin: 0 0 0 0;
-    background: transparent;
+    background: silver;
     color: getColor("offWhite");
     font-size: 16px;
 }
@@ -38,8 +38,7 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: getColor("lightGrey");
-    @include lightBorderRounding();
+    background: themeRGBA("lightGrey", 0.6);
 }
 
 ::-webkit-scrollbar-thumb:hover {

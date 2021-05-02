@@ -64,13 +64,12 @@
                     </div>
                 </div>
             </div>
-
-            <msg-with-pic 
-                v-else
-                :msg="`There was a problem finding institutions to sign up for...`"
-                :gif="`twirlingPlane`"
-            /> 
             
+            <general-message
+                v-else
+                :message="`There was a problem finding institutions to sign up for...`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
+            />
 
         </loading>
 
@@ -80,14 +79,14 @@
 <script>
 import complexKeyBinder from '@/components/misc/complexKeyBinder.vue'
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 
 export default {
     name: "institutionSelections",
     components: {
         loading,
         complexKeyBinder,
-        msgWithPic
+        generalMessage
     },
     data() {
         return {

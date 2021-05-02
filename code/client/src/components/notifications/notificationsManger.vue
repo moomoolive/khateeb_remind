@@ -28,7 +28,7 @@ export default {
                 type: 'alert',
                 options: {
                     textSize: 'small',
-                    icon: 'asalam',
+                    icon: 'door-open',
                     msg: notification.msg,
                     _id: notification._id,
                     notificationOrigin: 'server',
@@ -40,17 +40,15 @@ export default {
             switch(notification.tag) {
                 case 'welcome':
                     return {
-                        icon: 'asalam',
-                        graphicType: 'gif'
+                        icon: 'door-open'
                     }
                 case 'khateebs': 
                     return {
-                        icon: 'khateebs'
+                        icon: 'street-view'
                     }
                 case 'jummah':
                     return {
-                        icon: 'personPraying',
-                        graphicType: 'gif'
+                        icon: 'pray'
                     }
                 default:
                     return {}

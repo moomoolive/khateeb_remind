@@ -159,11 +159,12 @@
 
             </div>
 
-            <msg-with-pic 
+            <general-message
                 v-else
-                :msg="`Couldn't retrieve settings...`"
-                :gif="`twirlingPlane`"
-            /> 
+                :message="`Couldn't retrieve settings...`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
+            />
+ 
         </loading>
     </div>
 </template>
@@ -172,7 +173,7 @@
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
 import institutionFormTemplate from '@/components/forms/templates/institution.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import loading from '@/components/general/loadingScreen.vue'
 
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
@@ -184,7 +185,7 @@ export default {
         collapsableBox,
         formMain,
         institutionFormTemplate,
-        msgWithPic,
+        generalMessage,
         loading
     },
     data() {

@@ -60,25 +60,26 @@
                     </div>
                 </div>
             </div>
-
-            <msg-with-pic 
+            
+            <general-message
                 v-else
-                :msg="`Couldn't retrieve institutions`"
-                :gif="`twirlingPlane`"
+                :message="`Couldn't retrieve institutions`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
             />
+
         </loading>
     </div>
 </template>
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 
 export default {
     name: "sysAdminInstitutionViewer",
     components: {
         loading,
-        msgWithPic
+        generalMessage
     },
     data() {
         return {

@@ -66,17 +66,16 @@
                                 v-show="
                                     viewingWeekIsCurrentPastOrFuture !== 'past' &&
                                     khateebsUnavailableForSelectedWeek.length > 0
-                                " 
+                                "
                                 class="unavailable-khateebs-this-week-container silver"
                             >
                                 
                                 <div class="unavailable-khateebs-this-week-header-container" @click="toggleUnavailableKhateebs()">
                                     <div>
-                                        <img 
-                                            src="~@/assets/misc/rightArrow.png" 
-                                            :class="`dropdown-arrow ${showingUnavailable ? 'showing': ''}`"
-                                            alt="dropdown arrow"
-                                        >
+                                        <dropdown-arrow 
+                                            :faceDown="showingUnavailable"
+                                            class="dropdown-arrow"
+                                        />
                                     </div>
 
                                     <div class="unavailable-khateebs-this-week-header">
@@ -131,17 +130,17 @@
 
                     </div>
 
-                    <div v-else>
-                        <msg-with-pic
-                            class="empty-notifications-msg" 
-                            :gif="`flyingPlanesAllOver`"
-                            :msg=" reciever === 'institutionAdmin' ?
-                                `Please create you first location to get started` :
-                                `Schedule hasn't been created yet`
-                            "
-                            :textColor="`white`"
-                        />
-                    </div>
+                    <general-message
+                        v-else
+                        :message=" reciever === 'institutionAdmin' ?
+                            `Please create you first location to get started` :
+                            `Schedule hasn't been created yet`
+                        "
+                        :fontAwesomeIcon="['far', 'paper-plane']"
+                        textColor="offWhite"
+                        iconColor="green"
+                    />
+
             </loading>
 
             <router-query-manager
@@ -157,7 +156,6 @@
 </template>
 
 <script>
-import msgWithPic from '@/components/general/msgWithPic.vue'
 import loading from '@/components/general/loadingScreen.vue'
 import routerQueryManager from './misc/routerQueryManager.vue'
 import scheduleStandardControls from './controls/main.vue'
@@ -165,6 +163,8 @@ import locationsDisplay from './locationDisplay/locations-display.vue'
 import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 import jummahSettingsPopup from './jummahSettingsPopup/main.vue'
 import tagCircle from '@/components/general/tagCircle.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
+import dropdownArrow from '@/components/misc/dropdownArrow.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
 import jummahHelpers from '@/libraries/jummahs/main.js'
@@ -178,14 +178,15 @@ export default {
     name: "jummahScheduleDisplay",
     components: {
         loading,
-        msgWithPic,
         routerQueryManager,
         scheduleStandardControls,
         locationsDisplay,
         generalPopupContainer,
         jummahSettingsPopup,
         CollapseTransition,
-        tagCircle
+        tagCircle,
+        generalMessage,
+        dropdownArrow
     },
     props:{
         jummahs: {
@@ -449,11 +450,7 @@ export default {
 }
 
 .dropdown-arrow {
-    height: 15px;
     margin-right: 10px;
-    &.showing {
-        transform: rotate(90deg);
-    }
 }
 
 .controls-position {

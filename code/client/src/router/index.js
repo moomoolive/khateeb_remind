@@ -12,6 +12,7 @@ import _utils from '@/libraries/globalUtilities.js'
 import helpers from '@/libraries/router/main.js'
 import beforeNavHooks from '@/libraries/router/beforeNavigationHooks.js'
 import requestQueryHelpers from '@/libraries/requests/queries/main.js'
+import notificationHelpers from '@/libraries/notifications/main.js'
 
 import homepage from '@/views/homepage.vue'
 
@@ -80,14 +81,7 @@ router.beforeEach((to, from, next) => {
     }
     else if (!_utils.validAuthentication(to.meta.auth)) {
       if (!store.state.router.firstPage) {
-        window.setTimeout(() => {
-          store.dispatch('notifications/create', { type: 'alert', options: {
-            color: "red",
-            icon: "locked",
-            msg: "Unauthorized",
-            ...origin
-          }})
-        }, threeTenthsOfASecond)
+        window.setTimeout(() => notificationHelpers.unauthorizedMsg(), threeTenthsOfASecond)
       }
       next(helpers.homepageURL(store.getters.userType))
     }

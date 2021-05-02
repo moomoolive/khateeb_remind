@@ -19,25 +19,26 @@
                 />
             </div>
 
-            <msg-with-pic 
+            <general-message
                 v-else
-                :msg="`Couldn't retrieve institution settings`"
-                :gif="`twirlingPlane`"
+                :message="`Couldn't retrieve institution settings`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
             />
+
         </loading>
     </div>
 </template>
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import formMain from '@/components/forms/main.vue'
 
 export default {
     name: "rootInstitutionSettings",
     components: {
         loading,
-        msgWithPic,
+        generalMessage,
         formMain
     },
     data() {

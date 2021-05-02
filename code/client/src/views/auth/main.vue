@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img :src="require('@/assets/logos/khateebRemindLogo.svg')">
+        <img :src="`${pathToPublicFolder}khateebRemind.png`">
         <div class="formContainer">
 
             <form-main
@@ -50,7 +50,8 @@ export default {
         return {
             errorMsg: '',
             userCredentials: localStorageHelpers.get(this.userCredentialKey) || { username: '' },
-            userCredentialKey: "userCredentials"
+            userCredentialKey: "userCredentials",
+            pathToPublicFolder: process.env.BASE_URL
         }
     },
     methods: {

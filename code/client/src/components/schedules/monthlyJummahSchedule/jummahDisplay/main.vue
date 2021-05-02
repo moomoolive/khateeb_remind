@@ -50,11 +50,11 @@
                     >
                         <div class="unavailable-khateebs-this-timing-header-container" @click="toggleUnavailableKhateebs()">
                             <div>
-                                <img 
-                                    src="~@/assets/misc/rightArrow.png" 
-                                    :class="`dropdown-arrow ${showingUnavailable ? 'showing': ''}`"
-                                    alt="dropdown arrow"
-                                >
+                                <dropdown-arrow
+                                    :fontSize="13" 
+                                    :faceDown="showingUnavailable"
+                                    class="dropdown-arrow"
+                                />
                             </div>
 
                             <div class="unavailable-khateebs-this-timing-header">
@@ -102,6 +102,7 @@
 <script>
 import tagCircle from '@/components/general/tagCircle.vue'
 import jummahStaticTags from './jummahTags.json'
+import dropdownArrow from '@/components/misc/dropdownArrow.vue'
 
 import timingHelpers from '@/libraries/timings/main.js'
 import khateebHelpers from '@/libraries/khateebs/main.js'
@@ -115,7 +116,8 @@ export default {
         tagCircle,
         "institutionAdmin": () => import('./khateebInfoCells/adminCells.vue'),
         "khateeb": () => import("./khateebInfoCells/khateebCells.vue"),
-        CollapseTransition
+        CollapseTransition,
+        dropdownArrow
     },
     props: {
         reciever: {
@@ -338,11 +340,7 @@ div {
 }
 
 .dropdown-arrow {
-    height: 14px;
     margin-right: 10px;
-    &.showing {
-        transform: rotate(90deg);
-    }
 }
 
 .unavailable-khateebs-this-timing-header {
@@ -403,7 +401,6 @@ div {
     }
 
     .dropdown-arrow {
-        height: 11px;
         margin-right: 7px;
     }
 

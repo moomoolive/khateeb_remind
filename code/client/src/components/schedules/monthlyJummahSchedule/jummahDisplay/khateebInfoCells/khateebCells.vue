@@ -18,11 +18,11 @@
 
         <div v-show="khateebPreferences[1].khateebID" class="khateeb-role-label" @click="toggleBackupDisplay()">
            <span>
-                <img 
-                    src="~@/assets/misc/rightArrow.png" 
-                    :class="`show-backup-arrow ${showBackup ? 'showing' : ''}`"
-                    alt="right arrow"
-                >
+               <dropdown-arrow 
+                    :fontSize="12"
+                    :faceDown="showBackup"
+                    class="show-backup-arrow"
+                />
            </span>
            Backup
         </div>
@@ -48,10 +48,13 @@ import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 import khateebHelpers from '@/libraries/khateebs/main.js'
 
+import dropdownArrow from '@/components/misc/dropdownArrow.vue'
+
 export default {
     name: 'khateebKhateebCells',
     components: {
         CollapseTransition,
+        dropdownArrow
     },
     props: {
         khateebPreferences: {
@@ -110,11 +113,7 @@ div {
 }
 
 .show-backup-arrow {
-    height: 12px;
     margin-right: 5px;
-    &.showing {
-        transform: rotate(90deg);
-    }
 }
 
 .cell-container {

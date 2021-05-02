@@ -38,7 +38,7 @@
                             class="blue signup-button" 
                             @click="$router.push({ path: '/create/user' })"
                         >
-                            Sign Up Your Institution
+                            Sign Me Up
                         </button>
                         <div class="signup-button-caption">
                             * <i><span class="purple">Free</span>, <span class="green">Forever</span> (insha'Allah)</i>
@@ -47,11 +47,7 @@
                 </div>
 
                 <div class="main-photo-frame">
-                    <img 
-                        src="@/assets/notifications/khateebs.png"
-                        class="main-photo" 
-                        alt="masjid"
-                    >
+                    <fa-icon icon="mosque" class="main-photo" />
                 </div>
 
             </div>
@@ -62,13 +58,9 @@
                 
                 <div class="icon-container">
                     <a href="#notifications">
-                        <img 
-                            src="@/assets/usecase/mobile.png" 
-                            class="icon-image"
-                            alt="mobile"
-                        >
+                        <fa-icon icon="mobile" class="short-description-icon"/>
                         <div class="icons-heading">
-                            Notifications
+                            Notify
                         </div>
                         <div class="icons-subheading">
                             Send khutbah-related updates to your khateebs' phone, laptop, or tablet <br><br>
@@ -78,13 +70,9 @@
 
                 <div class="icon-container">
                     <a href="#scheduling">
-                        <img 
-                            src="@/assets/usecase/clock.png" 
-                            class="icon-image"
-                            alt="clock"
-                        >
+                        <fa-icon icon="clock" class="short-description-icon" />
                         <div class="icons-heading">
-                            Scheduling
+                            Schedule
                         </div>
                         <div class="icons-subheading">
                             Set default khateebs and automate your khateeb scheduling
@@ -94,11 +82,7 @@
 
                 <div class="icon-container">
                     <a href="#centralize">
-                        <img 
-                            src="@/assets/usecase/database.png" 
-                            class="icon-image"
-                            alt="database"
-                        >
+                        <fa-icon icon="database" class="short-description-icon" />
                         <div class="icons-heading">
                             Centralize
                         </div>
@@ -118,11 +102,7 @@
                 <div class="all-long-explanations-container">
                     <div class="long-explanation-container" id="notifications">
                         <div class="long-explanation-icon-container">
-                            <img 
-                                src="@/assets/usecase/note.png" 
-                                class="icon-image"
-                                alt="notification"
-                            >
+                            <fa-icon icon="comment-alt" class="long-description-icon" />
                         </div>
                         <div class="long-explanation-text-container">
                             <div class="long-explanation-header">
@@ -151,21 +131,13 @@
                             </div>
                         </div>
                         <div class="long-explanation-icon-container">
-                            <img 
-                                src="@/assets/usecase/calendar.png" 
-                                class="icon-image"
-                                alt="calendar"
-                            >
+                            <fa-icon icon="calendar-alt" class="long-description-icon" />
                         </div>
                     </div>
 
                     <div class="long-explanation-container" id="centralize">
                         <div class="long-explanation-icon-container">
-                            <img 
-                                src="@/assets/usecase/cloud.png" 
-                                class="icon-image"
-                                alt="cloud"
-                            >
+                            <fa-icon icon="cloud-upload-alt" class="long-description-icon" />
                         </div>
                         <div class="long-explanation-text-container">
                             <div class="long-explanation-header">
@@ -202,11 +174,7 @@
                 <div class="other-features-container">
 
                     <div class="icon-container">
-                        <img 
-                            src="@/assets/usecase/pwa.png" 
-                            class="icon-image"
-                            alt="laptop and phone"
-                        >
+                        <fa-icon icon="cloud-download-alt" class="other-features-icon" />
                         <div class="icons-heading">
                             Downloadable
                         </div>
@@ -217,11 +185,7 @@
                     </div>
 
                     <div class="icon-container">
-                        <img 
-                            src="@/assets/usecase/camera.png" 
-                            class="icon-image"
-                            alt="camera"
-                        >
+                        <fa-icon icon="camera" class="other-features-icon" />
                         <div class="icons-heading">
                             Simple Interface
                         </div>
@@ -231,11 +195,7 @@
                     </div>
 
                     <div class="icon-container">
-                        <img 
-                            src="@/assets/usecase/clipboard.png" 
-                            class="icon-image"
-                            alt="linux logo"
-                        >
+                        <fa-icon icon="clipboard-check" class="other-features-icon" />
                         <div class="icons-heading">
                             Practical
                         </div>
@@ -246,11 +206,7 @@
                     </div>
 
                     <div class="icon-container">
-                        <img 
-                            src="@/assets/usecase/linux.png" 
-                            class="icon-image"
-                            alt="linux logo"
-                        >
+                        <fa-icon :icon="['fab', 'linux']" class="other-features-icon" />
                         <div class="icons-heading">
                             Open-Source
                         </div>
@@ -313,6 +269,7 @@ export default {
 
 .main-photo-frame {
     width: 50%;
+    margin-top: 30px;
     @include flexboxDefault();
 }
 
@@ -344,6 +301,7 @@ export default {
 .main-photo {
     width: 90%;
     height: 90%;
+    max-width: 400px;
 }
 
 .main-section-division {
@@ -391,10 +349,26 @@ export default {
     margin-bottom: 30px;
 }
 
+.short-description-icon {
+    font-size: 50px;
+}
+
+.long-description-icon {
+    font-size: 110px;
+}
+
+.other-features-icon {
+    font-size: 70px;
+}
+
 .icon-image {
     width: 50%;
     height: 50%;
     max-width: 120px;
+    
+    &.short-description {
+        font-size: 20px;
+    }
 }
 
 .icons-heading {

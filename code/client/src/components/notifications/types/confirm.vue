@@ -1,9 +1,10 @@
 <template>
     <div class="confirm-container">
         
-        <img 
-            :src="require(`@/assets/notifications/${options.picture || 'exclamation'}.png`)"
-        >
+        <fa-icon 
+            :icon="options.picture || `exclamation-triangle`"
+            class="icon" 
+        />
 
         <div class="msg-spacing">
             <p v-for="msg in options.msg.split('\n')" :key="msg">
@@ -101,6 +102,11 @@ p {
     font-size: 16px;
     font-weight: bold;
     text-align: center;
+}
+
+.icon {
+    margin-top: 20px;
+    font-size: 110px;
 }
 
 .msg-spacing {

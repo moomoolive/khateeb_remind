@@ -67,18 +67,19 @@
                     </div>
                 </div>
 
-                <msg-with-pic 
+                <general-message
                     v-else
-                    :msg="`You haven't signed up to any institutions yet`"
-                    :gif="`twirlingPlane`"
+                    :message="`You haven't signed up to any institutions yet`"
+                    :fontAwesomeIcon="['fas', 'clipboard']"
+                    iconColor="orange"
                 />
 
             </div>
 
-            <msg-with-pic 
+            <general-message
                 v-else
-                :msg="`There was a problem retrieving your information`"
-                :gif="`twirlingPlane`"
+                :message="`Something went wrong when retrieving your information`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
             />
 
         </loading>
@@ -87,13 +88,14 @@
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+
+import generalMessage from '@/components/misc/generalMessage.vue'
 
 export default {
     name: "userAuthorizations",
     components: {
         loading,
-        msgWithPic
+        generalMessage
     },
     data() {
         return {
@@ -223,11 +225,19 @@ button {
 
 .signup-button {
     @include floatingBoxShadow(0.4);
+    margin-right: 20px;
+    margin-left: 20px;
 }
 
 @media screen and (max-width: $phoneWidth) {
     .signup-buttons-container {
         flex-direction: column;
+    }
+
+    .signup-button {
+        @include floatingBoxShadow(0.4);
+        margin-right: 0px;
+        margin-left: 0px;
     }
 }
 </style>

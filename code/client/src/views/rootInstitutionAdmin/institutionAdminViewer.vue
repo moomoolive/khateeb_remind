@@ -59,12 +59,11 @@
                 </div>
             </div>
 
-            <div v-else>
-                <msg-with-pic 
-                    :msg="`You're currently the only administrator at this institution`"
-                    :gif="`twirlingPlane`"
-                />
-            </div>
+            <general-message
+                v-else
+                :message="`No admins have signed up to your institution yet`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
+            />
 
         </loading>
 
@@ -74,7 +73,7 @@
 <script>
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
 import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 
@@ -85,7 +84,7 @@ export default {
     components: {
         collapsableBox,
         loading,
-        msgWithPic,
+        generalMessage,
         userFormTemplate,
         generalPopupContainer
     },

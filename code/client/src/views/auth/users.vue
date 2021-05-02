@@ -1,31 +1,25 @@
 <template>
     <div>
-        <loading>
-
-            <user-form-template
-                :includeVitals="true"
-                :formProps="{
-                    bindedExts: ['confirms'],
-                    backgroundColor: 'red',
-                    buttonColor: 'blue',
-                    buttonText: 'Sign up',
-                    formTitle: 'Create Account'
-                }"
-                @submitted="signupKhateeb($event)"
-            />
-
-        </loading>
+        <user-form-template
+            :includeVitals="true"
+            :formProps="{
+                bindedExts: ['confirms'],
+                backgroundColor: 'red',
+                buttonColor: 'blue',
+                buttonText: 'Sign up',
+                formTitle: 'Create Account'
+            }"
+            @submitted="signupKhateeb($event)"
+        />
     </div>
 </template>
 
 <script>
-import loading from '@/components/general/loadingScreen.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
 
 export default {
     name: "userSignup",
     components: {
-        loading,
         userFormTemplate,
     },
     data() {
