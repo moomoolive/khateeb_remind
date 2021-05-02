@@ -1,6 +1,6 @@
 <template>
     <div>
-        <loading :loadingTime="800">
+        <loading>
             <div v-if="showSettings && settingsArePresent" class="settings-container">
                 
                 <collapsable-box

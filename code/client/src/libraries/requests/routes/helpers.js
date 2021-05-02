@@ -23,7 +23,7 @@ const returnDataTypeFromRequest = (checkFn=Array.isArray) => (returnVal=[]) => {
                 return data
             else
                 return returnVal
-        } catch(err) {
+        } catch {
             return returnVal
         }
     }

@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import Config from '$config'
 
 export default {
     name: 'loading',
@@ -33,7 +34,7 @@ export default {
         loadingTime: {
             type: Number,
             required: false,
-            default: 700
+            default: Config.networkConfig.defaultIOLoadingTime
         },
         externalFinishSignal: {
             type: Boolean,

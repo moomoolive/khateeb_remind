@@ -1,13 +1,17 @@
 import helpers from './helpers.js'
 
+import Config from '$config'
+
 const appWillUpdateMessage = () => {
+    const toSeconds = Config.pwaConfig.reloadDelayAfterNewServiceWorkerDetected / 1_000
     helpers.createFooterPopup(
         'statusUpdate', 
         { 
             gif: 'loading-alternate', 
             color: 'blue',
             topMessage: "Updates Detected",
-            bottomMessage: "Reloading in a Moment..." 
+            bottomMessage: "Reloading in a Moment...",
+            closeAfter: toSeconds + 2
         }
     )
 }

@@ -4,7 +4,7 @@
             :baseLink="`institutionAdmin`"
             :outboundLinks="outboundLinks"
         />
-        <vue-page-transition name="fade-in-down">
+        <vue-page-transition :name="routerConfig.animationName">
             <router-view class="pages"></router-view>
         </vue-page-transition>
     </div>
@@ -12,6 +12,8 @@
 
 <script>
 import centralNav from '@/components/misc/centralNav.vue'
+
+import Config from '$config'
 
 export default {
     name: 'adminParentRoute',
@@ -21,6 +23,7 @@ export default {
     data() {
         return {
             currentRoute: this.$router.currentRoute.fullPath,
+            routerConfig: Config.routerConfig,
             outboundLinks: [
                 {
                     name: 'Set Schedule',

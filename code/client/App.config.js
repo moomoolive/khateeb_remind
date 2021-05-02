@@ -1,7 +1,8 @@
 const networkConfig = {
     serverURL: process.env.VUE_APP_API_SERVER_URL,
     offlineModeRequestCountThreshold: parseInt(process.env.VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT),
-    pwaTestingServerURL: "http://localhost:80"
+    pwaTestingServerURL: "http://localhost:80",
+    defaultIOLoadingTime: parseInt(process.env.VUE_APP_DEFAULT_IO_LOADING_TIME)
 }
 
 const securityConfig = {
@@ -21,6 +22,14 @@ const globalConfig = {
     nullId: 'none'
 }
 
+const routerConfig = {
+    animationName: "fade-in-down"
+}
+
+const pwaConfig = {
+    reloadDelayAfterNewServiceWorkerDetected: 3_000 // in milliseconds
+}
+
 export default {
     get networkConfig() {
         return networkConfig
@@ -36,5 +45,11 @@ export default {
     },
     get globalConfig() {
         return globalConfig
+    },
+    get routerConfig() {
+        return routerConfig
+    },
+    get pwaConfig() {
+        return pwaConfig
     }
 }

@@ -1,9 +1,6 @@
 <template>
     <div class="scroller-container">
-        <loading
-            :loadingTime="900"
-            :textColor="`white`"
-        >
+        <loading :textColor="`white`">
             
             <div v-if="allNotifications.length > 0">
                 <div 

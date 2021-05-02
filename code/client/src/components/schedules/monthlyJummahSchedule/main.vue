@@ -19,7 +19,7 @@
         </general-popup-container>
 
         <div class="schedule-container">
-            <loading :loadingTime="800">
+            <loading>
 
                 <div class="controls-position">
 

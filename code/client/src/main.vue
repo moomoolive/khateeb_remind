@@ -35,7 +35,7 @@
 
         <default-app-background />
 
-        <vue-page-transition name="fade-in-down">
+        <vue-page-transition :name="routerConfig.animationName">
           <router-view 
             :class="`displayed-page page-padding`"
           />
@@ -81,6 +81,8 @@ import localStorageHelpers from './libraries/localStorageManagement/main.js'
 
 import { nanoid } from 'nanoid'
 
+import Config from '$config'
+
 export default {
   components: {
     notifications,
@@ -96,7 +98,8 @@ export default {
   data() {
     return {
       showNotificationDisplay: false,
-      isOffline: false
+      isOffline: false,
+      routerConfig: Config.routerConfig
     }
   },
   methods: {
