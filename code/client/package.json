@@ -7,9 +7,9 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "build:pwa-test": "vue-cli-service build --dest pwa_test --report-json",
+    "build:pwa-test": "cross-env VUE_APP_PWA=1 vue-cli-service build --dest pwa_test --report-json",
     "serve:pwa": "lite-server --baseDir=\"pwa_test\" -c lite-server.config.json",
-    "pwa": "cross-env VUE_APP_PWA=1 npm run build:pwa-test && npm run serve:pwa"
+    "pwa": "npm run build:pwa-test && npm run serve:pwa"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
