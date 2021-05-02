@@ -12,6 +12,7 @@ import VueClipboard from 'vue-clipboard2'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import VuePageTransition from 'vue-page-transition'
+import resize from 'vue-element-resize-detector'
  
 import Config from '$config'
 import iconsList from './icon.config.js'
@@ -20,6 +21,7 @@ library.add(...iconsList)
 Vue.use(VueClipboard)
 Vue.use(VCalendar)
 Vue.use(VuePageTransition)
+Vue.use(resize)
 
 Vue.component('fa-icon', FontAwesomeIcon)
 

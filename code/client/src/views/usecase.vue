@@ -72,9 +72,6 @@
                         </div>
                         <div class="icons-subheading">
                             Send khutbah-related updates to your khateebs' phone, laptop, or tablet <br><br>
-                            <span class="icons-subheading-warning red">
-                                * IOS and older browsers are unsupported
-                            </span>
                         </div>
                     </a>
                 </div>

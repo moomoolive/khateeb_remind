@@ -17,9 +17,9 @@ img {
     min-height: 0px;
 }
 
-body {
+body, html {
     margin: 0 0 0 0;
-    background-color: getColor("silver");
+    background: transparent;
     color: getColor("offWhite");
     font-size: 16px;
 }
@@ -34,7 +34,7 @@ p {
 }
 
 ::-webkit-scrollbar-track {
-    display: none;
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
