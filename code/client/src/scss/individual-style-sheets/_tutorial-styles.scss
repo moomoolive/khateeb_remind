@@ -1,6 +1,6 @@
 h1 {
     font-size: 30px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
 img {
@@ -13,12 +13,12 @@ div {
 }
 
 p {
-    color: darken(getColor("purple"), 12%);
+    color: darken(get-color("purple"), 12%);
     font-size: 17px;
     text-align: left;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     h1 {
         font-size: 3.4vh;
     }

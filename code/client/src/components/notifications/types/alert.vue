@@ -102,7 +102,7 @@ button {
     height: 30px;
     margin-bottom: 20px;
     margin-top: 20px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 .alert-container {
@@ -111,7 +111,7 @@ button {
     max-height: 350px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .msg {
         line-height: 18px;

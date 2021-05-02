@@ -352,10 +352,10 @@ button {
 
 
 .input-container {
-    @include flexboxDefault();
+    @include flexbox-default();
     width: 80%;
     max-width: 800px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 p {
@@ -373,10 +373,10 @@ select {
     outline: none;
     height: 40px;
     font-size: 15px;
-    color: getColor("offWhite");
-    background-color: themeRGBA("grey", 1);
+    color: get-color("off-white");
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
     margin-bottom: 20px;
 }
@@ -389,10 +389,10 @@ input {
     margin-left: 10px;
     margin-right: 10px;
     font-size: 15px;
-    color: getColor("offWhite");
-    background-color: themeRGBA("grey", 1);
+    color: get-color("off-white");
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
     margin-bottom: 20px;
 }
@@ -429,29 +429,29 @@ button {
     padding-right: 10px;
     margin-bottom: 15px;
     margin-top: 15px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .copy-link-container {
     width: 190px;
-    background: getColor("silver");
+    background: get-color("silver");
     padding-left: 20px;
     padding-right: 20px;
     padding-top: 10px;
     padding-bottom: 10px;
-    @include normalBorderRounding();
-    @include floatingBoxShadow();
+    @include normal-border-rounding();
+    @include floating-box-shadow();
 }
 
 .copy-link-text {
     height: 40px;
     width: 150px;
     font-size: 15px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 
     &:focus {
-        color: getColor("green");
-        background: getColor("grey");
+        color: get-color("green");
+        background: get-color("grey");
         font-weight: bold;
     }
 }
@@ -459,7 +459,7 @@ button {
 .copy-link-header {
     font-size: 16px;
     font-weight: bold;
-    @include flexboxDefault();
+    @include flexbox-default();
 }
 
 .copy-link-button {
@@ -468,13 +468,13 @@ button {
     width: 90px;
     height: 40px;
     border-radius: 7px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
     margin-bottom: 10px;
-    color: getColor("blue");
+    color: get-color("blue");
     font-weight: bold;
 
     &.copied {
-        color: getColor("green");
+        color: get-color("green");
     }
 }
 
@@ -483,7 +483,7 @@ button {
 }
 
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       .khateebs-container {
             flex-direction: column;
         }

@@ -57,7 +57,7 @@ export default {
 
 <style lang="scss" scoped>
 .popup-container {
-    background: getColor("blue");
+    background: get-color("blue");
     padding-left: 30px;
     padding-right: 30px;
     padding-top: 15px;

@@ -29,7 +29,7 @@
                 <general-message
                     class="empty-notifications-msg"
                     :message="`No notifications to show...`"
-                    textColor="offWhite"
+                    textColor="off-white"
                     iconColor="blue"
                     :fontAwesomeIcon="['fas', 'inbox']"
                 />
@@ -116,12 +116,12 @@ export default {
 
 .notification-container {
     height: 15%;
-    border-bottom: getColor("silver") solid 1px;
-    border-top: getColor("silver") solid 1px;
+    border-bottom: get-color("silver") solid 1px;
+    border-top: get-color("silver") solid 1px;
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: getColor("grey");
-    @include floatingBoxShadow(0.4);
+    background-color: get-color("grey");
+    @include floating-box-shadow(0.4);
     display: flex;
     flex-direction: column;
     
@@ -136,12 +136,12 @@ export default {
 
 .notification-msg {
     width: 85%;
-    @include centerMargin();
+    @include center-margin();
     text-align: left;
     font-size: 16px;
     margin-top: 0 !important;
     padding-bottom: 12px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
 .notification-date {
@@ -154,7 +154,7 @@ export default {
     float: left;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .needs-attention {
         font-size: 14px;

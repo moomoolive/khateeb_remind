@@ -164,9 +164,9 @@ export default {
 }
 
 .all-authorizations {
-    @include flexboxDefault(row, true);
+    @include flexbox-default(row, true);
     max-width: 900px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 button {
@@ -175,21 +175,21 @@ button {
 
 .authorization-button {
     width: 100%;
-    background: getColor('grey');
+    background: get-color('grey');
     padding-top: 20px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     padding-bottom: 7px;
     padding-left: 5px;
     padding-right: 5px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     margin-bottom: 0;
-    @include floatingBoxShadow(0.4);
+    @include floating-box-shadow(0.4);
     cursor: pointer;
     line-height: 22px;
 
     &:hover {
-        background: lighten(getColor('grey'), 10%);
+        background: lighten(get-color('grey'), 10%);
     }
 }
 
@@ -202,13 +202,13 @@ button {
 
 .delete-auth-button {
     margin-top: 0;
-    color: getColor('grey');
+    color: get-color('grey');
     font-size: 15px;
     padding-top: 12px;
     padding-bottom: 12px;
     width: 100%;
     margin-bottom: 50px;
-    @include floatingBoxShadow(0.4);
+    @include floating-box-shadow(0.4);
     border-bottom-left-radius: 99999px;
     border-bottom-right-radius: 99999px;
 }
@@ -218,24 +218,24 @@ button {
 }
 
 .signup-buttons-container {
-    @include flexboxDefault();
-    @include centerMargin();
+    @include flexbox-default();
+    @include center-margin();
     margin-bottom: 20px;
 }
 
 .signup-button {
-    @include floatingBoxShadow(0.4);
+    @include floating-box-shadow(0.4);
     margin-right: 20px;
     margin-left: 20px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .signup-buttons-container {
         flex-direction: column;
     }
 
     .signup-button {
-        @include floatingBoxShadow(0.4);
+        @include floating-box-shadow(0.4);
         margin-right: 0px;
         margin-left: 0px;
     }

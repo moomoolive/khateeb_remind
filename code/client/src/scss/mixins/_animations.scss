@@ -1,4 +1,4 @@
-@mixin blinkingAnimation($speedOfAnimation: 2s, $time: infinite, $opacity: 5) {
+@mixin blinking-animation($speedOfAnimation: 2s, $time: infinite, $opacity: 5) {
     animation: blinking $speedOfAnimation $time;
     $fullOpacity: 1;
     @keyframes blinking {

@@ -127,12 +127,12 @@ export default {
     padding-right: 25px;
     padding-bottom: 25px;
     padding-top: 25px;
-    @include floatingBoxShadow();
-    @include normalBorderRounding();
+    @include floating-box-shadow();
+    @include normal-border-rounding();
 }
 
 .buttons-container {
-    @include flexboxDefault(column);
+    @include flexbox-default(column);
 }
 
 .greeting {
@@ -140,7 +140,7 @@ export default {
     margin-bottom: 5px;
     text-align: left;
     font-weight: bold;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
 .handle {
@@ -152,8 +152,8 @@ export default {
 button {
     width: 130px;
     font-size: 16px;
-    @include floatingBoxShadow();
-    background: getColor("blue");
+    @include floating-box-shadow();
+    background: get-color("blue");
 }
 
 .institution-name {
@@ -176,10 +176,10 @@ button {
     height: 50px;
     width: 50px;
     border-radius: 50%;
-    border: getColor("blue") solid 2px;
+    border: get-color("blue") solid 2px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
 }
 

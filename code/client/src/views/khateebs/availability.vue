@@ -174,7 +174,7 @@ export default {
     margin-bottom: 20px;
     width: 80%;
     max-width: 800px;
-    @include centerMargin();
+    @include center-margin();
     max-height: 1500px;
 }
 
@@ -184,13 +184,13 @@ export default {
 
 .unavailable-date-info-header {
     font-size: 16px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     margin-bottom: 20px;
     margin-top: 20px;
     line-height: 20px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .unavailable-date-info-header {
         font-size: 14px;

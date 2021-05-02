@@ -51,14 +51,14 @@ p {
     margin-right: auto;
     font-size: 18px;
     text-align: left;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
 div {
     cursor: not-allowed;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     p {
         font-size: 2.4vh;
         margin-top: 1vh;

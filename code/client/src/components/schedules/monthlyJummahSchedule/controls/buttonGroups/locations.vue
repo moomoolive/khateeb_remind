@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/scss/individualStyleSheets/_jummahSchedule.scss';
+@import '~@/scss/individual-style-sheets/_jummah-schedule.scss';
 
 .location-btns {
     margin-left: 10px;
@@ -56,7 +56,7 @@ export default {
     font-size: 17px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .location-btns {
         font-size: 15px;

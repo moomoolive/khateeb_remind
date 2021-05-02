@@ -52,13 +52,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/scss/individualStyleSheets/_jummahSchedule.scss';
+@import '~@/scss/individual-style-sheets/_jummah-schedule.scss';
 
 button {
     font-size: 17px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     button {
         font-size: 15px;

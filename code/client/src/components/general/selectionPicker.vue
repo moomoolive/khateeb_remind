@@ -159,10 +159,10 @@ export default {
     border-radius: 7px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     &.unselected {
-        background: themeRGBA("darkRed", 0.7);
+        background: get-color("dark-red", 0.7);
     }
     &.selected {
-        background: themeRGBA("green", 0.7);
+        background: get-color("green", 0.7);
     }
 }
 
@@ -184,15 +184,15 @@ export default {
     padding-top: 10px;
     padding-bottom: 10px;
     max-height: 350px;
-    background: themeRGBA("purple", 0.9);
+    background: get-color("purple", 0.9);
     margin-left: auto;
     margin-right: auto;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     &.unselected {
-        background: themeRGBA("purple", 0.9);
+        background: get-color("purple", 0.9);
     }
     &.selected {
-        background: themeRGBA("blue", 0.9);
+        background: get-color("blue", 0.9);
     }
 }
 
@@ -211,7 +211,7 @@ export default {
 .more-info-container {
     margin-top: 5px;
     margin-bottom: 5px;
-    background: themeRGBA("yellow", 0.6);
+    background: get-color("yellow", 0.6);
     border-radius: 4px;
     padding-top: 3px;
     padding-bottom: 3px;
@@ -223,7 +223,7 @@ p {
     margin-left: auto;
     margin-right: auto;
     font-size: 16px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     cursor: default;
 }
 
@@ -247,7 +247,7 @@ button {
     margin-right: auto;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     p {
         font-size: 2.4vh;
     }

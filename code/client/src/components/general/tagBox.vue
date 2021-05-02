@@ -90,12 +90,12 @@ $tags: (
 }
 
 @mixin tagBackground($color) {
-    background-color: getColor($color) !important;
+    background-color: get-color($color) !important;
     color: black;
 }
 
 @mixin tagIcon($color) {
-    background-color: darken(getColor($color), 20%);
+    background-color: darken(get-color($color), 20%);
 }
 
 @mixin tag($section) {
@@ -125,9 +125,9 @@ div {
     display: inline-block;
     font-size: 1.4vh !important;
     pointer-events: none;
-    background-color: getColor("blue") !important;
+    background-color: get-color("blue") !important;
     padding: 0.8vh;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     margin: 0 1vh 0 0;
     box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 8px;
     @include tag('background');
@@ -147,8 +147,8 @@ div {
     pointer-events: auto;
     padding: $padding;
     padding-left: 0.8vh;
-    color: getColor("offWhite");
-    background-color: darken(getColor("blue"), 20%);
+    color: get-color("off-white");
+    background-color: darken(get-color("blue"), 20%);
     border-radius: 2px;
     @include tag('icon')
 }

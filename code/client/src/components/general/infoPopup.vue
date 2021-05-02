@@ -58,7 +58,7 @@ p {
 }
 
 .popup {
-    background-color: getColor('silver');
+    background-color: get-color('silver');
     border-radius: 3px;
     padding: 1vh;
     font-size: 2vh;

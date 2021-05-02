@@ -27,7 +27,7 @@ export default {
 <style lang="scss" scoped>
 .button {
     margin-top: 40px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 </style>

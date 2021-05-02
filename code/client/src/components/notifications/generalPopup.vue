@@ -63,7 +63,7 @@ export default {
   height: 100vh;
   width: 100vw;
   position: fixed;
-  background: themeRGBA('grey', 0.3);
+  background: get-color('grey', 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,7 +78,7 @@ export default {
 .close-content {
     height: 30px;
     font-size: 20px;
-    background: getColor("silver");
+    background: get-color("silver");
     display: flex;
     align-items: center;
     justify-content: center;
@@ -91,7 +91,7 @@ export default {
     width: 90%;
     height: auto;
     border-radius: 4px;
-    background: getColor("grey");
+    background: get-color("grey");
     padding-bottom: 20px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     overflow: hidden;

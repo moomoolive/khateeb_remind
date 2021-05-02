@@ -168,10 +168,10 @@ export default {
     padding-top: 20px;
     padding-right: 15px;
     padding-left: 15px;
-    @include floatingBoxShadow(0.4);
+    @include floating-box-shadow(0.4);
     margin-top: 20px;
-    @include lightBorderRounding();
-    @include centerMargin();
+    @include light-border-rounding();
+    @include center-margin();
 }
 
 .institution-selection-content-container {
@@ -185,14 +185,14 @@ export default {
     height: 100px;
     width: 100px;
     margin-right: 30px;
-    border: getColor("blue") solid 3px;
+    border: get-color("blue") solid 3px;
 }
 
 .institution-text {
     margin-bottom: 10px;
     text-align: left;
     font-size: 18px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 
     &.small {
         font-size: 14px;
@@ -201,7 +201,7 @@ export default {
 
 .signup-link-container {
     margin-left: 20px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     text-align: left;
 }
 
@@ -210,7 +210,7 @@ export default {
     cursor: pointer;
 
     &:hover {
-        color: getColor("blue");
+        color: get-color("blue");
     }
 
     &.invisible {
@@ -222,7 +222,7 @@ export default {
     margin-left: 3px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .image-container {
         margin-right: 20px;
         height: 80px;

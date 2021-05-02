@@ -191,10 +191,10 @@ select {
     height: 4vh;
     max-height: 40px;
     font-size: 15px;
-    color: getColor("offWhite");
-    background-color: themeRGBA("grey", 1);
+    color: get-color("off-white");
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
 }
 
@@ -233,7 +233,7 @@ button {
     margin-bottom: 10px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     select {
         font-size: 2vh;

@@ -137,7 +137,7 @@
                             `Schedule hasn't been created yet`
                         "
                         :fontAwesomeIcon="['far', 'paper-plane']"
-                        textColor="offWhite"
+                        textColor="off-white"
                         iconColor="green"
                     />
 
@@ -369,13 +369,13 @@ export default {
 }
 
 .month-indicator-text {
-    color: getColor("offWhite");
+    color: get-color("off-white");
     font-size: 18px;
     width: 150px;
 }
 
 .change-month-buttons {
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
     font-size: 14px;
     font-weight: bold;
     max-height: 30px;
@@ -388,7 +388,7 @@ export default {
 .schedule-container {
     padding-top: 15px;
     padding-bottom: 15px;
-    background: themeRGBA("darkBlue", 0.5);
+    background: get-color("dark-blue", 0.5);
     width: 70%;
     max-width: 850px;
     min-width: 200px;
@@ -402,7 +402,7 @@ export default {
 
 .unavailable-khateebs-position {
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
     margin-top: 40px;
 }
 
@@ -414,8 +414,8 @@ export default {
     margin-bottom: 30px;
     padding-left: 10px;
     padding-right: 10px;
-    @include normalBorderRounding();
-    @include floatingBoxShadow();
+    @include normal-border-rounding();
+    @include floating-box-shadow();
 }
 
 .unavailable-khateebs-this-week-header {
@@ -428,12 +428,12 @@ export default {
 }
 
 .unavailable-khateebs-this-week-header-container {
-    @include flexboxDefault();
+    @include flexbox-default();
     width: 95%;
 }
 
 .unavailable-khateebs-this-week-tag-container {
-    @include flexboxDefault(row, True);
+    @include flexbox-default(row, True);
     margin-top: 20px;
 }
 
@@ -454,7 +454,7 @@ export default {
 }
 
 .controls-position {
-    @include flexboxDefault(row-reverse);
+    @include flexbox-default(row-reverse);
 }
 
 .buttons-container {
@@ -462,7 +462,7 @@ export default {
 }
 
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .buttons-container {
         margin-top: 0px;
@@ -473,7 +473,7 @@ export default {
     }
     
     .schedule-container {
-            background: themeRGBA("darkBlue", 0.5);
+            background: get-color("dark-blue", 0.5);
             width: 90%;
     }
 

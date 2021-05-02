@@ -158,11 +158,11 @@ p {
     font-size: 18px;
     font-weight: bold;
     text-align: left;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
 .menu-item {
-    background-color: themeRGBA("grey", 0.9);
+    background-color: get-color("grey", 0.9);
     cursor: default;
     padding-top: 20px;
     padding-bottom: 20px;
@@ -170,7 +170,7 @@ p {
     padding-right: 10px;
     
     &:hover {
-        background-color: lighten(themeRGBA("grey", 1), 20%);
+        background-color: lighten(get-color("grey", 1), 20%);
         
     }
     
@@ -182,28 +182,28 @@ p {
 }
 
 .get-the-app {
-    background-color: themeRGBA("green", 0.9) !important;
+    background-color: get-color("green", 0.9) !important;
     color: black !important;
     &:hover {
-      background-color: lighten(themeRGBA("green", 1), 20%) !important;
+      background-color: lighten(get-color("green", 1), 20%) !important;
     }
 }
 
 .caution {
-    background-color: themeRGBA("yellow", 0.9) !important;
+    background-color: get-color("yellow", 0.9) !important;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     &:hover {
-      background-color: lighten(themeRGBA("yellow", 1), 20%) !important;
+      background-color: lighten(get-color("yellow", 1), 20%) !important;
     }
 }
 
 .caution-alternate {
-    background-color: themeRGBA("red", 0.9) !important;
+    background-color: get-color("red", 0.9) !important;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     &:hover {
-      background-color: lighten(themeRGBA("red", 1), 20%) !important;
+      background-color: lighten(get-color("red", 1), 20%) !important;
     }
 }
 
@@ -211,7 +211,7 @@ p {
     color: black;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       
       p {
         font-size: 16px;

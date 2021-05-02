@@ -3,15 +3,15 @@
 div {
     margin: 0 0 0 0;
 
-    @include allColors();
+    @include all-colors();
 
     &.round {
-        @include normalBorderRounding();
+        @include normal-border-rounding();
     }
 }
 
 span {
-    @include allTextColors();
+    @include all-text-colors();
 }
   
 img {
@@ -22,7 +22,7 @@ img {
 body, html {
     margin: 0 0 0 0;
     background: silver;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     font-size: 16px;
 }
 
@@ -40,11 +40,11 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: themeRGBA("lightGrey", 0.6);
+    background: get-color("light-grey", 0.6);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: getColor('grey');
+    background: get-color('grey');
 }
 
 h2 {
@@ -54,10 +54,10 @@ h2 {
 }
 
 button {
-    background-color: getColor("green");
+    background-color: get-color("green");
     border: none;
     border-radius: 4px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     padding: 5px 12px;
     text-align: center;
     text-decoration: none;
@@ -72,9 +72,9 @@ button {
     
     &.pale-hover {
         &:hover {
-            background-color: getColor("offWhite") !important;
+            background-color: get-color("off-white") !important;
             color: black !important;
-            border: 0.1vh solid getColor("green");
+            border: 0.1vh solid get-color("green");
         }
     }
     
@@ -84,16 +84,16 @@ button {
     }
 
     &.round {
-        @include completelyRoundBorder();
+        @include completely-round-border();
     }
 
     &.blink-focus {
         &:focus { 
-            @include blinkingAnimation(); 
+            @include blinking-animation(); 
         }
     }
 
-    @include allColors();
+    @include all-colors();
 }
 
 .dropdown-enter-active,

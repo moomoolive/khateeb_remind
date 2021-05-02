@@ -116,24 +116,24 @@ export default {
 
 <style lang="scss" scoped>
 .active { 
-    @include blinkingAnimation($speedOfAnimation: 5s, $opacity: 2);
+    @include blinking-animation($speedOfAnimation: 5s, $opacity: 2);
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0; 
 }
 
 .grey {
-    background-color: getColor("grey");
+    background-color: get-color("grey");
     &:hover {
-        background-color: getColor("grey") !important;
-        color: getColor("offWhite") !important;
+        background-color: get-color("grey") !important;
+        color: get-color("off-white") !important;
     }
 }
 
 .red {
-    background-color: getColor("darkRed");
+    background-color: get-color("dark-red");
     &:hover {
-        background-color: getColor("darkRed") !important;
-        color: getColor("offWhite") !important;
+        background-color: get-color("dark-red") !important;
+        color: get-color("off-white") !important;
     }
 }
 
@@ -155,11 +155,11 @@ export default {
 }
 
 .box-shadow {
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 .icon {
-    color: getColor("blue");
+    color: get-color("blue");
     position: relative;
     left: 5px;
 }
@@ -181,14 +181,14 @@ export default {
     border-bottom-right-radius: $rad;
     margin: auto;
     &.blue {
-        background: themeRGBA("darkBlue", 0.8);
+        background: get-color("dark-blue", 0.8);
     }   
     &.silver {
-        background: themeRGBA("silver", 0.8);
+        background: get-color("silver", 0.8);
     }
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .collapsible {
         padding: 2vh;
         font-size: 2vh;

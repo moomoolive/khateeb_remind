@@ -103,17 +103,17 @@ export default {
     height: 200px;
     width: 200px;
     border-radius: 50%;
-    border: getColor("yellow") solid 3px;
+    border: get-color("yellow") solid 3px;
 }
 
 .institution-description {
   font-size: 25px;
-  color: getColor("offWhite");
+  color: get-color("off-white");
   margin-bottom: 20px;
 }
 
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
   .institution-description {
     font-size: 20px;
   }   

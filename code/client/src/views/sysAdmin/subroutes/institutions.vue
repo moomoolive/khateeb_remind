@@ -112,10 +112,10 @@ export default {
     padding-right: 10px;
     max-width: 500px;
     text-align: left;
-    color: getColor("offWhite");
-    @include normalBorderRounding();
-    @include centerMargin();
-    @include floatingBoxShadow();
+    color: get-color("off-white");
+    @include normal-border-rounding();
+    @include center-margin();
+    @include floating-box-shadow();
     margin-top: 30px;
 }
 
@@ -140,7 +140,7 @@ export default {
     font-size: 1.15em;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .institution-container {
         font-size: 14px;

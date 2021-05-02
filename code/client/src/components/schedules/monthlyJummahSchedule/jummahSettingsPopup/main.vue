@@ -195,7 +195,7 @@ export default {
 
 <style lang="scss" scoped>
 div {
-    color: getColor("offWhite");
+    color: get-color("off-white");
     font-size: 17px;
     &.settings-label {
         padding-bottom: 7px;

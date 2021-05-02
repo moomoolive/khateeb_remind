@@ -20,7 +20,7 @@
                 :errorMsg="errorMsg"
                 :rerenderOnBasedOnUpdate="false"
                 :showInvalidationMsgs="false"
-                :backgroundColor="`darkBlue`"
+                :backgroundColor="`dark-blue`"
                 :buttonText="`Log In`"
                 :confirmBeforeSubmit="false"
                 :disableIfSameAsStart="false"
@@ -97,7 +97,7 @@ input {
 
 p {
     margin-top: 0;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
 a {
@@ -109,7 +109,7 @@ a {
     cursor: default;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
       a {
         font-size: 15px;

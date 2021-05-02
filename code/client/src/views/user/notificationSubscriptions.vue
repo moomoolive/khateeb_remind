@@ -178,7 +178,7 @@ export default {
             if (/chrome|google/gi.test(name))
                 return { icon: ['fab', 'chrome'], color: 'green' }
             else if (/firefox|mozilla/gi.test(name))
-                return { icon: ['fab', 'firefox-browser'], color: 'darkRed' }
+                return { icon: ['fab', 'firefox-browser'], color: 'dark-red' }
             else if (/edge|microsoft/gi.test(name))
                 return { icon: ['fab', 'edge-legacy'], color: 'blue' }
             else if (/safari|apple/gi.test(name))
@@ -224,12 +224,12 @@ export default {
     margin-top: 20px;
     width: 80%;
     max-width: 650px;
-    @include lightBorderRounding();
+    @include light-border-rounding();
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 9px;
     padding-right: 9px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .slider-container {
@@ -253,23 +253,23 @@ export default {
 
 .option-container {
     width: 100%;
-    background: getColor("offWhite");
+    background: get-color("off-white");
     padding-top: 5px;
     padding-bottom: 5px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 
     &:first-child {
         border-top-left-radius: 7px;
         border-top-right-radius: 7px;
         border-top: none;
-        border-bottom: 1px themeRGBA('grey', 0.5) solid;
+        border-bottom: 1px get-color('grey', 0.5) solid;
     }
 
     &:last-child {
-        border-top: 1px themeRGBA('grey', 0.5) solid;
+        border-top: 1px get-color('grey', 0.5) solid;
         border-bottom: none;
     }
 
@@ -297,7 +297,7 @@ export default {
     margin-left: auto;
     margin-right: auto;
     margin-top: 30px;
-    background: getColor('silver');
+    background: get-color('silver');
     padding-bottom: 20px;
     margin-bottom: 20px;
     border-radius: 7px;
@@ -314,7 +314,7 @@ export default {
 }
 
 .device-number {
-    background: getColor('offWhite');
+    background: get-color('off-white');
     height: 40px;
     margin-bottom: 20px;
     font-size: 17px;
@@ -355,14 +355,14 @@ export default {
     margin-left: auto;
     margin-right: auto;
     font-weight: bold;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    background: getColor("green");
+    background: get-color("green");
     &.purple {
-        background: getColor("purple");
+        background: get-color("purple");
     }
     &.red {
-        background: getColor("red");
+        background: get-color("red");
     }
 }
 
@@ -373,7 +373,7 @@ export default {
     font-weight: bold;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .subscriptions-container {
         flex-direction: column;

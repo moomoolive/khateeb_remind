@@ -89,7 +89,7 @@ button {
     height: 15%;
     font-size: 17px;
     margin-bottom: 30px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 p {
@@ -116,7 +116,7 @@ p {
 
 .hard-confirmation-input-container {
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .confirmation-input {
@@ -125,19 +125,19 @@ p {
     border-radius: 4px;
     height: 25px;
     width: 90%;
-    @include centerMargin();
+    @include center-margin();
     margin-top: 10px;
     margin-bottom: 10px;
-    color: getColor("offWhite");
-    background-color: themeRGBA("grey", 1);
+    color: get-color("off-white");
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
     position: relative;
     z-index: 0;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     button {
         font-size: 14px;

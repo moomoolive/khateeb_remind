@@ -77,8 +77,8 @@ select {
     border-radius: 3px;
     outline: 0;
     border: 0;
-    background: getColor("lightGrey");
-    color: darken(getColor("purple"), 12%);
+    background: get-color("light-grey");
+    color: darken(get-color("purple"), 12%);
 }
 
 .selector-container {
@@ -99,7 +99,7 @@ img {
 }
 
 .tutorial-scroll-divider {
-    border-top: 1px darken(getColor("orange"), 12%) solid;
+    border-top: 1px darken(get-color("orange"), 12%) solid;
     width: 70%;
     margin-left: auto;
     margin-right: auto;

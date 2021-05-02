@@ -156,13 +156,13 @@ export default {
 
 <style lang="scss" scoped>
 .topnav {
-  background-color: themeRGBA("grey", 0.5);
+  background-color: get-color("grey", 0.5);
   height: 5vh;
   min-height: 40px;
   max-height: 50px;
   width: 100vw;
   overflow: visible;
-  min-width: $minimumAppWidth;
+  min-width: $minimum-app-width;
 }
 
 .logo {
@@ -183,7 +183,7 @@ export default {
   width: 200px;
   height: 30px;
   max-width: 110px;
-  @include floatingBoxShadow();
+  @include floating-box-shadow();
 }
 
 .signup-buttons-container {
@@ -191,7 +191,7 @@ export default {
 }
 
 .icons-container {
-  @include flexboxDefault();
+  @include flexbox-default();
   height: 5vh;
   min-height: 40px;
   max-height: 50px;
@@ -210,14 +210,14 @@ export default {
   cursor: pointer;
 
   &.active {
-    color: getColor("blue");
+    color: get-color("blue");
   }
 }
 
 .no-wifi {
     position: absolute;
     left: 51px;
-    @include flexboxDefault();
+    @include flexbox-default();
     height: 5vh;
     min-height: 40px;
     max-height: 50px;
@@ -233,10 +233,10 @@ export default {
 .menu-container {
   max-width: 600px;
   margin-left: auto;
-  @include floatingBoxShadow(); 
+  @include floating-box-shadow(); 
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
       .signup-buttons {
         font-size: 8px;

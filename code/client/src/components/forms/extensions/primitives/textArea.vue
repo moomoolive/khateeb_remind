@@ -61,10 +61,10 @@ textarea {
     height: 13vh;
     max-height: 300px;
     font-size: 1.5vh;
-    color: getColor("offWhite");
-    background-color: themeRGBA("grey", 1);
+    color: get-color("off-white");
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
     position: relative;
     z-index: 0;

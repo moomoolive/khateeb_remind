@@ -1,3 +1,3 @@
-@mixin floatingBoxShadow($intensity: 0.24) {
+@mixin floating-box-shadow($intensity: 0.24) {
     box-shadow: rgba(0, 0, 0, $intensity) 0px 3px 8px;
 }

@@ -280,13 +280,13 @@ export default {
 }
 
 @keyframes glow { 
-    0% { background-color: getColor("silver"); }
-    50% { background-color: getColor("yellow") }
-    100% { background-color: getColor("silver"); } 
+    0% { background-color: get-color("silver"); }
+    50% { background-color: get-color("yellow") }
+    100% { background-color: get-color("silver"); } 
 }
 
 .jummahPreferences {
-    background: getColor("silver");
+    background: get-color("silver");
     border-top-right-radius: 7px;
     border-bottom-right-radius: 7px;
     padding-top: 10px;
@@ -302,7 +302,7 @@ export default {
     font-size: 16px;
     margin-top: 10px;
     font-weight: bold;
-    background: themeRGBA("red", 0.9);
+    background: get-color("red", 0.9);
     margin-left: auto;
     margin-right: auto;
     width: 87%;
@@ -317,13 +317,13 @@ div {
     &.timing {
         font-size: 14px;
         text-decoration: underline;
-        color: getColor("offWhite");
+        color: get-color("off-white");
         margin-bottom: 2px;
     }
 }
 
 .timing-container {
-    background: getColor("offWhite");
+    background: get-color("off-white");
     border-top-left-radius: 7px;
     border-bottom-left-radius: 7px;
     display: flex;
@@ -350,13 +350,13 @@ div {
 }
 
 .unavailable-khateebs-this-timing-header-container {
-    @include flexboxDefault();
+    @include flexbox-default();
     width: 95%;
 }
 
 .unavailable-khateebs-position {
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
     margin-top: 20px;
 }
 
@@ -369,7 +369,7 @@ div {
     margin-bottom: 10px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .jummahPreferences {
         border-radius: 0;

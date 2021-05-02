@@ -4,22 +4,22 @@
 @import '~@/scss/functions/_colors.scss';
 
 @mixin color($color) {
-    background-color: getColor($color);
-    &:hover{ border: 0.1vh solid getColor($color); }
+    background-color: get-color($color);
+    &:hover{ border: 0.1vh solid get-color($color); }
 }
 
-@mixin allColors($list: $themeColors) {
+@mixin all-colors($list: $themeColors) {
     @each $colorName, $color in $list {
         &.#{$colorName} { @include color($colorName); }
     }
 }
 
-@mixin textColor($color) {
-    color: getColor($color);
+@mixin text-color($color) {
+    color: get-color($color);
 }
 
-@mixin allTextColors($list: $themeColors) {
+@mixin all-text-colors($list: $themeColors) {
     @each $colorName, $color in $list {
-        &.#{$colorName} { @include textColor($colorName); }
+        &.#{$colorName} { @include text-color($colorName); }
     }
 }

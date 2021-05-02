@@ -137,7 +137,7 @@ export default {
     margin-top: 15px;
     margin-bottom: 15px;
     font-weight: bold;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     
     &.no-jummahs {
         text-decoration: underline;

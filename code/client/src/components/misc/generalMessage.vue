@@ -28,7 +28,7 @@ export default {
         iconColor: {
             type: String,
             required: false,
-            default: 'darkRed'
+            default: 'dark-red'
         },
         textColor: {
             type: String,
@@ -45,7 +45,7 @@ export default {
     width: 80%;
     max-width: 1000px;
     margin-top: 100px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .message-container {
@@ -57,7 +57,7 @@ export default {
     font-size: 90px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .message-container {
     
     }
@@ -67,7 +67,7 @@ export default {
     }
 }
 
-@media screen and (min-width: $desktopWidth) {
+@media screen and (min-width: $desktop-width) {
     .message-container {
     
     }

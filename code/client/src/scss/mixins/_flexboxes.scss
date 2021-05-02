@@ -1,14 +1,14 @@
-@mixin flexWrap() {
+@mixin flex-wrap() {
     flex-wrap: wrap;
 }
 
-@mixin flexboxDefault($direction: row, $withWrap: false) {
+@mixin flexbox-default($direction: row, $withWrap: false) {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: $direction;
     @if $withWrap {
-        @include flexWrap();
+        @include flex-wrap();
     }
 }
 

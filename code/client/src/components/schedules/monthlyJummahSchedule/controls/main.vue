@@ -53,7 +53,7 @@ export default {
 
 <style lang="scss" scoped>
 .std-controls {
-    background: themeRGBA("grey", 0.8);
+    background: get-color("grey", 0.8);
     margin-left: 10px;
     margin-right: 10px;
     border-radius: 7px;
@@ -75,7 +75,7 @@ export default {
     justify-content: center;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .std-controls {
         width: 40%;

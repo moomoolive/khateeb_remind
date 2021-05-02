@@ -11,7 +11,7 @@
                         }
                     }"
                     :buttonText="`Recover Username`"
-                    :backgroundColor="`darkBlue`"
+                    :backgroundColor="`dark-blue`"
                     :showInvalidationMsgs="false"
                     :confirmBeforeSubmit="false"
                     @submitted="recoverUsername($event)"

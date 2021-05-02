@@ -269,7 +269,7 @@ export default {
 }
 
 .my-regularly-scheduled-khutbahs-text {
-    color: getColor("offWhite");
+    color: get-color("off-white");
     text-align: left;
     width: 80%;
     margin-left: auto;

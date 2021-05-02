@@ -1,5 +1,5 @@
 .active-controls {
-    @include blinkingAnimation()
+    @include blinking-animation()
 }
 
 button {
@@ -9,7 +9,7 @@ button {
     padding-bottom: 7px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     button {
         padding-left: 8px;
         padding-right: 8px;

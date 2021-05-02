@@ -100,7 +100,7 @@ export default {
 
 .content {
     min-height: 50px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     text-align: left;
 }
 
@@ -110,7 +110,7 @@ p {
     font-size: 16px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
         
         .announcements-container {
             flex-direction: column;

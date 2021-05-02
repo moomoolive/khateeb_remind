@@ -169,7 +169,7 @@ button {
     padding-top: 10px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .new-existing-divider {
         margin-top: 3vh;
         border-bottom: black solid 0.4vh;

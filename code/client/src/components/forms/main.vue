@@ -132,7 +132,7 @@ export default {
         backgroundColor: {
             type: String,
             required: false,
-            default: 'darkBlue'
+            default: 'dark-blue'
         },
         errorMsg: {
             type: String,
@@ -342,39 +342,39 @@ button {
     width: 90%;
     color: black;
     font-size: 17px;
-    @include floatingBoxShadow(0.5);
+    @include floating-box-shadow(0.5);
 }
 
-.darkBlue-form {
-    background: themeRGBA("darkBlue", 0.5);
+.dark-blue-form {
+    background: get-color("dark-blue", 0.5);
 }
 
 .red-form {
-    background: themeRGBA("red", 0.5);
+    background: get-color("red", 0.5);
 }
 
 .yellow-form {
-    background: themeRGBA("yellow", 0.5);
+    background: get-color("yellow", 0.5);
 }
 
 .formContainer {
     margin-top: 30px;
     padding-top: 10px;
     padding-bottom: 10px;
-    @include normalBorderRounding();
+    @include normal-border-rounding();
     width: 80%;
     max-width: 500px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .box-shadow {
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 .formLabel {
     text-align: left;
     margin-top: 20px;
-    @include centerMargin();
+    @include center-margin();
     font-size: 18px;
     color: black;
     width: 90%;
@@ -382,10 +382,10 @@ button {
 
 .errorMsg {
     margin-top: 10px;
-    color: getColor("yellow");
+    color: get-color("yellow");
     font-size: 17px;
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .formTitle {
@@ -398,10 +398,10 @@ button {
     color: red;
     font-size: 13px;
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .formLabel {
         font-size: 14px;

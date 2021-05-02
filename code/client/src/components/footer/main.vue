@@ -116,7 +116,7 @@ export default {
 
 <style lang="scss" scoped>
 .footer-container {
-    background: getColor('grey');
+    background: get-color('grey');
     padding-bottom: 2px;
     position: relative;
     z-index: 1;
@@ -138,17 +138,17 @@ a {
     position: relative;
     display: block;
     text-decoration: none;
-    color: getColor("silver");
+    color: get-color("silver");
     font-size: 12px;
     margin-bottom: 9px;
     cursor: pointer;
     
     &:hover {
-        color: getColor("blue") !important;
+        color: get-color("blue") !important;
     }
     
     &.green {
-        color: getColor("green");
+        color: get-color("green");
     }
 }
 
@@ -165,7 +165,7 @@ a {
 
 .footer-links-section-header {
     font-size: 15px;
-    color: getColor("blue");
+    color: get-color("blue");
     font-weight: bold;
 }
 
@@ -174,7 +174,7 @@ a {
     width: 5em;
     margin-top: 2px;
     margin-bottom: 8px;
-    background: getColor("purple");
+    background: get-color("purple");
 }
 
 .khateeb-remind-logo {
@@ -184,22 +184,22 @@ a {
 
 .khateeb-remind-name {
     font-size: 11px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 
     &:hover {
-        color: getColor("blue") !important;
+        color: get-color("blue") !important;
     }
 }
 
 .footer-logo {
-    @include flexboxDefault();
+    @include flexbox-default();
     margin-bottom: 10px;
     margin-left: auto;
     width: 118px;
     cursor: pointer;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     a {
         margin-bottom: 12px;
     }

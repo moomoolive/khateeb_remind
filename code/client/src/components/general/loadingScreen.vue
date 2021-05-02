@@ -67,6 +67,6 @@ export default {
 .loading-animation {
     width: 65%;
     max-width: 275px;
-    @include centerMargin();
+    @include center-margin();
 }
 </style>

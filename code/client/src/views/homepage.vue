@@ -69,7 +69,7 @@ a {
 
 .content-layer {
     width: 90vw;
-    @include centerMargin();
+    @include center-margin();
     min-height: 79vh !important;
     padding-top: 10vh;
 }
@@ -77,13 +77,13 @@ a {
 .signup-now-container {
     margin-left: 12vw;
     margin-right: auto;
-    background: getColor("silver");
+    background: get-color("silver");
     width: 75%;
     max-width: 400px;
     padding-top: 20px;
     padding-bottom: 20px;
-    @include floatingBoxShadow();
-    @include normalBorderRounding();
+    @include floating-box-shadow();
+    @include normal-border-rounding();
     padding-left: 15px;
     padding-right: 15px;
     text-align: left;
@@ -127,10 +127,10 @@ button {
     padding-top: 10px;
     padding-bottom: 10px;
     margin-left: 0;
-    @include floatingBoxShadow(0.3);
+    @include floating-box-shadow(0.3);
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .content-layer {
         padding-bottom: 8vh;
@@ -141,7 +141,7 @@ button {
     }
 
     .signup-now-container {
-        @include centerMargin();
+        @include center-margin();
     }
 
     .main-header {
@@ -151,7 +151,7 @@ button {
     }
 }
 
-@media screen and (min-width: $desktopWidth) {
+@media screen and (min-width: $desktop-width) {
     .hompage-background {
         background-position: 0% 15%;
     }

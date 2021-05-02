@@ -172,20 +172,20 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@/scss/_globalStyles.scss';
+@import '~@/scss/_global-styles.scss';
 
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    color: #2c3e50;
+    color: get-color("grey");
     overflow-x: hidden;
-    background: getColor("silver");
+    background: get-color("silver");
 }
 
 .big-app-background {
-  background: getColor("green");
+  background: get-color("green");
   height: 250px;
   position: absolute;
   top: 0;
@@ -195,15 +195,15 @@ export default {
 
 .app-container {
   max-width: $maxAppWidth;
-  min-width: $minimumAppWidth;
-  @include centerMargin();
-  @include floatingBoxShadow(0.6);
+  min-width: $minimum-app-width;
+  @include center-margin();
+  @include floating-box-shadow(0.6);
   position: relative;
   z-index: 0;
 }
 
 .main-content-background {
-  background: getColor("blue");
+  background: get-color("blue");
   overflow: hidden !important;
   position: relative;
   z-index: 0;
@@ -234,7 +234,7 @@ export default {
     position: relative;
     z-index: 9;
     overflow: hidden;
-    @include lightBorderRounding();
+    @include light-border-rounding();
     bottom: 5%;
 }
 
@@ -247,17 +247,17 @@ export default {
   max-height: 300px;
   padding: 7px 4px 7px 4px;
   border-radius: 7px;
-  @include floatingBoxShadow(0.4);
+  @include floating-box-shadow(0.4);
 }
 
 .notifications-layer {
   z-index: 9;
   position: fixed;
-  background: themeRGBA('grey', 0.3);
+  background: get-color('grey', 0.3);
   width: 100vw;
   height: 100vh;
-  min-width: $minimumAppWidth;
-  @include flexboxDefault();
+  min-width: $minimum-app-width;
+  @include flexbox-default();
 }
 
 .notifications-size-position {
@@ -265,10 +265,10 @@ export default {
   height: auto;
   max-height: 400px;
   max-width: 400px;
-  @include floatingBoxShadow(0.4);
+  @include floating-box-shadow(0.4);
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       .page-padding {
         padding-bottom: 5%;
         padding-top: 13% !important;

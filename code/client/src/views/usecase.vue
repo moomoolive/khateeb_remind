@@ -250,15 +250,15 @@ export default {
 .content-container {
     width: 80vw;
     max-width: 1100px;
-    @include centerMargin();
-    background: getColor("silver");
+    @include center-margin();
+    background: get-color("silver");
     margin-top: 40px;
     padding-top: 20px;
     padding-left: 30px;
     padding-right: 30px;
     padding-bottom: 20px;
-    @include normalBorderRounding();
-    @include floatingBoxShadow();
+    @include normal-border-rounding();
+    @include floating-box-shadow();
 }
 
 .main-photo-section {
@@ -270,7 +270,7 @@ export default {
 .main-photo-frame {
     width: 50%;
     margin-top: 30px;
-    @include flexboxDefault();
+    @include flexbox-default();
 }
 
 .main-caption-container {
@@ -306,10 +306,10 @@ export default {
 
 .main-section-division {
     width: 100%;
-    border-bottom: getColor("grey") solid 5px;
+    border-bottom: get-color("grey") solid 5px;
     margin-top: 50px;
     margin-bottom: 50px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .signup-button-container {
@@ -324,7 +324,7 @@ export default {
     font-size: 18px;
     padding-top: 15px;
     padding-bottom: 15px;
-    @include floatingBoxShadow(0.30);
+    @include floating-box-shadow(0.30);
 
     &.last-button {
         width: 70%;
@@ -381,7 +381,7 @@ export default {
     font-size: 14px;
     margin-top: 7px;
     width: 90%;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .icons-subheading-warning {
@@ -413,7 +413,7 @@ export default {
 
 a {
     text-decoration: none;
-    color: getColor("grey");
+    color: get-color("grey");
 }
 
 .all-long-explanations-container {
@@ -435,7 +435,7 @@ a {
     margin-bottom: 50px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .long-explanation-header {
         font-size: 19px;

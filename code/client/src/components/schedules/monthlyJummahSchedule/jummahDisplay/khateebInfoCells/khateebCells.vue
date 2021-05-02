@@ -129,7 +129,7 @@ div {
     margin-bottom: 15px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .is-giving-khutbah-indicator {
         font-size: 12px;
     }

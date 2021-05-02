@@ -138,7 +138,7 @@ export default {
     color: red;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .delete-account {
         font-size: 3vh;
     }

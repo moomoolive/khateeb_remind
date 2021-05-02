@@ -30,7 +30,7 @@
             v-else
             :message="`No Entries for this Week`"
             :fontAwesomeIcon="['fas', 'calendar-alt']"
-            iconColor="darkBlue"
+            iconColor="dark-blue"
         />
 
     </div>
@@ -153,12 +153,12 @@ export default {
         font-size: 25px;
         text-decoration: none;
         margin-top: 5px;
-        color: getColor("offWhite");
+        color: get-color("off-white");
     }
 }
 
 .location-container {
-    background: themeRGBA("green", 0.7);
+    background: get-color("green", 0.7);
     width: 80%;
     margin-left: auto;
     margin-right: auto;
@@ -177,7 +177,7 @@ export default {
     font-size: 25px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
    
    .location-container {
         margin-bottom: 20%;

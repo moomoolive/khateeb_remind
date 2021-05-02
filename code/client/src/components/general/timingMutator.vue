@@ -83,7 +83,7 @@ p {
         color: black;
     }
     &.white {
-        color: getColor("offWhite");
+        color: get-color("off-white");
     }
     &.small {
         font-size: 15px;
@@ -98,7 +98,7 @@ button {
     }
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     p {
         font-size: 3.5vh;
     }

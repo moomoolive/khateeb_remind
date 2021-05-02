@@ -14,7 +14,7 @@
                         }
                     }"
                     :basedOn="$store.state.user.userInfo.systemSettings"
-                    :backgroundColor="`darkBlue`"
+                    :backgroundColor="`dark-blue`"
                     @submitted="saveRootSettings($event)"
                 />
             </div>

@@ -351,26 +351,26 @@ export default {
     margin-top: 20px;
     text-align: left;
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
     font-size: 15px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     line-height: 25px;
 }
 
 .delete-logo-container {
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
     display: flex;
     justify-content: flex-start;
 }
 
 .delete-logo-button {
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
     font-size: 17px;
     margin-top: 30px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .settings-container {
         flex-direction: column;

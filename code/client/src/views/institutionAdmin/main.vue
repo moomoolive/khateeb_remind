@@ -110,7 +110,7 @@ p {
     text-align: right;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       .notifications-size-position {
         width: 70%;
         height: 35vh;

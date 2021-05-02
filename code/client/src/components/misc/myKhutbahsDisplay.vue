@@ -177,7 +177,7 @@ div {
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
-    background: getColor("silver");
+    background: get-color("silver");
     border-radius: 7px;
     box-shadow: rgba(0, 0, 0, 0.34) 0px 3px 8px;
     margin-bottom: 15px;
@@ -216,7 +216,7 @@ div {
     max-width: 430px;
     margin-left: auto;
     margin-right: auto;
-    background: getColor("silver");
+    background: get-color("silver");
     border-radius: 7px;
     box-shadow: rgba(0, 0, 0, 0.4) 0px 3px 8px;
     padding-top: 20px;
@@ -225,8 +225,8 @@ div {
 }
 
 .status-text {
-    background: getColor("grey");
-    color: getColor("offWhite");
+    background: get-color("grey");
+    color: get-color("off-white");
     padding-top: 20px;
     padding-bottom: 20px;
     border-radius: 7px;
@@ -253,7 +253,7 @@ div {
     margin-bottom: 20px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .khutbahs-container {
         flex-direction: column;
     }

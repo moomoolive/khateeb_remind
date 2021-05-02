@@ -45,6 +45,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 @keyframes rise{
   0%{
     bottom:-100px;

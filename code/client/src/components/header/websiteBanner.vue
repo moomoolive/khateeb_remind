@@ -107,7 +107,7 @@ export default {
 
 <style lang="scss" scoped>
 .banner-container {
-    background: getColor("silver");
+    background: get-color("silver");
     font-size: 18px;
     padding-bottom: 3px;
     padding-top: 3px;
