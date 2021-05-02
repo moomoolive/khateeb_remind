@@ -34,8 +34,7 @@
 export default {
     name: "tutorialNotification",
     components: {
-        "general1": () => import("@/staticHTMLPages/tutorials/general/1.vue"),
-        "khateebs1": () => import("@/staticHTMLPages/tutorials/khateebs/1.vue")
+        "general1": () => import("@/staticHTMLPages/tutorials/general/1.vue")
     },
     props: {
         options: {
@@ -50,9 +49,6 @@ export default {
             tutorials: {
                 general: [
                     "Multiple Selector"
-                ],
-                khateebs: [
-                    "Getting Started"
                 ]
             }
         }

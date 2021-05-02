@@ -14,6 +14,19 @@
                 >
                     Feedback
                 </a>
+                <a 
+                    v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
+                    class="green"
+                    @click="$store.dispatch('user/downgradeUserAuthorization')"
+                >
+                    Exit Institution
+                </a>
+                <a 
+                    class="green"
+                    @click="logout()"
+                >
+                    Logout
+                </a>
             </div>
 
             <div class="footer-links-section">
@@ -85,6 +98,12 @@ export default {
         toHomepage() {
             if (this.$router.currentRoute.fullPath !== '/')
                 return this.$router.push({ path: "/" })
+        },
+        async logout() {
+            const confirm = await this._utils.confirm(`Are you sure you want to logout?`)
+            if (!confirm)
+                return
+            this.$store.dispatch('user/logout')
         }
     },
     computed: {
@@ -121,7 +140,7 @@ a {
     text-decoration: none;
     color: getColor("silver");
     font-size: 12px;
-    margin-bottom: 5px;
+    margin-bottom: 9px;
     cursor: pointer;
     
     &:hover {
@@ -182,12 +201,27 @@ a {
 
 @media screen and (max-width: $phoneWidth) {
     a {
-        font-size: 11px;
+        margin-bottom: 12px;
     }
 
     .footer-links-section-header {
         font-size: 13px;
         margin-right: 0px;
+    }
+
+    .footer-links-section {
+        margin-top: 0px;
+        padding-bottom: 15px;
+        margin-left: 20px;
+        margin-right: 40px;
+
+        &:first-child {
+            margin-top: 15px;
+        }
+
+        &:last-child {
+            padding-bottom: 0px;
+        }
     }
 
     .footer-links-section {
@@ -200,7 +234,7 @@ a {
         flex-direction: column;
         justify-content: center;
         padding-top: 7px;
-        padding-bottom: 30px;
+        padding-bottom: 0;
     }
 
     .footer-links-header-divide {

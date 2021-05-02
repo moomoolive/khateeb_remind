@@ -1,3 +1,5 @@
+@import './index.scss';
+
 div {
     margin: 0 0 0 0;
 
@@ -63,6 +65,7 @@ button {
     font-size: 16px;
     transition-duration: 0.4s;
     outline: none;
+    cursor: pointer;
 
     $marginOne: 7px;
     margin: $marginOne $marginOne $marginOne $marginOne;
@@ -91,4 +94,23 @@ button {
     }
 
     @include allColors();
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.7s ease-in;
+}
+.dropdown-enter,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }

@@ -90,7 +90,7 @@ export default {
     },
     computed: {
         userType() {
-            return this.$store.state.user.userInfo.__t
+            return this.$store.getters['user/type']
         },
         showInstitutionLogo() {
             return this.imageSrc !== require('@/assets/logos/genericInstitution.png') && !this.isLoggedInAsGenericUser

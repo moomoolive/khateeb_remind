@@ -7,22 +7,3 @@
         100%	{ opacity: $fullOpacity;}
     }   
 }
-
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.7s ease-in;
-}
-.dropdown-enter,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}

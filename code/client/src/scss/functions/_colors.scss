@@ -1,0 +1,12 @@
+@use "sass:map";
+
+@import '~@/scss/consts/_colors.scss';
+
+@function getColor($name) {
+    @return map.get($themeColors, $name);
+}
+
+@function themeRGBA($name, $opacity) {
+    $hex: getColor($name);
+    @return rgba($hex, $opacity)
+};

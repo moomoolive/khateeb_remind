@@ -52,7 +52,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/scss/jummahSchedule/buttons.scss';
+@import '~@/scss/individualStyleSheets/_jummahSchedule.scss';
 
 button {
     font-size: 17px;

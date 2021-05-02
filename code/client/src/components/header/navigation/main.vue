@@ -170,6 +170,7 @@ export default {
   padding: 5px;
   position: absolute;
   left: 5px;
+  cursor: pointer;
 }
 
 .signup-buttons {
@@ -206,6 +207,7 @@ export default {
   font-size: 35px;
   margin-left: 10px;
   margin-right: 10px;
+  cursor: pointer;
 
   &.active {
     color: getColor("blue");
