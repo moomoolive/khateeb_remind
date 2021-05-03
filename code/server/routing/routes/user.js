@@ -257,7 +257,6 @@ router.put(
     ),
     async (req, res) => {
         try {
-            console.log(req.headers)
             const notification = await $db.notifications.findOne({ _id: req.body._id }).exec()
             if (notification.userID.toString() !== req.headers.userid)
                 return res.status(403).json({ msg: `You're not allowed to edit this notification (id: ${req.body._id})` })

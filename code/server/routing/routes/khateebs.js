@@ -14,57 +14,77 @@ router.get(
     authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
-            const data = await $db.userScheduleRestrictions
-                .aggregate([
-                    { 
-                        $match: { 
-                            institution: mongoose.Types.ObjectId(req.headers.institutionid) 
-                        } 
-                    },
-                    { 
-                        $lookup: { 
-                            from: "users",
-                            localField: "user",
-                            foreignField: "_id",
-                            as: "khateeb"
-                        } 
-                    },
-                    { $unwind: '$khateeb' },
-                    {
-                        $lookup: {
-                            from: "authorizations",
-                            localField: "khateeb.authorizations",
-                            foreignField: "_id",
-                            as: "khateeb.authorizations"
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: "$khateeb._id",
-                            handle: "$khateeb.handle",
-                            email: "$khateeb.email",
-                            statuses: "$khateeb.statuses",
-                            title: "$khateeb.title",
-                            firstName: "$khateeb.firstName",
-                            lastName: "$khateeb.lastName",
-                            lastLogin: "$khateeb.lastLogin",
-                            createdAt: "$khateeb.createdAt",
-                            updatedAt: "$khateeb.updatedAt",
-                            availableTimings: "$availableTimings",
-                            unavailableDates: "$unavailableDates",
-                            authRef: {
-                                $filter: {
-                                    input: "$khateeb.authorizations",
-                                    as: "authRef",
-                                    cond: { $eq: ["$$authRef.institution", req.headers.institutionid] } 
-                                }
-                            }
-                        },
-                    },
-                    { $unwind: "$authRef" },
-                ])
-                .exec()
-            return res.json({ data })
+            const khateebAuthorization = await $db.authorizations.findOne({ 
+                institution: req.headers.institutionid,
+                role: 'khateeb'
+            }).exec()
+            if (!khateebAuthorization)
+                return res.status(422).json({ 
+                    data: [], 
+                    msg: `Requested authorization doesn't exist. Authorization reference: role=khateeb institution=${req.headers.institutionid}` 
+                })
+            const data = await $db.users.aggregate([
+                // get users that have the 'khateeb' authorization key for 
+                // requesting institution
+                { 
+                    $match: { "authorizations.authId": khateebAuthorization._id } 
+                },
+                { $unwind: "$authorizations" },
+                // perform "join" on the "authorization" field
+                {
+                    $lookup: {
+                        from: "authorizations",
+                        localField: "authorizations.authId",
+                        foreignField: "_id",
+                        as: "authorizations.info"
+                    }
+                },
+                { $unwind: "$authorizations.info" },
+                // filter out authorizations that aren't relavent to 
+                // being a khateeb at this institution
+                {
+                    $match: { 
+                        "authorizations.info.institution": req.headers.institutionid,
+                        "authorizations.info.role": "khateeb"
+                    }
+                },
+                // perform "join" on the "scheduleRestriction" field
+                {
+                    $lookup: {
+                        // aggregate won't find model unless the model name
+                        // is all lowercase and will NOT work with camel case
+                        from: "userschedulerestrictions",
+                        localField: "scheduleRestrictions",
+                        foreignField: "_id",
+                        as: "schedule"
+                    }
+                },
+                { $unwind: '$schedule' },
+                // filter out schedule restrictions and that aren't 
+                // related to requesting institution
+                { 
+                    $match: { "schedule.institution": mongoose.Types.ObjectId(req.headers.institutionid), } 
+                },
+                // cast khateebs to desired data structure
+                {
+                    $project: {
+                        _id: "$_id",
+                        handle: "$handle",
+                        email: "$email",
+                        title: "$title",
+                        firstName: "$firstName",
+                        lastName: "$lastName",
+                        lastLogin: "$lastLogin",
+                        createdAt: "$authorizations.createdAt",
+                        updatedAt: "$authorizations.updatedAt",
+                        availableTimings: "$schedule.availableTimings",
+                        unavailableDates: "$schedule.unavailableDates",
+                        confirmed: "$authorizations.confirmed",
+                        authorizationId: "$authorizations._id"
+                    }
+                }
+            ]).exec()
+            return res.json({ data, authorizationReference: khateebAuthorization._id })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ data: [], msg: `Error retrieving khateebs. Err trace: ${err}` })

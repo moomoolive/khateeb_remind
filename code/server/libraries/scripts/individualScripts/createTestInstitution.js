@@ -96,12 +96,17 @@ const createTestInstitution = async () => {
 
                     // create fake schedule restrictions for each khateeb
                     // that is somewhat random
-                    await new $db.userScheduleRestrictions({
+                    const scheduleRestriction = await new $db.userScheduleRestrictions({
                         institution: institutionID,
-                        user: khateeb._id.toString(),
+                        user: khateeb._id,
                         availableTimings: i % 2 === 0 ? [] : testInstitutionTimings[i] ? [testInstitutionTimings[i]._id.toString()] : [],
                         unavailableDates: i % 2 === 0 ? [{ vCalendarId, date }] : [],
                     }).save()
+                    
+                    await $db.users.update(
+                        { _id: khateeb._id },
+                        { scheduleRestrictions: [scheduleRestriction._id] }
+                    )
 
                 } catch(err) {
                     ids.push(`Error occured creating khateeb #${i + 1}. Err trace: ${err}`)

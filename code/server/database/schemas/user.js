@@ -102,6 +102,11 @@ const user = new mongoose.Schema({
             required: false,
             default: false
         }
+    },
+    scheduleRestrictions: {
+        type: [{ type: mongoose.Types.ObjectId, ref: 'userScheduleRestriction' }],
+        required: false,
+        default: () => []
     }
 }, { timestamps: true })
 
