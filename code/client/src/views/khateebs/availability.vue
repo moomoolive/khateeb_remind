@@ -1,6 +1,15 @@
 <template>
     <div>
 
+        <div class="settings-header">
+            Availability Settings
+        </div>
+        <div class="settings-sub-header">
+            <span class="dark-blue">
+                {{ $store.state.user.institution.abbreviatedName }}
+            </span>
+        </div>
+
         <div class="settings-container">
 
             <collapsable-box
@@ -11,7 +20,7 @@
                 <selection-picker
                     :options="availableTimingsSelection"
                     :currentlySelected="availableTimings"
-                    @changed="updateInfo({ availableTimings: $event })"
+                    @changed="updateScheduleRestrictions({ availableTimings: $event })"
                 />
             </collapsable-box>
 
@@ -59,7 +68,11 @@ export default {
     data() {
         return {
             locations: [],
-            timings: []
+            timings: [],
+            userInfo: {
+                availableTimings: [],
+                unavailableDates: []
+            }
         }
     },
     methods: {
@@ -68,28 +81,34 @@ export default {
             this.locations = locations
             this.timings = timings
         },
+        async getScheduleRestrictions() {
+            const res = await this._api.user.getScheduleRestrictions()
+            this.userInfo = res
+        },
         addToUnavailableDays(newVCalendarDate={}) {
             const friday = 5
             const unavailableDates = this._utils.deepCopy(this.userInfo.unavailableDates)
-            if (newVCalendarDate.date.getDay() !== friday)
+            if (newVCalendarDate.date.getDay() !== friday) {
                 return
+            }
             const found = unavailableDates.findIndex(date => date.vCalendarId === newVCalendarDate.id)
-            if (found >= 0)
+            if (found >= 0) {
                 unavailableDates.splice(found, 1)
-            else
+            } else {
                 unavailableDates.push({ vCalendarId: newVCalendarDate.id, date: newVCalendarDate.date.toISOString() })
-            this.updateInfo({ unavailableDates })
+            }
+            this.updateScheduleRestrictions({ unavailableDates })
         },
-        async updateInfo(update={}) {
-            const res = await this._api.user.updateInfo(update)
-            if (!res.data)
+        async updateScheduleRestrictions(update={}) {
+            const res = await this._api.user.updateScheduleRestrictions(update)
+            if (!res) {
                 return this._utils.alert(`There was problem make your changes`)
+            } else {
+                this.userInfo = res
+            }
         },
     },
     computed: {
-        userInfo() {
-            return this.$store.state.user.userInfo
-        },
         availableTimings() {
             return this.userInfo.availableTimings
         },
@@ -137,6 +156,7 @@ export default {
         }
     },
     watch: {
+        /*
         async unavailableDates(newVal, oldVal) {
             if (newVal.length === oldVal.length)
                 return
@@ -162,9 +182,11 @@ export default {
                 msg: `${this.usersFullNameWithTitle} ${lessAvailable ? `is less available nowadays to give` : `is now available to give more` } khutbahs${lessAvailable ? `.` : ` insha'Allah!`} Check out his profile for more details.` 
             })
         }
+        */
     },
     created() {
         this.getAvailableTimings()
+        this.getScheduleRestrictions()
     }
 }
 </script>
@@ -188,6 +210,16 @@ export default {
     margin-bottom: 20px;
     margin-top: 20px;
     line-height: 20px;
+}
+
+.settings-header {
+    font-size: 27px;
+    margin-bottom: 7px;
+}
+
+.settings-sub-header {
+    font-size: 20px;
+    margin-bottom: 50px;
 }
 
 @media screen and (max-width: $phone-width) {

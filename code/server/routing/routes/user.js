@@ -22,8 +22,6 @@ router.put(
             validator.body("email").isEmail().optional(),
             validator.body("firstName").isLength({ min: 1 }).isString().optional(),
             validator.body("lastName").isLength({ min: 1 }).isString().optional(),
-            validator.body("availableTimings").isArray().optional(),
-            validator.body("unavailableDates").isArray().optional(),
             validator.body("title").isLength({ min: 1 }).isString().optional(),
             validator.body("systemSettings.autoConfirmRegistration").isBoolean().optional(),
             validator.body("settings.recieveExternalNotification").isBoolean().optional(),
@@ -337,5 +335,45 @@ router.put('/pwa-subscription',
             return res.status(503).json({ data: {}, msg: `Couldn't delete subscription. ${err}` })
         }
 })
+
+router.get('/schedule-restrictions', async (req, res) => {
+    try {
+        const data = await $db.userScheduleRestrictions
+            .findOne({
+                institution: req.headers.institutionid,
+                user: req.headers.userid
+            })
+            .exec()
+        return res.json({ data })
+    } catch(err) {
+        console.error(err)
+        return res.status(503).json({ data: { availableTimings: [], unavailableDates: [] }, msg: `Couldn't fetch schedule restrictions ${err}` })
+    }
+})
+
+router.put(
+    '/schedule-restrictions', 
+    validationMiddleware.validateRequest(
+        [
+            validator.body("availableTimings").isArray().optional(),
+            validator.body("unavailableDates").isArray().optional(),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            const data = await $db.userScheduleRestrictions
+                .findOneAndUpdate(
+                    { user: req.headers.userid, institution: req.headers.institutionid },
+                    req.body,
+                    { new: true }
+                )
+                .exec()
+            return res.json({ data })
+        } catch(err) {
+            console.log(err)
+            return res.status(503).json({ data: null, msg: `An error occured when updating profile. Err trace: ${err}` })
+        }
+    }
+)
 
 module.exports = router

@@ -108,6 +108,36 @@ const requests = {
         } catch {
             return 1
         }
+    },
+    async getScheduleRestrictions() {
+        try {
+            const { data: res } = await axios.get(extension + '/schedule-restrictions')
+            if (!res || !Array.isArray(res.availableTimings) || !Array.isArray(res.unavailableDates)) {
+                throw TypeError(`incorrect type recieved from response`)
+            } else {
+                return { 
+                    unavailableDates: res.unavailableDates,
+                    availableTimings: res.availableTimings 
+                }
+            }
+        } catch {
+            return { availableTimings: [], unavailableDates: [] }
+        }
+    },
+    async updateScheduleRestrictions(info={}) {
+        try {
+            const { data: res } = await axios.put(extension + '/schedule-restrictions', info)
+            if (!res || !Array.isArray(res.availableTimings) || !Array.isArray(res.unavailableDates)) {
+                return null
+            } else {
+                return { 
+                    unavailableDates: res.unavailableDates,
+                    availableTimings: res.availableTimings 
+                }
+            }
+        } catch {
+            return null
+        }
     }
 }
 

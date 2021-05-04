@@ -25,7 +25,7 @@
                             Confirm {{ admin.firstName }} {{ admin.lastName }}'s Registration
                         </button>
                         <div v-if="admin.confirmed">
-                            <user-form-template 
+                            <user-form-template
                                 :formProps="{
                                     readOnly: true,
                                     basedOn: admin,
