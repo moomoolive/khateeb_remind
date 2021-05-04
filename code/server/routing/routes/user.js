@@ -8,6 +8,7 @@ const validationMiddleware = require($rootDir + '/middleware/validation/main.js'
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const requestValidationHelpers = require($rootDir + '/libraries/requestValidation/main.js')
 const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
+const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 
 const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 1 }))
@@ -187,13 +188,14 @@ router.post(
             const authorizationAlreadyExists = userInfo.authorizations.find(a => a.authId === authInfo._id)
             if (authorizationAlreadyExists)
                 return res.status(403).json({ code: 3, msg: `Illegal operation. Authorization already exists` })
+            const autoConfirmPolicy = authInfo.institution.settings.autoConfirmRegistration
             const updateCommand = { 
                 $push: { 
                     authorizations: { 
                         authId: authInfo._id, 
                         // system administrators can never be autoconfirmed
                         // only khateebs can be if administrator turns on that setting
-                        confirmed: req.body.role !== 'khateeb' ? false : authInfo.institution.settings.autoConfirmRegistration
+                        confirmed: req.body.role !== 'khateeb' ? false : autoConfirmPolicy
                     } 
                 } 
             }
@@ -203,6 +205,9 @@ router.post(
                     institution: req.body.institution 
                 }).save()
                 updateCommand.$push.scheduleRestrictions = scheduleRestriction._id
+                const note = new notificationConstructors.KhateebSignupNotificationConstructor(userInfo, autoConfirmPolicy)
+                await note.setRecipentsToAdmins(authInfo.institution._id)
+                note.create()
             }
             await $db.users.update({ _id: userInfo._id }, updateCommand)
             return res.json({ code: 0 })
@@ -296,7 +301,7 @@ router.post('/pwa-subscription', async (req, res) => {
     try {
         let subscriptions = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).exec()
         if (!subscriptions)
-            subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid, institutionID: req.headers.institutionid }).save()
+            subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid }).save()
         if (subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid))
             return res.json({ code: 0, msg: `This device is already subscribed to notifications` })
         const deviceIdentification = new DeviceDetector().parse(req.headers["user-agent"])

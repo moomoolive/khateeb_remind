@@ -32,7 +32,7 @@ router.post(
         validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("timingID").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("locationID").isLength($config.consts.mongooseIdLength).isString(),
-        validator.body("khateebID").isString().custom(requestValidationHelpers.validIdOrNullIdInField),
+        validator.body("khateebID").custom(requestValidationHelpers.validIdOrNullIdInField).isString(),
         validator.body("notificationID").isString().custom(requestValidationHelpers.validIdOrNullIdInField),
         validator.body("date").isLength({ min: 1 }),
         validator.body("notified").isBoolean(),
@@ -53,7 +53,7 @@ router.post(
             const data = await new $db.jummahPreferences(req.body).save()
             if (req.headers.usertype === 'khateeb') {
                 const jummahMeta = await data.gatherMeta()
-                const khateeb = await $db.khateebs.findOne({ _id: req.headers.userid }).exec()
+                const khateeb = await $db.users.findOne({ _id: req.headers.userid }).exec()
                 const note = new notificationConstructors.khateebJummahSignupConstructor(khateeb, data, jummahMeta)
                 await note.setRecipentsToAdmins(req.headers.institutionid)
                 note.create()

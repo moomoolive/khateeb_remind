@@ -9,9 +9,14 @@
                 />
             </span>
             
+            <div class="msg-container">
+                <div v-if="options.headline" class="headline">
+                    {{ options.headline }}
+                </div>
 
-            <div :class="`msg ${options.textSize ? options.textSize : 'large'}`">
-                {{ options.msg }}<br>
+                <div :class="`msg ${options.textSize ? options.textSize : 'large'}`">
+                    {{ options.msg }}<br>
+                </div>
             </div>
             
             <button
@@ -62,7 +67,6 @@ export default {
 
 <style lang="scss" scoped>
 .msg {
-    margin-top: 25px;
     margin-left: auto;
     margin-right: auto;
     line-height: 23px;
@@ -76,6 +80,15 @@ export default {
     &.large {
         font-size: 32px;
     }
+}
+
+.msg-container {
+    margin-top: 25px;
+}
+
+.headline {
+    font-size: 25px;
+    font-weight: bold;
 }
 
 .topAnchor {
@@ -121,7 +134,11 @@ button {
         &.large {
             font-size: 26px;
         }
-}
+    }
+    
+    .headline {
+        font-size: 21px;
+    }
 }
 
 </style>

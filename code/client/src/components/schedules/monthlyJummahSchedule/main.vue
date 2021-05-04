@@ -11,6 +11,7 @@
                 :selectedDate="selectedDate"
                 :viewingWeekIsCurrentPastOrFuture="viewingWeekIsCurrentPastOrFuture"
                 :maxNotificationLoopRunCount="maxNotificationLoopRunCount"
+                :khateebsavailableForSelectedWeek="khateebsavailableForSelectedWeek"
                 @run-notification-loop="$emit('run-notification-loop', $event)"
                 @clear-notifications="$emit('update-preference', $event)"
                 @khateeb-signup="$emit('khateeb-signup', $event)"

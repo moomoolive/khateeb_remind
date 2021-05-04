@@ -11,7 +11,6 @@ webpush.setVapidDetails(
 
 const sendPushMessage = async (subscription={}, dataToSend={}) => {
     try {
-        console.log('sub', subscription)
         const browserAPIRes = await webpush.sendNotification(
             subscription, 
             JSON.stringify({ 

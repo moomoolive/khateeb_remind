@@ -1,61 +1,64 @@
 <template>
     <div>
-
         <div class="settings-header">
             Availability Settings
         </div>
+
         <div class="settings-sub-header">
             <span class="dark-blue">
                 {{ $store.state.user.institution.abbreviatedName }}
             </span>
         </div>
+        
+        <loading>
 
-        <div class="settings-container">
+            <div class="settings-container">
 
-            <collapsable-box
-                class="user-setting"
-                :headline="`Available Timings`"
-                :tagDetails="availableTimingsTag"
-            >
-                <selection-picker
-                    :options="availableTimingsSelection"
-                    :currentlySelected="availableTimings"
-                    @changed="updateScheduleRestrictions({ availableTimings: $event })"
-                />
-            </collapsable-box>
+                <collapsable-box
+                    class="user-setting"
+                    :headline="`Available Timings`"
+                    :tagDetails="availableTimingsTag"
+                >
+                    <selection-picker
+                        :options="availableTimingsSelection"
+                        :currentlySelected="availableTimings"
+                        @changed="updateScheduleRestrictions({ availableTimings: $event })"
+                    />
+                </collapsable-box>
 
-            <collapsable-box
-                class="user-setting"
-                :headline="`Unavailable Dates`"
-            >
-                
-                <div class="unavailable-date-info-header">
-                    Click on a date to mark it as unavailable<br><br>
-                    <span class="blue">Blue dot</span> indicates current date<br>
-                    <span class="red">Red dot</span> indicates unavailable date
-                </div>
+                <collapsable-box
+                    class="user-setting"
+                    :headline="`Unavailable Dates`"
+                >
+                    
+                    <div class="unavailable-date-info-header">
+                        Click on a date to mark it as unavailable<br><br>
+                        <span class="blue">Blue dot</span> indicates current date<br>
+                        <span class="red">Red dot</span> indicates unavailable date
+                    </div>
 
-                <v-calendar
-                    class="calendar"
-                    color="blue"
-                    :disabled-unavailableDates='[ { weekdays: [1, 2, 3, 4, 5, 7] }, ...unavailableDates ]'
-                    @dayclick="addToUnavailableDays($event)"
-                    :min-date="new Date()"
-                    :attributes="vCalendarAttributes"
-                    is-dark
-                    is-range
-                />
+                    <v-calendar
+                        class="calendar"
+                        color="blue"
+                        :disabled-unavailableDates='[ { weekdays: [1, 2, 3, 4, 5, 7] }, ...unavailableDates ]'
+                        @dayclick="addToUnavailableDays($event)"
+                        :min-date="new Date()"
+                        :attributes="vCalendarAttributes"
+                        is-dark
+                        is-range
+                    />
 
-            </collapsable-box>
+                </collapsable-box>
 
-        </div>
-
+            </div>
+        </loading>
     </div>
 </template>
 
 <script>
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import selectionPicker from '@/components/general/selectionPicker.vue'
+import loading from '@/components/general/loadingScreen.vue'
 
 import khateebHelpers from '@/libraries/khateebs/main.js'
 
@@ -63,7 +66,8 @@ export default {
     name: "khateebAvailability",
     components: {
         collapsableBox,
-        selectionPicker
+        selectionPicker,
+        loading
     },
     data() {
         return {
@@ -156,7 +160,6 @@ export default {
         }
     },
     watch: {
-        /*
         async unavailableDates(newVal, oldVal) {
             if (newVal.length === oldVal.length)
                 return
@@ -182,7 +185,6 @@ export default {
                 msg: `${this.usersFullNameWithTitle} ${lessAvailable ? `is less available nowadays to give` : `is now available to give more` } khutbahs${lessAvailable ? `.` : ` insha'Allah!`} Check out his profile for more details.` 
             })
         }
-        */
     },
     created() {
         this.getAvailableTimings()

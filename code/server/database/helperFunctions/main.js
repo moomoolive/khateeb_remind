@@ -20,5 +20,5 @@ const getUserScheduleRestrictionsAssociatedWithInstitution = async (userId="1234
 
 module.exports = {
     removeAuthorizationFromUserCommand,
-    getUserScheduleRestrictionsAssociatedWithInstitution
+    getUserScheduleRestrictionsAssociatedWithInstitution,
 }

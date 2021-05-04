@@ -46,9 +46,17 @@ module.exports = class NotificationConstructor {
 
     async getInstitutionAdmins(institutionID) {
         try {
-            const rootAdmin = await $db.rootInstitutionAdmins.findOne({ institutionID }).exec()
-            const otherAdmins = await $db.institutionAdmins.find({ institutionID }).exec()
-            return [rootAdmin, ...otherAdmins]
+            const authorizations = await $db.authorizations
+                .find({ institution: institutionID })
+                .exec()
+            const rootAdminAuthorization = authorizations.find(a => a.role === 'rootInstitutionAdmin')
+            const adminAuthorization = authorizations.find(a => a.role === 'institutionAdmin')
+            const allAdmins = await $db.users
+                .find({ 
+                    "authorizations.authId": { $in: [rootAdminAuthorization._id, adminAuthorization._id] } 
+                })
+                .exec()
+            return Array.isArray(allAdmins) ? allAdmins : []
         } catch(err) {
             console.log(err)
             return []
@@ -57,8 +65,8 @@ module.exports = class NotificationConstructor {
 
     compileNotificationInfo(user) {
         return {
-            userID: user._id.toString(),
-            institutionID: user.institutionID.toString(),
+            userID: user._id,
+            institutionID: user.institutionID,
             tag: this.tag,
             msg: this.msg(user),
             meta: this.meta,

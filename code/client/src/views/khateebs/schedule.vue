@@ -62,7 +62,7 @@ export default {
       async khateebSignup(newJummahPreference={}) {
         if (!this.institutionSettings.allowJummahSignup)
           return this._utils.alert(`Unfortunately your administrator has not allowed jummah signups! If you want this feature please talk to your administrator.`)
-        const newPreference = await this._api.jummahs.createNewPreference(newJummahPreference)
+        const newPreference = await this._api.jummahs.createNewJummahPreference(newJummahPreference)
         if (Object.keys(newPreference).length > 0)
           this.jummahs.push(newPreference)
       },

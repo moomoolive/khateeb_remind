@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 const bcyrpt = require('bcrypt')
 
-const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
 const authorization = new mongoose.Schema({
@@ -136,7 +135,11 @@ user.pre('save', function(next) {
 
 user.post('save', async function(user, next) {
     try {
-        await notificationConstructors.WelcomeNotificationConstructor(user)
+        await new $db.notifications({
+            tag: 'welcome',
+            msg: `Asalam aliakoum ${user.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. If you ever need help take a look at the tutorials in your navigation!`,
+            userID: this._id
+        }).save()
         return next()
     } catch(err) {
         console.log(err)
