@@ -11,7 +11,7 @@ const appWillUpdateMessage = () => {
             color: 'blue',
             topMessage: "Updates Detected",
             bottomMessage: "Reloading in a Moment...",
-            closeAfter: toSeconds + 2
+            closeAfter: toSeconds + 3
         }
     )
 }

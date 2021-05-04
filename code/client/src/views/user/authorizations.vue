@@ -30,9 +30,15 @@
                         class="authorization-container"
                     >
                         <button
-                            :disabled="!authorization.confirmed"
+                            :disabled="
+                                !authorization.confirmed ||
+                                (
+                                    loadingAuth !== 'none' &&
+                                    loadingAuth !== authorization._id
+                                )
+                            "
                             class="authorization-button"
-                            @click="upgradeUserAuthorization(authorization.authId)"
+                            @click="upgradeUserAuthorization(authorization)"
                         >
                             Sign in as a
                             <span class="blue">
@@ -42,13 +48,27 @@
                             <span class="red">
                                 {{ _utils.stringFormat(authorization.authId.institution.name) }}
                             </span>
-                            <div class="confirmation-status">
-                                <span :class="authorization.confirmed ? 'green' : 'yellow' ">
-                                    <fa-icon :icon="authorization.confirmed ? 'lock-open' : 'lock' " />
-                                </span>
-                                <span class="confirmation-status-text ">
-                                    {{ authorization.confirmed ? "Confirmed" : 'Pending' }}
-                                </span>
+                            <div class="authorization-bottom-section">
+                                
+                                <div class="confirmation-status">
+                                    <span :class="authorization.confirmed ? 'green' : 'yellow' ">
+                                        <fa-icon :icon="authorization.confirmed ? 'lock-open' : 'lock' " />
+                                    </span>
+                                    <span class="confirmation-status-text ">
+                                        {{ authorization.confirmed ? "Confirmed" : 'Pending' }}
+                                    </span>
+                                </div>
+
+                                <div 
+                                    :class="`loading-icon ${loadingAuth === authorization._id ? '' : 'invisible' }`"
+                                >
+                                    <img 
+                                        src="~@/assets/gifs/loading.gif"
+                                        class="loading-animation" 
+                                        alt="loading animation"
+                                    >
+                                </div>
+
                             </div>
                         </button>
                         <!-- 
@@ -100,6 +120,8 @@ export default {
     data() {
         return {
             userInfo: {},
+            loadingAuth: 'none',
+            readyToGoIntoInstitution: new Promise((resolve) => resolve(true))
         }
     },
     methods: {
@@ -108,16 +130,26 @@ export default {
             this.userInfo = data
             return this.$store.dispatch('user/updateUserInfo', data)
         },
+        promptLoadingIconOnPressingAuthorization(id="12345") {
+            this.loadingAuth = id
+            this.readyToGoIntoInstitution = new Promise(resolve => {
+                const twoSecondsInMilliseconds = 2_000
+                window.setTimeout(() => resolve(true), twoSecondsInMilliseconds)
+            })
+        },
         async upgradeUserAuthorization(authInfo={}) {
+            this.promptLoadingIconOnPressingAuthorization(authInfo._id)
             const { token } = await this._api.user.upgradeAuthorization({
-                authId: authInfo._id,
-                role: authInfo.role,
-                institutionID: authInfo.institution._id
+                authId: authInfo.authId._id,
+                role: authInfo.authId.role,
+                institutionID: authInfo.authId.institution._id
             })
             if (!token)
                 return this._utils.alert(`A problem occurred when signing in`)
+            // create a consistent delay before login
+            await this.readyToGoIntoInstitution
             this.$store.dispatch('user/updateToken', token)
-            this.$store.dispatch('user/updateInstitutionInfo', authInfo.institution)
+            this.$store.dispatch('user/updateInstitutionInfo', authInfo.authId.institution)
             return this.authUpgradeRedirect()
         },
         authUpgradeRedirect() {
@@ -200,6 +232,27 @@ button {
     font-size: 14px;
     padding-left: 9px;
     margin-top: 7px;
+    width: 48%;
+}
+
+.authorization-bottom-section {
+    display: flex;
+    align-items: flex-end;
+}
+
+.loading-icon {
+    width: 48%;
+    text-align: right;
+
+    &.invisible {
+        visibility: hidden;
+    }
+}
+
+.loading-animation {
+    width: 45px;
+    position: relative;
+    top: 7px;
 }
 
 .delete-auth-button {

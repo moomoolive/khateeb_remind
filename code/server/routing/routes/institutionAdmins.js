@@ -56,8 +56,13 @@ router.get(
                         createdAt: "$authorizations.createdAt",
                         updatedAt: "$authorizations.updatedAt",
                         confirmed: "$authorizations.confirmed",
-                        authorizationId: "$authorizations._id"
+                        authorizationId: "$authorizations._id",
+                        active: "$active"
                     }
+                },
+                // filter by request query
+                {
+                    $match: req.query
                 }
             ]).exec()
             return res.json({ data })
@@ -66,31 +71,6 @@ router.get(
             return res.status(503).json({ data: [], msg: `Couldn't retrieve institution admins. Err trace: ${err}` })
         }
 })
-
-/*
-router.post("/",
-    postRequestMiddleware.appendUserInfoToBody("institutionID"),
-    validationMiddleware.validateRequest(
-        [
-            validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
-            validator.body("password").isLength({ min: 6 }).isString(),
-            validator.body("username").isLength({ min: 6 }).isString(),
-            validator.body("handle").isLength({ min: 1 }).isString(),
-            validator.body("email").isEmail(),
-            validator.body("firstName").isLength({ min: 1 }).isString(),
-            validator.body("lastName").isLength({ min: 1 }).isString(),
-        ]
-    ),
-    async (req, res) => {
-        try {
-            const data = await new $db.institutionAdmins({ ...req.body, confirmed: true }).save()
-            return res.json({ data })
-        } catch(err) {
-            console.log(err)
-            return res.status(503).json({ data: {}, msg: `Couldn't create new institution admin. Err trace: ${err}` })
-        }
-})
-*/
 
 router.put(
     '/',

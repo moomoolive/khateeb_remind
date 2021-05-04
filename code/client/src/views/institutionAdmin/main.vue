@@ -42,7 +42,8 @@ export default {
                 {
                     name: 'Other Administrators',
                     route: 'create-others',
-                    auth: { level: 4 }
+                    auth: { level: 4 },
+                    blinking: false
                 },
                 {
                     name: 'Settings',
@@ -57,18 +58,29 @@ export default {
             const pendingCount = pendingKhateebs.length
             this.outboundLinks[2].blinking = pendingCount > 0
         },
+        async fetchPendingInstitutionAdminCount() {
+            if (this.$store.getters['user/type'] !== 'rootInstitutionAdmin')
+                return
+            const pendingAdmins = await this._api.institutionAdmins.getOtherAdmins({ confirmed: false })
+            this.outboundLinks[3].blinking = pendingAdmins.length > 0
+        },
+        getPendingUsersCount() {
+            this.verifyPending()
+            this.fetchPendingInstitutionAdminCount()
+        }
     },
     watch:{
         currentRoute(newVal) {
-            if (newVal === '/institutionAdmin')
-                this.verifyPending()
+            if (newVal === '/institutionAdmin') {
+                this.getPendingUsersCount()
+            }
         }
     },
     updated() {
         this.currentRoute = this.$router.currentRoute.fullPath
     },
     created() {
-        this.verifyPending()
+        this.getPendingUsersCount()
     }
 }
 </script>

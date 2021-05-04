@@ -44,11 +44,14 @@
                         -->
                         <div
                             v-if="
-                                !userPermissions[`${institution._id}-khateeb`] ||
-                                !(
-                                    userPermissions[`${institution._id}-institutionAdmin`] || 
-                                    userPermissions[`${institution._id}-rootInstitutionAdmin`]
-                                ) 
+                                (
+                                    !userPermissions[`${institution._id}-khateeb`] ||
+                                    !(
+                                        userPermissions[`${institution._id}-institutionAdmin`] || 
+                                        userPermissions[`${institution._id}-rootInstitutionAdmin`]
+                                    )
+                                ) &&
+                                selectedInstitution === 'none'
                             " 
                             class="signup-link-container"
                         >
@@ -74,6 +77,17 @@
                                 </span> 
                                 Signup as Khateeb
                             </div>
+                        </div>
+                         <!-- v-if="selectedInstitution === institution._id" -->
+                        <div 
+                            v-if="selectedInstitution === institution._id"
+                            :class="`loading-icon`"
+                        >
+                            <img 
+                                src="~@/assets/gifs/loading.gif"
+                                class="loading-animation" 
+                                alt="loading animation"
+                            >
                         </div>
                     </div>
                 </div>
@@ -105,7 +119,9 @@ export default {
     data() {
         return {
             allInstitutions: [],
-            institutionLogosFromRequest : []
+            institutionLogosFromRequest : [],
+            selectedInstitution: 'none',
+            readyToGoToAuthorizations: new Promise(resolve => resolve(true))
         }
     },
     methods: {
@@ -128,6 +144,13 @@ export default {
             const target = this.institutionLogosFromRequest.find(i => i.id === institutionID)
             target.image = image
         },
+        promptLoadingIconOnPressingInstitution(id="1234") {
+            this.selectedInstitution = id
+            this.readyToGoToAuthorizations = new Promise(resolve => {
+                const milliseconds = 2_500
+                window.setTimeout(() => resolve(true), milliseconds)
+            })
+        },
         signupPipeline(institutionInfo={}, role="khateeb") {
             if (this.$store.getters['user/isLoggedIn'])
                 return this.addAuthorization(institutionInfo, role)
@@ -135,9 +158,13 @@ export default {
                 return
         },
         async addAuthorization(institutionInfo={}, role="khateeb") {
+            this.promptLoadingIconOnPressingInstitution(institutionInfo._id)
             const res = await this._api.user.addAuthorization({ institution: institutionInfo._id, role })
             if (res === 0) {
+                await this.readyToGoToAuthorizations
                 this._utils.toHomePage()
+            } else {
+                this._utils.alert(`A problem occurred when signing you up`)
             }
         }
     },
@@ -173,6 +200,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.loading-animation {
+    width: 105px;
+    text-align: center;
+}
+
+.loading-icon {
+    margin-left: 110px;
+}
+
 .institution-selection-button {
     width: 80%;
     max-width: 600px;
@@ -252,6 +288,11 @@ export default {
     .signup-link-container {
         margin-left: 0px;
         margin-top: 20px;
+    }
+
+    .loading-icon {
+        width: 100%;
+        margin-left: 0;
     }
 }
 </style>

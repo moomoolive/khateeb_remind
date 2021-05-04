@@ -81,8 +81,13 @@ router.get(
                         availableTimings: "$schedule.availableTimings",
                         unavailableDates: "$schedule.unavailableDates",
                         confirmed: "$authorizations.confirmed",
-                        authorizationId: "$authorizations._id"
+                        authorizationId: "$authorizations._id",
+                        active: "$active"
                     }
+                },
+                // now filter khateebs based on query
+                {
+                    $match: req.query
                 }
             ]).exec()
             return res.json({ data, authorizationReference: khateebAuthorization._id })
