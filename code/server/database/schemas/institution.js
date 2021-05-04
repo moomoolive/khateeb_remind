@@ -90,7 +90,7 @@ institution.methods.createStandardAuthorizations = async function() {
     for (const role of standardAuthorizationRoles) {
         try {
             const auth = await new $db.authorizations({ institution: id, role }).save()
-            console.log(`create authorization `, auth)
+            console.log(`created authorization ${auth.role} ${auth._id}`)
         } catch(err) {
             console.error(`Couldn't create standard authorizations for ${this.name} `, err)
         }

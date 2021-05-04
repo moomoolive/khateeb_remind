@@ -27,8 +27,11 @@
                 @submitted="login($event)"
             />
 
-            <div>
-                <a @click="forgotCredentials()">Forgot Username or Password?</a>
+            <div
+                class="forgot-credentials-text " 
+                @click="forgotCredentials()"
+            >
+                Forgot Username or Password?
             </div>
 
         </div>
@@ -100,18 +103,21 @@ p {
     color: get-color("off-white");
 }
 
-a {
+.forgot-credentials-text {
     position: relative;
     top: 50px;
     font-size: 19px;
-    text-decoration: underline;
     font-weight: bold;
-    cursor: default;
+    cursor: pointer;
+
+    &:hover {
+        color: getColor("green");
+    }
 }
 
 @media screen and (max-width: $phone-width) {
 
-      a {
+    .forgot-credentials-text  {
         font-size: 15px;
     }
 }

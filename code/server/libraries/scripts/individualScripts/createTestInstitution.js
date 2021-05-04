@@ -48,7 +48,7 @@ const createTestInstitution = async () => {
                 handle: randomNamegenerate().dashed,
                 firstName: randomNamegenerate().dashed,
                 lastName: randomNamegenerate().dashed,
-                authorizations: [{ authId: institutionAdminAuthorization._id, confirmed: true }]
+                authorizations: [{ authId: institutionAdminAuthorization._id, confirmed: false }]
             }).save()
             console.log(`Created institution admin for test institution, id: ${testInstitutionAdmin._id}`)
         }

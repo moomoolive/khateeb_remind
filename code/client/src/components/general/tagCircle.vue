@@ -57,18 +57,22 @@ export default {
     
     &.red {
         color: get-color("off-white");
+        background-color: get-color("red");
     }
     
     &.purple {
         color: get-color("off-white");
+        background-color: get-color("purple");
     }
     
     &.blue{
         color: get-color("off-white");
+        background-color: get-color("blue");
     }
 
     &.grey {
         color: get-color("off-white");
+        background-color: get-color("grey");
     }
 
     &.square {

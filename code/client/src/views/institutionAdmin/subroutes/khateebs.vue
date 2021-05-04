@@ -77,13 +77,13 @@
                             <div>
                                 <button class="red" @click="deleteKhateeb(khateeb)">
                                     <p v-if="khateeb.confirmed">Delete {{ khateeb.firstName }} from System</p>
-                                    <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Application</p>
+                                    <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Registration</p>
                                 </button>
                                 <button 
                                     v-if="!khateeb.confirmed" 
                                     @click="confirmKhateebRegistration(khateeb._id)"
                                 >
-                                    <p>Confirm {{ khateeb.firstName }}'s Application</p>
+                                    <p>Confirm {{ khateeb.firstName }}'s Registration</p>
                                 </button>
                                 <user-form-template 
                                     v-if="khateeb.confirmed"

@@ -3,7 +3,7 @@
         
         <div>
             <button 
-                class="add-new-announcement-button round blue"
+                class="add-new-announcement-button round dark-blue"
                 @click="openAddNewAnnouncementForm()"
             >
                 +
