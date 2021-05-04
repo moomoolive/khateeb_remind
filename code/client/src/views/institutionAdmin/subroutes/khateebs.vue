@@ -63,36 +63,6 @@
                     </div>
                 </div>
 
-                <div class="institution-signup-link-container ">
-                    <div class="copy-link-container">
-                        <div class="copy-link-header " @click="toggleKhateebLinkContainer()">
-                            <div>
-                                <dropdown-arrow 
-                                    :fontSize="13"
-                                    :faceDown="showSignupLink"
-                                    class="dropdown-arrow"
-                                />
-                            </div>
-                            <div>
-                                {{ $store.state.user.institution.abbreviatedName }} Khateeb Signup Link 
-                            </div>
-                        </div>
-                        <collapse-transition>
-                            <div v-show="showSignupLink">
-                                <button 
-                                    :class="`grey copy-link-button ${copiedLink ? 'copied' : ''}`"
-                                    @click="copyLink()"
-                                > 
-                                    📋 {{ copiedLink ? "Copied" : 'Copy' }}
-                                </button>
-                                <div>
-                                    <input type="text" class="copy-link-text" v-model="signupLink">
-                                </div>
-                            </div>
-                        </collapse-transition>
-                    </div>
-                </div>
-
                 <div v-if="showKhateebs" class="khateebs-container">
                     <div 
                         v-for="(khateeb, khateebNo) in filteredKhateebs"
@@ -105,26 +75,25 @@
                             :tagDetails="khateebTag(khateeb)"
                         >
                             <div>
-                                <button class="red" @click="deleteKhateeb(khateeb._id)">
+                                <button class="red" @click="deleteKhateeb(khateeb)">
                                     <p v-if="khateeb.confirmed">Delete {{ khateeb.firstName }} from System</p>
                                     <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Application</p>
                                 </button>
                                 <button 
                                     v-if="!khateeb.confirmed" 
-                                    @click="editKhateeb({ _id: khateeb._id, confirmed: true })"
+                                    @click="confirmKhateebRegistration(khateeb._id)"
                                 >
                                     <p>Confirm {{ khateeb.firstName }}'s Application</p>
                                 </button>
                                 <user-form-template 
                                     v-if="khateeb.confirmed"
-                                    :userType="`khateeb`"
+                                    :khateebMode="true"
                                     :formProps="{
                                         basedOn: khateeb,
                                         buttonText: `Edit ${khateeb.firstName}'s Info`,
                                         backgroundColor: 'none',
                                         readOnly: true
                                     }"
-                                    @submitted="editKhateeb($event)"
                                 />
                             </div>
                         </collapsable-box>
@@ -148,12 +117,9 @@ import loading from '@/components/general/loadingScreen.vue'
 import generalMessage from '@/components/misc/generalMessage.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
-import dropdownArrow from '@/components/misc/dropdownArrow.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
-
-import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 export default {
     name: 'khateebs',
@@ -161,9 +127,7 @@ export default {
         loading,
         collapsableBox,
         userFormTemplate,
-        CollapseTransition,
         generalMessage,
-        dropdownArrow
     },
     data() {
         return {
@@ -172,24 +136,12 @@ export default {
             timings: [],
             showKhateebs: true,
             showSearchTools: false,
-            query: {},
-            signupLink: `https://khateebs.com/create/khateebs?institutionID=${this.$store.state.user.institution._id}`,
-            copiedLink: false,
-            showSignupLink: false
+            query: {}
         }
     },
     methods: {
-        toggleKhateebLinkContainer() {
-            this.showSignupLink = !this.showSignupLink
-        },
         async getAllKhateebs() {
             this.khateebs = await this._api.khateebs.getKhateebs()
-        },
-        copyLink() {
-            this.copiedLink = true
-            this.$copyText(this.signupLink)
-            const fiveSecondsInMilliseconds = 5_000
-            window.setTimeout(() => this.copiedLink = false, fiveSecondsInMilliseconds)
         },
         async getActiveLocationsAndTimings() {
             const [locations, timings] = await this._api.chainedRequests.getActiveLocationsAndTimings()
@@ -255,10 +207,14 @@ export default {
             else
                 return [{ words: `Last Active: ${this._utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
         },
-        async editKhateeb($event) {
-            const res = await this._api.khateebs.updateExistingKhateeb($event)
-            this.khateebs.splice(this.findKhateebIndex(res._id), 1, res)
-            this.rerenderView()
+        async confirmKhateebRegistration(khateebId="12345") {
+            const res = await this._api.khateebs.updateExistingKhateeb({ khateebId, confirmed: true })
+            if (!requestHelpers.dataWasDeleted(res)) {
+                return
+            }
+            const targetKhateeb = this.khateebs[this.findKhateebIndex(khateebId)]
+            targetKhateeb.confirmed = true
+            return this.rerenderView()
         },
         findKhateebIndex(id) {
             return this.khateebs.findIndex(khateeb => khateeb._id === id)
@@ -267,13 +223,13 @@ export default {
             this.showKhateebs = false
             this.$nextTick(() => { this.showKhateebs = true })
         },
-        async deleteKhateeb(id) {
+        async deleteKhateeb(khateeb={}) {
             const confirm = await this._utils.confirm(`Are you sure you want to permenantly delete this khateeb?`)
             if (!confirm)
                 return
-            const res = await this._api.khateebs.deleteKhateeb(id)
+            const res = await this._api.khateebs.deleteKhateeb({ authId: khateeb.authorizationId, khateebId: khateeb._id })
             if (requestHelpers.dataWasDeleted(res))
-                this.khateebs.splice(this.findKhateebIndex(id), 1)
+                this.khateebs.splice(this.findKhateebIndex(khateeb._id), 1)
         },
         khateebFilter(noFilterValue="any", valueKey="active", queryParams={}) {
             if (queryParams[valueKey] !== noFilterValue)

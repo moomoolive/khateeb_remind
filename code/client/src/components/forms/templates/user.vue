@@ -29,6 +29,11 @@ export default {
             required: false,
             default: () => {}
         },
+        khateebMode: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
     },
     data() {
         return {
@@ -64,6 +69,14 @@ export default {
                     required: true
                 }
             },
+            khateebMeta: {
+                availableTimings: {
+                    required: true
+                },
+                unavailableDates: {
+                    required: true
+                }
+            }
         }
     },
     methods: {
@@ -72,8 +85,12 @@ export default {
     computed: {
         formStructure() {
             let form = { ...this.baseUser }
-            if (this.includeVitals)
+            if (this.includeVitals) {
                 form = { ...this.userVitals , ...form }
+            }
+            if (this.khateebMode) {
+                form = { ...form, ...this.khateebMeta }
+            }
             return form
         }
     }

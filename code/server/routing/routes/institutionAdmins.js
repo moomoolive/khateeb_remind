@@ -13,8 +13,52 @@ router.get(
     "/", 
     async (req, res) => {
         try {
-            const institutionAdminAuthorization = await $db.authorizations.findOne({ institution: req.headers.institutionid, role: "institutionAdmin" }).exec()
-            const data = await $db.users.find({ authorizations: institutionAdminAuthorization._id.toString() }).select(['-updatedAt', "-__v", "-password"]).exec()
+            const institutionAdminAuthorization = await $db.authorizations.findOne({ 
+                institution: req.headers.institutionid, 
+                role: "institutionAdmin" 
+            }).exec()
+            const data = await $db.users.aggregate([
+                // find users that have the 'institutionAdmin' key
+                // for requesting institution
+                { 
+                    $match: { "authorizations.authId": institutionAdminAuthorization._id }
+                },
+                { $unwind: "$authorizations" },
+                // perform "join" on the "authorization" field
+                {
+                    $lookup: {
+                        from: "authorizations",
+                        localField: "authorizations.authId",
+                        foreignField: "_id",
+                        as: "authorizations.info"
+                    }
+                },
+                { $unwind: "$authorizations.info" },
+                // filter out authorizations that aren't relavent to 
+                // being an institutionAdmin at this institution
+                {
+                    $match: { 
+                        "authorizations.info.institution": req.headers.institutionid,
+                        "authorizations.info.role": "institutionAdmin"
+                    }
+                },
+                // cast institution admins to desired data structure
+                {
+                    $project: {
+                        _id: "$_id",
+                        handle: "$handle",
+                        email: "$email",
+                        title: "$title",
+                        firstName: "$firstName",
+                        lastName: "$lastName",
+                        lastLogin: "$lastLogin",
+                        createdAt: "$authorizations.createdAt",
+                        updatedAt: "$authorizations.updatedAt",
+                        confirmed: "$authorizations.confirmed",
+                        authorizationId: "$authorizations._id"
+                    }
+                }
+            ]).exec()
             return res.json({ data })
         } catch(err) {
             console.log(err)

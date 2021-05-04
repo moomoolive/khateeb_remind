@@ -13,9 +13,15 @@
         </div>
 
         <div v-if="options.hard" class="hard-confirmation-input-container">
-            <div>
-                Type <b>'{{ confirmationText }}</b>' then press '{{ confirmButtonText }}'
-            </div>
+            <p>
+                Type 
+                '
+                <span :class="options.confirmationTextColor || 'red'">
+                    <b>{{ confirmationText }}</b>
+                </span>
+                '
+                then press '{{ confirmButtonText }}'
+            </p>
             <div>
                 <input type="text" v-model="userText" class="confirmation-input">
             </div>

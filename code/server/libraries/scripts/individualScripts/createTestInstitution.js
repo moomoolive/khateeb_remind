@@ -20,15 +20,37 @@ const createTestInstitution = async () => {
         
 
         // check if test institution root admin exists if not create it
-        let testInstitutionRootAdmin = await $db.rootInstitutionAdmins.findOne({ institutionID: testInstitution._id.toString() }).exec()
+        const rootInstitutionAdminAuthorization = authorizations.find(a => a.role === 'rootInstitutionAdmin')
+        let testInstitutionRootAdmin = await $db.users.findOne({ 
+            "authorizations.authId": rootInstitutionAdminAuthorization._id
+        }).exec()
         if (testInstitutionRootAdmin)
-            console.log('Test institution admin already exists')
+            console.log('Test root institution admin already exists')
         else {
-            const target = authorizations.find(a => a.role === 'rootInstitutionAdmin')
-            await new $db.users({
+            testInstitutionRootAdmin = await new $db.users({
                 ...initConfig.testInstitution.rootAdmin,
-                authorizations: [{ authId: target._id.toString(), confirmed: true }]
+                authorizations: [{ authId: rootInstitutionAdminAuthorization._id, confirmed: true }]
             }).save()
+            console.log(`Created root admin for test institution, id: ${testInstitutionRootAdmin._id}`)
+        }
+
+        // check one institution admin 
+        // for test institution exists if not create it
+        const institutionAdminAuthorization = authorizations.find(a => a.role === 'institutionAdmin')
+        let testInstitutionAdmin = await $db.users.findOne({ 
+            "authorizations.authId": institutionAdminAuthorization._id
+        }).exec()
+        if (testInstitutionAdmin)
+            console.log('Test institution already has one institution admin')
+        else {
+            testInstitutionAdmin = await new $db.users({
+                ...initConfig.testInstitution.institutionAdmin,
+                handle: randomNamegenerate().dashed,
+                firstName: randomNamegenerate().dashed,
+                lastName: randomNamegenerate().dashed,
+                authorizations: [{ authId: institutionAdminAuthorization._id, confirmed: true }]
+            }).save()
+            console.log(`Created institution admin for test institution, id: ${testInstitutionAdmin._id}`)
         }
         
         // check if test institution has as many locations as specified in
@@ -71,7 +93,10 @@ const createTestInstitution = async () => {
         // check if test institution has as many khateebs as specified in
         // "Server.config.js" file, if not create enough to fulfill that
         // quota
-        let testInstitutionKhateebs = await $db.khateebs.find({ institutionID: testInstitution._id.toString() }).exec()
+        const khateebAuthorization = authorizations.find(a => a.role === 'khateeb')
+        let testInstitutionKhateebs = await $db.users.find({ 
+            "authorizations.authId": khateebAuthorization._id
+        }).exec()
         if (testInstitutionKhateebs.length === initConfig.testInstitution.khateebCount)
             return console.log(`Test institution already has ${initConfig.testInstitution.khateebCount} khateebs`)
         else {
@@ -79,7 +104,6 @@ const createTestInstitution = async () => {
             const testInstitutionTimings = await $db.timings.find({ institutionID: testInstitution._id.toString() })
             const date = scheduleHelpers.findUpcomingFridayDBFormat()
             const vCalendarId = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-            const khateebAuthorization = authorizations.find(a => a.role === 'khateeb')
             const institutionID = testInstitution._id.toString()
             for (let i = testInstitutionKhateebs.length; i < initConfig.testInstitution.khateebCount; i++) {
                 try {
@@ -90,7 +114,7 @@ const createTestInstitution = async () => {
                         firstName: randomNamegenerate().dashed,
                         lastName: randomNamegenerate().dashed,
                         title: i % 3 === 0 ? 'shiekh' : i % 2 === 0 ? 'imam' : 'none',
-                        authorizations: [{ authId: khateebAuthorization._id.toString(), confirmed: true }]
+                        authorizations: [{ authId: khateebAuthorization._id.toString(), confirmed: i % 5 !== 0 }]
                     }).save()
                     ids.push(khateeb._id)
 

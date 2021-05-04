@@ -37,7 +37,21 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="signup-link-container">
+                        <!-- 
+                            show signup links only if user is not a khateeb or
+                            not an administrator at displayed institution (meaning they
+                            aren't and instituion admin or a root institution admin)
+                        -->
+                        <div
+                            v-if="
+                                !userPermissions[`${institution._id}-khateeb`] ||
+                                !(
+                                    userPermissions[`${institution._id}-institutionAdmin`] || 
+                                    userPermissions[`${institution._id}-rootInstitutionAdmin`]
+                                ) 
+                            " 
+                            class="signup-link-container"
+                        >
                             <div 
                                 :class="`signup-link
                                     ${userPermissions[`${institution._id}-institutionAdmin`] || userPermissions[`${institution._id}-rootInstitutionAdmin`] ? 
@@ -125,8 +139,6 @@ export default {
             if (res === 0) {
                 this._utils.toHomePage()
             }
-            // eslint-disable-next-line
-            console.log(res)
         }
     },
     computed: {

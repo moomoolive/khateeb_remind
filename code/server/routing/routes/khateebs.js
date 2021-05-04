@@ -6,6 +6,7 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
+const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
 const router = express.Router()
 
@@ -96,14 +97,24 @@ router.put(
     '/',
     authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
-        validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
-        validator.body("active").isBoolean().optional(),
-        validator.body("confirmed").isBoolean().optional()
+        validator.body("khateebId").isLength($config.consts.mongooseIdLength).isString(),
+        validator.body("confirmed").isBoolean()
     ]),
-    authMiddleware.isAllowedToUpdateResource(["institutionID"], "khateebs"),
     async (req, res) => {
         try {
-            const data = await $db.khateebs.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            const [targetKhateeb] = await $db.users
+                .find({ _id: req.body.khateebId })
+                .populate("authorizations.authId")
+                .exec()
+            const targetAuthorization = targetKhateeb.authorizations.find(a => {
+                return a.authId.institution.toString() === req.headers.institutionid && a.authId.role === 'khateeb'
+            })
+            if (!targetAuthorization)
+                return res.status(422).json({ data: {}, msg: `target authorization does not exist` }) 
+            const data = await $db.users.update(
+                { "authorizations._id": targetAuthorization._id },
+                { "authorizations.$.confirmed": req.body.confirmed }
+            )
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -116,15 +127,28 @@ router.delete(
     '/',
     authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
-        validator.query("_id").isLength($config.consts.mongooseIdLength).isString()
+        validator.query("authId").isLength($config.consts.mongooseIdLength).isString(),
+        validator.query("khateebId").isLength($config.consts.mongooseIdLength).isString(),
     ], "query"),
-    authMiddleware.isAllowedToDeleteResource(["institutionID"], "khateebs"),
     async (req, res) => {
         try {
-            const khateeb = await $db.khateebs.findOne(req.query)
-            const dependantsRes = await khateeb.deleteNotifications()
-            const deleted = await $db.khateebs.deleteOne(req.query)
-            return res.json({ data: { khateeb: deleted, dependantsRes } })
+            const [targetUser] = await $db.users
+                .find({ _id: req.query.khateebId })
+                .populate("authorizations.authId")
+                .populate("scheduleRestrictions")
+                .exec()
+            const targetAuthorization = targetUser.authorizations.find(a => {
+                return a.authId.role === 'khateeb' && a.authId.institution.toString() === req.headers.institutionid
+            })
+            if (!targetAuthorization)
+                return res.status(422).json({ data: {}, msg: `target authorization does not exist` })
+            const targetScheduleRestrictions = targetUser.scheduleRestrictions
+                .filter(sR => sR.institution.toString() === req.headers.institutionid)
+                .map(sR => sR._id)
+            const updateCommand = databaseHelpers.removeAuthorizationFromUserCommand(targetAuthorization._id)
+            updateCommand.$pull.scheduleRestrictions = { $in: targetScheduleRestrictions }
+            const data = await $db.users.update({ _id: targetUser._id }, updateCommand)
+            return res.json({ data })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ data: `Couldn't delete khateeb. Err trace: ${err}` })

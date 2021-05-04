@@ -79,12 +79,15 @@ const initializationConfig = {
             // `${baseUsername}${index + 1}`
             baseUsername: 'testk',
             info: {
-                password: '123456',
                 password: process.env.DEFAULT_TEST_USER_PASS,
-                confirmed: true,
                 email: globalConfig.consts.randomEmail,
 
             }
+        },
+        institutionAdmin : {
+            password: process.env.DEFAULT_TEST_USER_PASS,
+            email: globalConfig.consts.randomEmail,
+            username: `testAdmin`
         }
     },
 }

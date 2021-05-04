@@ -135,7 +135,9 @@ export default {
         },
         async removeAuthorization(authorization={}, authIndex=0) {
             const confirm = await this._utils.confirm(
-                `Are you sure you want to remove this permission? You'll no longer be able log into ${authorization.authId.institution.name} as a ${authorization.authId.role}`
+                `Are you sure you want to remove these permissions? You'll no longer be able log into ${authorization.authId.institution.name} as a ${authorization.authId.role}`,
+                "yellow",
+                { hard: true, confirmationText: 'Remove Permissions' }
             )
             if (!confirm)
                 return
