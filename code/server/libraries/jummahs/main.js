@@ -54,7 +54,10 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
     }
     const findJummahKhateebInfo = async () => {
         try {
-            const khateeb = await $db.khateebs.find().safelyFindOne(preferenceInfo.khateebID).exec()
+            const khateeb = await $db.users
+                .find()
+                .safelyFindOne(preferenceInfo.khateebID)
+                .exec()
             if (!khateeb)
                 throw TypeError(`Database responded with incorrect type of khateeb info`)
             else

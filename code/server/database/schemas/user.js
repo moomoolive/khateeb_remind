@@ -115,6 +115,12 @@ user.blah = {
     default: true
 }
 
+user.query.safelyFindOne = function(_id='none') {
+    if (!_id || _id.toLocaleLowerCase() === $config.consts.nullId)
+        throw TypeError('Please provide a valid khateeb id')
+    return this.where({ _id })
+}
+
 user.pre('save', function(next) {
     const user = this
     if (!this.isModified('password'))
