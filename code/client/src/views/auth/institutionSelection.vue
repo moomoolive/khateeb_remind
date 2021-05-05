@@ -8,6 +8,12 @@
 
         <loading :loadingTime="1200">
             <div v-if="showingInstitutions.length > 0">
+                
+                <div v-if="$store.getters['user/decodedJWT'].specialStatus">
+                    *You hold a special user status, therefore
+                    all signups are disabled for you 
+                </div>
+                
                 <div
                     v-for="(institution, institutionIndex) in showingInstitutions"
                     :key="institutionIndex"
@@ -37,21 +43,11 @@
                                 </span>
                             </div>
                         </div>
-                        <!-- 
-                            show signup links only if user is not a khateeb or
-                            not an administrator at displayed institution (meaning they
-                            aren't and instituion admin or a root institution admin)
-                        -->
                         <div
                             v-if="
-                                (
-                                    !userPermissions[`${institution._id}-khateeb`] ||
-                                    !(
-                                        userPermissions[`${institution._id}-institutionAdmin`] || 
-                                        userPermissions[`${institution._id}-rootInstitutionAdmin`]
-                                    )
-                                ) &&
-                                selectedInstitution === 'none'
+                                !isHoldingAllPossibleAuthorizationsForGivenInstitution(institution._id) &&
+                                !isCurrentlySigningUpToAnInstitution() &&
+                                !$store.getters['user/decodedJWT'].specialStatus
                             " 
                             class="signup-link-container"
                         >
@@ -78,7 +74,6 @@
                                 Signup as Khateeb
                             </div>
                         </div>
-                         <!-- v-if="selectedInstitution === institution._id" -->
                         <div 
                             v-if="selectedInstitution === institution._id"
                             :class="`loading-icon`"
@@ -150,6 +145,19 @@ export default {
                 const milliseconds = 2_500
                 window.setTimeout(() => resolve(true), milliseconds)
             })
+        },
+        isKhateebAtGivenInstitution(id="1234") {
+            return this.userPermissions[`${id}-khateeb`]
+        },
+        isAdministratorAtGivenInstitution(id="1234") {
+            return this.userPermissions[`${id}-institutionAdmin`] || 
+                this.userPermissions[`${id}-rootInstitutionAdmin`]
+        },
+        isHoldingAllPossibleAuthorizationsForGivenInstitution(id="1234") {
+            return this.isKhateebAtGivenInstitution(id) && this.isAdministratorAtGivenInstitution(id)
+        },
+        isCurrentlySigningUpToAnInstitution() {
+            return this.selectedInstitution !== 'none'
         },
         signupPipeline(institutionInfo={}, role="khateeb") {
             if (this.$store.getters['user/isLoggedIn'])

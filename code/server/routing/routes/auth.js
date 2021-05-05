@@ -4,7 +4,6 @@ const validator = require('express-validator')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 
-const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
@@ -94,7 +93,10 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const user = await $db.users.findOne({ username: req.body.username }).select(["-__v"]).exec()
+            const user = await $db.users
+                .findOne({ username: req.body.username, active: true })
+                .select(["-__v"])
+                .exec()
             if (!user)
                 return res.status(401).json({  msg: 'unauthorized', token: null })
             validPassword = await user.comparePassword(req.body.password)

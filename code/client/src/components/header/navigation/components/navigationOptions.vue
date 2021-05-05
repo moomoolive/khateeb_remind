@@ -1,6 +1,20 @@
 <template>
     <div v-on-clickaway="close">
+
+        <!-- generic user options -->
+        <div v-if="_utils.validAuthentication({ level: 1 })">
+            
+            <div class="menu-item" @click="redirect('/authorizations')">
+                <p>Login Selection</p>
+            </div>
+            
+            <div class="menu-item" @click="redirect('/institution-selection')">
+                <p>Institution Signup</p>
+            </div>
+
+        </div>
         
+        <!-- khateeb options -->
         <div v-if="_utils.validAuthentication({ level: 2 })">
             
             <div class="menu-item" @click="redirect('/khateeb/')">
@@ -17,6 +31,7 @@
 
         </div>
 
+        <!-- insitutition admin options -->
         <div v-if="_utils.validAuthentication({ min: 3, max: 4 })">
             
             <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
@@ -33,6 +48,7 @@
 
         </div>
 
+        <!-- System admin and root user options -->
         <div v-if="_utils.validAuthentication({ min: 5 })" >
             
             <div class="menu-item" @click="redirect('/sysAdmin')">

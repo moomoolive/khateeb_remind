@@ -13,6 +13,11 @@ const pwaSubscription = require('./schemas/pwaSubscription.js')
 const authorization = require('./schemas/authorizations.js')
 const userScheduleRestriction = require('./schemas/userScheduleRestrictions.js')
 
+// discriminators --> basically a schema that inherits and extends any of the
+// above schemas
+const root = require('./discriminators/rootUser.js')
+const sysAdmin = require('./discriminators/sysAdmin.js')
+
 const models = {
     institutions: mongoose.model('institution', institution),
     timings: mongoose.model('timing', timing),
@@ -28,8 +33,8 @@ const models = {
 }
 
 const userTypes = {
-    root: models.users.discriminator('root', discriminators.root),
-    sysAdmins: models.users.discriminator('sysAdmin', discriminators.sysAdmin),
+    root: models.users.discriminator('root', root),
+    sysAdmins: models.users.discriminator('sysAdmin', sysAdmin),
 
     // legacy structures
     rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', discriminators.rootInstitutionAdmin),

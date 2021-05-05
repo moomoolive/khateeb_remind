@@ -19,7 +19,17 @@ const authorization = new mongoose.Schema({
 const user = new mongoose.Schema({
     username: {
         type: String,
-        required: true,
+        // The username field should be required, but I have checks across the
+        // front end and backend to ensure that any new user must submit
+        // a username. I've left it false because when a user deletes their
+        // account I want the user to still be in the database, so that
+        // 'jummahPreferences' that included the user as a khateeb 
+        // will still be able to render correctly.
+        //
+        // So in order to free up the 'username' namespace in the database
+        // when a user is deleted this field is simply erased from their
+        // document.
+        required: false,
         unique: true,
         minLength: 6
     },
@@ -182,10 +192,63 @@ user.methods.comparePassword = async function (submittedPassword) {
     }
 }
 
-user.methods.deleteNotifications = async function() {
-    const res = {}
+user.methods.deactivateAccount = async function () {
+    const dependants = await this.deleteDependencies()
+    const userRes = await this.setAccountToInactive()
+    return { userRes, dependants }
+}
+
+user.methods.setAccountToInactive = async function() {
+    let res = {}
     try {
-        res.notifications = await $db.notifications.deleteMany({ userID: this._id.toString() }) 
+        res = await $db.users.update(
+            { _id: this._id },
+            { 
+                active: false , 
+                scheduleRestrictions: [],
+                // remove username - refer to explanation in schema section
+                // above
+                $unset: { username: "" } 
+            }
+        )
+    } catch(err) {
+        console.error(err)
+    }
+    return res
+}
+
+user.methods.deleteDependencies = async function() {
+    const responses = {}
+    responses.notifications = await this.deleteNotifications()
+    responses.pwaSubscriptions = await this.deletePwaSubscriptions()
+    responses.scheduleRestrictions = await this.deleteScheduleRestrictions()
+    return responses
+}
+
+user.methods.deleteScheduleRestrictions = async function() {
+    let res = {}
+    try {
+        res = await $db.userScheduleRestrictions.deleteMany({ user: this._id }) 
+    } catch(err) {
+        console.log(err)
+    }
+    return res
+}
+
+user.methods.deletePwaSubscriptions = async function() {
+    let res = {}
+    try {
+        res = await $db.pwaSubscriptions.deleteMany({ userID: this._id }) 
+    } catch(err) {
+        console.log(err)
+    }
+    return res
+}
+
+user.methods.deleteNotifications = async function() {
+    let res = {}
+    try {
+        res = await $db.notifications.deleteMany({ userID: this._id }) 
     } catch(err) {
         console.log(err)
     }

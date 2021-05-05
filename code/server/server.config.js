@@ -51,6 +51,7 @@ const initializationConfig = {
         username: 'rootUser',
         firstName: "Mostafa",
         lastName: "Elbannan",
+        handle: "rooty",
         password: process.env.DEFAULT_ROOT_PASS,
         email: globalConfig.consts.randomEmail
     },

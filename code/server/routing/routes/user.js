@@ -277,13 +277,14 @@ router.put(
 
 router.delete('/', async (req, res) => {
     try {
-        const user = await $db[req.headers.targetusermodel].findOne({ _id: req.headers.userid }).exec()
-        const notificationRes = await user.deleteNotifications()
-        const userRes = await $db[req.headers.targetusermodel].deleteOne({ _id: user._id.toString() })
-        return res.json({ userRes, notificationRes })
+        const user = await $db[req.headers.targetusermodel]
+            .findOne({ _id: req.headers.userid })
+            .exec()
+        const data = await user.deactivateAccount()
+        return res.json({ data })
     } catch(err) {
-        console.log(err)
-        return res.json(`Couldn't delete account`)
+        console.error(err)
+        return res.json({ data: {}, msg: `Couldn't delete user account ${err}` })
     }
 })
 
