@@ -4,7 +4,7 @@
             :includeVitals="true"
             :formProps="{
                 bindedExts: ['confirms'],
-                backgroundColor: 'red',
+                backgroundColor: 'yellow',
                 buttonColor: 'blue',
                 buttonText: 'Sign up',
                 formTitle: 'Create Account'

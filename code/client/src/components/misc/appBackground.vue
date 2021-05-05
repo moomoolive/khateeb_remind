@@ -9,16 +9,13 @@
             class="bubbles"
             :style="`height: ${bubbleBackgroundHeight}px !important;`"
         >
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
+            <div v-for="x in 10" :key="x" class="bubble"></div>
+            <fa-icon
+              v-for="icon in miscIcons"
+              :key="icon.name" 
+              :icon="[icon.section, icon.name]" 
+              :class="`bubble misc-icon ${icon.name}`" 
+            />
         </div>
     </div>
 </template>
@@ -28,7 +25,13 @@ export default {
     name: "appDefaultBackground",
     data() {
         return {
-            bubbleBackgroundHeight: 800
+            bubbleBackgroundHeight: 800,
+            miscIcons: [
+              { name: "star-and-crescent", section: 'fas'},
+              { name: "mosque", section: 'fas'}, 
+              { name: "paper-plane", section: 'far' },
+              { name: "comment-alt", section: 'fas' }
+            ]
         }
     },
     methods: {
@@ -89,10 +92,48 @@ export default {
   animation: rise 10s infinite ease-in;
 }
 
+.misc-icon {
+  font-size: 60px;
+  border-radius: 0;
+  background: none;
+  color: get-color("off-white");
+
+  &.star-and-crescent {
+    animation-delay:1s;
+    animation-duration:15s;
+    left:10%;
+  }
+
+  &.mosque {
+    animation-delay:2s;
+    animation-duration:11s;
+    left:90%;
+  }
+
+  &.paper-plane {
+    animation-delay:5s;
+    animation-duration:16s;
+    left:50%;
+  }
+
+  &.comment-alt {
+    animation-delay:8s;
+    animation-duration:8s;
+    left:25%;
+  }
+}
+
+.crescent {
+  animation-delay:1s;
+  animation-duration:15s;
+  left:10%;
+}
+
+
 .bubble:nth-child(1){
   width:40px;
   height:40px;
-  left:10%;
+  left:9%;
   animation-duration:8s;
 }
 
