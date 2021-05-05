@@ -1,7 +1,6 @@
 import helpers from './helpers.js'
 import store from '@/store/index.js'
 import typeCheckingHelpers from '@/libraries/typeChecking/main.js'
-import localStorageHelpers from '@/libraries/localStorageManagement/main.js'
 
 import axios from 'axios'
 
@@ -18,37 +17,6 @@ const requests = {
         } catch {
             return { data: null }
         }
-    },
-    async checkIn() {
-        let userPackage = { 
-            notifications: [],
-            institution: { name: "Random institution", abbreviatedName: "Rand Inst" },
-            userInfo: {
-                __t: "khateeb",
-                _id: "1234",
-                confirmed: true,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                institutionID: "1234",
-                lastLogin: new Date(),
-                firstName: "random",
-                lastName: "random",
-                username: "randomUser",
-                handle: "random"
-            }
-        }
-        try {
-            const res = await axios.get(extension + '/check-in')
-            if (res && res.notifications && res.institution && res.userInfo) {
-                userPackage = res
-                localStorageHelpers.commit('cachedUserCheckIn', res)
-            }
-        } catch {
-            const cachedUserCheckIn = localStorageHelpers.get('cachedUserCheckIn')
-            if (cachedUserCheckIn)
-                userPackage = cachedUserCheckIn
-        }
-        await store.dispatch('storeUserPackage', userPackage)
     },
     deleteAccount() {
         return helpers.returnEmptyObjectFromRequest("delete", "user")
@@ -78,8 +46,19 @@ const requests = {
         }
     },
     async getNotifications() {
-        const notifications = await helpers.returnArrayFromRequest('get', ['user', 'notifications'])
-        return store.commit('notifications/stashServerNotifications', notifications)
+        const toStore = { notifications: [], lastLogin: new Date() }
+        try {
+            const { data } = await axios.get(extension + '/notifications')
+            if (!data || !Array.isArray(data.notifications) || !data.lastLogin) {
+                throw TypeError(`recieved incorrect type from response`)
+            }
+            toStore.notifications = data.notifications
+            toStore.lastLogin = data.lastLogin
+        } catch {
+            return { notifications: [], lastLogin: new Date() }
+        }
+        store.commit('notifications/stashServerNotifications', toStore.notifications)
+        return store.commit('user/updateLastLogin', toStore.lastLogin)
     },
     getUserAuthorizations() {
         return helpers.returnEmptyObjectFromRequest('get', ['user', 'authorizations'])

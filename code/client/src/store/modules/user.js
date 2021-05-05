@@ -39,6 +39,9 @@ export default {
             userInfo.lastLogin = new Date(userInfo.lastLogin)
             state.userInfo = userInfo
         },
+        updateLastLogin(state, date=new Date()) {
+            state.userInfo.lastLogin = new Date(date)
+        },
         updateInstitutionInfo(state, institution={}) {
             state.institution = institution
         },

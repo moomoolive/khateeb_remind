@@ -1,6 +1,7 @@
 const express = require('express')
 const validator = require('express-validator')
 const DeviceDetector = require('device-detector-js')
+const mongoose = require('mongoose')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
@@ -88,36 +89,19 @@ router.get('/authorizations', async (req, res) => {
 
 router.get('/notifications', async (req, res) => {
     try {
-        const data = await $db.notifications
-            .find({ userID: req.headers.userid })
-            .populate('institutionID')
-            .sort('-createdAt')
-            .limit(10)
-            .exec()
-        return res.json({ data })
+        const [notifications, userInfo] = await Promise.all([
+            $db.notifications
+                .find({ userID: req.headers.userid })
+                .populate('institutionID')
+                .sort('-createdAt')
+                .limit(10)
+                .exec(),
+            $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).exec()
+        ]) 
+        return res.json({ data: { notifications, lastLogin: userInfo.lastLogin } })
     } catch(err) {
         console.error(err)
-        return res.json({ data: [], msg: `Couldn't get notifications ${err}` })
-    }
-})
-
-router.get('/check-in', async(req, res) => {
-    try {
-        const [userInfo, notifications, institution] = await Promise.all([
-            $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).select(["-__v", "-password", "-statuses"]).exec(),
-            $db.notifications.find({ userID: req.headers.userid }).sort('-createdAt').limit(10).exec(),
-            // rootInstitution isn't a real institution
-            // it's just a static value that is passed to the frontend
-            // so that the root admin and system administrators function
-            // exactly like any normal user 
-            req.headers.institutionid === 'root' ? 
-                Promise.resolve($config.rootInstitution) : 
-                $db.institutions.findOne({ _id: req.headers.institutionid }).select(["-updatedAt", "-__v", "-settings"]).exec()
-        ])
-        return res.json({ userInfo, notifications, institution })
-    } catch(err) {
-        console.log(err)
-        return res.status(503).json({ msg: `An error fetching user package. Err trace: ${err}` })
+        return res.json({ data: { notifications: [], lastLogin: new Date() }, msg: `Couldn't get notifications ${err}` })
     }
 })
 
