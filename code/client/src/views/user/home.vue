@@ -96,7 +96,22 @@ export default {
             this.showProfileSettings = false
             this.$nextTick(() => { this.showProfileSettings = true })
         },
+        async alertUserAboutConficts() {
+            const confirm = await this._utils.confirm(
+                `It appears that you're a root adminstrator at one or more institutions. Before you can successfully delete your account you must remove your root adminstrator permissions at each relavent institutions. Would you like to be redirected to the permissions page?`
+            )
+            if (!confirm) {
+                return
+            } else if (!this.$store.getters['user/isLoggedInAsGenericUser']) {
+                await this.$store.dispatch('user/downgradeUserAuthorization')
+            } else {
+                return this._utils.toHomePage()
+            }
+        },
         async deleteAccount() {
+            if (this.$store.state.user.isRootAdminAtOneInstitution) {
+                return this.alertUserAboutConficts()
+            }
             const confirm = await this._utils.confirm(
                 `Are you sure you want to permenantly delete your account?`,
                 "yellow",

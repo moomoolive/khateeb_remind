@@ -189,4 +189,68 @@ router.put(
         }
 })
 
+router.post(
+    '/delegate-permissions',
+    authMiddleware.authenticate({ level: 4 }),
+    validationMiddleware.validateRequest(
+        [
+            validator.body("targetUserId").isLength($config.consts.mongooseIdLength).isString(),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            console.log(req.body)
+            const [targetUser] = await $db.users
+                .find({ _id: req.body.targetUserId })
+                .populate("authorizations.authId")
+                .exec()
+            const isUserInRequestingInstitution = targetUser.authorizations.find(a =>{
+                return a.confirmed && a.authId.institution.toString() === req.headers.institutionid
+            })
+            if (!targetUser || !isUserInRequestingInstitution)
+                return res.status(403).json({ code: 2, msg: `Cannot add permissions to user` })
+            const institutionAuthorizations = await $db.authorizations
+                .find({ institution: req.headers.institutionid })
+                .exec()
+            const rootInstitutionAdminAuthorization = institutionAuthorizations.find(a => a.role === 'rootInstitutionAdmin')
+            const institutionAdminAuthorization = institutionAuthorizations.find(a => a.role === 'institutionAdmin')
+            const newRootAdmin = await $db.users.bulkWrite([
+                {
+                    updateOne: {
+                        filter: { _id: req.body.targetUserId },
+                        update: {
+                            $push: {
+                                authorizations: { authId: rootInstitutionAdminAuthorization._id, confirmed: true }
+                            },
+                        }
+                    }
+                },
+                {
+                    updateOne: {
+                        filter: { _id: req.body.targetUserId },
+                        update: {
+                            // remove institutionAdmin permissions in case they have them
+                            $pull: {
+                                authorizations: { authId: institutionAdminAuthorization._id }
+                            }
+                        }
+                    }
+                },
+            ])
+            const delegatingUser = await $db.users.update(
+                { _id: req.headers.userid },
+                {
+                    $pull: {
+                        authorizations: { authId: rootInstitutionAdminAuthorization._id }
+                    }
+                }
+            )
+            return res.json({ code: 0, msg: `Permissions successfully delegated`, newRootAdmin, delegatingUser })
+        } catch(err) {
+            console.error(err)
+            return res.status(503).json({ code: 1, msg: `An error occured when delgating authorization ${err}` })
+        }
+    }
+)
+
 module.exports = router

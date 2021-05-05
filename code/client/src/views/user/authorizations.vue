@@ -32,10 +32,7 @@
                         <button
                             :disabled="
                                 !authorization.confirmed ||
-                                (
-                                    loadingAuth !== 'none' &&
-                                    loadingAuth !== authorization._id
-                                )
+                                isGettingNewToken
                             "
                             class="authorization-button"
                             @click="upgradeUserAuthorization(authorization)"
@@ -78,11 +75,27 @@
                             check the backend for more info 
                         -->
                         <button 
-                            :disabled="authorization._id === 'root' || authorization._id === 'sysAdmin'"
+                            :disabled="
+                                authorization._id === 'root' || 
+                                authorization._id === 'sysAdmin' ||
+                                isGettingNewToken
+                            "
                             class="delete-auth-button yellow"
                             @click="removeAuthorization(authorization, authIndex)"
                         >
-                            Remove these Permissions
+                            <div v-if="loadingAuthToSetting === 'none'">
+                                Remove these Permissions
+                            </div>
+                            <div
+                                v-if="loadingAuthToSetting === authorization._id" 
+                                class="loading-to-settings-animation-container"
+                            >
+                                <img 
+                                    src="~@/assets/gifs/loading-alternate.gif"
+                                    class="loading-to-settings-animation"
+                                    alt="alternate loading animation"
+                                >
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -121,7 +134,9 @@ export default {
         return {
             userInfo: {},
             loadingAuth: 'none',
-            readyToGoIntoInstitution: new Promise((resolve) => resolve(true))
+            loadingAuthToSetting: 'none',
+            readyToGoIntoInstitution: new Promise((resolve) => resolve(true)),
+            readyToGoToSettings: new Promise((resolve) => resolve(true))
         }
     },
     methods: {
@@ -132,25 +147,26 @@ export default {
         },
         promptLoadingIconOnPressingAuthorization(id="12345") {
             this.loadingAuth = id
-            this.readyToGoIntoInstitution = new Promise(resolve => {
-                const twoSecondsInMilliseconds = 2_000
-                window.setTimeout(() => resolve(true), twoSecondsInMilliseconds)
+            this.readyToGoIntoInstitution = this.createDelay(2_000)
+        },
+        createDelay(milliseconds=2_000) {
+            return new Promise(resolve => {
+                window.setTimeout(() => resolve(true), milliseconds)
             })
+        },
+        stashTokenAndInstitutionData(token="a.JWT.token", institution={}) {
+            this.$store.dispatch('user/updateToken', token)
+            this.$store.dispatch('user/updateInstitutionInfo', institution)
         },
         async upgradeUserAuthorization(authInfo={}) {
             this.promptLoadingIconOnPressingAuthorization(authInfo._id)
-            const { token } = await this._api.user.upgradeAuthorization({
-                authId: authInfo.authId._id,
-                role: authInfo.authId.role,
-                institutionID: authInfo.authId.institution._id,
-                institutionStatus: authInfo.authId.institution.__t || 'default'
-            })
-            if (!token)
+            const token = await this.upgradeAuth(authInfo)
+            if (!token) {
                 return this._utils.alert(`A problem occurred when signing in`)
+            }
             // create a consistent delay before login
             await this.readyToGoIntoInstitution
-            this.$store.dispatch('user/updateToken', token)
-            this.$store.dispatch('user/updateInstitutionInfo', authInfo.authId.institution)
+            this.stashTokenAndInstitutionData(token, authInfo.authId.institution)
             return this.authUpgradeRedirect()
         },
         authUpgradeRedirect() {
@@ -167,6 +183,8 @@ export default {
             }
         },
         async removeAuthorization(authorization={}, authIndex=0) {
+            if (authorization.authId.role === 'rootInstitutionAdmin')
+                return this.pushToDelegationPage(authorization) 
             const confirm = await this._utils.confirm(
                 `Are you sure you want to remove these permissions? You'll no longer be able log into ${authorization.authId.institution.name} as a ${authorization.authId.role}`,
                 "yellow",
@@ -179,9 +197,57 @@ export default {
                 institution: authorization.authId.institution._id,
                 role: authorization.authId.role 
             })
-            if (code === 0)
-                return this.userInfo.authorizations.splice(authIndex, 1)
-                
+            if (code === 0) {
+                return this.userInfo.authorizations.splice(authIndex, 1) 
+            }
+        },
+        async upgradeAuth(authInfo={}) {
+            const { token } = await this._api.user.upgradeAuthorization({
+                authId: authInfo.authId._id,
+                role: authInfo.authId.role,
+                institutionID: authInfo.authId.institution._id,
+                institutionStatus: authInfo.authId.institution.__t || 'default'
+            })
+            return token
+        },
+        promptLoadingAlternateIconOnPressingRemovingPermissions(id="12345") {
+            this.loadingAuthToSetting = id
+            this.readyToGoToSettings = this.createDelay(2_000)
+        },
+        async pushToDelegationPage(authorization={}) {
+            const confirm = await this._utils.confirm(`You cannot remove root admin permissions from here, you must login then do so from the institution settings page by pressing 'delgate permissions' or deleting the institution entirely. Would you like to be taken there now?`)
+            this.promptLoadingAlternateIconOnPressingRemovingPermissions(authorization._id)
+            if (!confirm) {
+                return
+            }
+            const token = await this.upgradeAuth(authorization)
+            if (!token) {
+                return this._utils.alert(`A problem occurred when signing in`)
+            }
+            this.stashTokenAndInstitutionData(token, authorization.authId.institution)
+            await this.readyToGoToSettings
+            return this.$router.push({ 
+                path: `/institutionAdmin/settings`, 
+                // open setting with delegation and deleting institution info
+                // when page loads
+                query: { click: "danger-zone" } 
+            })
+        }
+    },
+    computed: {
+        isGettingNewToken() {
+            return this.loadingAuthToSetting !== 'none' || this.loadingAuth !== 'none'
+        }
+    },
+    watch: {
+        userInfo(newVal) {
+            if (!newVal.authorizations || newVal.authorizations.length < 1) {
+                return
+            }
+            const userIsRootInstitutionAtOneInstitution = newVal.authorizations.find(a => {
+                return a.authId.role === 'rootInstitutionAdmin'
+            })
+            this.$store.commit('user/changeRootAdminAtOneInstitutionStatus', Boolean(userIsRootInstitutionAtOneInstitution))
         }
     },
     created() {
@@ -191,6 +257,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.loading-to-settings-animation-container {
+    height: 15px;
+}
+
+.loading-to-settings-animation {
+    width: 30px;
+    position: relative;
+    bottom: 7px;
+}   
+
 .authorization-container {
     width: 80%;
     max-width: 400px;
@@ -273,10 +349,12 @@ button {
     margin-left: 3px;
 }
 
+
+
 .signup-buttons-container {
     @include flexbox-default();
     @include center-margin();
-    margin-bottom: 20px;
+    margin-bottom: 50px;
 }
 
 .signup-button {

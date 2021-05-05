@@ -57,7 +57,8 @@ router.get(
                         updatedAt: "$authorizations.updatedAt",
                         confirmed: "$authorizations.confirmed",
                         authorizationId: "$authorizations._id",
-                        active: "$active"
+                        active: "$active",
+                        __t: 'institutionAdmin'
                     }
                 },
                 // filter by request query

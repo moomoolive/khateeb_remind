@@ -19,6 +19,13 @@ const adminRoutes = [
                 }
               },
               {
+                path: 'delgate-permissions',
+                component: () => import('@/views/rootInstitutionAdmin/delgatePermissions.vue'),
+                meta: {
+                  auth: { level: 4 }
+                }
+              },
+              {
                 path: 'announcements',
                 component: () => import('@/views/institutionAdmin/subroutes/announcements.vue'),
                 meta: {

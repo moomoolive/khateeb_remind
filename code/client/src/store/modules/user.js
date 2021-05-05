@@ -21,7 +21,9 @@ export default {
         isBrowsingOnPWA: userIdentification.deviceBrowsingViaPWA(),
         userInfo: localStorage.getItem(JWTKey) ? 
             localStorageHelpers.get(userInfoKey) || {} : 
-            {} 
+            {}
+        ,
+        isRootAdminAtOneInstitution: true
     }),
     mutations: {
         removeToken(state) {
@@ -42,6 +44,9 @@ export default {
         },
         removeInstitutionInformation(state) {
             state.institution = {}
+        },
+        changeRootAdminAtOneInstitutionStatus(state, change=true) {
+            state.isRootAdminAtOneInstitution = change 
         }
     },  
     actions: {

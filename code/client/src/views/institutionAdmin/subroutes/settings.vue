@@ -146,13 +146,23 @@
                 </collapsable-box>
 
                 <collapsable-box
-                    v-if="_utils.validAuthentication(3)"
+                    v-if="$store.getters['user/type'] === 'rootInstitutionAdmin'"
                     class="setting-container"
                     :headline="`Danger Zone`"
                     :buttonColor="`red`"
                     :bodyColor="`silver`"
+                    ref="danger-zone"
                 >
-                    <button class="yellow delete-institution" @click="deleteInstitution()">
+                    <button 
+                        class="yellow delete-institution" 
+                        @click="handoffPermissions()"
+                    >
+                        Delgate Permissions
+                    </button>
+                    <button 
+                        class="red delete-institution" 
+                        @click="deleteInstitution()"
+                    >
                         Delete Institution
                     </button>
                 </collapsable-box>
@@ -227,6 +237,9 @@ export default {
         async getSettingsAndInstitutionInfo() {
             this.institution = await this._api.institutions.getInstitution()
         },
+        async handoffPermissions() {
+            return this.$router.push({ path: '/institutionAdmin/delgate-permissions' })
+        },
         async saveInstitutionDetails(newChanges={}) {
             const updated = await this._api.institutions.updateInstitution(newChanges)
             if (Object.keys(updated).length < 1)
@@ -242,8 +255,6 @@ export default {
             )
             if (confirm) {
                 const res = await this._api.institutions.deleteInstitution()
-                // eslint-disable-next-line
-                console.log(res)
                 if (!requestHelpers.dataWasDeleted(res))
                     return
                 this._utils.alert(`You've successfully deleted your institution`, 'success')
@@ -332,7 +343,8 @@ export default {
     height: 6vh;
     max-height: 60px;
     font-size: 20px;
-    color: red;
+    color: get-color('grey');
+    @include floating-box-shadow();
 }
 
 .insert-image-container {

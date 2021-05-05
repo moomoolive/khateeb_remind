@@ -82,7 +82,8 @@ router.get(
                         unavailableDates: "$schedule.unavailableDates",
                         confirmed: "$authorizations.confirmed",
                         authorizationId: "$authorizations._id",
-                        active: "$active"
+                        active: "$active",
+                        __t: 'khateeb'
                     }
                 },
                 // now filter khateebs based on query

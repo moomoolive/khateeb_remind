@@ -141,7 +141,7 @@ export default {
     },
     methods: {
         async getAllKhateebs() {
-            this.khateebs = await this._api.khateebs.getKhateebs()
+            this.khateebs = await this._api.khateebs.getKhateebs({ active: true })
         },
         async getActiveLocationsAndTimings() {
             const [locations, timings] = await this._api.chainedRequests.getActiveLocationsAndTimings()

@@ -70,6 +70,18 @@ const requests = {
         } catch {
             return { msg: `An error occured when verifying code`, code: 1 }
         }
+    },
+    async delegatePermissions(info={}) {
+        try {
+            const res = await axios.post(extension + '/delegate-permissions', info)
+            if (!res || isNaN(res.code) || !res.msg) {
+                throw TypeError(`Required info is missing`)
+            } else {
+                return { code: res.code, msg: res.msg }
+            }
+        } catch {
+            return { msg: `An error occured when delegation permissions`, code: 1 }
+        }
     }
 }
 

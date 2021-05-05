@@ -97,7 +97,7 @@ export default {
             }
         },
         async getOtherAdmins() {
-            this.admins = await this._api.institutionAdmins.getOtherAdmins()
+            this.admins = await this._api.institutionAdmins.getOtherAdmins({ active: true })
         },
         adminTag(admin={}) {
             if (admin.confirmed) {
