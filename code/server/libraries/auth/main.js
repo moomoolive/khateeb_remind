@@ -47,6 +47,9 @@ const mutateHeadersToIncludeUserInfo = (request, decodedToken) => {
     if (decodedToken.specialStatus) {
         request.headers.specialStatus = decodedToken.specialStatus
     }
+    if (decodedToken.specialInstitution) {
+        request.headers.specialInstitution = decodedToken.specialInstitution
+    }
     request.headers.authLevel = userTypeToAuthLevel(decodedToken.__t)
 } 
 

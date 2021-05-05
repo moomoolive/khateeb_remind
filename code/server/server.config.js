@@ -115,7 +115,10 @@ const securityConfig = {
 const thirdPartyServicesInfo = {
     AWS: {
         email: process.env.AWS_SES_EMAIL,
-        cloudStorageBucketName: process.env.AWS_S3_BUCKET_NAME
+        cloudStorageBucketName: process.env.AWS_S3_BUCKET_NAME,
+        cloudSubDirectories: {
+            logos: 'img/logos/'
+        }
     }
 }
 

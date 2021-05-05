@@ -7,13 +7,13 @@ const createTestInstitution = async () => {
     try {
         
         // check if test institution exists if not create it
-        let testInstitution = await $db.institutions.findOne({ 
-            name: initConfig.testInstitution.institution.name 
-        }).exec()
+        let testInstitution = await $db.testInstitution
+            .findOne({})
+            .exec()
         if (testInstitution)
             console.log('Test institution already exists')
         else
-            testInstitution = await new $db.institutions(
+            testInstitution = await new $db.testInstitution(
                 initConfig.testInstitution.institution
             ).save()
         const authorizations = await $db.authorizations.find({ institution: testInstitution._id.toString() }).exec()

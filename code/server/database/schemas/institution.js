@@ -1,8 +1,9 @@
 const mongoose = require('mongoose')
 
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
-const scripts = require($rootDir + '/libraries/scripts/index.js')
 const cloudStorageHelpers = require($rootDir + '/libraries/cloudStorage/main.js')
+
+const { thirdPartyServicesConfig } = require($rootDir + '/Server.config.js')
 
 const institution = new mongoose.Schema({
     name: {
@@ -12,8 +13,8 @@ const institution = new mongoose.Schema({
     },
     abbreviatedName: {
         type: String,
-        required: false,
-        default: '__NO-ABBREVIATED-NAME__'
+        required: true,
+        minlength: 1
     },
     timezone: {
         type: String,
@@ -75,6 +76,11 @@ const institution = new mongoose.Schema({
                 max: 6
             }
         }
+    },
+    active: {
+        type: Boolean,
+        required: false,
+        default: true
     }
 },
 { timestamps: true, minimize: false })
@@ -97,50 +103,116 @@ institution.methods.createStandardAuthorizations = async function() {
     }
 }
 
-institution.methods.deleteDependencies = async function() {
-    const deleteRes = {}
+institution.methods.deactivate = async function() {
+    const res = {}
+    res.directDependencies = await this.deleteDirectDependencies()
+    res.logo = await this.deleteInstitutionLogo()
+    const authorizationKeys = await this.getAuthorizationKeys()
     try {
-        const models = Object.keys($db)
-        for (let i = 0; i < models.length; i++) {
-            const model = models[i]
-            if (model === 'institutions')
-                continue
-            deleteRes[model] = await $db[model].deleteMany({ institutionID: this._id.toString() })
-        }
-        deleteRes.cloudStorage = await cloudStorageHelpers.deleteFile(`img/logos/${this._id}`)
+        // In the case that users with authorization keys aren't correctly deleted
+        // I want to keep the authorization keys so that they can at least be
+        // manually deleted, or programmatically by a cron script
+        res.userAuth = await this.removeAuthorizationKeysFromUsers(authorizationKeys)
+        res.authKeys = await this.deleteAuthorizationKeys()
     } catch(err) {
-        console.log(err)
+        console.error(err)
     }
-    return deleteRes
+    res.institution = await this.deactivateInstitution()
+    return res
 }
 
-institution.methods.createRootAdministrator = async function(administratorInfo={}, confirmed=false) {
-    administratorInfo.institutionID = this._id.toString()
+institution.methods.deleteInstitutionLogo = async function() {
+    const res = await cloudStorageHelpers.deleteFile(`${thirdPartyServicesConfig.AWS.cloudSubDirectories.logos}${this._id}`)
+    return res
+}
+
+institution.methods.deleteAuthorizationKeys = async function() {
+    let res = {}
     try {
-        const adminEntry = await new $db.rootInstitutionAdmins({ ...administratorInfo, confirmed }).save()
-        console.log(`Created root institution admin for inst:${this.name} (id: ${adminEntry._id})`)
-        return adminEntry
+        res = await $db.authorizations.deleteMany({ institution: this._id })
     } catch(err) {
-        console.log(err)
+        console.error(err)
+    }
+    return res
+}
+
+institution.methods.deactivateInstitution = async function() {
+    let res = {}
+    try {
+        res = await $db.institutions.update({ _id: this._id }, { active: false })
+    } catch(err) {
+        console.error(err)
+    }
+    return res
+}
+
+institution.methods.removeAuthorizationKeysFromUsers = async function(authKeys=[]) {
+    try {
+        const res = await $db.users
+            .update(
+                {},
+                {
+                    $pull: { 
+                        "authorizations": {
+                            authId: { $in: authKeys }
+                        }
+                    }
+                },
+                { multi: true }
+            )
+        return res
+    } catch(err) {
+        console.error(`couldn't remove user with authorization keys`, err)
+        throw new Error(err)
     }
 }
 
-institution.methods.confirmRootAdmin = async function() {
+institution.methods.getAuthorizationKeys = async function() {
+    let res = []
     try {
-        const updated = await $db.rootInstitutionAdmins.findOneAndUpdate({ institutionID: this._id.toString() }, { confirmed: true }, { new: true }).exec()
-        return updated
+        const authorizations = await $db.authorizations
+            .find({ institution: this._id })
+            .exec()
+        res = authorizations.map(a => a._id)
     } catch(err) {
-        console.log(err)
+        console.error(err)
     }
+    return res
+}
+
+const directDependenciesList = [
+    { name: "locations", key: "institutionID" },
+    { name: "timings", key: "institutionID" },
+    { name: "jummahPreferences", key: "institutionID" },
+    { name: "userScheduleRestrictions", key: "institution" },
+    { name: "announcements", key: "institutionID" },
+]
+institution.methods.deleteDirectDependencies = async function() {
+    const res = {}
+    for (const dependency of directDependenciesList) {
+        res[dependency.name] = await this.deleteTargetDependency(dependency.name, dependency.key)
+    }
+    return res
+}
+
+
+// "institutionReferenceKey" is taken a input for legacy reasons
+institution.methods.deleteTargetDependency = async function(targetModelName="timings", institutionReferenceKey="institutionID") {
+    let res = {}
+    try {
+        const query = {}
+        query[institutionReferenceKey] = this._id
+        res = await $db[targetModelName]
+            .deleteMany(query)
+            .exec()
+    } catch(err) {
+        console.error(err)
+    }
+    return res
 }
 
 institution.methods.getLocalTime = function () {
     return scheduleHelpers.getDateInTimezoneNow(this.timezone)
 }
-
-institution.post('deleteOne', async function() {
-    const threeSecondsInMilliseconds = 3_000
-    global.setTimeout(async () => { await scripts.createTestInstitution() }, threeSecondsInMilliseconds)
-})
 
 module.exports = institution

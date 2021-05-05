@@ -142,7 +142,8 @@ export default {
             const { token } = await this._api.user.upgradeAuthorization({
                 authId: authInfo.authId._id,
                 role: authInfo.authId.role,
-                institutionID: authInfo.authId.institution._id
+                institutionID: authInfo.authId.institution._id,
+                institutionStatus: authInfo.authId.institution.__t || 'default'
             })
             if (!token)
                 return this._utils.alert(`A problem occurred when signing in`)

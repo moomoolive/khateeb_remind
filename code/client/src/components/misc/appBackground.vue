@@ -107,7 +107,7 @@ export default {
   &.mosque {
     animation-delay:2s;
     animation-duration:11s;
-    left:90%;
+    left:70%;
   }
 
   &.paper-plane {

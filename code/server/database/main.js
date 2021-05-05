@@ -15,8 +15,13 @@ const userScheduleRestriction = require('./schemas/userScheduleRestrictions.js')
 
 // discriminators --> basically a schema that inherits and extends any of the
 // above schemas
+
+// users
 const root = require('./discriminators/rootUser.js')
 const sysAdmin = require('./discriminators/sysAdmin.js')
+
+// institutions
+const testInstitution = require('./discriminators/testInstitution.js')
 
 const models = {
     institutions: mongoose.model('institution', institution),
@@ -32,7 +37,7 @@ const models = {
     userScheduleRestrictions: mongoose.model('userScheduleRestriction', userScheduleRestriction)
 }
 
-const userTypes = {
+const userDiscriminators = {
     root: models.users.discriminator('root', root),
     sysAdmins: models.users.discriminator('sysAdmin', sysAdmin),
 
@@ -43,7 +48,12 @@ const userTypes = {
     // to be phased out
 }
 
+const institutionDiscriminators = {
+    testInstitution: models.institutions.discriminator('testInstitution', testInstitution)
+}
+
 module.exports = { 
     ...models, 
-    ...userTypes
+    ...userDiscriminators,
+    ...institutionDiscriminators
 }

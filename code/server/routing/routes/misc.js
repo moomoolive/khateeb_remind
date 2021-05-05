@@ -24,7 +24,10 @@ validationMiddleware.validateRequest(
 
 router.get('/institution-selection', async (req, res) => {
     try {
-        const data = await $db.institutions.find({ confirmed: true, name: { $ne: "__ROOT__" } }).select(["-createdAt", "-updatedAt"]).exec()
+        const data = await $db.institutions
+            .find({ confirmed: true, active: true })
+            .select(["-createdAt", "-updatedAt"])
+            .exec()
         return res.json({ data })
     } catch(err) {
         console.log(err)

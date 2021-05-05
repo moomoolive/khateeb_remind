@@ -127,7 +127,10 @@ router.post(
         [
             validator.body("authId").isString().custom(requestValidationHelpers.validInstitutionId),
             validator.body("role").isString().isLength({ min: 1 }),
-            validator.body("institutionID").isString().custom(requestValidationHelpers.validInstitutionId)
+            validator.body("institutionID").isString().custom(requestValidationHelpers.validInstitutionId),
+            // this is used to distinguish better default institutions and special ones
+            // like the test institution
+            validator.body("institutionStatus").isString().isLength({ min: 1 })
         ]
     ),
     async (req, res) => {
@@ -147,6 +150,9 @@ router.post(
             }
             if (req.headers.specialStatus) {
                 tokenInfo.specialStatus = req.headers.specialStatus
+            }
+            if (req.body.institutionStatus !== 'default') {
+                tokenInfo.specialInstitution = req.body.institutionStatus
             }
             return res.json({ token: authHelpers.createToken(tokenInfo) })
         } catch(err) {

@@ -15,7 +15,7 @@ const root = new mongoose.Schema({
             default: true
         }
     }
-})
+}, { timestamps: true })
 
 root.methods.deactivateAccount = async function() {
     const dependants = await this.deleteDependencies() // method found in parent schema 'user'

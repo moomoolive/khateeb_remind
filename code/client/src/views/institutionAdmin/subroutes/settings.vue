@@ -242,6 +242,8 @@ export default {
             )
             if (confirm) {
                 const res = await this._api.institutions.deleteInstitution()
+                // eslint-disable-next-line
+                console.log(res)
                 if (!requestHelpers.dataWasDeleted(res))
                     return
                 this._utils.alert(`You've successfully deleted your institution`, 'success')

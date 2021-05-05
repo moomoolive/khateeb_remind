@@ -105,8 +105,6 @@ export default {
             if (!confirm)
                 return
             const res = await this._api.user.deleteAccount()
-            // eslint-disable-next-line
-            console.log(res)
             if (!requestHelpers.dataWasDeleted(res))
                 return
             this.$store.dispatch('user/logout')

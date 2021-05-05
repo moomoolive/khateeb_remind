@@ -6,14 +6,18 @@ const validationMiddleware = require($rootDir + '/middleware/validation/main.js'
 
 const cloudStorageHelpers = require($rootDir + '/libraries/cloudStorage/main.js')
 
+const { thirdPartyServicesConfig } = require($rootDir + '/Server.config.js')
+
 const router = express.Router()
+
+const TARGET_LOGO_SUBDIRECTORY = thirdPartyServicesConfig.AWS.cloudSubDirectories.logos
 
 router.get('/', 
     validationMiddleware.validateRequest([
         validator.query("institutionID").isString().isLength($config.consts.mongooseIdLength)
     ], "query"),
     async (req, res) => {
-        const { file, status, msg="none" } = await cloudStorageHelpers.getFile(`img/logos/${req.query.institutionID}`)
+        const { file, status, msg="none" } = await cloudStorageHelpers.getFile(`${TARGET_LOGO_SUBDIRECTORY}${req.query.institutionID}`)
         if (status !== 200)
             return res.json({ cloudRes: status, msg })
         res.setHeader("Content-Type", "image/png")
@@ -36,7 +40,7 @@ router.put('/',
         const binaryImg = new Uint8Array(req.body.img)
         // not saving file extension because current cloud provider doesn't support
         // searching for multiple extensions in one request
-        const { code, msg="successfully uploaded logo" } = await cloudStorageHelpers.uploadFile(binaryImg, `img/logos/${req.headers.institutionid}`)
+        const { code, msg="successfully uploaded logo" } = await cloudStorageHelpers.uploadFile(binaryImg, `${TARGET_LOGO_SUBDIRECTORY}${req.headers.institutionid}`)
         return res.json({ data: { code }, msg })
     }
 )
@@ -44,7 +48,7 @@ router.put('/',
 router.delete("/", 
     authMiddleware.authenticate({ min: 3, max: 4 }),
     async (req, res) => {
-        const { code, msg="successfully deleted logo" } = await cloudStorageHelpers.deleteFile(`img/logos/${req.headers.institutionid}`)
+        const { code, msg="successfully deleted logo" } = await cloudStorageHelpers.deleteFile(`${TARGET_LOGO_SUBDIRECTORY}${req.headers.institutionid}`)
         return res.json({ data: { code }, msg })
     }
 )
