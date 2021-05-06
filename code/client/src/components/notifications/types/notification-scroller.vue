@@ -16,9 +16,17 @@
                     </div>
 
                     <div class="notification-msg">
-                        <span class="notification-date purple">
-                            {{ _utils.dynamicDisplayDate(notification.createdAt) }}
-                        </span><br><br>
+                        <div v-if="notification.institutionID" class="institution-name">
+                            <span class="blue">
+                                {{ notification.institutionID.abbreviatedName }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="notification-date purple">
+                                {{ _utils.dynamicDisplayDate(notification.createdAt) }}
+                            </span>
+                        </div>
+                        <br>
                         {{ notification.msg }}
                     </div>
 
@@ -144,9 +152,10 @@ export default {
     color: get-color("off-white");
 }
 
-.notification-date {
+.notification-date, .institution-name {
     font-size: 12px;
 }
+
 
 .tag {
     margin-left: 20px;

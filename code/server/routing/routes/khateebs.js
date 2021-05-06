@@ -171,11 +171,14 @@ router.post(
     ]),
     async (req, res) => {
         try {
-            const note = new notificationConstructors[req.params.type + 'AvailabilityChangeConstructor']({ 
-                change: req.body.change,
-                khateebID: req.headers.userid,
-                msg: req.body.msg 
-            })
+            const note = new notificationConstructors[req.params.type + 'AvailabilityChangeConstructor'](
+                req.headers.institutionid,
+                { 
+                    change: req.body.change,
+                    khateebID: req.headers.userid,
+                    msg: req.body.msg 
+                }
+            )
             await note.setRecipentsToAdmins(req.headers.institutionid)
             await note.create()
             return res.json({ code: 0 })

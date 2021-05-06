@@ -9,7 +9,8 @@ module.exports = class JummahReminderNotificationConstructor extends Notificatio
             { 
                 msgInfo: jummahMeta, 
                 urgent: true, 
-                meta: { jummahRef: jummah._id.toString() } 
+                meta: { jummahRef: jummah._id.toString() },
+                institutionID: jummah.institutionID 
             }, 
             true,
             true

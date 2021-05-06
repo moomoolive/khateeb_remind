@@ -87,14 +87,31 @@ router.get('/authorizations', async (req, res) => {
     }
 })
 
+/*
+.populate({ 
+                path: 'authorizations.authId',
+                select: { __v: 0 },
+                populate: {
+                    path: 'institution',
+                    select: {
+                        settings: 0,
+                        __v: 0
+                    }
+                }
+            })
+*/
+
 router.get('/notifications', async (req, res) => {
     try {
         const [notifications, userInfo] = await Promise.all([
             $db.notifications
                 .find({ userID: req.headers.userid })
-                .populate('institutionID')
+                .populate({
+                    path: 'institutionID',
+                    select: { abbreviatedName: 1 }
+                })
                 .sort('-createdAt')
-                .limit(10)
+                .limit(20)
                 .exec(),
             $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).exec()
         ]) 
@@ -195,7 +212,7 @@ router.post(
                     institution: req.body.institution 
                 }).save()
                 updateCommand.$push.scheduleRestrictions = scheduleRestriction._id
-                const note = new notificationConstructors.KhateebSignupNotificationConstructor(userInfo, autoConfirmPolicy)
+                const note = new notificationConstructors.KhateebSignupNotificationConstructor(userInfo, autoConfirmPolicy, req.body.institution)
                 await note.setRecipentsToAdmins(authInfo.institution._id)
                 note.create()
             }

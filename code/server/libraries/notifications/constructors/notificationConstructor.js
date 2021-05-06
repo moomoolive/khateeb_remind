@@ -66,7 +66,6 @@ module.exports = class NotificationConstructor {
     compileNotificationInfo(user) {
         return {
             userID: user._id,
-            institutionID: user.institutionID,
             tag: this.tag,
             msg: this.msg(user),
             meta: this.meta,
