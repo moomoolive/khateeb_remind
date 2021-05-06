@@ -14,7 +14,7 @@
                     }
                 }"
                 :basedOn="{
-                    username: userCredentials.username,
+                    username: userCredentials,
                     password: ''
                 }"
                 :errorMsg="errorMsg"
@@ -52,18 +52,19 @@ export default {
     data() {
         return {
             errorMsg: '',
-            userCredentials: localStorageHelpers.get(this.userCredentialKey) || { username: '' },
-            userCredentialKey: "userCredentials",
+            userCredentials: this.getUserCredentials() ||  '',
+            userCredentialKey: "username",
             pathToPublicFolder: process.env.BASE_URL
         }
     },
     methods: {
         async login(loginInfo={}) {
             const authRes = await this._api.auth.getToken(loginInfo)
-            if (!authRes.token || authRes.msg !== 'success')
+            if (!authRes.token || authRes.msg !== 'success') {
                 return this.errorMsg = 'Incorrect Username or Password'
+            }
             this.$store.dispatch('user/updateToken', authRes.token)
-            localStorageHelpers.commit(this.userCredentialKey, { username: loginInfo.username })
+            this.setUserCredentials(loginInfo.username)
             this._api.user.getNotifications()
             return this._utils.toHomePage()
         },
@@ -74,6 +75,15 @@ export default {
                     { text: 'Password Recovery', to: '/forgot/password' }
                 ]
             )
+        },
+        setUserCredentials(username="moomoo") {
+            return localStorageHelpers.commit(this.userCredentialKey, username)
+        },
+        getUserCredentials() {
+            // I honestly have no idea why using 'this.userCredentialKey'
+            // doesn't find the target key in localstorage
+            // it always returns null - so for now this will work
+            return localStorageHelpers.get('username')
         }
     },
     created() {
@@ -111,7 +121,7 @@ p {
     cursor: pointer;
 
     &:hover {
-        color: getColor("green");
+        color: get-color("dark-blue");
     }
 }
 

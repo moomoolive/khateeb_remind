@@ -17,14 +17,16 @@
         </div>
 
         <div v-show="khateebPreferences[1].khateebID" class="khateeb-role-label" @click="toggleBackupDisplay()">
-           <span>
-               <dropdown-arrow 
+            <div>
+                <dropdown-arrow 
                     :fontSize="12"
                     :faceDown="showBackup"
                     class="show-backup-arrow"
                 />
-           </span>
-           Backup
+            </div>
+            <div>
+                Backup
+            </div>
         </div>
         <collapse-transition>
             <div v-show="showBackup" class="khateeb-name-label">
@@ -106,6 +108,9 @@ div {
     margin-bottom: 5px;
     margin-top: 5px;
     font-size: 17px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .khateeb-name-label {

@@ -2,32 +2,34 @@
     <div class="footer-container">
         <div class="bottom-nav">
             
-            <div v-show="isLoggedIn" class="footer-links-section">
-                <div class="footer-links-section-header">
-                    Users
+            <collapse-transition :duration="600">
+                <div v-show="isLoggedIn" class="footer-links-section">
+                    <div class="footer-links-section-header">
+                        Users
+                    </div>
+                    <div class="footer-links-header-divide"></div>
+                    <a
+                        class="green"
+                        :href="feedbackURL" 
+                        target="_blank"
+                    >
+                        Feedback
+                    </a>
+                    <a 
+                        v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
+                        class="green"
+                        @click="$store.dispatch('user/downgradeUserAuthorization')"
+                    >
+                        Exit Institution
+                    </a>
+                    <a 
+                        class="green"
+                        @click="logout()"
+                    >
+                        Logout
+                    </a>
                 </div>
-                <div class="footer-links-header-divide"></div>
-                <a
-                    class="green"
-                    :href="feedbackURL" 
-                    target="_blank"
-                >
-                    Feedback
-                </a>
-                <a 
-                    v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
-                    class="green"
-                    @click="$store.dispatch('user/downgradeUserAuthorization')"
-                >
-                    Exit Institution
-                </a>
-                <a 
-                    class="green"
-                    @click="logout()"
-                >
-                    Logout
-                </a>
-            </div>
+            </collapse-transition>
 
             <div class="footer-links-section">
                 <div class="footer-links-section-header">
@@ -83,8 +85,13 @@
 <script>
 import Config from '$config'
 
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+
 export default {
     name: 'Footer',
+    components: {
+        CollapseTransition
+    },
     data() {
         return {
             feedbackURL: Config.thirdPartyServicesConfig.feedbackFormURL

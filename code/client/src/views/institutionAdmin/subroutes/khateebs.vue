@@ -7,7 +7,10 @@
                     
                     <div>
                         <button class="yellow" @click="showSearchTools = !showSearchTools">
-                            🔍 {{ showSearchTools ? 'Close' : 'Open' }} Search Tools
+                            <span class="grey">
+                                <fa-icon icon="search" /> 
+                            </span>
+                            {{ showSearchTools ? 'Close' : 'Open' }} Search Tools
                         </button>
                     </div>
                     
@@ -300,13 +303,6 @@ p {
     font-size: 16px;
 }
 
-button {
-    width: 80%;
-    height: 45px;
-    border-radius: 0;
-}
-
-
 .input-container {
     @include flexbox-default();
     width: 80%;
@@ -356,9 +352,12 @@ input {
 button {
     width: 80%;
     max-width: 300px;
-    height: 50px;
+    padding-bottom: 10px;
+    padding-top: 10px;
     font-size: 18px;
     margin-bottom: 20px;
+    border-radius: 0;
+    @include floating-box-shadow();
 }
 
 .search-tools {

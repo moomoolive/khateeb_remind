@@ -107,7 +107,11 @@ export default {
             timings: [],
             locations: [],
             allKhutbahsUntilTheEndOfNextMonthNotFromUser: [],
-            showDefaultKhateebsPopup: false
+            showDefaultKhateebsPopup: false,
+            userInfo: {
+                availableTimings: [],
+                unavailableDates: []
+            }
         }
     },
     methods: {
@@ -120,6 +124,10 @@ export default {
         timingDisplay(timingId="1234") {
             const timing = this.timings.find(t => t._id === timingId)
             return timingHelpers.timingDisplay(timing)
+        },
+        async getScheduleRestrictions() {
+            const res = await this._api.user.getScheduleRestrictions()
+            this.userInfo = res
         },
         async requestJummahsForCurrentUser() {
             this.khutbahs = await this.requestJummahs({ khateebID: this.currentUserId })
@@ -216,7 +224,7 @@ export default {
                         })
                         // filter out unavailable dates
                         .filter(t => {
-                            return !this.$store.state.user.userInfo.unavailableDates
+                            return !this.userInfo.unavailableDates
                                 .find(e => datetime.sameDateMonthAndYear(e.date, t.date))
                         })
                         // filter out khutbahs already taken by other khateebs
@@ -248,6 +256,7 @@ export default {
         }
     },
     created() {
+        this.getScheduleRestrictions()
         this.requestJummahsForCurrentUser()
         this.requestJummahsUpUntilTheEndOfNextMonth()
         this.getAllLocationsAndTimings()

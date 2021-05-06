@@ -34,7 +34,7 @@
                     </select>
                 </span>
                 
-                <div v-if="preference.khateebID.toLowerCase() !== _config.nullId">
+                <div v-if="preference.khateebID !== _config.nullId">
 
                     <div 
                         v-show="preference.isGivingKhutbah" 
@@ -113,6 +113,13 @@ export default {
         },
         async khateebSelectionChanged(change, index) {
             const khateebID = change.target.value
+            // if i'm completely honest, this if statement is only here
+            // because there is a bug when creating a new preference (not from default khateebs)
+            // where it will emit the event multiple times
+            // i'm not sure why it's happening but hopefully testing will figure this out
+            if (!khateebID) {
+                return
+            }
             if (this.noPreferenceIndicated(index) || this.khateebPreferences[index].upsert) {
                 const isBackup = index !== 0
                 this.$emit('new-preference', { 
@@ -139,10 +146,11 @@ export default {
         },
         setInitialValue() {
             this.khateebPreferences.forEach((preference, index) => {
-                if (this.noPreferenceIndicated(index))
+                if (this.noPreferenceIndicated(index)) {
                     return
-                else
+                } else {
                     this.khateebPreferencesMirror[index] = { ...preference }
+                }
             })
             this.cachePreferences()
         },

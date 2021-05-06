@@ -3,7 +3,7 @@
         
         <complex-key-binder 
             :targetKeyBinds="['t', 'Control', 'Alt']"
-            @all-key-bindings-active="testInstitutionSignup()"
+            @all-key-bindings-active="revealTestInstitution()"
         />
 
         <loading :loadingTime="1200">
@@ -32,7 +32,7 @@
                                 {{ _utils.stringFormat(institution.name) }}
                             </div>
                             <div class="institution-text small">
-                                <span class="blue">({{ institution.abbreviatedName }})</span>
+                                <span class="blue">{{ institution.abbreviatedName }}</span>
                             </div>
                             <div class="institution-text">
                                 <span class="purple">
@@ -104,6 +104,8 @@ import complexKeyBinder from '@/components/misc/complexKeyBinder.vue'
 import loading from '@/components/general/loadingScreen.vue'
 import generalMessage from '@/components/misc/generalMessage.vue'
 
+import Config from '$config'
+
 export default {
     name: "institutionSelections",
     components: {
@@ -116,10 +118,14 @@ export default {
             allInstitutions: [],
             institutionLogosFromRequest : [],
             selectedInstitution: 'none',
-            readyToGoToAuthorizations: new Promise(resolve => resolve(true))
+            readyToGoToAuthorizations: new Promise(resolve => resolve(true)),
+            showTestInstitution: false
         }
     },
     methods: {
+        revealTestInstitution() {
+            this.showTestInstitution = true
+        },
         async getAllConfirmedInstitutions() {
             this.allInstitutions = await this._api.misc.institutionSelection()
         },
@@ -142,8 +148,7 @@ export default {
         promptLoadingIconOnPressingInstitution(id="1234") {
             this.selectedInstitution = id
             this.readyToGoToAuthorizations = new Promise(resolve => {
-                const milliseconds = 2_500
-                window.setTimeout(() => resolve(true), milliseconds)
+                window.setTimeout(() => resolve(true), Config.networkConfig.defaultAuthIOLoadingTime)
             })
         },
         isKhateebAtGivenInstitution(id="1234") {
@@ -178,7 +183,7 @@ export default {
     },
     computed: {
         showingInstitutions() {
-            if (this.allInstitutions.length > 1)
+            if (this.allInstitutions.length > 1 && !this.showTestInstitution)
                 return this.allInstitutions.filter(i => i.name !== "test")
             else
                 return this.allInstitutions

@@ -134,7 +134,7 @@
                     <general-message
                         v-else
                         :message=" reciever === 'institutionAdmin' ?
-                            `Please create you first location to get started` :
+                            `Create you first location to get started` :
                             `Schedule hasn't been created yet`
                         "
                         :fontAwesomeIcon="['far', 'paper-plane']"
@@ -389,14 +389,12 @@ export default {
 .schedule-container {
     padding-top: 15px;
     padding-bottom: 15px;
-    background: get-color("dark-blue", 0.5);
     width: 70%;
     max-width: 850px;
     min-width: 200px;
     margin-left: auto;
     margin-right: auto;
     border-radius: 7px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 
@@ -474,8 +472,7 @@ export default {
     }
     
     .schedule-container {
-            background: get-color("dark-blue", 0.5);
-            width: 90%;
+        width: 90%;
     }
 
     .unavailable-khateebs-this-week-header-container {

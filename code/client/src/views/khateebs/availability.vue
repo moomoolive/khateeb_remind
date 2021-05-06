@@ -61,6 +61,7 @@ import selectionPicker from '@/components/general/selectionPicker.vue'
 import loading from '@/components/general/loadingScreen.vue'
 
 import khateebHelpers from '@/libraries/khateebs/main.js'
+import jummahHelpers from '@/libraries/jummahs/main.js'
 
 export default {
     name: "khateebAvailability",
@@ -76,7 +77,8 @@ export default {
             userInfo: {
                 availableTimings: [],
                 unavailableDates: []
-            }
+            },
+            firstRequest: true
         }
     },
     methods: {
@@ -88,6 +90,12 @@ export default {
         async getScheduleRestrictions() {
             const res = await this._api.user.getScheduleRestrictions()
             this.userInfo = res
+            if (this.firstRequest) {
+                this.markThatFirstRequestHasCome()
+            }
+        },
+        markThatFirstRequestHasCome() {
+            this.$nextTick(() => this.firstRequest = false)
         },
         addToUnavailableDays(newVCalendarDate={}) {
             const friday = 5
@@ -161,29 +169,47 @@ export default {
     },
     watch: {
         async unavailableDates(newVal, oldVal) {
-            if (newVal.length === oldVal.length)
+            if (newVal.length === oldVal.length || this.firstRequest) {
                 return
+            }
             const longerArray = newVal.length > oldVal.length ? newVal : oldVal
             const diff = longerArray.slice(-1)[0]
             const wasDeleted = newVal.length < oldVal.length
-            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Date", {
+            const info = {
                 change: { diff, wasDeleted },
                 msg: `${this.usersFullNameWithTitle} is ${wasDeleted ? 'now available' : 'no longer available'} to give khutbahs on ${new Date(diff).toLocaleDateString('en-US', { month: "long", year: "numeric", day: "numeric" })}${wasDeleted ? ` insha'Allah` : ''}.` 
-            })
+            }
+            // if khateeb is not available for a particular day anymore
+            // erase their id from any jummahs on that day
+            if (!wasDeleted) {
+                info.eraseKhateebIdQuery = { date: jummahHelpers.fridayToFridayDBFormat(diff) }
+            }
+            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Date", info)
         },
         async availableTimings(newVal, oldVal) {
-            if (oldVal.length === newVal.length)
+            if (oldVal.length === newVal.length || this.firstRequest) {
                 return
+            }
             const longerArray = newVal.length > oldVal.length ? newVal : oldVal
             const shorterArray = newVal.length > oldVal.length ? oldVal : newVal
             const diff = longerArray.filter(e => !shorterArray.find(el => el === e))[0]
             const lessAvailable = newVal.length === 0 ? 
                 false : newVal.length === 1 ? 
                 true : newVal.length < oldVal.length
-            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Timing", {
+            const info = {
                 change: { diff, lessAvailable },
                 msg: `${this.usersFullNameWithTitle} ${lessAvailable ? `is less available nowadays to give` : `is now available to give more` } khutbahs${lessAvailable ? `.` : ` insha'Allah!`} Check out his profile for more details.` 
-            })
+            }
+            // if khateeb is available for less timings
+            // erase their name from the jummahs that have them scheduled
+            // from today onwards
+            if (lessAvailable) {
+                info.eraseKhateebIdQuery = {
+                    date: { $gte: jummahHelpers.fridayToFridayDBFormat(new Date()) },
+                    timingID: diff
+                }
+            }
+            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Timing", info)
         }
     },
     created() {

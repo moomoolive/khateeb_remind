@@ -103,7 +103,8 @@ router.post(
     authMiddleware.authenticate({ level: 2 }),
     validationMiddleware.validateRequest([
         validator.body("change").exists(),
-        validator.body("msg").isString().isLength({ min: 1 })
+        validator.body("msg").isString().isLength({ min: 1 }),
+        validator.body("eraseKhateebIdQuery").optional()
     ]),
     async (req, res) => {
         try {
@@ -117,6 +118,13 @@ router.post(
             )
             await note.setRecipentsToAdmins(req.headers.institutionid)
             await note.create()
+            if (req.body.eraseKhateebIdQuery) {
+                await $db.jummahPreferences.deleteMany({
+                    institutionID: req.headers.institutionid,
+                    khateebID: req.headers.userid,
+                    ...req.body.eraseKhateebIdQuery    
+                })
+            }
             return res.json({ code: 0 })
         } catch(err) {
             console.log(err)

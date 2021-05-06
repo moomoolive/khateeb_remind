@@ -104,6 +104,7 @@ export default {
     width: 200px;
     border-radius: 50%;
     border: get-color("yellow") solid 3px;
+    background: get-color("dirty-white");
 }
 
 .institution-description {

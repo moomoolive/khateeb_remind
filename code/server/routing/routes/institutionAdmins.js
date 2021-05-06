@@ -82,7 +82,6 @@ router.put(
     ]),
     async (req, res) => {
         try {
-            console.log(req.query)
             const [targetAdmin] = await $db.users
                 .find({ _id: req.body.adminId })
                 .populate("authorizations.authId")

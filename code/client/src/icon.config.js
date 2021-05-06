@@ -29,7 +29,9 @@ import {
     faStreetView,
     faChevronRight,
     faChevronDown,
-    faStarAndCrescent
+    faStarAndCrescent,
+    faSignOutAlt,
+    faSearch
  } from '@fortawesome/free-solid-svg-icons'
 
  import {
@@ -83,5 +85,7 @@ export default [
     faStreetView,
     faChevronRight,
     faChevronDown,
-    faStarAndCrescent
+    faStarAndCrescent,
+    faSignOutAlt,
+    faSearch,
 ]

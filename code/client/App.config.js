@@ -2,7 +2,8 @@ const networkConfig = {
     serverURL: process.env.VUE_APP_API_SERVER_URL,
     offlineModeRequestCountThreshold: parseInt(process.env.VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT),
     pwaTestingServerURL: "http://localhost:80",
-    defaultIOLoadingTime: parseInt(process.env.VUE_APP_DEFAULT_IO_LOADING_TIME) // in milliseconds
+    defaultIOLoadingTime: parseInt(process.env.VUE_APP_DEFAULT_IO_LOADING_TIME), // in milliseconds
+    defaultAuthIOLoadingTime: parseInt(process.env.VUE_APP_DEFAULT_AUTH_IO_LOADING_TIME), // in milliseconds
 }
 
 const securityConfig = {

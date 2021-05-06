@@ -3,7 +3,8 @@
         <loading>
             <institution-signup-form-template 
                 :formProps="{
-                    formTitle: 'Create an Institution'
+                    formTitle: 'Create an Institution',
+                    bindedExts: ['states']
                 }"
                 @submitted="toAPI($event)"
             />

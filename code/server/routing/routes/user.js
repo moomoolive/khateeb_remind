@@ -25,7 +25,8 @@ router.put(
             validator.body("firstName").isLength({ min: 1 }).isString().optional(),
             validator.body("lastName").isLength({ min: 1 }).isString().optional(),
             validator.body("title").isLength({ min: 1 }).isString().optional(),
-            validator.body("systemSettings.autoConfirmRegistration").isBoolean().optional(),
+            validator.body("systemSettings.autoConfirmInstitutionRegistration").isBoolean().optional(),
+            validator.body("systemSettings.autoConfirmUserRegistration").isBoolean().optional(),
             validator.body("settings.recieveExternalNotification").isBoolean().optional(),
             validator.body("settings.recievePWAPush").isBoolean().optional(),
         ]
@@ -87,20 +88,6 @@ router.get('/authorizations', async (req, res) => {
     }
 })
 
-/*
-.populate({ 
-                path: 'authorizations.authId',
-                select: { __v: 0 },
-                populate: {
-                    path: 'institution',
-                    select: {
-                        settings: 0,
-                        __v: 0
-                    }
-                }
-            })
-*/
-
 router.get('/notifications', async (req, res) => {
     try {
         const [notifications, userInfo] = await Promise.all([
@@ -114,7 +101,7 @@ router.get('/notifications', async (req, res) => {
                 .limit(20)
                 .exec(),
             $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).exec()
-        ]) 
+        ])
         return res.json({ data: { notifications, lastLogin: userInfo.lastLogin } })
     } catch(err) {
         console.error(err)

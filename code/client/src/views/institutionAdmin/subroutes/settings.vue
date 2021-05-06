@@ -248,6 +248,12 @@ export default {
             this.rerenderSettings()
         },
         async deleteInstitution() {
+            const continueToDelete = await this._utils.confirm(
+                `Are you sure you want to delete this institution entirely? Or would you like to assign another user your current role (root admin)? Click 'yes' if you are sure you want to delete this institution.`
+            )
+            if (!continueToDelete) {
+                return this.handoffPermissions()
+            }
             const confirm = await this._utils.confirm(
                 `Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`,
                 "yellow",

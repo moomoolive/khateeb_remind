@@ -23,89 +23,103 @@
                     </div>
                 </div>
 
-                <div v-if="userInfo.authorizations.length > 0" class="all-authorizations">
-                    <div
-                        v-for="(authorization, authIndex) in userInfo.authorizations"
-                        :key="authIndex" 
-                        class="authorization-container"
-                    >
-                        <button
-                            :disabled="
-                                !authorization.confirmed ||
-                                isGettingNewToken
-                            "
-                            class="authorization-button"
-                            @click="upgradeUserAuthorization(authorization)"
+                <div class="all-authorizations-container">
+                    <div class="selected-role-container">
+                        <div class="role-selection-text">
+                            Role
+                        </div>
+                        <select v-model="selectedRole" class="selected-role-dropdown">
+                            <option value="all">Any</option>
+                            <option value="khateeb">Khateeb</option>
+                            <option value="institutionAdmin">Admin</option>
+                            <option value="rootInstitutionAdmin">Root Admin</option>
+                        </select>
+                    </div>
+                    <div v-if="filteredAuthorizations.length > 0" class="all-authorizations">
+                        <div
+                            v-for="(authorization, authIndex) in filteredAuthorizations"
+                            :key="authIndex" 
+                            class="authorization-container"
                         >
-                            Sign in as a
-                            <span class="blue">
-                                {{ _utils.stringFormat(authorization.authId.role) }}
-                            </span>
-                            @
-                            <span class="red">
-                                {{ _utils.stringFormat(authorization.authId.institution.name) }}
-                            </span>
-                            <div class="authorization-bottom-section">
-                                
-                                <div class="confirmation-status">
-                                    <span :class="authorization.confirmed ? 'green' : 'yellow' ">
-                                        <fa-icon :icon="authorization.confirmed ? 'lock-open' : 'lock' " />
-                                    </span>
-                                    <span class="confirmation-status-text ">
-                                        {{ authorization.confirmed ? "Confirmed" : 'Pending' }}
-                                    </span>
-                                </div>
+                            <button
+                                :disabled="
+                                    !authorization.confirmed ||
+                                    isGettingNewToken
+                                "
+                                class="authorization-button"
+                                @click="upgradeUserAuthorization(authorization)"
+                            >
+                                Sign in as a
+                                <span class="blue">
+                                    {{ _utils.stringFormat(authorization.authId.role) }}
+                                </span>
+                                @
+                                <span class="red">
+                                    {{ _utils.stringFormat(authorization.authId.institution.name) }}
+                                </span>
+                                <div class="authorization-bottom-section">
+                                    
+                                    <div class="confirmation-status">
+                                        <span :class="authorization.confirmed ? 'green' : 'yellow' ">
+                                            <fa-icon :icon="authorization.confirmed ? 'lock-open' : 'lock' " />
+                                        </span>
+                                        <span class="confirmation-status-text ">
+                                            {{ authorization.confirmed ? "Confirmed" : 'Pending' }}
+                                        </span>
+                                    </div>
 
-                                <div 
-                                    :class="`loading-icon ${loadingAuth === authorization._id ? '' : 'invisible' }`"
+                                    <div 
+                                        :class="`loading-icon ${loadingAuth === authorization._id ? '' : 'invisible' }`"
+                                    >
+                                        <img 
+                                            src="~@/assets/gifs/loading.gif"
+                                            class="loading-animation" 
+                                            alt="loading animation"
+                                        >
+                                    </div>
+
+                                </div>
+                            </button>
+                            <!-- 
+                                root users and system administrators a little more unique than
+                                normal users, as their authorization for going to system
+                                administrator pages aren't actaully logged to the database 
+                                check the backend for more info 
+                            -->
+                            <button 
+                                :disabled="
+                                    authorization._id === 'root' || 
+                                    authorization._id === 'sysAdmin' ||
+                                    isGettingNewToken
+                                "
+                                class="delete-auth-button yellow"
+                                @click="removeAuthorization(authorization, authIndex)"
+                            >
+                                <div v-if="loadingAuthToSetting === 'none'">
+                                    Remove Permissions
+                                </div>
+                                <div
+                                    v-if="loadingAuthToSetting === authorization._id" 
+                                    class="loading-to-settings-animation-container"
                                 >
                                     <img 
-                                        src="~@/assets/gifs/loading.gif"
-                                        class="loading-animation" 
-                                        alt="loading animation"
+                                        src="~@/assets/gifs/loading-alternate.gif"
+                                        class="loading-to-settings-animation"
+                                        alt="alternate loading animation"
                                     >
                                 </div>
-
-                            </div>
-                        </button>
-                        <!-- 
-                            root users and system administrators a little more unique than
-                            normal users, as their authorization for going to system
-                            administrator pages aren't actaully logged to the database 
-                            check the backend for more info 
-                        -->
-                        <button 
-                            :disabled="
-                                authorization._id === 'root' || 
-                                authorization._id === 'sysAdmin' ||
-                                isGettingNewToken
-                            "
-                            class="delete-auth-button yellow"
-                            @click="removeAuthorization(authorization, authIndex)"
-                        >
-                            <div v-if="loadingAuthToSetting === 'none'">
-                                Remove these Permissions
-                            </div>
-                            <div
-                                v-if="loadingAuthToSetting === authorization._id" 
-                                class="loading-to-settings-animation-container"
-                            >
-                                <img 
-                                    src="~@/assets/gifs/loading-alternate.gif"
-                                    class="loading-to-settings-animation"
-                                    alt="alternate loading animation"
-                                >
-                            </div>
-                        </button>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <general-message
-                    v-else
-                    :message="`You haven't signed up to any institutions yet`"
-                    :fontAwesomeIcon="['fas', 'clipboard']"
-                    iconColor="orange"
-                />
+                    <general-message
+                        v-else
+                        :message="generalMessageText"
+                        :fontAwesomeIcon="['fas', 'clipboard']"
+                        iconColor="orange"
+                        class="no-results-message"
+                    />
+                </div>
 
             </div>
 
@@ -124,6 +138,8 @@ import loading from '@/components/general/loadingScreen.vue'
 
 import generalMessage from '@/components/misc/generalMessage.vue'
 
+import Config from '$config'
+
 export default {
     name: "userAuthorizations",
     components: {
@@ -136,7 +152,8 @@ export default {
             loadingAuth: 'none',
             loadingAuthToSetting: 'none',
             readyToGoIntoInstitution: new Promise((resolve) => resolve(true)),
-            readyToGoToSettings: new Promise((resolve) => resolve(true))
+            readyToGoToSettings: new Promise((resolve) => resolve(true)),
+            selectedRole: 'all'
         }
     },
     methods: {
@@ -147,7 +164,7 @@ export default {
         },
         promptLoadingIconOnPressingAuthorization(id="12345") {
             this.loadingAuth = id
-            this.readyToGoIntoInstitution = this.createDelay(2_000)
+            this.readyToGoIntoInstitution = this.createDelay(Config.networkConfig.defaultAuthIOLoadingTime)
         },
         createDelay(milliseconds=2_000) {
             return new Promise(resolve => {
@@ -162,6 +179,7 @@ export default {
             this.promptLoadingIconOnPressingAuthorization(authInfo._id)
             const token = await this.upgradeAuth(authInfo)
             if (!token) {
+                this.resetloadingAuth()
                 return this._utils.alert(`A problem occurred when signing in`)
             }
             // create a consistent delay before login
@@ -190,8 +208,9 @@ export default {
                 "yellow",
                 { hard: true, confirmationText: 'Remove Permissions' }
             )
-            if (!confirm)
+            if (!confirm) {
                 return
+            }
             const code = await this._api.user.removeAuthorization({ 
                 id: authorization._id, 
                 institution: authorization.authId.institution._id,
@@ -212,16 +231,17 @@ export default {
         },
         promptLoadingAlternateIconOnPressingRemovingPermissions(id="12345") {
             this.loadingAuthToSetting = id
-            this.readyToGoToSettings = this.createDelay(2_000)
+            this.readyToGoToSettings = this.createDelay(Config.networkConfig.defaultAuthIOLoadingTime)
         },
         async pushToDelegationPage(authorization={}) {
             const confirm = await this._utils.confirm(`You cannot remove root admin permissions from here, you must login then do so from the institution settings page by pressing 'delgate permissions' or deleting the institution entirely. Would you like to be taken there now?`)
             this.promptLoadingAlternateIconOnPressingRemovingPermissions(authorization._id)
             if (!confirm) {
-                return
+                return this.resetLoadingAuthToSetting()
             }
             const token = await this.upgradeAuth(authorization)
             if (!token) {
+                this.resetLoadingAuthToSetting()
                 return this._utils.alert(`A problem occurred when signing in`)
             }
             this.stashTokenAndInstitutionData(token, authorization.authId.institution)
@@ -232,11 +252,33 @@ export default {
                 // when page loads
                 query: { click: "danger-zone" } 
             })
+        },
+        resetLoadingAuthToSetting() {
+            return this.loadingAuthToSetting = 'none'
+        },
+        resetloadingAuth() {
+            return this.loadingAuth = 'none'
         }
     },
     computed: {
         isGettingNewToken() {
             return this.loadingAuthToSetting !== 'none' || this.loadingAuth !== 'none'
+        },
+        filteredAuthorizations() {
+            if (!this.userInfo.authorizations) {
+                return []
+            } else if (this.selectedRole === 'all') {
+                return this.userInfo.authorizations
+            } else {
+                return this.userInfo.authorizations.filter(a => a.authId.role === this.selectedRole)
+            }
+        },
+        generalMessageText() {
+            if (this.selectedRole !== 'all') {
+                return `None of your permissions match the role '${this._utils.stringFormat(this.selectedRole)}'`
+            } else {
+                return `You haven't signed up to any institutions yet`
+            }
         }
     },
     watch: {
@@ -274,10 +316,40 @@ export default {
     margin-right: auto;
 }
 
+.no-results-message {
+    margin-bottom: 70px;
+}
+
 .all-authorizations {
     @include flexbox-default(row, true);
+}
+
+.all-authorizations-container {
     max-width: 900px;
     @include center-margin();
+}
+
+.role-selection-text {
+    margin-right: 29px;
+    font-size: 15px;
+    margin-bottom: 3px;
+}
+
+.selected-role-dropdown {
+    background: get-color('grey');
+    color: get-color('off-white');
+    outline: none;
+    border: none;
+    width: 90px;
+    @include floating-box-shadow(0.4);
+    height: 30px;
+    @include normal-border-rounding();
+}
+
+.selected-role-container {
+    text-align: right;
+    margin-right: 2%;
+    margin-bottom: 20px;
 }
 
 button {
@@ -372,6 +444,10 @@ button {
         @include floating-box-shadow(0.4);
         margin-right: 0px;
         margin-left: 0px;
+    }
+
+    .selected-role-container {
+        margin-right: 8%;
     }
 }
 </style>

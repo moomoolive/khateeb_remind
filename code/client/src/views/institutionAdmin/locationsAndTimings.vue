@@ -170,7 +170,7 @@
 
             <div>
                 <button 
-                    class="add-location-btn blue"
+                    class="add-location-btn dark-blue"
                     @click="addNewLocation()"
                 >
                     +

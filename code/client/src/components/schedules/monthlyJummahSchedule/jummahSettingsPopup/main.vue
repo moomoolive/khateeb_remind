@@ -106,9 +106,13 @@ export default {
         }
     },
     methods: {
-        signupKhateeb(isBackup=false) {
+        async signupKhateeb(isBackup=false) {
             if (this.currentUserIsAlreadySignedUpForThisJummah)
                 return this._utils.alert(`You're already signed up for this jummah!`)
+            const confirm = await this._utils.confirm(`Are you sure you want to signup to this jummah?`)
+            if (!confirm) {
+                return
+            }
             this.$emit('khateeb-signup', {
                 date: jummahHelpers.fridayToFridayDBFormat(new Date(this.selectedDate)),
                 timingID: this.info.timing._id,

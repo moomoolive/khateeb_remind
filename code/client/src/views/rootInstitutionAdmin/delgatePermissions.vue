@@ -30,6 +30,9 @@
                                 </span>
                                 <span class="green">
                                     {{ _utils.stringFormat(user.__t) }}
+                                    <span v-if="user.hasTwoRoles">
+                                        {{ "& Khateeb" }}
+                                    </span>
                                 </span>
                             </div>
                             <div class="bottom-section">
@@ -59,7 +62,7 @@
             <general-message
                 v-else
                 :message="
-                    `It seems you're the only confirmed user in your institution - 
+                    `It seems you're the only confirmed user at your institution - 
                     which means there's no one else to delgate permissions to.`
                 "
                 iconColor="yellow"
@@ -144,13 +147,14 @@ export default {
                 const userIndex = usersPassed[user._id]
                 if (user._id === this.$store.state.user.userInfo._id) {
                     continue
-                } else if (userIndex) {
+                } else if (userIndex !== undefined) {
                     // if user is both a khateeb and institution admin
                     // only show institution admin variation
                     arr[userIndex].__t = 'institutionAdmin'
+                    arr[userIndex].hasTwoRoles = true
                 } else {
-                    arr.push(this._utils.deepCopy(user))
                     usersPassed[user._id] = i
+                    arr.push(this._utils.deepCopy(user))
                 }
             }
             return arr

@@ -85,8 +85,9 @@ export default {
         },
         async createNewJummahPreference(newPreference={}) {
             const newJummahPreference = await this._api.jummahs.createNewJummahPreference(newPreference)
-            if (Object.keys(newJummahPreference).length > 0)
+            if (Object.keys(newJummahPreference).length > 0) {
                 this.jummahs.push(newJummahPreference)
+            }
         },
         async requestJummahs(jummahDateRange) {
             this.jummahs = await this._api.jummahs.getJummahs({ date: jummahDateRange })
