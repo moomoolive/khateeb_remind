@@ -1,6 +1,7 @@
 const { cronWrapper } = require($rootDir + '/libraries/cron/main.js')
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
+const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
 const findDefaultPreferenceForThisWeek = (defaultKhateebID="12345", khateebs=[], upcomingFriday=new Date(), targetTiming={}, isBackup=true) => {
     const noneScheduled = { _id: $config.consts.nullId }
@@ -83,9 +84,23 @@ const job = async () => {
             if (!mainKhateeb || !backupKhateeb) {
                 let khateebsAtThisInstitution = []
                 try {
-                    const khateebs = await $db.khateebs.find({ institutionID: targetInstitution._id.toString() }).exec()
-                    if (Array.isArray(khateebs))
+                    const khateebAuthorization = await $db.authorizations
+                        .findOne({ 
+                            institution: targetInstitution._id,
+                            role: 'khateeb'
+                        })
+                        .exec()
+                    if (!khateebAuthorization) {
+                        throw TypeError(`khateeb authorization doesn't exist`)
+                    }
+                    const khateebs = await databaseHelpers.getKhateebs(
+                        targetInstitution._id, 
+                        khateebAuthorization, 
+                        { active: true }
+                    )
+                    if (Array.isArray(khateebs)) {
                         khateebsAtThisInstitution = khateebs
+                    }
                 } catch(err) {
                     console.log(`Couldn't find khateebs at ${targetInstitution.name} `, err)
                 }

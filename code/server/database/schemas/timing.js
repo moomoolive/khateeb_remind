@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
+
 const defaultKhateebForWeek = new mongoose.Schema({
     mainKhateeb: {
         type: String,
@@ -67,11 +69,27 @@ timing.methods.deleteDependants = async function() {
     const res = {}
     try {
         const timingID = this._id.toString()
-        const khateebs = await $db.khateebs.find({ institutionID: this.institutionID }).exec()
+        const khateebAuthorization = await $db.authorizations
+            .findOne({ 
+                institution: this.institutionID,
+                role: 'khateeb'
+            })
+            .exec()
+        if (!khateebAuthorization) {
+            throw TypeError(`Khateeb Authorization doesn't exist`)
+        }
+        const khateebs =await databaseHelpers.getKhateebs(
+            this.institutionID, 
+            khateebAuthorization, 
+            { active: true }
+        )
         for (let i = 0; i < khateebs.length; i++) {
             const khateeb = khateebs[i]
             const availableTimings = khateeb.availableTimings.filter(timing => timing !== timingID)
-            const khateebTimingRes = await $db.khateebs.updateOne({ _id: khateeb._id.toString() }, { availableTimings })
+            const khateebTimingRes = await $db.users.updateOne(
+                { _id: khateeb._id }, 
+                { availableTimings }
+            )
             if (!res.khateebs)
                 res.khateebs = khateebTimingRes
             else

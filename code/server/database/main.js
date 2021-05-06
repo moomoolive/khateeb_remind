@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-const discriminators = require('./discriminators/main.js')
 const location = require('./schemas/location.js')
 const institution = require('./schemas/institution.js')
 const timing = require('./schemas/timing.js')
@@ -40,12 +39,6 @@ const models = {
 const userDiscriminators = {
     root: models.users.discriminator('root', root),
     sysAdmins: models.users.discriminator('sysAdmin', sysAdmin),
-
-    // legacy structures
-    rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', discriminators.rootInstitutionAdmin),
-    khateebs: models.users.discriminator('khateeb', discriminators.khateeb),
-    institutionAdmins: models.users.discriminator('institutionAdmin', discriminators.institutionAdmin),
-    // to be phased out
 }
 
 const institutionDiscriminators = {
