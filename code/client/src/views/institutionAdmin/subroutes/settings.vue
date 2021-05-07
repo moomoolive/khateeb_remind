@@ -1,6 +1,6 @@
 <template>
     <div>
-        <loading :loadingTime="800">
+        <loading>
             <div v-if="showSettings && settingsArePresent" class="settings-container">
                 
                 <collapsable-box
@@ -146,24 +146,35 @@
                 </collapsable-box>
 
                 <collapsable-box
-                    v-if="_utils.validAuthentication(3)"
+                    v-if="$store.getters['user/type'] === 'rootInstitutionAdmin'"
                     class="setting-container"
                     :headline="`Danger Zone`"
                     :buttonColor="`red`"
                     :bodyColor="`silver`"
+                    ref="danger-zone"
                 >
-                    <button class="yellow delete-institution" @click="deleteInstitution()">
+                    <button 
+                        class="yellow delete-institution" 
+                        @click="handoffPermissions()"
+                    >
+                        Delgate Permissions
+                    </button>
+                    <button 
+                        class="red delete-institution" 
+                        @click="deleteInstitution()"
+                    >
                         Delete Institution
                     </button>
                 </collapsable-box>
 
             </div>
 
-            <msg-with-pic 
+            <general-message
                 v-else
-                :msg="`Couldn't retrieve settings...`"
-                :gif="`twirlingPlane`"
-            /> 
+                :message="`Couldn't retrieve settings...`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
+            />
+ 
         </loading>
     </div>
 </template>
@@ -172,7 +183,7 @@
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import formMain from '@/components/forms/main.vue'
 import institutionFormTemplate from '@/components/forms/templates/institution.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import loading from '@/components/general/loadingScreen.vue'
 
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
@@ -184,7 +195,7 @@ export default {
         collapsableBox,
         formMain,
         institutionFormTemplate,
-        msgWithPic,
+        generalMessage,
         loading
     },
     data() {
@@ -226,6 +237,9 @@ export default {
         async getSettingsAndInstitutionInfo() {
             this.institution = await this._api.institutions.getInstitution()
         },
+        async handoffPermissions() {
+            return this.$router.push({ path: '/institutionAdmin/delgate-permissions' })
+        },
         async saveInstitutionDetails(newChanges={}) {
             const updated = await this._api.institutions.updateInstitution(newChanges)
             if (Object.keys(updated).length < 1)
@@ -234,6 +248,12 @@ export default {
             this.rerenderSettings()
         },
         async deleteInstitution() {
+            const continueToDelete = await this._utils.confirm(
+                `Are you sure you want to delete this institution entirely? Or would you like to assign another user your current role (root admin)? Click 'yes' if you are sure you want to delete this institution.`
+            )
+            if (!continueToDelete) {
+                return this.handoffPermissions()
+            }
             const confirm = await this._utils.confirm(
                 `Are you sure you want to delete your institution? All jummahs, khateebs, and institution admins will be deleted as well.`,
                 "yellow",
@@ -329,7 +349,8 @@ export default {
     height: 6vh;
     max-height: 60px;
     font-size: 20px;
-    color: red;
+    color: get-color('grey');
+    @include floating-box-shadow();
 }
 
 .insert-image-container {
@@ -350,26 +371,26 @@ export default {
     margin-top: 20px;
     text-align: left;
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
     font-size: 15px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     line-height: 25px;
 }
 
 .delete-logo-container {
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
     display: flex;
     justify-content: flex-start;
 }
 
 .delete-logo-button {
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
     font-size: 17px;
     margin-top: 30px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .settings-container {
         flex-direction: column;

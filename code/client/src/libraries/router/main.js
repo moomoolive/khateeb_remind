@@ -12,6 +12,8 @@ const homepageURL = (userType) => {
       return '/institutionAdmin'
     case 'khateeb':
       return '/khateeb'
+    case 'user':
+      return '/authorizations'
     default:
       return '/login'
   }

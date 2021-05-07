@@ -36,15 +36,15 @@ export default {
 <style lang="scss" scoped>
 
 .tag-container {
-    background-color: getColor("green");
+    background-color: get-color("green");
     padding-left: 17px;
     padding-right: 17px;
     padding-bottom: 8px;
     padding-top: 8px;    
     font-size: 16px;
-    @include completelyRoundBorder();
-    @include floatingBoxShadow(0.4);
-    @include flexboxDefault();
+    @include completely-round-border();
+    @include floating-box-shadow(0.4);
+    @include flexbox-default();
     color: black;
 
     &.small {
@@ -56,19 +56,23 @@ export default {
     }
     
     &.red {
-        color: getColor("offWhite");
+        color: get-color("off-white");
+        background-color: get-color("red");
     }
     
     &.purple {
-        color: getColor("offWhite");
+        color: get-color("off-white");
+        background-color: get-color("purple");
     }
     
     &.blue{
-        color: getColor("offWhite");
+        color: get-color("off-white");
+        background-color: get-color("blue");
     }
 
     &.grey {
-        color: getColor("offWhite");
+        color: get-color("off-white");
+        background-color: get-color("grey");
     }
 
     &.square {
@@ -76,7 +80,7 @@ export default {
     }
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .tag-container {
         font-size: 13px;

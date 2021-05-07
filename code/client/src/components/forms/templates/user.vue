@@ -24,16 +24,12 @@ export default {
             required: false,
             default: false
         },
-        userType: {
-            type: String,
-            required: true
-        },
         formProps: {
             type: Object,
             required: false,
             default: () => {}
         },
-        editableKhateebFormat: {
+        khateebMode: {
             type: Boolean,
             required: false,
             default: false
@@ -73,6 +69,14 @@ export default {
                     required: true
                 }
             },
+            khateebMeta: {
+                availableTimings: {
+                    required: true
+                },
+                unavailableDates: {
+                    required: true
+                }
+            }
         }
     },
     methods: {
@@ -81,10 +85,12 @@ export default {
     computed: {
         formStructure() {
             let form = { ...this.baseUser }
-            if (this.userType !== 'khateeb')
-                delete form.title
-            if (this.includeVitals)
+            if (this.includeVitals) {
                 form = { ...this.userVitals , ...form }
+            }
+            if (this.khateebMode) {
+                form = { ...form, ...this.khateebMeta }
+            }
             return form
         }
     }

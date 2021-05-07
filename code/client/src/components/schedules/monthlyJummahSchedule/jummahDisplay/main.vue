@@ -50,11 +50,11 @@
                     >
                         <div class="unavailable-khateebs-this-timing-header-container" @click="toggleUnavailableKhateebs()">
                             <div>
-                                <img 
-                                    src="~@/assets/misc/rightArrow.png" 
-                                    :class="`dropdown-arrow ${showingUnavailable ? 'showing': ''}`"
-                                    alt="dropdown arrow"
-                                >
+                                <dropdown-arrow
+                                    :fontSize="13" 
+                                    :faceDown="showingUnavailable"
+                                    class="dropdown-arrow"
+                                />
                             </div>
 
                             <div class="unavailable-khateebs-this-timing-header">
@@ -102,6 +102,7 @@
 <script>
 import tagCircle from '@/components/general/tagCircle.vue'
 import jummahStaticTags from './jummahTags.json'
+import dropdownArrow from '@/components/misc/dropdownArrow.vue'
 
 import timingHelpers from '@/libraries/timings/main.js'
 import khateebHelpers from '@/libraries/khateebs/main.js'
@@ -115,7 +116,8 @@ export default {
         tagCircle,
         "institutionAdmin": () => import('./khateebInfoCells/adminCells.vue'),
         "khateeb": () => import("./khateebInfoCells/khateebCells.vue"),
-        CollapseTransition
+        CollapseTransition,
+        dropdownArrow
     },
     props: {
         reciever: {
@@ -278,13 +280,13 @@ export default {
 }
 
 @keyframes glow { 
-    0% { background-color: getColor("silver"); }
-    50% { background-color: getColor("yellow") }
-    100% { background-color: getColor("silver"); } 
+    0% { background-color: get-color("silver"); }
+    50% { background-color: get-color("yellow") }
+    100% { background-color: get-color("silver"); } 
 }
 
 .jummahPreferences {
-    background: getColor("silver");
+    background: get-color("silver");
     border-top-right-radius: 7px;
     border-bottom-right-radius: 7px;
     padding-top: 10px;
@@ -300,7 +302,7 @@ export default {
     font-size: 16px;
     margin-top: 10px;
     font-weight: bold;
-    background: themeRGBA("red", 0.9);
+    background: get-color("red", 0.9);
     margin-left: auto;
     margin-right: auto;
     width: 87%;
@@ -315,13 +317,13 @@ div {
     &.timing {
         font-size: 14px;
         text-decoration: underline;
-        color: getColor("offWhite");
+        color: get-color("off-white");
         margin-bottom: 2px;
     }
 }
 
 .timing-container {
-    background: getColor("offWhite");
+    background: get-color("off-white");
     border-top-left-radius: 7px;
     border-bottom-left-radius: 7px;
     display: flex;
@@ -338,11 +340,7 @@ div {
 }
 
 .dropdown-arrow {
-    height: 14px;
     margin-right: 10px;
-    &.showing {
-        transform: rotate(90deg);
-    }
 }
 
 .unavailable-khateebs-this-timing-header {
@@ -352,13 +350,13 @@ div {
 }
 
 .unavailable-khateebs-this-timing-header-container {
-    @include flexboxDefault();
+    @include flexbox-default();
     width: 95%;
 }
 
 .unavailable-khateebs-position {
     width: 80%;
-    @include centerMargin();
+    @include center-margin();
     margin-top: 20px;
 }
 
@@ -371,7 +369,7 @@ div {
     margin-bottom: 10px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .jummahPreferences {
         border-radius: 0;
@@ -403,7 +401,6 @@ div {
     }
 
     .dropdown-arrow {
-        height: 11px;
         margin-right: 7px;
     }
 

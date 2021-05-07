@@ -2,10 +2,21 @@
     <div v-if="options" class="alert-container">
         <div>
 
-            <img :src="require(`@/assets/notifications/${graphicType(options.icon)}`)">
+            <span :class="options.iconColor || 'grey'">
+                <fa-icon 
+                    class="icon"
+                    :icon="options.icon || `exclamation-triangle`" 
+                />
+            </span>
             
-            <div :class="`msg ${options.textSize ? options.textSize : 'large'}`">
-                {{ options.msg }}<br>
+            <div class="msg-container">
+                <div v-if="options.headline" class="headline">
+                    {{ options.headline }}
+                </div>
+
+                <div :class="`msg ${options.textSize ? options.textSize : 'large'}`">
+                    {{ options.msg }}<br>
+                </div>
             </div>
             
             <button
@@ -56,7 +67,6 @@ export default {
 
 <style lang="scss" scoped>
 .msg {
-    margin-top: 25px;
     margin-left: auto;
     margin-right: auto;
     line-height: 23px;
@@ -72,6 +82,15 @@ export default {
     }
 }
 
+.msg-container {
+    margin-top: 25px;
+}
+
+.headline {
+    font-size: 25px;
+    font-weight: bold;
+}
+
 .topAnchor {
     height: 8px;
 }
@@ -83,6 +102,11 @@ img {
     margin-top: 15px;
 }
 
+.icon {
+    margin-top: 20px;
+    font-size: 110px;
+}
+
 
 button {
     margin-top: 4%;
@@ -91,7 +115,7 @@ button {
     height: 30px;
     margin-bottom: 20px;
     margin-top: 20px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 .alert-container {
@@ -100,7 +124,7 @@ button {
     max-height: 350px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .msg {
         line-height: 18px;
@@ -110,7 +134,11 @@ button {
         &.large {
             font-size: 26px;
         }
-}
+    }
+    
+    .headline {
+        font-size: 21px;
+    }
 }
 
 </style>

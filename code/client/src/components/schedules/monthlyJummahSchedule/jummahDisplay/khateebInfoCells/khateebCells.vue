@@ -17,14 +17,16 @@
         </div>
 
         <div v-show="khateebPreferences[1].khateebID" class="khateeb-role-label" @click="toggleBackupDisplay()">
-           <span>
-                <img 
-                    src="~@/assets/misc/rightArrow.png" 
-                    :class="`show-backup-arrow ${showBackup ? 'showing' : ''}`"
-                    alt="right arrow"
-                >
-           </span>
-           Backup
+            <div>
+                <dropdown-arrow 
+                    :fontSize="12"
+                    :faceDown="showBackup"
+                    class="show-backup-arrow"
+                />
+            </div>
+            <div>
+                Backup
+            </div>
         </div>
         <collapse-transition>
             <div v-show="showBackup" class="khateeb-name-label">
@@ -48,10 +50,13 @@ import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 import khateebHelpers from '@/libraries/khateebs/main.js'
 
+import dropdownArrow from '@/components/misc/dropdownArrow.vue'
+
 export default {
     name: 'khateebKhateebCells',
     components: {
         CollapseTransition,
+        dropdownArrow
     },
     props: {
         khateebPreferences: {
@@ -103,6 +108,9 @@ div {
     margin-bottom: 5px;
     margin-top: 5px;
     font-size: 17px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .khateeb-name-label {
@@ -110,11 +118,7 @@ div {
 }
 
 .show-backup-arrow {
-    height: 12px;
     margin-right: 5px;
-    &.showing {
-        transform: rotate(90deg);
-    }
 }
 
 .cell-container {
@@ -130,7 +134,7 @@ div {
     margin-bottom: 15px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .is-giving-khutbah-indicator {
         font-size: 12px;
     }

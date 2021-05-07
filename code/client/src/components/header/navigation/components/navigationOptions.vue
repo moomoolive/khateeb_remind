@@ -1,7 +1,21 @@
 <template>
     <div v-on-clickaway="close">
-        
+
+        <!-- generic user options -->
         <div v-if="_utils.validAuthentication({ level: 1 })">
+            
+            <div class="menu-item" @click="redirect('/authorizations')">
+                <p>Login Selection</p>
+            </div>
+            
+            <div class="menu-item" @click="redirect('/institution-selection')">
+                <p>Institution Signup</p>
+            </div>
+
+        </div>
+        
+        <!-- khateeb options -->
+        <div v-if="_utils.validAuthentication({ level: 2 })">
             
             <div class="menu-item" @click="redirect('/khateeb/')">
                 <p>Schedule</p>
@@ -17,7 +31,8 @@
 
         </div>
 
-        <div v-if="_utils.validAuthentication({ min: 2, max: 3 })">
+        <!-- insitutition admin options -->
+        <div v-if="_utils.validAuthentication({ min: 3, max: 4 })">
             
             <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
                 <p>Set Schedule</p>
@@ -33,7 +48,8 @@
 
         </div>
 
-        <div v-if="_utils.validAuthentication({ min: 4 })" >
+        <!-- System admin and root user options -->
+        <div v-if="_utils.validAuthentication({ min: 5 })" >
             
             <div class="menu-item" @click="redirect('/sysAdmin')">
                 <p>Admin Central</p>
@@ -52,8 +68,16 @@
         >
             <p class="alternate-text-color">Download the App</p>
         </div>
+
+        <div
+            v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
+            class="menu-item caution" 
+            @click="downgradeUserAuthorization()"
+        >
+            <p class="alternate-text-color">Exit Institution</p>
+        </div>
         
-        <div class="menu-item caution" @click="logout()">
+        <div class="menu-item caution-alternate" @click="logout()">
             <p class="alternate-text-color">Logout</p>
         </div>
 
@@ -123,6 +147,11 @@ export default {
                 return
             this.$store.dispatch('user/logout')
         },
+        downgradeUserAuthorization() {
+            this.$emit('close-nav')
+            this.$store.dispatch('user/downgradeUserAuthorization')
+            return this.close()
+        },
     },
     watch: {
         activeMenu(newVal, oldVal) {
@@ -145,11 +174,11 @@ p {
     font-size: 18px;
     font-weight: bold;
     text-align: left;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
 .menu-item {
-    background-color: themeRGBA("grey", 0.9);
+    background-color: get-color("grey", 0.9);
     cursor: default;
     padding-top: 20px;
     padding-bottom: 20px;
@@ -157,7 +186,7 @@ p {
     padding-right: 10px;
     
     &:hover {
-        background-color: lighten(themeRGBA("grey", 1), 20%);
+        background-color: lighten(get-color("grey", 1), 20%);
         
     }
     
@@ -169,19 +198,28 @@ p {
 }
 
 .get-the-app {
-    background-color: themeRGBA("green", 0.9) !important;
+    background-color: get-color("green", 0.9) !important;
     color: black !important;
     &:hover {
-      background-color: lighten(themeRGBA("green", 1), 20%) !important;
+      background-color: lighten(get-color("green", 1), 20%) !important;
     }
 }
 
 .caution {
-    background-color: themeRGBA("yellow", 0.9) !important;
+    background-color: get-color("yellow", 0.9) !important;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     &:hover {
-      background-color: lighten(themeRGBA("yellow", 1), 20%) !important;
+      background-color: lighten(get-color("yellow", 1), 20%) !important;
+    }
+}
+
+.caution-alternate {
+    background-color: get-color("red", 0.9) !important;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    &:hover {
+      background-color: lighten(get-color("red", 1), 20%) !important;
     }
 }
 
@@ -189,7 +227,7 @@ p {
     color: black;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       
       p {
         font-size: 16px;

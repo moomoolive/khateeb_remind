@@ -3,16 +3,21 @@
         
         <complex-key-binder 
             :targetKeyBinds="['t', 'Control', 'Alt']"
-            @all-key-bindings-active="testInstitutionSignup()"
+            @all-key-bindings-active="revealTestInstitution()"
         />
 
         <loading :loadingTime="1200">
             <div v-if="showingInstitutions.length > 0">
-                <button
+                
+                <div v-if="$store.getters['user/decodedJWT'].specialStatus">
+                    *You hold a special user status, therefore
+                    all signups are disabled for you 
+                </div>
+                
+                <div
                     v-for="(institution, institutionIndex) in showingInstitutions"
                     :key="institutionIndex"
                     class="grey institution-selection-button"
-                    @click="$router.push({ path: '/create/khateebs', query: { institutionID: institution._id } })"
                 >
                     <div class="institution-selection-content-container">
                         <div>
@@ -24,27 +29,70 @@
                         </div>
                         <div>
                             <div class="institution-text">
-                                {{ institution.name }}
+                                {{ _utils.stringFormat(institution.name) }}
                             </div>
                             <div class="institution-text small">
-                                <span class="blue">({{ institution.abbreviatedName }})</span>
+                                <span class="blue">{{ institution.abbreviatedName }}</span>
                             </div>
                             <div class="institution-text">
                                 <span class="purple">
-                                    {{ institution.state }}, {{ institution.country }}
+                                    <span v-if="institution.state !== _config.nullId">
+                                        {{ institution.state }},
+                                    </span>
+                                     {{ institution.country }}
                                 </span>
                             </div>
                         </div>
+                        <div
+                            v-if="
+                                !isHoldingAllPossibleAuthorizationsForGivenInstitution(institution._id) &&
+                                !isCurrentlySigningUpToAnInstitution() &&
+                                !$store.getters['user/decodedJWT'].specialStatus
+                            " 
+                            class="signup-link-container"
+                        >
+                            <div 
+                                :class="`signup-link
+                                    ${userPermissions[`${institution._id}-institutionAdmin`] || userPermissions[`${institution._id}-rootInstitutionAdmin`] ? 
+                                        ' invisible' : ''
+                                    }`
+                                "
+                                @click="signupPipeline(institution, 'institutionAdmin')"
+                            >
+                                <span class="signup-icon green">
+                                    <fa-icon icon="suitcase-rolling" />
+                                </span>
+                                Signup as Administrator
+                            </div>
+                            <div 
+                                :class="`signup-link${userPermissions[`${institution._id}-khateeb`] ? ' invisible' : ''}`" 
+                                @click="signupPipeline(institution, 'khateeb')"
+                            >
+                                <span class="signup-icon blue">
+                                    <fa-icon icon="mosque" />
+                                </span> 
+                                Signup as Khateeb
+                            </div>
+                        </div>
+                        <div 
+                            v-if="selectedInstitution === institution._id"
+                            :class="`loading-icon`"
+                        >
+                            <img 
+                                src="~@/assets/gifs/loading.gif"
+                                class="loading-animation" 
+                                alt="loading animation"
+                            >
+                        </div>
                     </div>
-                </button>
+                </div>
             </div>
-
-            <msg-with-pic 
-                v-else
-                :msg="`There was a problem finding institutions to sign up for...`"
-                :gif="`twirlingPlane`"
-            /> 
             
+            <general-message
+                v-else
+                :message="`There was a problem finding institutions to sign up for...`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
+            />
 
         </loading>
 
@@ -54,22 +102,30 @@
 <script>
 import complexKeyBinder from '@/components/misc/complexKeyBinder.vue'
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
+
+import Config from '$config'
 
 export default {
     name: "institutionSelections",
     components: {
         loading,
         complexKeyBinder,
-        msgWithPic
+        generalMessage
     },
     data() {
         return {
             allInstitutions: [],
-            institutionLogosFromRequest : []
+            institutionLogosFromRequest : [],
+            selectedInstitution: 'none',
+            readyToGoToAuthorizations: new Promise(resolve => resolve(true)),
+            showTestInstitution: false
         }
     },
     methods: {
+        revealTestInstitution() {
+            this.showTestInstitution = true
+        },
         async getAllConfirmedInstitutions() {
             this.allInstitutions = await this._api.misc.institutionSelection()
         },
@@ -88,14 +144,60 @@ export default {
             const image = await this._api.logos.getInstitutionLogo({ institutionID })
             const target = this.institutionLogosFromRequest.find(i => i.id === institutionID)
             target.image = image
+        },
+        promptLoadingIconOnPressingInstitution(id="1234") {
+            this.selectedInstitution = id
+            this.readyToGoToAuthorizations = new Promise(resolve => {
+                window.setTimeout(() => resolve(true), Config.networkConfig.defaultAuthIOLoadingTime)
+            })
+        },
+        isKhateebAtGivenInstitution(id="1234") {
+            return this.userPermissions[`${id}-khateeb`]
+        },
+        isAdministratorAtGivenInstitution(id="1234") {
+            return this.userPermissions[`${id}-institutionAdmin`] || 
+                this.userPermissions[`${id}-rootInstitutionAdmin`]
+        },
+        isHoldingAllPossibleAuthorizationsForGivenInstitution(id="1234") {
+            return this.isKhateebAtGivenInstitution(id) && this.isAdministratorAtGivenInstitution(id)
+        },
+        isCurrentlySigningUpToAnInstitution() {
+            return this.selectedInstitution !== 'none'
+        },
+        signupPipeline(institutionInfo={}, role="khateeb") {
+            if (this.$store.getters['user/isLoggedIn'])
+                return this.addAuthorization(institutionInfo, role)
+            else
+                return
+        },
+        async addAuthorization(institutionInfo={}, role="khateeb") {
+            this.promptLoadingIconOnPressingInstitution(institutionInfo._id)
+            const res = await this._api.user.addAuthorization({ institution: institutionInfo._id, role })
+            if (res === 0) {
+                await this.readyToGoToAuthorizations
+                this._utils.toHomePage()
+            } else {
+                this._utils.alert(`A problem occurred when signing you up`)
+            }
         }
     },
     computed: {
         showingInstitutions() {
-            if (this.allInstitutions.length > 1)
+            if (this.allInstitutions.length > 1 && !this.showTestInstitution)
                 return this.allInstitutions.filter(i => i.name !== "test")
             else
                 return this.allInstitutions
+        },
+        userPermissions() {
+            const permissions = this.$store.state.user.userInfo.authorizations
+            return permissions
+                .map(p => ({ institution: p.authId.institution._id, role: p.authId.role }))
+                .reduce((total, p) => {
+                    const obj = {}
+                    obj[`${p.institution}-${p.role}`] = true
+                    return { ...total, ...obj }
+                }, {})
+            
         }
     },
     watch: {
@@ -111,41 +213,77 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.loading-animation {
+    width: 105px;
+    text-align: center;
+}
+
+.loading-icon {
+    margin-left: 110px;
+}
+
 .institution-selection-button {
-    width: 90%;
+    width: 80%;
     max-width: 600px;
     padding-bottom: 20px;
     padding-top: 20px;
     padding-right: 15px;
     padding-left: 15px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow(0.4);
     margin-top: 20px;
+    @include light-border-rounding();
+    @include center-margin();
 }
 
 .institution-selection-content-container {
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .image-container {
     height: 100px;
     width: 100px;
     margin-right: 30px;
-    border: getColor("blue") solid 3px;
+    border: get-color("blue") solid 3px;
 }
 
 .institution-text {
     margin-bottom: 10px;
     text-align: left;
     font-size: 18px;
+    color: get-color("off-white");
 
     &.small {
         font-size: 14px;
     }
 }
 
-@media screen and (max-width: $phoneWidth) {
+.signup-link-container {
+    margin-left: 20px;
+    color: get-color("off-white");
+    text-align: left;
+}
+
+.signup-link {
+    margin-bottom: 7px;
+    cursor: pointer;
+
+    &:hover {
+        color: get-color("blue");
+    }
+
+    &.invisible {
+        visibility: hidden;
+    }
+}
+
+.signup-icon {
+    margin-left: 3px;
+}
+
+@media screen and (max-width: $phone-width) {
     .image-container {
         margin-right: 20px;
         height: 80px;
@@ -158,6 +296,16 @@ export default {
         &.small {
             font-size: 13px;
         }
+    }
+
+    .signup-link-container {
+        margin-left: 0px;
+        margin-top: 20px;
+    }
+
+    .loading-icon {
+        width: 100%;
+        margin-left: 0;
     }
 }
 </style>

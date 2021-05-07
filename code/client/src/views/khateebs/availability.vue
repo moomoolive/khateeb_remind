@@ -1,65 +1,84 @@
 <template>
     <div>
-
-        <div class="settings-container">
-
-            <collapsable-box
-                class="user-setting"
-                :headline="`Available Timings`"
-                :tagDetails="availableTimingsTag"
-            >
-                <selection-picker
-                    :options="availableTimingsSelection"
-                    :currentlySelected="availableTimings"
-                    @changed="updateInfo({ availableTimings: $event })"
-                />
-            </collapsable-box>
-
-            <collapsable-box
-                class="user-setting"
-                :headline="`Unavailable Dates`"
-            >
-                
-                <div class="unavailable-date-info-header">
-                    Click on a date to mark it as unavailable<br><br>
-                    <span class="blue">Blue dot</span> indicates current date<br>
-                    <span class="red">Red dot</span> indicates unavailable date
-                </div>
-
-                <v-calendar
-                    class="calendar"
-                    color="blue"
-                    :disabled-unavailableDates='[ { weekdays: [1, 2, 3, 4, 5, 7] }, ...unavailableDates ]'
-                    @dayclick="addToUnavailableDays($event)"
-                    :min-date="new Date()"
-                    :attributes="vCalendarAttributes"
-                    is-dark
-                    is-range
-                />
-
-            </collapsable-box>
-
+        <div class="settings-header">
+            Availability Settings
         </div>
 
+        <div class="settings-sub-header">
+            <span class="dark-blue">
+                {{ $store.state.user.institution.abbreviatedName }}
+            </span>
+        </div>
+        
+        <loading>
+
+            <div class="settings-container">
+
+                <collapsable-box
+                    class="user-setting"
+                    :headline="`Available Timings`"
+                    :tagDetails="availableTimingsTag"
+                >
+                    <selection-picker
+                        :options="availableTimingsSelection"
+                        :currentlySelected="availableTimings"
+                        @changed="updateScheduleRestrictions({ availableTimings: $event })"
+                    />
+                </collapsable-box>
+
+                <collapsable-box
+                    class="user-setting"
+                    :headline="`Unavailable Dates`"
+                >
+                    
+                    <div class="unavailable-date-info-header">
+                        Click on a date to mark it as unavailable<br><br>
+                        <span class="blue">Blue dot</span> indicates current date<br>
+                        <span class="red">Red dot</span> indicates unavailable date
+                    </div>
+
+                    <v-calendar
+                        class="calendar"
+                        color="blue"
+                        :disabled-unavailableDates='[ { weekdays: [1, 2, 3, 4, 5, 7] }, ...unavailableDates ]'
+                        @dayclick="addToUnavailableDays($event)"
+                        :min-date="new Date()"
+                        :attributes="vCalendarAttributes"
+                        is-dark
+                        is-range
+                    />
+
+                </collapsable-box>
+
+            </div>
+        </loading>
     </div>
 </template>
 
 <script>
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import selectionPicker from '@/components/general/selectionPicker.vue'
+import loading from '@/components/general/loadingScreen.vue'
 
 import khateebHelpers from '@/libraries/khateebs/main.js'
+import jummahHelpers from '@/libraries/jummahs/main.js'
 
 export default {
     name: "khateebAvailability",
     components: {
         collapsableBox,
-        selectionPicker
+        selectionPicker,
+        loading
     },
     data() {
         return {
             locations: [],
-            timings: []
+            timings: [],
+            userInfo: {
+                availableTimings: [],
+                unavailableDates: []
+            },
+            firstRequest: true
         }
     },
     methods: {
@@ -68,28 +87,40 @@ export default {
             this.locations = locations
             this.timings = timings
         },
+        async getScheduleRestrictions() {
+            const res = await this._api.user.getScheduleRestrictions()
+            this.userInfo = res
+            if (this.firstRequest) {
+                this.markThatFirstRequestHasCome()
+            }
+        },
+        markThatFirstRequestHasCome() {
+            this.$nextTick(() => this.firstRequest = false)
+        },
         addToUnavailableDays(newVCalendarDate={}) {
             const friday = 5
             const unavailableDates = this._utils.deepCopy(this.userInfo.unavailableDates)
-            if (newVCalendarDate.date.getDay() !== friday)
+            if (newVCalendarDate.date.getDay() !== friday) {
                 return
+            }
             const found = unavailableDates.findIndex(date => date.vCalendarId === newVCalendarDate.id)
-            if (found >= 0)
+            if (found >= 0) {
                 unavailableDates.splice(found, 1)
-            else
+            } else {
                 unavailableDates.push({ vCalendarId: newVCalendarDate.id, date: newVCalendarDate.date.toISOString() })
-            this.updateInfo({ unavailableDates })
+            }
+            this.updateScheduleRestrictions({ unavailableDates })
         },
-        async updateInfo(update={}) {
-            const res = await this._api.user.updateInfo(update)
-            if (!res.data)
+        async updateScheduleRestrictions(update={}) {
+            const res = await this._api.user.updateScheduleRestrictions(update)
+            if (!res) {
                 return this._utils.alert(`There was problem make your changes`)
+            } else {
+                this.userInfo = res
+            }
         },
     },
     computed: {
-        userInfo() {
-            return this.$store.state.user.userInfo
-        },
         availableTimings() {
             return this.userInfo.availableTimings
         },
@@ -138,33 +169,52 @@ export default {
     },
     watch: {
         async unavailableDates(newVal, oldVal) {
-            if (newVal.length === oldVal.length)
+            if (newVal.length === oldVal.length || this.firstRequest) {
                 return
+            }
             const longerArray = newVal.length > oldVal.length ? newVal : oldVal
             const diff = longerArray.slice(-1)[0]
             const wasDeleted = newVal.length < oldVal.length
-            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Date", {
+            const info = {
                 change: { diff, wasDeleted },
                 msg: `${this.usersFullNameWithTitle} is ${wasDeleted ? 'now available' : 'no longer available'} to give khutbahs on ${new Date(diff).toLocaleDateString('en-US', { month: "long", year: "numeric", day: "numeric" })}${wasDeleted ? ` insha'Allah` : ''}.` 
-            })
+            }
+            // if khateeb is not available for a particular day anymore
+            // erase their id from any jummahs on that day
+            if (!wasDeleted) {
+                info.eraseKhateebIdQuery = { date: jummahHelpers.fridayToFridayDBFormat(diff) }
+            }
+            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Date", info)
         },
         async availableTimings(newVal, oldVal) {
-            if (oldVal.length === newVal.length)
+            if (oldVal.length === newVal.length || this.firstRequest) {
                 return
+            }
             const longerArray = newVal.length > oldVal.length ? newVal : oldVal
             const shorterArray = newVal.length > oldVal.length ? oldVal : newVal
             const diff = longerArray.filter(e => !shorterArray.find(el => el === e))[0]
             const lessAvailable = newVal.length === 0 ? 
                 false : newVal.length === 1 ? 
                 true : newVal.length < oldVal.length
-            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Timing", {
+            const info = {
                 change: { diff, lessAvailable },
                 msg: `${this.usersFullNameWithTitle} ${lessAvailable ? `is less available nowadays to give` : `is now available to give more` } khutbahs${lessAvailable ? `.` : ` insha'Allah!`} Check out his profile for more details.` 
-            })
+            }
+            // if khateeb is available for less timings
+            // erase their name from the jummahs that have them scheduled
+            // from today onwards
+            if (lessAvailable) {
+                info.eraseKhateebIdQuery = {
+                    date: { $gte: jummahHelpers.fridayToFridayDBFormat(new Date()) },
+                    timingID: diff
+                }
+            }
+            await this._api.khateebs.sendAvailabilityUpdateToAdmins("Timing", info)
         }
     },
     created() {
         this.getAvailableTimings()
+        this.getScheduleRestrictions()
     }
 }
 </script>
@@ -174,7 +224,7 @@ export default {
     margin-bottom: 20px;
     width: 80%;
     max-width: 800px;
-    @include centerMargin();
+    @include center-margin();
     max-height: 1500px;
 }
 
@@ -184,13 +234,23 @@ export default {
 
 .unavailable-date-info-header {
     font-size: 16px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     margin-bottom: 20px;
     margin-top: 20px;
     line-height: 20px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+.settings-header {
+    font-size: 27px;
+    margin-bottom: 7px;
+}
+
+.settings-sub-header {
+    font-size: 20px;
+    margin-bottom: 50px;
+}
+
+@media screen and (max-width: $phone-width) {
 
     .unavailable-date-info-header {
         font-size: 14px;

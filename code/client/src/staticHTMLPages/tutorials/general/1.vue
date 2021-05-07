@@ -21,5 +21,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "~@/scss/tutorialStyles.scss"
+@import "~@/scss/individual-style-sheets/_tutorial-styles.scss"
 </style>

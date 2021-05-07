@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.get(
     '/',
-    authMiddleware.authenticate({ min: 1, max: 3 }),
+    authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
             const data = await $db.institutions.findOne({ _id: req.headers.institutionid }).exec()
@@ -22,7 +22,7 @@ router.get(
 
 router.put(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("name").isLength({ min: 1 }).isString().optional(),
@@ -46,14 +46,14 @@ router.put(
 
 router.delete(
     '/',
-    authMiddleware.authenticate({ level: 3 }),
+    authMiddleware.authenticate({ level: 4 }),
     async (req, res) => {
         try {
-            const query = { _id: req.headers.institutionid }
-            const targetInstitution = await $db.institutions.findOne(query).exec()
-            const institutionRes = await $db.institutions.deleteOne(query)
-            const deletedDependants = await targetInstitution.deleteDependencies()
-            return res.json({ data: { institution: institutionRes, deletedDependants } })
+            const targetInstitution = await $db[req.headers.specialInstitution || "institutions"]
+                .findOne({ _id: req.headers.institutionid })
+                .exec()
+            const data = await targetInstitution.deactivate()
+            return res.json({ data })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ data: {}, msg: `Couldn't delete institution or dependencies. Err trace ${err}` })

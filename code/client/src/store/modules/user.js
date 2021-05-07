@@ -2,33 +2,28 @@ import auth from '@/libraries/auth/main.js'
 import userIdentification from '@/libraries/userIdentification/main.js'
 import localStorageHelpers from '@/libraries/localStorageManagement/main.js'
 import _utils from '@/libraries/globalUtilities.js'
+import requestHelpers from '@/libraries/requests/index.js'
 
 import axios from 'axios'
+
+const userInfoKey = 'userInfo'
+const institutionKey = 'institution'
+const JWTKey = 'token'
 
 export default {
     namespaced: true,
     state: () => ({
-        jwToken: localStorage.getItem('token') || null,
-        institution: !localStorage.getItem('token') ? {} : 
-        localStorageHelpers.get("cachedUserCheckIn") ? localStorageHelpers.get("cachedUserCheckIn").institution : { 
-            name: "random institution", 
-            abbreviatedName: "rand Inst" 
-        },
+        jwToken: localStorage.getItem(JWTKey) || null,
+        institution: localStorage.getItem(JWTKey) ?
+            localStorageHelpers.get(institutionKey) || {} :
+            {}
+        ,
         isBrowsingOnPWA: userIdentification.deviceBrowsingViaPWA(),
-        userInfo: !localStorage.getItem('token') ? {} : 
-        localStorageHelpers.get("cachedUserCheckIn") ? localStorageHelpers.get("cachedUserCheckIn").userInfo : {
-            __t: "khateeb",
-            _id: "1234",
-            confirmed: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            institutionID: "1234",
-            lastLogin: new Date(),
-            firstName: "random",
-            lastName: "random",
-            username: "randomUser",
-            handle: "random"
-        }
+        userInfo: localStorage.getItem(JWTKey) ? 
+            localStorageHelpers.get(userInfoKey) || {} : 
+            {}
+        ,
+        isRootAdminAtOneInstitution: true
     }),
     mutations: {
         removeToken(state) {
@@ -43,20 +38,55 @@ export default {
         updateUserInfo(state, userInfo={}) {
             userInfo.lastLogin = new Date(userInfo.lastLogin)
             state.userInfo = userInfo
+        },
+        updateLastLogin(state, date=new Date()) {
+            state.userInfo.lastLogin = new Date(date)
+        },
+        updateInstitutionInfo(state, institution={}) {
+            state.institution = institution
+        },
+        removeInstitutionInformation(state) {
+            state.institution = {}
+        },
+        changeRootAdminAtOneInstitutionStatus(state, change=true) {
+            state.isRootAdminAtOneInstitution = change 
         }
     },  
     actions: {
         logout({ commit }) {
-            localStorage.removeItem('token')
+            localStorage.removeItem(JWTKey)
+            localStorage.removeItem(institutionKey)
+            localStorage.removeItem(userInfoKey)
             delete axios.defaults.headers.common['authorization']
             commit('removeToken')
             _utils.toHomePage()
         },
         updateToken({ commit }, updated) {
             commit('updateToken', updated)
-            if (localStorage.getItem('rememberMe'))
-                localStorage.setItem('token', updated)
+            localStorage.setItem(JWTKey, updated)
             axios.defaults.headers.common.authorization = updated
+        },
+        updateUserInfo({ commit }, userInfo) {
+            localStorageHelpers.commit(userInfoKey, userInfo)
+            commit('updateUserInfo', userInfo)
+        },
+        updateInstitutionInfo({ commit }, institution) {
+            localStorageHelpers.commit(institutionKey, institution)
+            commit('updateInstitutionInfo', institution)
+        },
+        async downgradeUserAuthorization({ dispatch, commit }) {
+            try {
+                const { token } = await requestHelpers.user.downgradeAuthorization()
+                if (!token) {
+                    return
+                }
+                dispatch('updateToken', token)
+                commit('removeInstitutionInformation')
+                localStorage.removeItem(institutionKey)
+                return _utils.toHomePage()
+            } catch {
+                return _utils.alert(`A problem occurred when exiting institution`)
+            }
         }
     },
     getters: {
@@ -93,6 +123,9 @@ export default {
                 return auth.userTypeToAuthLevel(state.userInfo.__t)
             else
                 return 0
+        },
+        isLoggedInAsGenericUser(state, { decodedJWT }) {
+            return !decodedJWT.institutionID
         }
     } 
 }

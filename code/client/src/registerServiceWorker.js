@@ -3,6 +3,8 @@
 import { register } from 'register-service-worker'
 import footerPopups from './libraries/footerPopup/main.js'
 
+import Config from '$config'
+
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {
     ready () {
@@ -22,8 +24,9 @@ if (process.env.NODE_ENV === 'production') {
     },
     updated(registration) {
       footerPopups.appWillUpdateMessage()
-      const threeSecondsInMilliseconds = 3_000
-      window.setTimeout(() => registration.waiting.postMessage({ action: 'skipWaiting' }) , threeSecondsInMilliseconds)
+      window.setTimeout(() => { 
+        return registration.waiting.postMessage({ action: 'skipWaiting' })
+      } , Config.pwaConfig.reloadDelayAfterNewServiceWorkerDetected)
     },
     offline() {
       console.log('No internet connection found. App is running in offline mode.')

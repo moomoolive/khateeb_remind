@@ -3,6 +3,7 @@
     
     <div class="big-app-background"></div>
 
+    <!-- popup notifications -->
     <div 
       v-show="$store.state.notifications.display.show" 
       class="notifications-layer"
@@ -13,9 +14,12 @@
           class="notifications notifications-size-position"
         />
       </transition>
+
     </div>
 
     <div class="app-container">
+
+    <!-- navigation and header -->
       <div class="header">
 
         <collapse-transition>
@@ -26,18 +30,27 @@
 
       </div>
 
-      <transition
-        name="fade"
-        mode="out-in"
-      >
-        <router-view 
-          :class="`displayed-page page-padding ${$store.state.app.wallpaper}`"
-        />
-      </transition>
+      <!-- main router (displayed page) -->
+      <div :class="`main-content-background`">
 
+        <default-app-background />
+
+        <vue-page-transition :name="routerConfig.animationName">
+          <router-view 
+            :class="`displayed-page page-padding`"
+          />
+        </vue-page-transition>
+
+      </div>
+
+      <!-- app runtimes -->
       <request-manager />
-      <notifications-manager @toggle-notification-display="toggleNotificationDisplay()" />
 
+      <notifications-manager 
+        @toggle-notification-display="toggleNotificationDisplay()" 
+      />
+
+      <!-- footer popup messages -->
       <collapse-transition :duration="600">
           <footer-popup
             v-show="$store.state.footerPopup.show"
@@ -46,6 +59,7 @@
       </collapse-transition>
 
       <Footer />
+
     </div>
   </div>
 </template>
@@ -58,6 +72,7 @@ import notificationsManager from '@/components/notifications/notificationsManger
 import headerNavigation from '@/components/header/navigation/main.vue'
 import requestManager from '@/components/misc/requestManager.vue'
 import footerPopup from '@/components/footer/popup/main.vue'
+import defaultAppBackground from '@/components/misc/appBackground.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
@@ -65,6 +80,8 @@ import pwaHelpers from './libraries/pwa/main.js'
 import localStorageHelpers from './libraries/localStorageManagement/main.js'
 
 import { nanoid } from 'nanoid'
+
+import Config from '$config'
 
 export default {
   components: {
@@ -76,11 +93,13 @@ export default {
     headerNavigation,
     requestManager,
     footerPopup,
+    defaultAppBackground
   },
   data() {
     return {
       showNotificationDisplay: false,
-      isOffline: false
+      isOffline: false,
+      routerConfig: Config.routerConfig
     }
   },
   methods: {
@@ -140,8 +159,9 @@ export default {
   },
   mounted() {
     this.$nextTick(async () => {
-      if (this.$store.getters['user/isLoggedIn'])
-        await this._api.user.checkIn()
+      if (this.$store.getters['user/isLoggedIn']) {
+        this._api.user.getNotifications()
+      }
     })
   },
   created() {
@@ -152,47 +172,48 @@ export default {
 </script>
 
 <style lang="scss">
+@import '~@/scss/_global-styles.scss';
+
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    color: #2c3e50;
+    color: get-color("grey");
     overflow-x: hidden;
+    background: get-color("silver");
+}
+
+.big-app-background {
+  background: get-color("green");
+  height: 250px;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 0;
 }
 
 .app-container {
   max-width: $maxAppWidth;
-  min-width: $minimumAppWidth;
-  @include centerMargin();
-  @include floatingBoxShadow(0.6);
+  min-width: $minimum-app-width;
+  @include center-margin();
+  @include floating-box-shadow(0.6);
+  position: relative;
+  z-index: 0;
+}
+
+.main-content-background {
+  background: get-color("blue");
+  overflow: hidden !important;
+  position: relative;
+  z-index: 0;
 }
 
 .displayed-page {
     position: relative;
     z-index: 0;
-    background-image: url('~@/assets/wallpaper/app.jpg');
     margin: auto;
     min-height: 76vh;
-    
-    &.main {
-      background-image: url('~@/assets/wallpaper/app.jpg');
-    }
-    &.user {
-      background-image: url('~@/assets/wallpaper/user.png');
-    }
-    
-    &.sysAdmin {
-      background-image: url('~@/assets/wallpaper/sysAdmin.jpg');
-    }
-    
-    &.institutionAdmin {
-      background-image: url('~@/assets/wallpaper/institutionAdmin.jpg');
-    }
-
-    &.homepage {
-      background-image: url('~@/assets/misc/insideMasjid.jpg');
-    }
 }
 
 .page-padding {
@@ -213,7 +234,7 @@ export default {
     position: relative;
     z-index: 9;
     overflow: hidden;
-    @include lightBorderRounding();
+    @include light-border-rounding();
     bottom: 5%;
 }
 
@@ -226,17 +247,17 @@ export default {
   max-height: 300px;
   padding: 7px 4px 7px 4px;
   border-radius: 7px;
-  @include floatingBoxShadow(0.4);
+  @include floating-box-shadow(0.4);
 }
 
 .notifications-layer {
   z-index: 9;
   position: fixed;
-  background: themeRGBA('grey', 0.3);
+  background: get-color('grey', 0.3);
   width: 100vw;
   height: 100vh;
-  min-width: $minimumAppWidth;
-  @include flexboxDefault();
+  min-width: $minimum-app-width;
+  @include flexbox-default();
 }
 
 .notifications-size-position {
@@ -244,19 +265,10 @@ export default {
   height: auto;
   max-height: 400px;
   max-width: 400px;
-  @include floatingBoxShadow(0.4);
+  @include floating-box-shadow(0.4);
 }
 
-.big-app-background {
-  background: getColor("green");
-  height: 250px;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: -2;
-}
-
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       .page-padding {
         padding-bottom: 5%;
         padding-top: 13% !important;
@@ -267,6 +279,7 @@ export default {
     .app-container {
       margin-top: 50px;
       margin-bottom: 50px;
+      width: 1400px;
     }
 }
 </style>

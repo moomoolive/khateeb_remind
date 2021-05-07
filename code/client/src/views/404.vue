@@ -1,12 +1,12 @@
 <template>
     <div class="space">
-        <msg-with-pic
-            title="Ooops..."
-            msg="The page you searched for doesn't exist!"
-            gif="flyingPlanesAllOver"
+        <general-message
+            :message="`Ooops...The page you searched for doesn't exist!`"
+            :fontAwesomeIcon="['fas', 'question']"
+            iconColor="yellow"
         />
-        <div class="button">
-            <button @click="_utils.toHomePage()">
+        <div>
+            <button class="button" @click="_utils.toHomePage()">
                 Go to Home
             </button>
         </div>
@@ -14,19 +14,20 @@
 </template>
 
 <script>
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 
 export default {
     name: 'pageNotFound',
     components: {
-        msgWithPic
+        generalMessage
     }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .button {
-    margin-top: 2vh;
+    margin-top: 40px;
+    @include floating-box-shadow();
 }
 
 </style>

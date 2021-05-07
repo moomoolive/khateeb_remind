@@ -4,17 +4,16 @@
             :baseLink="`institutionAdmin`"
             :outboundLinks="outboundLinks"
         />
-        <transition
-        name="fade"
-        mode="out-in"
-        >
+        <vue-page-transition :name="routerConfig.animationName">
             <router-view class="pages"></router-view>
-        </transition>
+        </vue-page-transition>
     </div>
 </template>
 
 <script>
 import centralNav from '@/components/misc/centralNav.vue'
+
+import Config from '$config'
 
 export default {
     name: 'adminParentRoute',
@@ -24,6 +23,7 @@ export default {
     data() {
         return {
             currentRoute: this.$router.currentRoute.fullPath,
+            routerConfig: Config.routerConfig,
             outboundLinks: [
                 {
                     name: 'Set Schedule',
@@ -42,7 +42,8 @@ export default {
                 {
                     name: 'Other Administrators',
                     route: 'create-others',
-                    auth: { level: 3 }
+                    auth: { level: 4 },
+                    blinking: false
                 },
                 {
                     name: 'Settings',
@@ -57,18 +58,29 @@ export default {
             const pendingCount = pendingKhateebs.length
             this.outboundLinks[2].blinking = pendingCount > 0
         },
+        async fetchPendingInstitutionAdminCount() {
+            if (this.$store.getters['user/type'] !== 'rootInstitutionAdmin')
+                return
+            const pendingAdmins = await this._api.institutionAdmins.getOtherAdmins({ confirmed: false })
+            this.outboundLinks[3].blinking = pendingAdmins.length > 0
+        },
+        getPendingUsersCount() {
+            this.verifyPending()
+            this.fetchPendingInstitutionAdminCount()
+        }
     },
     watch:{
         currentRoute(newVal) {
-            if (newVal === '/institutionAdmin')
-                this.verifyPending()
+            if (newVal === '/institutionAdmin') {
+                this.getPendingUsersCount()
+            }
         }
     },
     updated() {
         this.currentRoute = this.$router.currentRoute.fullPath
     },
     created() {
-        this.verifyPending()
+        this.getPendingUsersCount()
     }
 }
 </script>
@@ -110,7 +122,7 @@ p {
     text-align: right;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       .notifications-size-position {
         width: 70%;
         height: 35vh;

@@ -1,0 +1,116 @@
+@import './index.scss';
+
+div {
+    margin: 0 0 0 0;
+
+    @include all-colors();
+
+    &.round {
+        @include normal-border-rounding();
+    }
+}
+
+span {
+    @include all-text-colors();
+}
+  
+img {
+    min-width: 0px;
+    min-height: 0px;
+}
+
+body, html {
+    margin: 0 0 0 0;
+    background: silver;
+    color: get-color("off-white");
+    font-size: 16px;
+}
+
+p {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: get-color("light-grey", 0.6);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: get-color('grey');
+}
+
+h2 {
+    font-size: 3.2vh;
+    padding-left: 0.4vw;
+    padding-right: 0.4vw;
+}
+
+button {
+    background-color: get-color("green");
+    border: none;
+    border-radius: 4px;
+    color: get-color("off-white");
+    padding: 5px 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    transition-duration: 0.4s;
+    outline: none;
+    cursor: pointer;
+
+    $marginOne: 7px;
+    margin: $marginOne $marginOne $marginOne $marginOne;
+    
+    &.pale-hover {
+        &:hover {
+            background-color: get-color("off-white") !important;
+            color: black !important;
+            border: 0.1vh solid get-color("green");
+        }
+    }
+    
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &.round {
+        @include completely-round-border();
+    }
+
+    &.blink-focus {
+        &:focus { 
+            @include blinking-animation(); 
+        }
+    }
+
+    @include all-colors();
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.7s ease-in;
+}
+.dropdown-enter,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}

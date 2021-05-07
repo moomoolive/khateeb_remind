@@ -3,7 +3,7 @@
         <div>
             <button 
                 @click="changeLocation('all')"
-                :class="`location-btns ${selectedLocation === 'all' ? 'active-controls' : ''}`"
+                :class="`location-btns green ${selectedLocation === 'all' ? 'active-controls' : ''}`"
             >
                 {{  locations.length > 1 ? 'All' : 'All Locations' }}
             </button>
@@ -12,7 +12,7 @@
             <button  
                 v-for="(location, locationIndex) in locations" 
                 :key="locationIndex"
-                :class="`location-btns ${selectedLocation === location._id ? 'active-controls' : ''}`"
+                :class="`location-btns green ${selectedLocation === location._id ? 'active-controls' : ''}`"
                 @click="changeLocation(location._id)"
             >
                 {{ location.name }}
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/scss/jummahSchedule/buttons.scss';
+@import '~@/scss/individual-style-sheets/_jummah-schedule.scss';
 
 .location-btns {
     margin-left: 10px;
@@ -56,7 +56,7 @@ export default {
     font-size: 17px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .location-btns {
         font-size: 15px;

@@ -50,7 +50,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: getColor("dirtyWhite");
+  background-color: get-color("dirty-white");
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -62,17 +62,17 @@ export default {
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: getColor("offWhite");
+  background-color: get-color("off-white");
   -webkit-transition: .4s;
   transition: .4s;
 }
 
 input:checked + .slider {
-  background-color: getColor("green");
+  background-color: get-color("green");
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px getColor("green");
+  box-shadow: 0 0 1px get-color("green");
 }
 
 input:checked + .slider:before {
@@ -83,7 +83,7 @@ input:checked + .slider:before {
 
 .slider.round {
   border-radius: 34px;
-  @include floatingBoxShadow(0.3);
+  @include floating-box-shadow(0.3);
 }
 
 .slider.round:before {

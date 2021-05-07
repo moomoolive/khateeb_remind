@@ -36,9 +36,9 @@
                     <div class="signup-button-container">
                         <button 
                             class="blue signup-button" 
-                            @click="$router.push({ path: '/create/institutions' })"
+                            @click="$router.push({ path: '/create/user' })"
                         >
-                            Sign Up Your Institution
+                            Sign Me Up
                         </button>
                         <div class="signup-button-caption">
                             * <i><span class="purple">Free</span>, <span class="green">Forever</span> (insha'Allah)</i>
@@ -47,11 +47,7 @@
                 </div>
 
                 <div class="main-photo-frame">
-                    <img 
-                        src="@/assets/notifications/khateebs.png"
-                        class="main-photo" 
-                        alt="masjid"
-                    >
+                    <fa-icon icon="mosque" class="main-photo" />
                 </div>
 
             </div>
@@ -62,32 +58,21 @@
                 
                 <div class="icon-container">
                     <a href="#notifications">
-                        <img 
-                            src="@/assets/usecase/mobile.png" 
-                            class="icon-image"
-                            alt="mobile"
-                        >
+                        <fa-icon icon="mobile" class="short-description-icon"/>
                         <div class="icons-heading">
-                            Notifications
+                            Notify
                         </div>
                         <div class="icons-subheading">
                             Send khutbah-related updates to your khateebs' phone, laptop, or tablet <br><br>
-                            <span class="icons-subheading-warning red">
-                                * IOS and older browsers are unsupported
-                            </span>
                         </div>
                     </a>
                 </div>
 
                 <div class="icon-container">
                     <a href="#scheduling">
-                        <img 
-                            src="@/assets/usecase/clock.png" 
-                            class="icon-image"
-                            alt="clock"
-                        >
+                        <fa-icon icon="clock" class="short-description-icon" />
                         <div class="icons-heading">
-                            Scheduling
+                            Schedule
                         </div>
                         <div class="icons-subheading">
                             Set default khateebs and automate your khateeb scheduling
@@ -97,11 +82,7 @@
 
                 <div class="icon-container">
                     <a href="#centralize">
-                        <img 
-                            src="@/assets/usecase/database.png" 
-                            class="icon-image"
-                            alt="database"
-                        >
+                        <fa-icon icon="database" class="short-description-icon" />
                         <div class="icons-heading">
                             Centralize
                         </div>
@@ -121,11 +102,7 @@
                 <div class="all-long-explanations-container">
                     <div class="long-explanation-container" id="notifications">
                         <div class="long-explanation-icon-container">
-                            <img 
-                                src="@/assets/usecase/note.png" 
-                                class="icon-image"
-                                alt="notification"
-                            >
+                            <fa-icon icon="comment-alt" class="long-description-icon" />
                         </div>
                         <div class="long-explanation-text-container">
                             <div class="long-explanation-header">
@@ -154,21 +131,13 @@
                             </div>
                         </div>
                         <div class="long-explanation-icon-container">
-                            <img 
-                                src="@/assets/usecase/calendar.png" 
-                                class="icon-image"
-                                alt="calendar"
-                            >
+                            <fa-icon icon="calendar-alt" class="long-description-icon" />
                         </div>
                     </div>
 
                     <div class="long-explanation-container" id="centralize">
                         <div class="long-explanation-icon-container">
-                            <img 
-                                src="@/assets/usecase/cloud.png" 
-                                class="icon-image"
-                                alt="cloud"
-                            >
+                            <fa-icon icon="cloud-upload-alt" class="long-description-icon" />
                         </div>
                         <div class="long-explanation-text-container">
                             <div class="long-explanation-header">
@@ -185,7 +154,7 @@
                 </div>
 
                 <div>
-                    <button class="purple signup-button last-button">
+                    <button class="purple signup-button last-button" @click="$router.push({ path: '/create/user' })">
                         I'm Ready to Sign Up
                     </button>
                     <div class="signup-button-caption">
@@ -205,11 +174,7 @@
                 <div class="other-features-container">
 
                     <div class="icon-container">
-                        <img 
-                            src="@/assets/usecase/pwa.png" 
-                            class="icon-image"
-                            alt="laptop and phone"
-                        >
+                        <fa-icon icon="cloud-download-alt" class="other-features-icon" />
                         <div class="icons-heading">
                             Downloadable
                         </div>
@@ -220,11 +185,7 @@
                     </div>
 
                     <div class="icon-container">
-                        <img 
-                            src="@/assets/usecase/camera.png" 
-                            class="icon-image"
-                            alt="camera"
-                        >
+                        <fa-icon icon="camera" class="other-features-icon" />
                         <div class="icons-heading">
                             Simple Interface
                         </div>
@@ -234,11 +195,7 @@
                     </div>
 
                     <div class="icon-container">
-                        <img 
-                            src="@/assets/usecase/clipboard.png" 
-                            class="icon-image"
-                            alt="linux logo"
-                        >
+                        <fa-icon icon="clipboard-check" class="other-features-icon" />
                         <div class="icons-heading">
                             Practical
                         </div>
@@ -249,11 +206,7 @@
                     </div>
 
                     <div class="icon-container">
-                        <img 
-                            src="@/assets/usecase/linux.png" 
-                            class="icon-image"
-                            alt="linux logo"
-                        >
+                        <fa-icon :icon="['fab', 'linux']" class="other-features-icon" />
                         <div class="icons-heading">
                             Open-Source
                         </div>
@@ -274,7 +227,7 @@
                 </div>
 
                 <div>
-                    <button class="green signup-button last-button">
+                    <button class="green signup-button last-button" @click="$router.push({ path: '/create/user' })">
                         I Want to Sign Up
                     </button>
                     <div class="signup-button-caption">
@@ -297,15 +250,15 @@ export default {
 .content-container {
     width: 80vw;
     max-width: 1100px;
-    @include centerMargin();
-    background: getColor("silver");
+    @include center-margin();
+    background: get-color("silver");
     margin-top: 40px;
     padding-top: 20px;
     padding-left: 30px;
     padding-right: 30px;
     padding-bottom: 20px;
-    @include normalBorderRounding();
-    @include floatingBoxShadow();
+    @include normal-border-rounding();
+    @include floating-box-shadow();
 }
 
 .main-photo-section {
@@ -316,7 +269,8 @@ export default {
 
 .main-photo-frame {
     width: 50%;
-    @include flexboxDefault();
+    margin-top: 30px;
+    @include flexbox-default();
 }
 
 .main-caption-container {
@@ -347,14 +301,15 @@ export default {
 .main-photo {
     width: 90%;
     height: 90%;
+    max-width: 400px;
 }
 
 .main-section-division {
     width: 100%;
-    border-bottom: getColor("grey") solid 5px;
+    border-bottom: get-color("grey") solid 5px;
     margin-top: 50px;
     margin-bottom: 50px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .signup-button-container {
@@ -369,7 +324,7 @@ export default {
     font-size: 18px;
     padding-top: 15px;
     padding-bottom: 15px;
-    @include floatingBoxShadow(0.30);
+    @include floating-box-shadow(0.30);
 
     &.last-button {
         width: 70%;
@@ -394,10 +349,26 @@ export default {
     margin-bottom: 30px;
 }
 
+.short-description-icon {
+    font-size: 50px;
+}
+
+.long-description-icon {
+    font-size: 110px;
+}
+
+.other-features-icon {
+    font-size: 70px;
+}
+
 .icon-image {
     width: 50%;
     height: 50%;
     max-width: 120px;
+    
+    &.short-description {
+        font-size: 20px;
+    }
 }
 
 .icons-heading {
@@ -410,7 +381,7 @@ export default {
     font-size: 14px;
     margin-top: 7px;
     width: 90%;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .icons-subheading-warning {
@@ -442,7 +413,7 @@ export default {
 
 a {
     text-decoration: none;
-    color: getColor("grey");
+    color: get-color("grey");
 }
 
 .all-long-explanations-container {
@@ -464,7 +435,7 @@ a {
     margin-bottom: 50px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .long-explanation-header {
         font-size: 19px;

@@ -17,7 +17,7 @@
         </div>
 
         <div v-if="!customLogoExists" class="institution-description">
-          {{ $store.state.user.institution.name }}
+          {{ _utils.stringFormat($store.state.user.institution.name) }}
         </div>
 
         <div class="institution-description">
@@ -62,7 +62,7 @@ export default {
       async khateebSignup(newJummahPreference={}) {
         if (!this.institutionSettings.allowJummahSignup)
           return this._utils.alert(`Unfortunately your administrator has not allowed jummah signups! If you want this feature please talk to your administrator.`)
-        const newPreference = await this._api.jummahs.createNewPreference(newJummahPreference)
+        const newPreference = await this._api.jummahs.createNewJummahPreference(newJummahPreference)
         if (Object.keys(newPreference).length > 0)
           this.jummahs.push(newPreference)
       },
@@ -103,17 +103,18 @@ export default {
     height: 200px;
     width: 200px;
     border-radius: 50%;
-    border: getColor("yellow") solid 3px;
+    border: get-color("yellow") solid 3px;
+    background: get-color("dirty-white");
 }
 
 .institution-description {
   font-size: 25px;
-  color: getColor("offWhite");
+  color: get-color("off-white");
   margin-bottom: 20px;
 }
 
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
   .institution-description {
     font-size: 20px;
   }   

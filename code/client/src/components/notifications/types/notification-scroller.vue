@@ -1,9 +1,6 @@
 <template>
     <div class="scroller-container">
-        <loading
-            :loadingTime="900"
-            :textColor="`white`"
-        >
+        <loading :textColor="`white`">
             
             <div v-if="allNotifications.length > 0">
                 <div 
@@ -19,9 +16,17 @@
                     </div>
 
                     <div class="notification-msg">
-                        <span class="notification-date purple">
-                            {{ _utils.dynamicDisplayDate(notification.createdAt) }}
-                        </span><br><br>
+                        <div v-if="notification.institutionID" class="institution-name">
+                            <span class="blue">
+                                {{ notification.institutionID.abbreviatedName }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="notification-date purple">
+                                {{ _utils.dynamicDisplayDate(notification.createdAt) }}
+                            </span>
+                        </div>
+                        <br>
                         {{ notification.msg }}
                     </div>
 
@@ -29,11 +34,12 @@
             </div>
 
             <div v-else class="empty-notifications-container">
-                <msg-with-pic
-                    class="empty-notifications-msg" 
-                    :gif="`twirlingPlane`"
-                    :msg="`No notifications to show...`"
-                    :textColor="`white`"
+                <general-message
+                    class="empty-notifications-msg"
+                    :message="`No notifications to show...`"
+                    textColor="off-white"
+                    iconColor="blue"
+                    :fontAwesomeIcon="['fas', 'inbox']"
                 />
             </div>
 
@@ -44,14 +50,14 @@
 <script>
 import tagCircle from '@/components/general/tagCircle.vue'
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 
 export default {
     name: "notificationScroller",
     components: {
         tagCircle,
         loading,
-        msgWithPic
+        generalMessage
     },
     props: {
         options: {
@@ -113,18 +119,17 @@ export default {
 }
 
 .empty-notifications-container {
-    background-color: getColor("grey");
-    padding-bottom: 10px;
+    padding-bottom: 40px;
 }
 
 .notification-container {
     height: 15%;
-    border-bottom: getColor("silver") solid 1px;
-    border-top: getColor("silver") solid 1px;
+    border-bottom: get-color("silver") solid 1px;
+    border-top: get-color("silver") solid 1px;
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: getColor("grey");
-    @include floatingBoxShadow(0.4);
+    background-color: get-color("grey");
+    @include floating-box-shadow(0.4);
     display: flex;
     flex-direction: column;
     
@@ -139,17 +144,18 @@ export default {
 
 .notification-msg {
     width: 85%;
-    @include centerMargin();
+    @include center-margin();
     text-align: left;
-    padding-top: 6px;
     font-size: 16px;
+    margin-top: 0 !important;
     padding-bottom: 12px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
-.notification-date {
+.notification-date, .institution-name {
     font-size: 12px;
 }
+
 
 .tag {
     margin-left: 20px;
@@ -157,7 +163,7 @@ export default {
     float: left;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .needs-attention {
         font-size: 14px;

@@ -75,9 +75,9 @@ export default {
 
 <style lang="scss" scoped>
 @keyframes glow { 
-    0% { background-color: getColor("silver"); }
-    50% { background-color: getColor("yellow") }
-    100% { background-color: getColor("silver"); } 
+    0% { background-color: get-color("silver"); }
+    50% { background-color: get-color("yellow") }
+    100% { background-color: get-color("silver"); } 
 }
 
 .admin-nav {
@@ -86,8 +86,8 @@ export default {
     max-height: 200px;
     max-width: 850px;
     padding: 10px 30px;
-    @include completelyRoundBorder();
-    @include floatingBoxShadow();
+    @include completely-round-border();
+    @include floating-box-shadow();
     color: black;
 
     &.glow {
@@ -108,7 +108,7 @@ p {
 }
 
 .indicator {
-    background: getColor('yellow');
+    background: get-color('yellow');
     padding: 2px 2px 2px 2px;
     margin-left: 7px;
 }
@@ -116,19 +116,19 @@ p {
 .return-to-central-container {
     width: 95%;
     max-width: 1100px;
-    @include centerMargin();
+    @include center-margin();
     text-align: left;
 }
 
 .back-to-central {
     width: 100px;
     height: 40px;
-    @include completelyRoundBorder();
-    @include floatingBoxShadow();
+    @include completely-round-border();
+    @include floating-box-shadow();
     color: black;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       
       .admin-nav {
           width: 90% !important;

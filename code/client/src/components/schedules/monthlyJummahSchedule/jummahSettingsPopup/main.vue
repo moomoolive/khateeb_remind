@@ -50,14 +50,14 @@
             <div v-else-if="reciever === 'khateeb'">
                 <button 
                     class="blue"
-                    :disabled="mainKhateebIsScheduled"
+                    :disabled="mainKhateebIsScheduled || !currentUserIsAvailableForJummah"
                     @click="signupKhateeb(false)" 
                 >
                     {{ mainKhateebIsScheduled ? "Already Filled" : "Sign up as Main Khateeb"}}
                 </button>
                 <button 
                     class="red"
-                    :disabled="backupKhateebIsScheduled"
+                    :disabled="backupKhateebIsScheduled || !currentUserIsAvailableForJummah"
                     @click="signupKhateeb(true)" 
                 >
                     {{ backupKhateebIsScheduled ? "Already Filled" : "Sign up as Backup"}}
@@ -99,12 +99,20 @@ export default {
         maxNotificationLoopRunCount: {
             type: Boolean,
             required: true
+        },
+        khateebsavailableForSelectedWeek: {
+            type: Array,
+            required: true
         }
     },
     methods: {
-        signupKhateeb(isBackup=false) {
+        async signupKhateeb(isBackup=false) {
             if (this.currentUserIsAlreadySignedUpForThisJummah)
                 return this._utils.alert(`You're already signed up for this jummah!`)
+            const confirm = await this._utils.confirm(`Are you sure you want to signup to this jummah?`)
+            if (!confirm) {
+                return
+            }
             this.$emit('khateeb-signup', {
                 date: jummahHelpers.fridayToFridayDBFormat(new Date(this.selectedDate)),
                 timingID: this.info.timing._id,
@@ -179,6 +187,9 @@ export default {
         currentUser() {
             return this.$store.state.user.userInfo._id
         },
+        currentUserKhateebInfo() {
+            return this.khateebsavailableForSelectedWeek.find(k => k._id === this.currentUser)
+        },
         currentUserIsAlreadySignedUpForThisJummah() {
             return this.info.khateebPreferences.find(kp => kp.khateebID === this.currentUser)
         },
@@ -188,6 +199,16 @@ export default {
         },
         notificationRunCountExceeded() {
             return this.notificationLoopRunCount > this.maxRunCount || this.maxNotificationLoopRunCount
+        },
+        currentUserIsAvailableForJummah() {
+            if (this.reciever !== 'khateeb')
+                return false
+            else if (!this.currentUserKhateebInfo)
+                return false
+            else if (this.currentUserKhateebInfo.availableTimings.length < 1)
+                return true
+            else
+                return this.currentUserKhateebInfo.availableTimings.find(t => t === this.info.timing._id)
         }
     }
 }
@@ -195,7 +216,7 @@ export default {
 
 <style lang="scss" scoped>
 div {
-    color: getColor("offWhite");
+    color: get-color("off-white");
     font-size: 17px;
     &.settings-label {
         padding-bottom: 7px;

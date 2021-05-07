@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-const discriminators = require('./discriminators/main.js')
 const location = require('./schemas/location.js')
 const institution = require('./schemas/institution.js')
 const timing = require('./schemas/timing.js')
@@ -10,6 +9,18 @@ const notification = require('./schemas/notification.js')
 const verificationCode = require('./schemas/verificationCode.js')
 const jummahPreference = require('./schemas/jummahPreference.js')
 const pwaSubscription = require('./schemas/pwaSubscription.js')
+const authorization = require('./schemas/authorizations.js')
+const userScheduleRestriction = require('./schemas/userScheduleRestrictions.js')
+
+// discriminators --> basically a schema that inherits and extends any of the
+// above schemas
+
+// users
+const root = require('./discriminators/rootUser.js')
+const sysAdmin = require('./discriminators/sysAdmin.js')
+
+// institutions
+const testInstitution = require('./discriminators/testInstitution.js')
 
 const models = {
     institutions: mongoose.model('institution', institution),
@@ -21,17 +32,21 @@ const models = {
     verificationCodes: mongoose.model('verificationCode', verificationCode),
     jummahPreferences: mongoose.model('jummahPreference', jummahPreference),
     pwaSubscriptions: mongoose.model('pwaSubscription', pwaSubscription),
+    authorizations: mongoose.model('authorization', authorization),
+    userScheduleRestrictions: mongoose.model('userScheduleRestriction', userScheduleRestriction)
 }
 
-const userTypes = {
-    khateebs: models.users.discriminator('khateeb', discriminators.khateeb),
-    root: models.users.discriminator('root', discriminators.root),
-    institutionAdmins: models.users.discriminator('institutionAdmin', discriminators.institutionAdmin),
-    sysAdmins: models.users.discriminator('sysAdmin', discriminators.sysAdmin),
-    rootInstitutionAdmins: models.users.discriminator('rootInstitutionAdmin', discriminators.rootInstitutionAdmin)
+const userDiscriminators = {
+    root: models.users.discriminator('root', root),
+    sysAdmins: models.users.discriminator('sysAdmin', sysAdmin),
+}
+
+const institutionDiscriminators = {
+    testInstitution: models.institutions.discriminator('testInstitution', testInstitution)
 }
 
 module.exports = { 
     ...models, 
-    ...userTypes
+    ...userDiscriminators,
+    ...institutionDiscriminators
 }

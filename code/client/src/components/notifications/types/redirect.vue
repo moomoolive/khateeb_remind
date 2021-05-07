@@ -41,25 +41,25 @@ button {
     width: 75%;
     height: 33px;
     font-size: 18px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 .redirectContainer {
-    @include flexboxDefault(column);
+    @include flexbox-default(column);
     padding-top: 10px;
     padding-bottom: 10px;
 }
 
 p {
     margin-top: 5px;
-    @include centerMargin();
+    @include center-margin();
     width: 80%;
     color: black;
     font-size: 16px;
     font-weight: bold;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     button {
         font-size: 13px;

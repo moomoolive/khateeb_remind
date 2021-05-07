@@ -12,6 +12,7 @@ import _utils from '@/libraries/globalUtilities.js'
 import helpers from '@/libraries/router/main.js'
 import beforeNavHooks from '@/libraries/router/beforeNavigationHooks.js'
 import requestQueryHelpers from '@/libraries/requests/queries/main.js'
+import notificationHelpers from '@/libraries/notifications/main.js'
 
 import homepage from '@/views/homepage.vue'
 
@@ -56,10 +57,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (store.state.router.firstPage)
     store.dispatch('router/registerLandingPage', helpers.fullPath(to))
-  const baseURL = helpers.baseURL(to)
-  const targetWallpaper = beforeNavHooks.targetWallpaper(baseURL)
-  if (store.state.wallpaper !== targetWallpaper)
-    store.commit('app/changeWallpaper', targetWallpaper)
+  
   if (to.matched.some(record => record.meta.noSiteBanner)) {
     if (store.state.websiteBanner.show)
       store.commit("websiteBanner/show")
@@ -82,15 +80,9 @@ router.beforeEach((to, from, next) => {
       return
     }
     else if (!_utils.validAuthentication(to.meta.auth)) {
-      const options = {
-        color: "red",
-        icon: "locked",
-        msg: "Unauthorized",
-        ...origin
+      if (!store.state.router.firstPage) {
+        window.setTimeout(() => notificationHelpers.unauthorizedMsg(), threeTenthsOfASecond)
       }
-      window.setTimeout(() => {
-        store.dispatch('notifications/create', { type: 'alert', options})
-      }, threeTenthsOfASecond)
       next(helpers.homepageURL(store.getters.userType))
     }
     next() 

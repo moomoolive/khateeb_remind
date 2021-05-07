@@ -4,10 +4,7 @@
         <div class="content-layer">
             <div class="signup-now-container">
                 <div class="main-header">
-                    Take the Stress Out of Khateeb Scheduling
-                </div>
-                <div class="main-features">
-                   <i>Free. Automated. Simple.</i>
+                    Stress-free Khateeb Scheduling
                 </div>
                 <div class="description-container">
                     <div class="description">
@@ -23,22 +20,12 @@
                     </div>
                 </div>
                 <div class="buttons-container">
-                    <button class="purple" @click="$router.push({ path: '/create/institutions' })">
-                        Signup My Institution
+                    <button 
+                        class="purple" 
+                        @click="$router.push({ path: '/create/user' })"
+                    >
+                        Get Started
                     </button>
-                    <button class="green" @click="$router.push({ path: '/institution-selection' })">
-                        Signup as a Khateeb
-                    </button>
-                </div>
-                <div class="credits">
-                    Photo by 
-                    <a href="https://unsplash.com/@fatihyurur?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank">
-                        <span class="green">Fatih Yürür</span>
-                    </a>
-                    , hosted @
-                    <a href="https://unsplash.com/@fatihyurur?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank">
-                        <span class="purple">Unsplash</span>
-                    </a> 
                 </div>
             </div>
         </div>
@@ -82,7 +69,7 @@ a {
 
 .content-layer {
     width: 90vw;
-    @include centerMargin();
+    @include center-margin();
     min-height: 79vh !important;
     padding-top: 10vh;
 }
@@ -90,13 +77,13 @@ a {
 .signup-now-container {
     margin-left: 12vw;
     margin-right: auto;
-    background: getColor("silver");
+    background: get-color("silver");
     width: 75%;
     max-width: 400px;
     padding-top: 20px;
     padding-bottom: 20px;
-    @include floatingBoxShadow();
-    @include normalBorderRounding();
+    @include floating-box-shadow();
+    @include normal-border-rounding();
     padding-left: 15px;
     padding-right: 15px;
     text-align: left;
@@ -125,7 +112,7 @@ a {
 
 .usecase-text {
     font-size: 14px;
-    margin-top: 15px;
+    margin-top: 25px;
 }
 
 .description-container {
@@ -139,10 +126,11 @@ a {
 button {
     padding-top: 10px;
     padding-bottom: 10px;
-    @include floatingBoxShadow(0.3);
+    margin-left: 0;
+    @include floating-box-shadow(0.3);
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .content-layer {
         padding-bottom: 8vh;
@@ -153,7 +141,7 @@ button {
     }
 
     .signup-now-container {
-        @include centerMargin();
+        @include center-margin();
     }
 
     .main-header {
@@ -163,7 +151,7 @@ button {
     }
 }
 
-@media screen and (min-width: $desktopWidth) {
+@media screen and (min-width: $desktop-width) {
     .hompage-background {
         background-position: 0% 15%;
     }

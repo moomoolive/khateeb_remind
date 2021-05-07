@@ -3,7 +3,14 @@ const helpers = require('./helpers.js')
 
 class khateebJummahSignupConstructor extends NotificationConstructor {
     constructor(khateeb={}, jummah={}, jummahMeta={}) {
-        super({}, 'khateebs', { msgInfo: { khateeb, jummah, ...jummahMeta } })
+        super(
+            {}, 
+            'khateebs', 
+            { 
+                msgInfo: { khateeb, jummah, ...jummahMeta },
+                institutionID: jummah.institutionID
+            }
+        )
     }
 
     msg() {

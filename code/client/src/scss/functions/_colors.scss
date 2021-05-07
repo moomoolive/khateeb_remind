@@ -1,0 +1,7 @@
+@use "sass:map";
+
+@import '~@/scss/consts/_colors.scss';
+
+@function get-color($name: "off-white", $opacity: 1) {
+    @return rgba(map.get($themeColors, $name), $opacity)
+};

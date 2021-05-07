@@ -85,7 +85,7 @@ p {
   -webkit-transition: .4s;
   transition: .4s;
   &.yellow {
-    background-color: getColor("yellow");
+    background-color: get-color("yellow");
   }
   &.grey {
     background-color: #ccc;
@@ -105,11 +105,11 @@ p {
 }
 
 input:checked + .slider {
-  background-color: getColor("blue");
+  background-color: get-color("blue");
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px getColor("blue");
+  box-shadow: 0 0 1px get-color("blue");
 }
 
 input:checked + .slider:before {

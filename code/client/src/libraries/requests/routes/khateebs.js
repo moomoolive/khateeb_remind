@@ -11,8 +11,8 @@ const requests = {
     updateExistingKhateeb(updatedKhateeb={}) {
         return helpers.returnEmptyObjectFromRequest("put", extension, updatedKhateeb)
     }, 
-    deleteKhateeb(_id="1234") {
-        return helpers.returnEmptyObjectFromRequest("delete", extension, { params: { _id } })
+    deleteKhateeb(params={}) {
+        return helpers.returnEmptyObjectFromRequest("delete", extension, { params })
     },
     async sendAvailabilityUpdateToAdmins(availabilityType="Date", options={}) {
         try {

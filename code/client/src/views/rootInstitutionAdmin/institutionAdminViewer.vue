@@ -1,70 +1,48 @@
 <template>
     <div>
 
-        <div>
-            <button 
-                class="add-new-admin-button blue round"
-                @click="openAddNewAdminForm()"
-            >
-                +
-            </button>
-        </div>
-
-        <general-popup-container
-            v-if="showAddNewAdminForm"
-            :closeOnClickAway="false"
-            @close="closeAddNewAdminForm()"
-        >
-            <div class="popup-container">
-                <user-form-template 
-                    :userType="`institutionAdmin`"
-                    :includeVitals="true"
-                    :formProps="{
-                        buttonText: 'Create New Admin',
-                        bindedExts: ['confirms'],
-                        backgroundColor: 'yellow'
-                    }"
-                    @submitted="submitAdmin($event)"
-                />
-            </div>
-        </general-popup-container>
-
         <loading>
-            <div v-if="admins.length > 0" class="admin-container">
+            <div v-if="admins.length > 0 && showAdmins" class="admin-container">
                 <div 
                     v-for="(admin, index) in admins.filter(a => Object.keys(a).length > 0)" 
                     :key="index"
                 >
                     <collapsable-box
                         :headline="`${admin.firstName} ${admin.lastName}`"
-                        :tagDetails="[{
-                            words: `Last Active: ${_utils.dynamicDisplayDate(admin.lastLogin)}`,
-                            color: `goodNews`,
-                            symbol: `☀️`
-                        }]"
+                        :tagDetails="adminTag(admin)"
                     >
-                        <button class="red" @click="deleteAdmin(admin._id, index)">
-                            Delete {{ admin.firstName }} from System
+                        <button class="red" @click="deleteAdmin(admin, index)">
+                            {{ admin.confirmed ? 
+                                `Delete ${admin.firstName} from System` :
+                                `Reject ${admin.firstName} ${admin.lastName}'s Registration`
+                            }}
                         </button>
-                        <user-form-template 
-                            :userType="`institutionAdmin`"
-                            :formProps="{
-                                readOnly: true,
-                                basedOn: admin,
-                                backgroundColor: 'none',
-                                buttonText: 'Update'
-                            }"
-                        />
+                        <button 
+                            v-if="!admin.confirmed" 
+                            class="green"
+                            @click="confirmAdminRegistration(admin)"
+                        >
+                            Confirm {{ admin.firstName }} {{ admin.lastName }}'s Registration
+                        </button>
+                        <div v-if="admin.confirmed">
+                            <user-form-template
+                                :formProps="{
+                                    readOnly: true,
+                                    basedOn: admin,
+                                    backgroundColor: 'none',
+                                    buttonText: 'Update'
+                                }"
+                            />
+                        </div>
                     </collapsable-box>
                 </div>
             </div>
 
-            <div v-else>
-                <msg-with-pic 
-                    :msg="`You're currently the only administrator at this institution`"
-                    :gif="`twirlingPlane`"
-                />
-            </div>
+            <general-message
+                v-else
+                :message="`No admins have signed up to your institution yet`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
+            />
 
         </loading>
 
@@ -74,9 +52,8 @@
 <script>
 import collapsableBox from '@/components/general/collapsableBox.vue'
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
-import generalPopupContainer from '@/components/notifications/generalPopup.vue'
 
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
 
@@ -85,39 +62,57 @@ export default {
     components: {
         collapsableBox,
         loading,
-        msgWithPic,
+        generalMessage,
         userFormTemplate,
-        generalPopupContainer
     },
     data() {
         return {
             admins: [],
-            showAddNewAdminForm: false
+            showAdmins: true
         }
     },
     methods: {
-        openAddNewAdminForm() {
-            this.showAddNewAdminForm = true
-        },
         closeAddNewAdminForm() {
             this.showAddNewAdminForm = false
         },
-        async submitAdmin(newAdmin={}) {
-            const newlySavedAdmin = await this._api.institutionAdmins.createNewAdmin(newAdmin)
-            this.admins.push(newlySavedAdmin)
-            this.closeAddNewAdminForm()
-            this._utils.alert(`Make sure to let the administrator you created know their password as soon as possible! Other wise they won't be able to log in!`)
+        async confirmAdminRegistration(admin={}) {
+            const res = await this._api.institutionAdmins.confirmAdmin({ adminId: admin._id, confirmed: true })
+            if (!requestHelpers.dataWasDeleted(res)) {
+                return
+            }
+            const targetAdminIndex = this.admins.findIndex(a => a._id === admin._id)
+            this.admins[targetAdminIndex].confirmed = true
+            return this.rerenderView()
         },
-        async deleteAdmin(id, index) {
+        rerenderView() {
+            this.showAdmins = false
+            this.$nextTick(() => this.showAdmins = true)
+        },
+        async deleteAdmin(admin={}, index=0) {
             const confirm = await this._utils.confirm(`Do you really want to permenantly delete this administrator?`)
             if (confirm) {
-                const res = await this._api.institutionAdmins.deleteAdmin(id)
+                const res = await this._api.institutionAdmins.deleteAdmin({ authId: admin.authorizationId, adminId: admin._id })
                 if (requestHelpers.dataWasDeleted(res))
                     this.admins.splice(index, 1)
             }
         },
         async getOtherAdmins() {
-            this.admins = await this._api.institutionAdmins.getOtherAdmins()
+            this.admins = await this._api.institutionAdmins.getOtherAdmins({ active: true })
+        },
+        adminTag(admin={}) {
+            if (admin.confirmed) {
+                return [{
+                    words: `Last Active: ${this._utils.dynamicDisplayDate(admin.lastLogin)}`,
+                    color: `goodNews`,
+                    symbol: `☀️`
+                }] 
+            } else {
+                return [{
+                    words: `Registration Pending`,
+                    color: `important`,
+                    symbol: `⏳`
+                }] 
+            }
         }
     },
     created() {
@@ -170,7 +165,7 @@ button {
     padding-top: 10px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     .new-existing-divider {
         margin-top: 3vh;
         border-bottom: black solid 0.4vh;

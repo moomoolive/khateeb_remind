@@ -1,11 +1,22 @@
 <template>
     <div>
-        <msg-with-pic
-            v-if="isLoading || !externalFinishSignal"
-            :msg="`Loading...`"
-            :gif="`loading`"
-            :textColor="textColor"
-        />
+        <div 
+            v-if="isLoading || !externalFinishSignal" 
+            class="loading-container"
+        >
+            <div>
+                <img 
+                    src="~@/assets/gifs/loading.gif" 
+                    alt="loading animation"
+                    class="loading-animation"
+                >
+            </div>
+            <div class="loading-text">
+                <span :class="textColor">
+                    Loading...
+                </span>
+            </div>
+        </div>
         <div v-if="!isLoading && externalFinishSignal">
             <slot></slot>
         </div>
@@ -13,18 +24,17 @@
 </template>
 
 <script>
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import Config from '$config'
 
 export default {
     name: 'loading',
     components: {
-        msgWithPic
     },
     props: {
         loadingTime: {
             type: Number,
             required: false,
-            default: 700
+            default: Config.networkConfig.defaultIOLoadingTime
         },
         externalFinishSignal: {
             type: Boolean,
@@ -34,7 +44,7 @@ export default {
         textColor: {
             required: false,
             type: String,
-            default: 'default'
+            default: 'grey'
         }
     },
     data() {
@@ -47,3 +57,16 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.loading-text {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.loading-animation {
+    width: 65%;
+    max-width: 275px;
+    @include center-margin();
+}
+</style>

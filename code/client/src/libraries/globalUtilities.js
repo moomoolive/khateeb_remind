@@ -21,7 +21,7 @@ export default {
     },
     alert(msg, type="caution", options) {
         const info = {
-            icon: type === 'caution' ? "exclamation" : 'success',
+            icon: type === 'caution' ? "exclamation-triangle" : 'check',
             color: type === 'caution' ? "yellow" : 'green',
             ...options
         }

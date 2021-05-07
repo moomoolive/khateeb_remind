@@ -1,8 +1,13 @@
-@import './globalScss/colors.scss';
-@import './globalScss/animations.scss';
-@import './globalScss/boxShadows.scss';
-@import './globalScss/flexboxes.scss';
-@import './globalScss/border-radii.scss';
-@import './globalScss/margins.scss';
-@import './globalScss/consts.scss';
-@import './globalScss/elementStyles.scss';
+// constants
+@import './consts/_viewport.scss';
+
+// functions
+@import './functions/_colors.scss';
+
+// mixins
+@import './mixins/_colors.scss';
+@import './mixins/_animations.scss';
+@import './mixins/_box-shadows.scss';
+@import './mixins/_flexboxes.scss';
+@import './mixins/_border-radii.scss';
+@import './mixins/_margins.scss';

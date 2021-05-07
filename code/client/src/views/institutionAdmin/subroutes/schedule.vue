@@ -85,8 +85,9 @@ export default {
         },
         async createNewJummahPreference(newPreference={}) {
             const newJummahPreference = await this._api.jummahs.createNewJummahPreference(newPreference)
-            if (Object.keys(newJummahPreference).length > 0)
+            if (Object.keys(newJummahPreference).length > 0) {
                 this.jummahs.push(newJummahPreference)
+            }
         },
         async requestJummahs(jummahDateRange) {
             this.jummahs = await this._api.jummahs.getJummahs({ date: jummahDateRange })
@@ -154,19 +155,19 @@ export default {
     padding-top: 8px;
     padding-bottom: 8px;
     margin-bottom: 30px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 .viewing-mode-dropdown {
     width: 120px;
     height: 30px;
     font-size: 15px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     border: none;
     outline: none;
-    background-color: themeRGBA("grey", 1);
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
     border-radius: 4px;
 }
@@ -177,10 +178,10 @@ export default {
 }
 
 .extra-controls-container {
-    @include flexboxDefault(column);
+    @include flexbox-default(column);
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
     .to-locations-timings-button {
         width: 200px;

@@ -1,0 +1,28 @@
+h1 {
+    font-size: 30px;
+    color: get-color("off-white");
+}
+
+img {
+    width: 90%;
+    max-height: 500px;
+    
+}
+
+div {
+}
+
+p {
+    color: darken(get-color("purple"), 12%);
+    font-size: 17px;
+    text-align: left;
+}
+
+@media screen and (max-width: $phone-width) {
+    h1 {
+        font-size: 3.4vh;
+    }
+    p {
+        font-size: 2.4vh;
+    }
+}

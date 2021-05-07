@@ -1,21 +1,35 @@
 const mongoose = require('mongoose')
 const bcyrpt = require('bcrypt')
 
-const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
-const user = new mongoose.Schema({
-    institutionID: {
-        type: String,
+const authorization = new mongoose.Schema({
+    authId: {
+        type: mongoose.Types.ObjectId,
         required: true,
-        validate: {
-            validator: val => val === 'root' || val.length === $config.consts.mongooseIdLength,
-            message: "Invalid institution id"
-        }
+        ref: 'authorization'
     },
+    confirmed: {
+        type: Boolean,
+        required: false,
+        default: false
+    }
+}, { timestamps: true })
+
+const user = new mongoose.Schema({
     username: {
         type: String,
-        required: true,
+        // The username field should be required, but I have checks across the
+        // front end and backend to ensure that any new user must submit
+        // a username. I've left it false because when a user deletes their
+        // account I want the user to still be in the database, so that
+        // 'jummahPreferences' that included the user as a khateeb 
+        // will still be able to render correctly.
+        //
+        // So in order to free up the 'username' namespace in the database
+        // when a user is deleted this field is simply erased from their
+        // document.
+        required: false,
         unique: true,
         minLength: 6
     },
@@ -23,11 +37,6 @@ const user = new mongoose.Schema({
         type: String,
         default: 'password',
         minLength: 6
-    },
-    confirmed: {
-        type: Boolean,
-        required: false,
-        default: false
     },
     handle: {
         type: String,
@@ -67,6 +76,16 @@ const user = new mongoose.Schema({
             message: "incorrect email format"
         }
     },
+    title: {
+        type: String,
+        default: $config.consts.nullId,
+        minLength: 1
+    },
+    authorizations:{
+        type: [authorization],
+        required: false,
+        default: () => []
+    },
     settings: {
         // default external notification is email
         // but can be swapped out by replacing the externalNotifications
@@ -92,6 +111,11 @@ const user = new mongoose.Schema({
             required: false,
             default: false
         }
+    },
+    scheduleRestrictions: {
+        type: [{ type: mongoose.Types.ObjectId, ref: 'userScheduleRestriction' }],
+        required: false,
+        default: () => []
     }
 }, { timestamps: true })
 
@@ -99,6 +123,12 @@ user.blah = {
     type: Boolean,
     required: false,
     default: true
+}
+
+user.query.safelyFindOne = function(_id='none') {
+    if (!_id || _id.toLocaleLowerCase() === $config.consts.nullId)
+        throw TypeError('Please provide a valid khateeb id')
+    return this.where({ _id })
 }
 
 user.pre('save', function(next) {
@@ -121,7 +151,11 @@ user.pre('save', function(next) {
 
 user.post('save', async function(user, next) {
     try {
-        await notificationConstructors.WelcomeNotificationConstructor(user)
+        await new $db.notifications({
+            tag: 'welcome',
+            msg: `Asalam aliakoum ${user.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. If you ever need help take a look at the tutorials in your navigation!`,
+            userID: this._id
+        }).save()
         return next()
     } catch(err) {
         console.log(err)
@@ -158,10 +192,63 @@ user.methods.comparePassword = async function (submittedPassword) {
     }
 }
 
-user.methods.deleteNotifications = async function() {
-    const res = {}
+user.methods.deactivateAccount = async function () {
+    const dependants = await this.deleteDependencies()
+    const userRes = await this.setAccountToInactive()
+    return { userRes, dependants }
+}
+
+user.methods.setAccountToInactive = async function() {
+    let res = {}
     try {
-        res.notifications = await $db.notifications.deleteMany({ userID: this._id.toString() }) 
+        res = await $db.users.update(
+            { _id: this._id },
+            { 
+                active: false , 
+                scheduleRestrictions: [],
+                // remove username - refer to explanation in schema section
+                // above
+                $unset: { username: "" } 
+            }
+        )
+    } catch(err) {
+        console.error(err)
+    }
+    return res
+}
+
+user.methods.deleteDependencies = async function() {
+    const responses = {}
+    responses.notifications = await this.deleteNotifications()
+    responses.pwaSubscriptions = await this.deletePwaSubscriptions()
+    responses.scheduleRestrictions = await this.deleteScheduleRestrictions()
+    return responses
+}
+
+user.methods.deleteScheduleRestrictions = async function() {
+    let res = {}
+    try {
+        res = await $db.userScheduleRestrictions.deleteMany({ user: this._id }) 
+    } catch(err) {
+        console.log(err)
+    }
+    return res
+}
+
+user.methods.deletePwaSubscriptions = async function() {
+    let res = {}
+    try {
+        res = await $db.pwaSubscriptions.deleteMany({ userID: this._id }) 
+    } catch(err) {
+        console.log(err)
+    }
+    return res
+}
+
+user.methods.deleteNotifications = async function() {
+    let res = {}
+    try {
+        res = await $db.notifications.deleteMany({ userID: this._id }) 
     } catch(err) {
         console.log(err)
     }

@@ -7,7 +7,10 @@
                     
                     <div>
                         <button class="yellow" @click="showSearchTools = !showSearchTools">
-                            🔍 {{ showSearchTools ? 'Close' : 'Open' }} Search Tools
+                            <span class="grey">
+                                <fa-icon icon="search" /> 
+                                {{ showSearchTools ? 'Close' : 'Open' }} Search Tools
+                            </span>
                         </button>
                     </div>
                     
@@ -63,36 +66,6 @@
                     </div>
                 </div>
 
-                <div class="institution-signup-link-container ">
-                    <div class="copy-link-container">
-                        <div class="copy-link-header " @click="toggleKhateebLinkContainer()">
-                            <div>
-                                <img 
-                                    src="~@/assets/misc/rightArrow.png" 
-                                    :class="`dropdown-arrow ${showSignupLink ? 'showing': ''}`"
-                                    alt="dropdown arrow"
-                                >
-                            </div>
-                            <div>
-                                {{ $store.state.user.institution.abbreviatedName }} Khateeb Signup Link 
-                            </div>
-                        </div>
-                        <collapse-transition>
-                            <div v-show="showSignupLink">
-                                <button 
-                                    :class="`grey copy-link-button ${copiedLink ? 'copied' : ''}`"
-                                    @click="copyLink()"
-                                > 
-                                    📋 {{ copiedLink ? "Copied" : 'Copy' }}
-                                </button>
-                                <div>
-                                    <input type="text" class="copy-link-text" v-model="signupLink">
-                                </div>
-                            </div>
-                        </collapse-transition>
-                    </div>
-                </div>
-
                 <div v-if="showKhateebs" class="khateebs-container">
                     <div 
                         v-for="(khateeb, khateebNo) in filteredKhateebs"
@@ -105,26 +78,25 @@
                             :tagDetails="khateebTag(khateeb)"
                         >
                             <div>
-                                <button class="red" @click="deleteKhateeb(khateeb._id)">
+                                <button class="red" @click="deleteKhateeb(khateeb)">
                                     <p v-if="khateeb.confirmed">Delete {{ khateeb.firstName }} from System</p>
-                                    <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Application</p>
+                                    <p v-if="!khateeb.confirmed">Reject {{ khateeb.firstName }}'s Registration</p>
                                 </button>
                                 <button 
                                     v-if="!khateeb.confirmed" 
-                                    @click="editKhateeb({ _id: khateeb._id, confirmed: true })"
+                                    @click="confirmKhateebRegistration(khateeb._id)"
                                 >
-                                    <p>Confirm {{ khateeb.firstName }}'s Application</p>
+                                    <p>Confirm {{ khateeb.firstName }}'s Registration</p>
                                 </button>
                                 <user-form-template 
                                     v-if="khateeb.confirmed"
-                                    :userType="`khateeb`"
+                                    :khateebMode="true"
                                     :formProps="{
                                         basedOn: khateeb,
                                         buttonText: `Edit ${khateeb.firstName}'s Info`,
                                         backgroundColor: 'none',
                                         readOnly: true
                                     }"
-                                    @submitted="editKhateeb($event)"
                                 />
                             </div>
                         </collapsable-box>
@@ -133,10 +105,10 @@
                 </div>
             </div>
 
-            <msg-with-pic 
+            <general-message
                 v-else
-                :msg="`No khateebs have signed up to your institution yet`"
-                :gif="`twirlingPlane`"
+                :message="`No khateebs have signed up to your institution yet`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
             />
 
         </loading>
@@ -145,23 +117,20 @@
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import collapsableBox from '@/components/general/collapsableBox.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
 import userFormTemplate from '@/components/forms/templates/user.vue'
 
 import datetime from '@/libraries/dateTime/main.js'
 import requestHelpers from '@/libraries/requests/helperLib/main.js'
-
-import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
 export default {
     name: 'khateebs',
     components: {
         loading,
         collapsableBox,
-        msgWithPic,
         userFormTemplate,
-        CollapseTransition
+        generalMessage,
     },
     data() {
         return {
@@ -170,24 +139,12 @@ export default {
             timings: [],
             showKhateebs: true,
             showSearchTools: false,
-            query: {},
-            signupLink: `https://khateebs.com/create/khateebs?institutionID=${this.$store.state.user.institution._id}`,
-            copiedLink: false,
-            showSignupLink: false
+            query: {}
         }
     },
     methods: {
-        toggleKhateebLinkContainer() {
-            this.showSignupLink = !this.showSignupLink
-        },
         async getAllKhateebs() {
-            this.khateebs = await this._api.khateebs.getKhateebs()
-        },
-        copyLink() {
-            this.copiedLink = true
-            this.$copyText(this.signupLink)
-            const fiveSecondsInMilliseconds = 5_000
-            window.setTimeout(() => this.copiedLink = false, fiveSecondsInMilliseconds)
+            this.khateebs = await this._api.khateebs.getKhateebs({ active: true })
         },
         async getActiveLocationsAndTimings() {
             const [locations, timings] = await this._api.chainedRequests.getActiveLocationsAndTimings()
@@ -253,10 +210,14 @@ export default {
             else
                 return [{ words: `Last Active: ${this._utils.dynamicDisplayDate(khateeb.lastLogin)}`, color: 'goodNews', symbol: '☀️' }]
         },
-        async editKhateeb($event) {
-            const res = await this._api.khateebs.updateExistingKhateeb($event)
-            this.khateebs.splice(this.findKhateebIndex(res._id), 1, res)
-            this.rerenderView()
+        async confirmKhateebRegistration(khateebId="12345") {
+            const res = await this._api.khateebs.updateExistingKhateeb({ khateebId, confirmed: true })
+            if (!requestHelpers.dataWasDeleted(res)) {
+                return
+            }
+            const targetKhateeb = this.khateebs[this.findKhateebIndex(khateebId)]
+            targetKhateeb.confirmed = true
+            return this.rerenderView()
         },
         findKhateebIndex(id) {
             return this.khateebs.findIndex(khateeb => khateeb._id === id)
@@ -265,13 +226,13 @@ export default {
             this.showKhateebs = false
             this.$nextTick(() => { this.showKhateebs = true })
         },
-        async deleteKhateeb(id) {
+        async deleteKhateeb(khateeb={}) {
             const confirm = await this._utils.confirm(`Are you sure you want to permenantly delete this khateeb?`)
             if (!confirm)
                 return
-            const res = await this._api.khateebs.deleteKhateeb(id)
+            const res = await this._api.khateebs.deleteKhateeb({ authId: khateeb.authorizationId, khateebId: khateeb._id })
             if (requestHelpers.dataWasDeleted(res))
-                this.khateebs.splice(this.findKhateebIndex(id), 1)
+                this.khateebs.splice(this.findKhateebIndex(khateeb._id), 1)
         },
         khateebFilter(noFilterValue="any", valueKey="active", queryParams={}) {
             if (queryParams[valueKey] !== noFilterValue)
@@ -342,18 +303,11 @@ p {
     font-size: 16px;
 }
 
-button {
-    width: 80%;
-    height: 45px;
-    border-radius: 0;
-}
-
-
 .input-container {
-    @include flexboxDefault();
+    @include flexbox-default();
     width: 80%;
     max-width: 800px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 p {
@@ -371,10 +325,10 @@ select {
     outline: none;
     height: 40px;
     font-size: 15px;
-    color: getColor("offWhite");
-    background-color: themeRGBA("grey", 1);
+    color: get-color("off-white");
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
     margin-bottom: 20px;
 }
@@ -387,10 +341,10 @@ input {
     margin-left: 10px;
     margin-right: 10px;
     font-size: 15px;
-    color: getColor("offWhite");
-    background-color: themeRGBA("grey", 1);
+    color: get-color("off-white");
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
     margin-bottom: 20px;
 }
@@ -398,9 +352,12 @@ input {
 button {
     width: 80%;
     max-width: 300px;
-    height: 50px;
+    padding-bottom: 10px;
+    padding-top: 10px;
     font-size: 18px;
     margin-bottom: 20px;
+    border-radius: 0;
+    @include floating-box-shadow();
 }
 
 .search-tools {
@@ -427,29 +384,29 @@ button {
     padding-right: 10px;
     margin-bottom: 15px;
     margin-top: 15px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .copy-link-container {
     width: 190px;
-    background: getColor("silver");
+    background: get-color("silver");
     padding-left: 20px;
     padding-right: 20px;
     padding-top: 10px;
     padding-bottom: 10px;
-    @include normalBorderRounding();
-    @include floatingBoxShadow();
+    @include normal-border-rounding();
+    @include floating-box-shadow();
 }
 
 .copy-link-text {
     height: 40px;
     width: 150px;
     font-size: 15px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 
     &:focus {
-        color: getColor("green");
-        background: getColor("grey");
+        color: get-color("green");
+        background: get-color("grey");
         font-weight: bold;
     }
 }
@@ -457,7 +414,7 @@ button {
 .copy-link-header {
     font-size: 16px;
     font-weight: bold;
-    @include flexboxDefault();
+    @include flexbox-default();
 }
 
 .copy-link-button {
@@ -466,26 +423,22 @@ button {
     width: 90px;
     height: 40px;
     border-radius: 7px;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
     margin-bottom: 10px;
-    color: getColor("blue");
+    color: get-color("blue");
     font-weight: bold;
 
     &.copied {
-        color: getColor("green");
+        color: get-color("green");
     }
 }
 
 .dropdown-arrow {
-    height: 14px;
     margin-right: 10px;
-    &.showing {
-        transform: rotate(90deg);
-    }
 }
 
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       .khateebs-container {
             flex-direction: column;
         }

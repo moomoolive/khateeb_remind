@@ -1,0 +1,25 @@
+@use "sass:map";
+
+@import '~@/scss/consts/_colors.scss';
+@import '~@/scss/functions/_colors.scss';
+
+@mixin color($color) {
+    background-color: get-color($color);
+    &:hover{ border: 0.1vh solid get-color($color); }
+}
+
+@mixin all-colors($list: $themeColors) {
+    @each $colorName, $color in $list {
+        &.#{$colorName} { @include color($colorName); }
+    }
+}
+
+@mixin text-color($color) {
+    color: get-color($color);
+}
+
+@mixin all-text-colors($list: $themeColors) {
+    @each $colorName, $color in $list {
+        &.#{$colorName} { @include text-color($colorName); }
+    }
+}

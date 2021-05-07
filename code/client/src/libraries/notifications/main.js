@@ -14,14 +14,15 @@ const tutorial = (category, number, fromSystem=false) => {
     helpers.createNotification(info)
 }
 
-const unauthorizedMsg = () => {
+const unauthorizedMsg = (options={}) => {
     const info = {
         type: 'alert',
         options: {
             color: "red",
-            icon: "locked",
+            icon: "lock",
             msg: "Unauthorized",
-            origin: "server"
+            origin: "server",
+            ...options
         }
     }
     helpers.createNotification(info)
@@ -32,7 +33,7 @@ const generalServerError = () => {
         type: 'alert',
         options: {
             color: "yellow",
-            icon: "unknown",
+            icon: "question",
             msg: "Our servers aren't responding right now. Try again later!",
             textSize: "small",
             origin: "server"
@@ -46,7 +47,7 @@ const serverCaughtError = () => {
         type: 'alert',
         options: {
             color: "yellow",
-            icon: "clock-no-markings",
+            icon: "clock",
             msg: "There was an error that occured when contacting the server. Try again later!",
             textSize: "small",
         }

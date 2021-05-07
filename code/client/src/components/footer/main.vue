@@ -2,19 +2,34 @@
     <div class="footer-container">
         <div class="bottom-nav">
             
-            <div v-show="isLoggedIn" class="footer-links-section">
-                <div class="footer-links-section-header">
-                    Users
+            <collapse-transition :duration="600">
+                <div v-show="isLoggedIn" class="footer-links-section">
+                    <div class="footer-links-section-header">
+                        Users
+                    </div>
+                    <div class="footer-links-header-divide"></div>
+                    <a
+                        class="green"
+                        :href="feedbackURL" 
+                        target="_blank"
+                    >
+                        Feedback
+                    </a>
+                    <a 
+                        v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
+                        class="green"
+                        @click="$store.dispatch('user/downgradeUserAuthorization')"
+                    >
+                        Exit Institution
+                    </a>
+                    <a 
+                        class="green"
+                        @click="logout()"
+                    >
+                        Logout
+                    </a>
                 </div>
-                <div class="footer-links-header-divide"></div>
-                <a
-                    class="green"
-                    :href="feedbackURL" 
-                    target="_blank"
-                >
-                    Feedback
-                </a>
-            </div>
+            </collapse-transition>
 
             <div class="footer-links-section">
                 <div class="footer-links-section-header">
@@ -57,14 +72,10 @@
         </div>
 
         <div class="footer-logo" @click="_utils.toHomePage()">
-            <div>
-                <img 
-                    src="@/assets/logos/khateebRemindLogo.svg"
-                    class="khateeb-remind-logo" 
-                    alt="khateeb remind logo"
-                >
-            </div>
             <div class="khateeb-remind-name">
+                <span class="green bottom-logo">
+                    <fa-icon :icon="['far', 'paper-plane']" />
+                </span>
                 Khateeb Remind
             </div>
         </div>
@@ -74,8 +85,13 @@
 <script>
 import Config from '$config'
 
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+
 export default {
     name: 'Footer',
+    components: {
+        CollapseTransition
+    },
     data() {
         return {
             feedbackURL: Config.thirdPartyServicesConfig.feedbackFormURL
@@ -89,6 +105,12 @@ export default {
         toHomepage() {
             if (this.$router.currentRoute.fullPath !== '/')
                 return this.$router.push({ path: "/" })
+        },
+        async logout() {
+            const confirm = await this._utils.confirm(`Are you sure you want to logout?`)
+            if (!confirm)
+                return
+            this.$store.dispatch('user/logout')
         }
     },
     computed: {
@@ -101,8 +123,10 @@ export default {
 
 <style lang="scss" scoped>
 .footer-container {
-    background: getColor('grey');
+    background: get-color('grey');
     padding-bottom: 2px;
+    position: relative;
+    z-index: 1;
 }
 
 .bottom-nav {
@@ -121,24 +145,22 @@ a {
     position: relative;
     display: block;
     text-decoration: none;
-    color: getColor("silver");
+    color: get-color("silver");
     font-size: 12px;
-    margin-bottom: 5px;
+    margin-bottom: 9px;
     cursor: pointer;
     
     &:hover {
-        color: getColor("blue") !important;
+        color: get-color("blue") !important;
     }
     
     &.green {
-        color: getColor("green");
+        color: get-color("green");
     }
 }
 
-span {
-    &:hover {
-        color: getColor("blue") !important;
-    }
+.bottom-logo {
+    margin-right: 3px;
 }
 
 .footer-links-section {
@@ -150,7 +172,7 @@ span {
 
 .footer-links-section-header {
     font-size: 15px;
-    color: getColor("blue");
+    color: get-color("blue");
     font-weight: bold;
 }
 
@@ -159,7 +181,7 @@ span {
     width: 5em;
     margin-top: 2px;
     margin-bottom: 8px;
-    background: getColor("purple");
+    background: get-color("purple");
 }
 
 .khateeb-remind-logo {
@@ -169,25 +191,44 @@ span {
 
 .khateeb-remind-name {
     font-size: 11px;
-    color: getColor("offWhite");
+    color: get-color("off-white");
+
+    &:hover {
+        color: get-color("blue") !important;
+    }
 }
 
 .footer-logo {
-    @include flexboxDefault();
+    @include flexbox-default();
     margin-bottom: 10px;
     margin-left: auto;
     width: 118px;
     cursor: pointer;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     a {
-        font-size: 11px;
+        margin-bottom: 12px;
     }
 
     .footer-links-section-header {
         font-size: 13px;
         margin-right: 0px;
+    }
+
+    .footer-links-section {
+        margin-top: 0px;
+        padding-bottom: 15px;
+        margin-left: 20px;
+        margin-right: 40px;
+
+        &:first-child {
+            margin-top: 15px;
+        }
+
+        &:last-child {
+            padding-bottom: 0px;
+        }
     }
 
     .footer-links-section {
@@ -200,7 +241,7 @@ span {
         flex-direction: column;
         justify-content: center;
         padding-top: 7px;
-        padding-bottom: 30px;
+        padding-bottom: 0;
     }
 
     .footer-links-header-divide {

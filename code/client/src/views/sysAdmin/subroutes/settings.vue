@@ -4,36 +4,41 @@
             <div v-if="$store.state.user.userInfo.systemSettings && showForm">
                 <form-main
                     :structure="{
-                        autoConfirmRegistration: {
+                        autoConfirmInstitutionRegistration: {
+                            type: 'checkbox',
+                            required: true
+                        },
+                        autoConfirmUserRegistration: {
                             type: 'checkbox',
                             required: true
                         }
                     }"
                     :basedOn="$store.state.user.userInfo.systemSettings"
-                    :backgroundColor="`darkBlue`"
+                    :backgroundColor="`dark-blue`"
                     @submitted="saveRootSettings($event)"
                 />
             </div>
 
-            <msg-with-pic 
+            <general-message
                 v-else
-                :msg="`Couldn't retrieve institution settings`"
-                :gif="`twirlingPlane`"
+                :message="`Couldn't retrieve institution settings`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
             />
+
         </loading>
     </div>
 </template>
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import formMain from '@/components/forms/main.vue'
 
 export default {
     name: "rootInstitutionSettings",
     components: {
         loading,
-        msgWithPic,
+        generalMessage,
         formMain
     },
     data() {

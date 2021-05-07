@@ -11,7 +11,7 @@
             </span>
         </div>
         
-        <div class="institution-name">
+        <div v-if="!isLoggedInAsGenericUser" class="institution-name">
             <span class="purple">
                 {{ $store.state.user.institution.abbreviatedName }}
             </span>
@@ -90,13 +90,13 @@ export default {
     },
     computed: {
         userType() {
-            return this.$store.state.user.userInfo.__t
+            return this.$store.getters['user/type']
         },
         showInstitutionLogo() {
-            return this.imageSrc !== require('@/assets/logos/genericInstitution.png')
+            return this.imageSrc !== require('@/assets/logos/genericInstitution.png') && !this.isLoggedInAsGenericUser
         },
-        isLoggedIn() {
-            return this.$store.getters['user/isLoggedIn']
+        isLoggedInAsGenericUser() {
+            return this.$store.getters['user/isLoggedInAsGenericUser']
         }
     },
     watch: {
@@ -108,13 +108,13 @@ export default {
             else if (!newVal && oldVal)
                 this.firstOpened = false
         },
-        isLoggedIn(newVal, oldVal) {
-            if (newVal && !oldVal)
+        isLoggedInAsGenericUser(newVal, oldVal) {
+            if (!newVal && oldVal)
                 return this.fetchInstitutionLogo()
         }
     },
     mounted() {
-        if (this.$store.getters["user/isLoggedIn"]) {
+        if (!this.isLoggedInAsGenericUser) {
             this.$nextTick(() => this.fetchInstitutionLogo())
         }
     }
@@ -127,12 +127,12 @@ export default {
     padding-right: 25px;
     padding-bottom: 25px;
     padding-top: 25px;
-    @include floatingBoxShadow();
-    @include normalBorderRounding();
+    @include floating-box-shadow();
+    @include normal-border-rounding();
 }
 
 .buttons-container {
-    @include flexboxDefault(column);
+    @include flexbox-default(column);
 }
 
 .greeting {
@@ -140,7 +140,7 @@ export default {
     margin-bottom: 5px;
     text-align: left;
     font-weight: bold;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
 .handle {
@@ -152,8 +152,8 @@ export default {
 button {
     width: 130px;
     font-size: 16px;
-    @include floatingBoxShadow();
-    background: getColor("blue");
+    @include floating-box-shadow();
+    background: get-color("blue");
 }
 
 .institution-name {
@@ -176,10 +176,10 @@ button {
     height: 50px;
     width: 50px;
     border-radius: 50%;
-    border: getColor("blue") solid 2px;
+    border: get-color("blue") solid 2px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
     
 }
 

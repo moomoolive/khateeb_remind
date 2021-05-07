@@ -6,13 +6,22 @@ import './registerServiceWorker.js'
 
 import requests from '@/libraries/requests/index.js'
 import funcs from '@/libraries/globalUtilities.js'
+
 import VCalendar from 'v-calendar'
-import VueClipboard from 'vue-clipboard2'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import VuePageTransition from 'vue-page-transition'
+import resize from 'vue-element-resize-detector'
  
 import Config from '$config'
+import iconsList from './icon.config.js'
+library.add(...iconsList)
 
-Vue.use(VueClipboard)
 Vue.use(VCalendar)
+Vue.use(VuePageTransition)
+Vue.use(resize)
+
+Vue.component('fa-icon', FontAwesomeIcon)
 
 // all prototypes are prepended with '_'
 // I wanted to prepend with '$' instead, but vue generally uses that

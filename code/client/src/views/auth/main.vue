@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img :src="require('@/assets/logos/khateebRemindLogo.svg')">
+        <img :src="`${pathToPublicFolder}khateebRemind.png`">
         <div class="formContainer">
 
             <form-main
@@ -14,32 +14,24 @@
                     }
                 }"
                 :basedOn="{
-                    username: userCredentials.username,
+                    username: userCredentials,
                     password: ''
                 }"
                 :errorMsg="errorMsg"
                 :rerenderOnBasedOnUpdate="false"
                 :showInvalidationMsgs="false"
-                :backgroundColor="`darkBlue`"
+                :backgroundColor="`dark-blue`"
                 :buttonText="`Log In`"
                 :confirmBeforeSubmit="false"
                 :disableIfSameAsStart="false"
                 @submitted="login($event)"
+            />
+
+            <div
+                class="forgot-credentials-text " 
+                @click="forgotCredentials()"
             >
-                
-                <div class="remember-me">
-                    <div>
-                        <input type="checkbox" v-model="userCredentials.remember">
-                    </div>
-                    <div>
-                        <p>Remember Me</p>
-                    </div>
-                </div>
-
-            </form-main>
-
-            <div>
-                <a @click="forgotCredentials()">Forgot Username or Password?</a>
+                Forgot Username or Password?
             </div>
 
         </div>
@@ -60,54 +52,21 @@ export default {
     data() {
         return {
             errorMsg: '',
-            userCredentials: this.initialRememberMeValue()
+            userCredentials: this.getUserCredentials() ||  '',
+            userCredentialKey: "username",
+            pathToPublicFolder: process.env.BASE_URL
         }
     },
     methods: {
-        unconfirmedMsg(msg) {
-            this._utils.alert(msg, 'caution', { icon: 'locked' })
-        },
         async login(loginInfo={}) {
             const authRes = await this._api.auth.getToken(loginInfo)
-            if (!authRes.token && (authRes.msg === 'un-confirmed-khateeb' ||  authRes.msg === 'un-confirmed-institutionAdmin'))
-                this.unconfirmedMsg(`Your administrator hasn't confirmed your account yet. Try again later!`)
-            else if (!authRes.token && authRes.msg === 'un-confirmed-rootInstitutionAdmin')
-                this.unconfirmedMsg(`Khateeb Remind hasn't confirmed your institution yet. Try again later!`)
-            else if (authRes.token && authRes.msg === 'success') {
-                this.$store.dispatch('user/updateToken', authRes.token)
-                await this._api.user.checkIn()
-                this.$nextTick(() => this.toApp(authRes.token, loginInfo))
+            if (!authRes.token || authRes.msg !== 'success') {
+                return this.errorMsg = 'Incorrect Username or Password'
             }
-            else
-                this.errorMsg = 'Incorrect Username or Password'
-        },
-        loginRedirect() {
-            const landingPage = this.$store.state.router.landingPage
-            if (!this.$store.state.app.hasLoggedInViaLoginPage && landingPage !== this.$route.path) {
-                this.$router.push(landingPage)
-                this.$store.commit('app/loggedInViaLoginPage')
-            }
-            else
-                this._utils.toHomePage()
-        },
-        initialRememberMeValue() {
-            return {
-                remember: false,
-                username: ''
-            }
-        },
-        getUserCredentials() {
-            if (!localStorageHelpers.get('userCredentials'))
-                localStorageHelpers.commit('userCredentials', this.initialRememberMeValue())
-            this.userCredentials = localStorageHelpers.get('userCredentials')
-        },
-        toApp(token="edafjlfsdfaj.alfdkjaklsf.aldfajlfda", { username="moomoo" }) {
-            if (this.userCredentials.remember) {
-                localStorage.setItem('token', token)
-                this.userCredentials.username = username
-                localStorageHelpers.commit('userCredentials', this.userCredentials)
-            }
-            this.$nextTick(() => { this.loginRedirect() })
+            this.$store.dispatch('user/updateToken', authRes.token)
+            this.setUserCredentials(loginInfo.username)
+            this._api.user.getNotifications()
+            return this._utils.toHomePage()
         },
         forgotCredentials() {
             notificationHelpers.redirectionOptions(
@@ -116,25 +75,21 @@ export default {
                     { text: 'Password Recovery', to: '/forgot/password' }
                 ]
             )
-        }
-    },
-    computed: {
-        rememberMe() {
-            return this.userCredentials.remember
-        }
-    },
-    watch: {
-        rememberMe(newVal, OldVal) {
-            if (!newVal && OldVal) {
-                this.userCredentials.username = ''
-                localStorageHelpers.commit('userCredentials', this.initialRememberMeValue())
-            }
+        },
+        setUserCredentials(username="moomoo") {
+            return localStorageHelpers.commit(this.userCredentialKey, username)
+        },
+        getUserCredentials() {
+            // I honestly have no idea why using 'this.userCredentialKey'
+            // doesn't find the target key in localstorage
+            // it always returns null - so for now this will work
+            return localStorageHelpers.get('username')
         }
     },
     created() {
-        if (this.$store.getters['user/isLoggedIn'])
+        if (this.$store.getters['user/isLoggedIn']) {
             this._utils.toHomePage()
-        this.getUserCredentials()
+        }
     }
 }
 </script>
@@ -153,41 +108,26 @@ input {
     margin-right: 6px;
 }
 
-.remember-me {
-    margin-top: 5px;
-    font-size: 15px;
-    font-weight: bold;
-    @include flexboxDefault();
-    width: 40%;
-    @include centerMargin();
-}
-
 p {
     margin-top: 0;
-    color: getColor("offWhite");
+    color: get-color("off-white");
 }
 
-a {
+.forgot-credentials-text {
     position: relative;
     top: 50px;
     font-size: 19px;
-    text-decoration: underline;
     font-weight: bold;
-    cursor: default;
+    cursor: pointer;
+
+    &:hover {
+        color: get-color("dark-blue");
+    }
 }
 
-@media screen and (max-width: $phoneWidth) {
-      
-      .remember-me {
-        font-size: 1.8vh;
-      }
+@media screen and (max-width: $phone-width) {
 
-      input {
-          width: 2vh;
-          height: 2vh;
-      }
-
-      a {
+    .forgot-credentials-text  {
         font-size: 15px;
     }
 }

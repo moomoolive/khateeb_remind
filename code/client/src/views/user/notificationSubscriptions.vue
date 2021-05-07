@@ -56,11 +56,19 @@
                                     </span>
                                 </div>
                                 
+                                <span :class="browserLogo(subscription.browserBrand).color">
+                                    <fa-icon 
+                                        :icon="browserLogo(subscription.browserBrand).icon"
+                                        class="browser-logo" 
+                                    />
+                                </span>
+                                <!--
                                 <img 
                                     :src="require(`@/assets/logos/${browserLogo(subscription.browserBrand)}`)" 
                                     class="browser-logo"
                                     alt="internet browser logo"
                                 >
+                                -->
 
                                 <div v-if="subscription.deviceId === deviceId" class="current-device">
                                     Current Device
@@ -102,13 +110,17 @@
                     </div>
                     
                     <div class="no-sub-container" v-else>
-                        <msg-with-pic 
-                            :msg="`No Devices Recieving Push Messages`"
-                            :gif="`twirlingPlane`"
+                        
+                        <general-message
+                            class="no-notifications-msg"
+                            :message="`No Devices Recieving Push Messages`"
+                            iconColor="yellow"
+                            :fontAwesomeIcon="['fas', 'bell']"
                         />
+
                         <div class="no-notifications-text">
                             Either your browser doesn't support web push notifications 
-                            or you've restricted Khateeb Remind's notification permissions. 
+                            or you've restricted Khateeb Remind's notification permissions. <br><br>
                             If you still want push notifications, try manually allowing Khateeb Remind 
                             to send notification through your browser settings.
                         </div>
@@ -123,7 +135,7 @@
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 import sliderButton from '@/components/misc/sliderButton.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
@@ -134,7 +146,7 @@ export default {
     name: "notificationSubscriptions",
     components: {
         loading,
-        msgWithPic,
+        generalMessage,
         CollapseTransition,
         sliderButton
     },
@@ -164,15 +176,15 @@ export default {
         },
         browserLogo(name="Chrome mobile") {
             if (/chrome|google/gi.test(name))
-                return 'chrome.png'
+                return { icon: ['fab', 'chrome'], color: 'green' }
             else if (/firefox|mozilla/gi.test(name))
-                return 'firefox.png'
-            else if (/safari|apple/gi.test(name))
-                return 'safari.png'
+                return { icon: ['fab', 'firefox-browser'], color: 'dark-red' }
             else if (/edge|microsoft/gi.test(name))
-                return 'edge.png'
+                return { icon: ['fab', 'edge-legacy'], color: 'blue' }
+            else if (/safari|apple/gi.test(name))
+                return { icon: ['fab', 'safari'], color: 'blue' }
             else
-                return 'genericBrowser.png'
+                return { icon: ['fas', 'globe'], color: 'orange' }
         },
         async toggleSetting(newVal=true, key="recievePWAPush") {
             const update = { }
@@ -199,9 +211,10 @@ export default {
 
 <style lang="scss" scoped>
 .no-notifications-text {
+    margin-top: 30px;
     width: 80%;
     max-width: 1000px;
-    font-size: 15px;
+    font-size: 16px;
     margin-bottom: 20px;
     margin-left: auto;
     margin-right: auto;
@@ -211,14 +224,12 @@ export default {
     margin-top: 20px;
     width: 80%;
     max-width: 650px;
-    @include lightBorderRounding();
-    @include floatingBoxShadow();
-    background: getColor("silver");
+    @include light-border-rounding();
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 9px;
     padding-right: 9px;
-    @include centerMargin();
+    @include center-margin();
 }
 
 .slider-container {
@@ -236,30 +247,29 @@ export default {
 }
 
 .permissions-header {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 22px;
     margin-bottom: 20px;
 }
 
 .option-container {
     width: 100%;
-    background: getColor("offWhite");
+    background: get-color("off-white");
     padding-top: 5px;
     padding-bottom: 5px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 
     &:first-child {
         border-top-left-radius: 7px;
         border-top-right-radius: 7px;
         border-top: none;
-        border-bottom: 1px themeRGBA('grey', 0.5) solid;
+        border-bottom: 1px get-color('grey', 0.5) solid;
     }
 
     &:last-child {
-        border-top: 1px themeRGBA('grey', 0.5) solid;
+        border-top: 1px get-color('grey', 0.5) solid;
         border-bottom: none;
     }
 
@@ -287,7 +297,7 @@ export default {
     margin-left: auto;
     margin-right: auto;
     margin-top: 30px;
-    background: getColor('silver');
+    background: get-color('silver');
     padding-bottom: 20px;
     margin-bottom: 20px;
     border-radius: 7px;
@@ -295,12 +305,16 @@ export default {
 }
 
 .browser-logo {
-    width: 60%;
-    margin-bottom: 30px;
+    font-size: 120px;
+    margin-bottom: 40px;
+}
+
+.no-notifications-msg {
+    margin-top: 30px;
 }
 
 .device-number {
-    background: getColor('offWhite');
+    background: get-color('off-white');
     height: 40px;
     margin-bottom: 20px;
     font-size: 17px;
@@ -341,14 +355,14 @@ export default {
     margin-left: auto;
     margin-right: auto;
     font-weight: bold;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    background: getColor("green");
+    background: get-color("green");
     &.purple {
-        background: getColor("purple");
+        background: get-color("purple");
     }
     &.red {
-        background: getColor("red");
+        background: get-color("red");
     }
 }
 
@@ -359,7 +373,7 @@ export default {
     font-weight: bold;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .subscriptions-container {
         flex-direction: column;

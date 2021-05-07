@@ -3,7 +3,7 @@
         
         <div>
             <button 
-                class="add-new-announcement-button round blue"
+                class="add-new-announcement-button round dark-blue"
                 @click="openAddNewAnnouncementForm()"
             >
                 +
@@ -146,7 +146,7 @@ export default {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
       
     
 }

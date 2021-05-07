@@ -7,9 +7,16 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "pwa": "cross-env VUE_APP_PWA=1 vue-cli-service build --dest pwa_test --report-json && serve pwa_test -l 1240"
+    "build:pwa-test": "cross-env VUE_APP_PWA=1 vue-cli-service build --dest pwa_test --report-json",
+    "serve:pwa": "lite-server --baseDir=\"pwa_test\" -c lite-server.config.json",
+    "pwa": "npm run build:pwa-test && npm run serve:pwa"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-brands-svg-icons": "^5.15.3",
+    "@fortawesome/free-regular-svg-icons": "^5.15.3",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/vue-fontawesome": "^2.0.2",
     "@ivanv/vue-collapse-transition": "^1.0.0",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
@@ -20,7 +27,8 @@
     "v-calendar": "^2.2.3",
     "vue": "^2.6.11",
     "vue-clickaway": "^2.2.2",
-    "vue-clipboard2": "^0.3.1",
+    "vue-element-resize-detector": "^1.0.6",
+    "vue-page-transition": "^0.2.2",
     "vue-pwa-install": "^1.1.0",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"
@@ -38,9 +46,9 @@
     "cross-env": "^7.0.3",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "lite-server": "^2.6.1",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
-    "serve": "^11.3.2",
     "vue-template-compiler": "^2.6.11"
   }
 }

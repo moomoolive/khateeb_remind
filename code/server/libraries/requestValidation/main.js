@@ -6,6 +6,15 @@ const validIdOrNullIdInField = (val="none") => {
     return true
 }
 
+const validInstitutionId = (val="root") => {
+    if (val !== 'root' && val.length !== $config.consts.mongooseIdLength) {
+        throw TypeError(`Invalid institution id`)
+    } else {
+        return true
+    }
+}
+
 module.exports = {
-    validIdOrNullIdInField
+    validIdOrNullIdInField,
+    validInstitutionId
 }

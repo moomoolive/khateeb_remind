@@ -14,5 +14,13 @@ export default [
         meta: {
             auth: { min: 1 }
         }
+    },
+    {
+        path: '/authorizations',
+        name: 'userAuthorizations',
+        component: () => import('@/views/user/authorizations.vue'),
+        meta: {
+            auth: { level: 1 }
+        }
     }
 ]

@@ -96,15 +96,15 @@ span {
     margin-right: auto;
     margin-top: 10px;
     margin-bottom: 10px;
-    @include floatingBoxShadow(0.3);
+    @include floating-box-shadow(0.3);
     &.after {
-        background: getColor("red");
+        background: get-color("red");
     }
     &.current {
-        background: getColor("grey");
+        background: get-color("grey");
     }
     &.before {
-        background: getColor("green");
+        background: get-color("green");
     }
 }
 

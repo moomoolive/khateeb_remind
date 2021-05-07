@@ -2,8 +2,8 @@ const express = require('express')
 const validator = require('express-validator')
 
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
+const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 
-const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
@@ -11,32 +11,38 @@ const router = express.Router()
 
 router.post(
     '/create/institution',
+    authMiddleware.authenticate({ min: 1 }),
     validationMiddleware.validateRequest(
         [
-            validator.body("institution.name").isLength({ min: 1 }).isString(),
-            validator.body("institution.abbreviatedName").isLength({ min: 1 }).isString(),
-            validator.body("institution.timezone").isLength({ min: 1 }).isString(),
-            validator.body("institution.country").isLength({ min: 1 }).isString(),
-            validator.body("institution.state").isLength({ min: 1 }).isString().optional(),
-            validator.body("institutionAdmin.password").isLength({ min: 6 }).isString(),
-            validator.body("institutionAdmin.username").isLength({ min: 6 }).isString(),
-            validator.body("institutionAdmin.handle").isLength({ min: 1 }).isString(),
-            validator.body("institutionAdmin.firstName").isLength({ min: 1 }).isString(),
-            validator.body("institutionAdmin.lastName").isLength({ min: 1 }).isString(),
-            validator.body("institutionAdmin.email").isEmail()
+            validator.body("name").isLength({ min: 1 }).isString(),
+            validator.body("abbreviatedName").isLength({ min: 1 }).isString(),
+            validator.body("timezone").isLength({ min: 1 }).isString(),
+            validator.body("country").isLength({ min: 1 }).isString(),
+            validator.body("state").isLength({ min: 1 }).isString().optional(),
         ]
     ), 
     async (req, res) => {
     try {
-        if (req.body.institution.name === 'test')
+        if (req.body.name === 'test')
             return res.json({ msg: `You cannot name your institution 'test'. Pick another name please.`, code: 2 })
         const rootUser = await $db.root.findOne({}).exec()
-        const autoConfirm = rootUser.systemSettings.autoConfirmRegistration 
-        const institutionEntry = await new $db.institutions({ ...req.body.institution, confirmed: autoConfirm }).save()
-        const rootInstitutionAdminEntry = await institutionEntry.createRootAdministrator(req.body.institutionAdmin, autoConfirm)
+        const autoConfirm = rootUser.systemSettings.autoConfirmInstitutionRegistration 
+        const institutionEntry = await new $db.institutions({ ...req.body, confirmed: autoConfirm }).save()
+        const institutionAuthorizations = await $db.authorizations.find({ institution: institutionEntry._id.toString() }).exec()
+        await $db.users.update(
+            { _id: req.headers.userid },
+            { 
+                $push: { 
+                    authorizations: { 
+                        authId: institutionAuthorizations.find(a => a.role === 'rootInstitutionAdmin')._id.toString(), 
+                        confirmed: autoConfirm
+                    } 
+                } 
+            }
+        )
         return res.json({ 
             code: 0, 
-            msg: `Alhamdillah! ${institutionEntry.name} was created, with ${rootInstitutionAdminEntry.firstName} ${rootInstitutionAdminEntry.lastName} as it's administrator (username: ${rootInstitutionAdminEntry.username}).${ autoConfirm ? '' : ' Please wait a day or two for Khateeb Remind to confirm your institution before logging in.' }`
+            msg: `Alhamdillah! ${institutionEntry.name} was created.${ autoConfirm ? ' You can now start setting schedules.' : ' Please wait a day or two for Khateeb Remind to confirm your institution before logging in.' }`
         })
     } catch(err) {
         console.error(err)
@@ -47,10 +53,9 @@ router.post(
 
 
 router.post(
-    '/create/khateeb',
+    '/create/user',
     validationMiddleware.validateRequest(
         [
-            validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
             validator.body("password").isLength({ min: 6 }).isString(),
             validator.body("username").isLength({ min: 6 }).isString(),
             validator.body("handle").isLength({ min: 1 }).isString(),
@@ -62,18 +67,15 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const instituion = await $db.institutions.findOne({ _id: req.body.institutionID }).exec()
-            if (!instituion)
-                return res.status(422).json({ msg: `That institution doesn't exist!`, code: 2 })
-            if (instituion.settings.autoConfirmRegistration)
-                req.body.confirmed = true
-            const khateebEntry = await new $db.khateebs(req.body).save()
-            const note = new notificationConstructors.KhateebSignupNotificationConstructor(khateebEntry, instituion.settings.autoConfirmRegistration)
-            await note.setRecipentsToAdmins(req.body.institutionID)
-            await note.create()
+            const root = await $db.root.findOne({}).exec()
+            if (!root)
+                return res.status(422).json({ msg: `An error occured`, code: 2 })
+            if (!root.systemSettings.autoConfirmUserRegistration)
+                return res.json({ msg: `Unfortunately user registration is currently offline`, code: 3 })
+            const userEntry = await new $db.users(req.body).save()
             return res.json({ 
                 code: 0, 
-                msg: `Asalam alaikoum ${khateebEntry.firstName}, your account has been created (username: ${khateebEntry.username}).${instituion.settings.autoConfirmRegistration ? '' : ' Please wait a day or two for the institution administrator to confirm your account.'}`
+                msg: `Asalam alaikoum ${userEntry.firstName}, your account has been created (username: ${userEntry.username}). Please login to start using Khateeb Remind.`
             })
     } catch(err) {
         console.error(err)
@@ -91,26 +93,23 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const user = await $db.users.findOne({ username: req.body.username }).select(["-__v"]).exec()
+            const user = await $db.users
+                .findOne({ username: req.body.username, active: true })
+                .select(["-__v"])
+                .exec()
             if (!user)
                 return res.status(401).json({  msg: 'unauthorized', token: null })
             validPassword = await user.comparePassword(req.body.password)
             if (!validPassword)
                 return res.status(401).json({  msg: 'unauthorized', token: null })
-            else if (!user.confirmed && user.__t !== 'root')
-                return res.json({ msg: `un-confirmed-${user.__t}`, token: null })
-            else
-                return res.json({ 
-                    msg: 'success', 
-                    token: authHelpers.createToken({ 
-                        _id: user._id, 
-                        __t: user.__t, 
-                        institutionID: user.institutionID  
-                    })
-                })
+            const tokenInfo = { _id: user._id, __t: 'user' }
+            if (user.__t) {
+                tokenInfo.specialStatus = user.__t
+            }
+            return res.json({ msg: 'success', token: authHelpers.createToken(tokenInfo) })
         } catch(err) {
-            console.log(err)
-            return res.status(503).json({ msg: `There was an issue encountered during sign`, token: null })
+            console.error(err)
+            return res.status(503).json({ msg: `There was an issue encountered during authentication ${err}`, token: null })
         }
 })
 
@@ -189,5 +188,69 @@ router.put(
             return res.status(503).json({ msg: `Couldn't verify code`, code: 1, err })
         }
 })
+
+router.post(
+    '/delegate-permissions',
+    authMiddleware.authenticate({ level: 4 }),
+    validationMiddleware.validateRequest(
+        [
+            validator.body("targetUserId").isLength($config.consts.mongooseIdLength).isString(),
+        ]
+    ),
+    async (req, res) => {
+        try {
+            console.log(req.body)
+            const [targetUser] = await $db.users
+                .find({ _id: req.body.targetUserId })
+                .populate("authorizations.authId")
+                .exec()
+            const isUserInRequestingInstitution = targetUser.authorizations.find(a =>{
+                return a.confirmed && a.authId.institution.toString() === req.headers.institutionid
+            })
+            if (!targetUser || !isUserInRequestingInstitution)
+                return res.status(403).json({ code: 2, msg: `Cannot add permissions to user` })
+            const institutionAuthorizations = await $db.authorizations
+                .find({ institution: req.headers.institutionid })
+                .exec()
+            const rootInstitutionAdminAuthorization = institutionAuthorizations.find(a => a.role === 'rootInstitutionAdmin')
+            const institutionAdminAuthorization = institutionAuthorizations.find(a => a.role === 'institutionAdmin')
+            const newRootAdmin = await $db.users.bulkWrite([
+                {
+                    updateOne: {
+                        filter: { _id: req.body.targetUserId },
+                        update: {
+                            $push: {
+                                authorizations: { authId: rootInstitutionAdminAuthorization._id, confirmed: true }
+                            },
+                        }
+                    }
+                },
+                {
+                    updateOne: {
+                        filter: { _id: req.body.targetUserId },
+                        update: {
+                            // remove institutionAdmin permissions in case they have them
+                            $pull: {
+                                authorizations: { authId: institutionAdminAuthorization._id }
+                            }
+                        }
+                    }
+                },
+            ])
+            const delegatingUser = await $db.users.update(
+                { _id: req.headers.userid },
+                {
+                    $pull: {
+                        authorizations: { authId: rootInstitutionAdminAuthorization._id }
+                    }
+                }
+            )
+            return res.json({ code: 0, msg: `Permissions successfully delegated`, newRootAdmin, delegatingUser })
+        } catch(err) {
+            console.error(err)
+            return res.status(503).json({ code: 1, msg: `An error occured when delgating authorization ${err}` })
+        }
+    }
+)
 
 module.exports = router

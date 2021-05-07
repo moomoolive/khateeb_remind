@@ -3,8 +3,8 @@ const helpers = require('./helpers.js')
 
 class KhateebSignupNotificationConstructor extends NotificationConstructor {
     
-    constructor(khateeb, autoConfirm) {
-        super({}, 'khateebs', { msgInfo: khateeb, urgent: true })
+    constructor(khateeb={}, autoConfirm=false, institutionID="1234") {
+        super({}, 'khateebs', { msgInfo: khateeb, urgent: true, institutionID })
         this.autoConfirm = autoConfirm
     }
     

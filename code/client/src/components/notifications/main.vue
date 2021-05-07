@@ -70,7 +70,7 @@ export default {
     margin-bottom: 0;
     max-height: 40px;
     height: 35px;
-    background-color: darken(getColor("silver"), 7%);
+    background-color: darken(get-color("silver"), 7%);
 }
 
 .close-notification-container {
@@ -85,23 +85,23 @@ export default {
 }
 
 .green-background {
-        background: themeRGBA("green", 0.88);
+        background: get-color("green", 0.88);
 }
 
 .red-background {
-        background: themeRGBA("red", 0.88);
+        background: get-color("red", 0.88);
 }
 
 .yellow-background {
-        background: themeRGBA("yellow", 0.88);
+        background: get-color("yellow", 0.88);
 }
 
 .blue-background {
-    background: themeRGBA("blue", 0.88);
+    background: get-color("blue", 0.88);
 }
 
 .grey-background {
-    background: themeRGBA("grey", 0.88)
+    background: get-color("grey", 0.88)
 }
 
 span {

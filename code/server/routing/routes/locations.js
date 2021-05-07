@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.get(
     '/',
-    authMiddleware.authenticate({ min: 1, max: 3 }),
+    authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
             const data = await $db.locations.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
@@ -23,7 +23,7 @@ router.get(
 
 router.post(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     postRequestMiddleware.appendUserInfoToBody("institutionID"),
     validationMiddleware.validateRequest([
         validator.body("institutionID").isLength($config.consts.mongooseIdLength).isString(),
@@ -44,7 +44,7 @@ router.post(
 
 router.put(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
         validator.body("_id").isLength($config.consts.mongooseIdLength).isString(),
         validator.body("name").isLength({ min: 1 }).isString().optional(),
@@ -64,7 +64,7 @@ router.put(
 
 router.delete(
     '/',
-    authMiddleware.authenticate({ min: 2, max: 3 }),
+    authMiddleware.authenticate({ min: 3, max: 4 }),
     validationMiddleware.validateRequest([
         validator.query("_id").isLength($config.consts.mongooseIdLength).isString()
     ], "query"),

@@ -4,17 +4,16 @@
             :outboundLinks="outboundLinks"
             :baseLink="`sysAdmin`"
         />
-        <transition
-            name="fade"
-            mode="out-in"
-        >
+        <vue-page-transition :name="routerConfig.animationName">
             <router-view></router-view>
-        </transition>
+        </vue-page-transition>
     </div>
 </template>
 
 <script>
 import centralNav from '@/components/misc/centralNav.vue'
+
+import Config from '$config'
 
 export default {
     name: 'sysAdminDashboard',
@@ -23,6 +22,7 @@ export default {
     },
     data() {
         return {
+            routerConfig: Config.routerConfig,
             outboundLinks: [
                 {
                     name: "Institutions",

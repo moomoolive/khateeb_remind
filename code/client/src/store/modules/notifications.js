@@ -16,7 +16,7 @@ export default {
         fromServer: [],
     }),
     mutations: {
-        stashServerNotifications(state, { notifications }) {
+        stashServerNotifications(state, notifications) {
             state.fromServer = notifications
         },
         display(state, { type, options }) {

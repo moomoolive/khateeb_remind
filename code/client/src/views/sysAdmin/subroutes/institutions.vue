@@ -60,25 +60,26 @@
                     </div>
                 </div>
             </div>
-
-            <msg-with-pic 
+            
+            <general-message
                 v-else
-                :msg="`Couldn't retrieve institutions`"
-                :gif="`twirlingPlane`"
+                :message="`Couldn't retrieve institutions`"
+                :fontAwesomeIcon="['far', 'paper-plane']"
             />
+
         </loading>
     </div>
 </template>
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
-import msgWithPic from '@/components/general/msgWithPic.vue'
+import generalMessage from '@/components/misc/generalMessage.vue'
 
 export default {
     name: "sysAdminInstitutionViewer",
     components: {
         loading,
-        msgWithPic
+        generalMessage
     },
     data() {
         return {
@@ -111,10 +112,10 @@ export default {
     padding-right: 10px;
     max-width: 500px;
     text-align: left;
-    color: getColor("offWhite");
-    @include normalBorderRounding();
-    @include centerMargin();
-    @include floatingBoxShadow();
+    color: get-color("off-white");
+    @include normal-border-rounding();
+    @include center-margin();
+    @include floating-box-shadow();
     margin-top: 30px;
 }
 
@@ -139,7 +140,7 @@ export default {
     font-size: 1.15em;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
 
     .institution-container {
         font-size: 14px;

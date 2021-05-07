@@ -1,15 +1,39 @@
 const mongoose = require('mongoose')
 
-const subDocs = require($rootDir + "/database/subDocuments/main.js")
-
-const pwaSubscription = new mongoose.Schema({
-    institutionID: {
+const individualPWASubscription = new mongoose.Schema({
+    deviceId: {
         type: String,
         required: true,
         minLength: $config.consts.mongooseIdLength,
-        maxLength: $config.consts.mongooseIdLength,
-        ref: 'institution'
+        maxLength: $config.consts.mongooseIdLength
     },
+    browserSubscriptionDetails: {
+        type: Object,
+        required: true
+    },
+    deviceType: {
+        type: String,
+        required: true,
+        minLength: 1
+    },
+    deviceBrand: {
+        type: String,
+        required: true,
+        minLength: 1
+    },
+    browserBrand: {
+        type: String,
+        required: true,
+        minLength: 1
+    },
+    active: {
+        type: Boolean,
+        required: false,
+        default: true
+    }
+}, { timestamps: true, _id: false })
+
+const pwaSubscription = new mongoose.Schema({
     userID: {
         type: String,
         required: true,
@@ -18,7 +42,7 @@ const pwaSubscription = new mongoose.Schema({
         ref: 'user'
     },
     subscriptions: {
-        type: [subDocs.individualPWASubscription],
+        type: [individualPWASubscription],
         required: false,
         default: () => []
     },

@@ -170,7 +170,7 @@
 
             <div>
                 <button 
-                    class="add-location-btn blue"
+                    class="add-location-btn dark-blue"
                     @click="addNewLocation()"
                 >
                     +
@@ -374,7 +374,7 @@ export default {
 }
 
 p {
-    color: getColor("offWhite");
+    color: get-color("off-white");
     font-size: 19px;
     font-weight: bold;
     margin-top: 15px;
@@ -391,13 +391,13 @@ input {
     height: 5vh;
     max-height: 55px;
     width: 80%;
-    color: getColor("offWhite");
+    color: get-color("off-white");
     margin-right: auto;
     margin-left: auto;
     font-size: 17px;
-    background-color: themeRGBA("grey", 1);
+    background-color: get-color("grey", 1);
     &:focus {
-        background-color: themeRGBA("grey", 0.5);
+        background-color: get-color("grey", 0.5);
     }
     position: relative;
     z-index: 0;
@@ -411,7 +411,7 @@ input {
     margin-left: auto;
     margin-right: auto;
     max-width: 500px;
-    background: getColor("blue");
+    background: get-color("blue");
     border-radius: 7px;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -451,7 +451,7 @@ button {
 }
 
 .default-khateebs-input-text {
-    color: getColor("purple");
+    color: get-color("purple");
     font-size: 16px;
     margin-bottom: 3px;
 }
@@ -465,12 +465,12 @@ button {
     border: none;
     outline: none;
     border-radius: 4px;
-    background: getColor("silver");
-    color: getColor("purple");
+    background: get-color("silver");
+    color: get-color("purple");
 }
 
 .default-khateebs-week-text {
-    color: getColor("offWhite");
+    color: get-color("off-white");
     font-size: 18px;
     text-align: left;
     width: 80%;
@@ -480,7 +480,7 @@ button {
 }
 
 .default-week-open-indicator {
-    color: getColor("blue");
+    color: get-color("blue");
 }
 
 .timing-btns {
@@ -489,7 +489,7 @@ button {
     &.extra-margin {
         margin-top: 15px;
     }
-    @include floatingBoxShadow();
+    @include floating-box-shadow();
 }
 
 .add-location-btn {
@@ -507,7 +507,7 @@ button {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
-@media screen and (max-width: $phoneWidth) {
+@media screen and (max-width: $phone-width) {
      p {
          font-size: 17px;
      }
