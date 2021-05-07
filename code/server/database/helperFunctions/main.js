@@ -42,7 +42,7 @@ const getKhateebs = (institutionId="1234", khateebAuthorization="1234", query={}
         // being a khateeb at this institution
         {
             $match: { 
-                "authorizations.info.institution": institutionId,
+                "authorizations.info.institution": mongoose.Types.ObjectId(institutionId),
                 "authorizations.info.role": "khateeb"
             }
         },

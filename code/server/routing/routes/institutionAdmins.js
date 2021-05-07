@@ -1,5 +1,6 @@
 const express = require('express')
 const validator = require('express-validator')
+const mongoose = require('mongoose')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
@@ -39,7 +40,7 @@ router.get(
                 // being an institutionAdmin at this institution
                 {
                     $match: { 
-                        "authorizations.info.institution": req.headers.institutionid,
+                        "authorizations.info.institution": mongoose.Types.ObjectId(req.headers.institutionid),
                         "authorizations.info.role": "institutionAdmin"
                     }
                 },

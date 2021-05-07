@@ -9,8 +9,8 @@
                         <button class="yellow" @click="showSearchTools = !showSearchTools">
                             <span class="grey">
                                 <fa-icon icon="search" /> 
+                                {{ showSearchTools ? 'Close' : 'Open' }} Search Tools
                             </span>
-                            {{ showSearchTools ? 'Close' : 'Open' }} Search Tools
                         </button>
                     </div>
                     
