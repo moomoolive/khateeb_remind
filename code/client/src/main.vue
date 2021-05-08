@@ -17,49 +17,51 @@
 
     </div>
 
-    <div class="app-container">
+    <div class="app-container-wrapper">
+      <div class="app-container">
 
-    <!-- navigation and header -->
-      <div class="header">
+      <!-- navigation and header -->
+        <div class="header">
 
-        <collapse-transition>
-          <website-banner v-show="$store.state.websiteBanner.show" />
+          <collapse-transition>
+            <website-banner v-show="$store.state.websiteBanner.show" />
+          </collapse-transition>
+
+          <header-navigation />
+
+        </div>
+
+        <!-- main router (displayed page) -->
+        <div :class="`main-content-background`">
+
+          <default-app-background />
+
+          <vue-page-transition :name="routerConfig.animationName">
+            <router-view 
+              :class="`displayed-page page-padding`"
+            />
+          </vue-page-transition>
+
+        </div>
+
+        <!-- app runtimes -->
+        <request-manager />
+
+        <notifications-manager 
+          @toggle-notification-display="toggleNotificationDisplay()" 
+        />
+
+        <!-- footer popup messages -->
+        <collapse-transition :duration="600">
+            <footer-popup
+              v-show="$store.state.footerPopup.show"
+              class="footer-popup" 
+            />
         </collapse-transition>
 
-        <header-navigation />
+        <Footer />
 
       </div>
-
-      <!-- main router (displayed page) -->
-      <div :class="`main-content-background`">
-
-        <default-app-background />
-
-        <vue-page-transition :name="routerConfig.animationName">
-          <router-view 
-            :class="`displayed-page page-padding`"
-          />
-        </vue-page-transition>
-
-      </div>
-
-      <!-- app runtimes -->
-      <request-manager />
-
-      <notifications-manager 
-        @toggle-notification-display="toggleNotificationDisplay()" 
-      />
-
-      <!-- footer popup messages -->
-      <collapse-transition :duration="600">
-          <footer-popup
-            v-show="$store.state.footerPopup.show"
-            class="footer-popup" 
-          />
-      </collapse-transition>
-
-      <Footer />
-
     </div>
   </div>
 </template>
@@ -213,7 +215,7 @@ export default {
     position: relative;
     z-index: 0;
     margin: auto;
-    min-height: 710px;
+    min-height: 76vh;
 }
 
 .page-padding {
@@ -268,6 +270,12 @@ export default {
   @include floating-box-shadow(0.4);
 }
 
+.app-container-wrapper {
+  background: get-color('grey');
+  max-width: 1400px;
+  @include center-margin();
+}
+
 @media screen and (max-width: $phone-width) {
       .page-padding {
         padding-bottom: 5%;
@@ -283,7 +291,7 @@ export default {
 }
 
 @media screen and (max-width: 300px) {
-      .app-container {
+      #app {
         overflow-x: scroll;
       }
 }
