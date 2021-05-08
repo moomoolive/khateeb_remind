@@ -213,7 +213,7 @@ export default {
     position: relative;
     z-index: 0;
     margin: auto;
-    min-height: 76vh;
+    min-height: 710px;
 }
 
 .page-padding {
