@@ -70,6 +70,7 @@ input {
     border-radius: 4px;
     height: 3vh;
     max-height: 30px;
+    min-height: 23px;
     font-size: 1.5vh;
     color: get-color("off-white");
     background-color: get-color("grey", 1);

@@ -90,6 +90,7 @@ select {
     outline: none;
     height: 4vh;
     max-height: 40px;
+    min-height: 30px;
     font-size: 1.5vh;
     color: get-color("off-white");
     background-color: get-color("grey", 1);

@@ -1,6 +1,7 @@
 <template>
     <div>
         <img :src="`${pathToPublicFolder}khateebRemind.png`">
+
         <div class="formContainer">
 
             <form-main
@@ -99,6 +100,7 @@ export default {
 img {
     width: 5vh;
     max-width: 50px;
+    min-width: 35px;
     margin-top: 30px;
 }
 

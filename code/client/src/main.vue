@@ -273,6 +273,19 @@ export default {
         padding-bottom: 5%;
         padding-top: 13% !important;
       }
+
+      .displayed-page {
+          position: relative;
+          z-index: 0;
+          margin: auto;
+          min-height: 550px;
+      }
+}
+
+@media screen and (max-width: 300px) {
+      .app-container {
+        overflow-x: scroll;
+      }
 }
 
 @media screen and (min-width: $maxAppWidth) {
