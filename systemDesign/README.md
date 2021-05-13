@@ -1,12 +1,29 @@
 # Khateeb Remind System Design Document
 
+# Purpose
+
+The purpose of this document is to explain the systen design of Khateeb Remind and some reasons for many of the design desicions. It should aid anyone wanting to replicate the app or contribute to the project in understanding the project on a deeper level.
+
 ## Table of Contents
 
 * [Project Stack](#project-stack)
+* [Notes on Project Structure](#notes-on-project-structure)
+* [Authorization Across the App](#authorization-across-the-app)
+* [Reasons for using Vue](#reasons-for-using-vue)
+* [Web App Routing](#web-app-routing)
+* [Client Side 'Runtimes'](#client-side-runtimes)
+* [Client Side Issues](#client-side-issues)
+* [Client Side Configurations](#client-side-configurations)
+* [Reasons for Using Node](#reasons-for-using-node)
+* [Server Side Controllers](#server-side-controllers)
+* [About Database and Schemas](#about-database-and-schemas)
+* [The Nefarious Notification Loop](#the-nefarious-notification-loop)
+* [About Notifications and Third Party Services](#about-notifications-and-third-party-services)
+* [Server Side Configurations](#server-side-configurations)
+* [Server Initialization](#server-initialization)
+* [Dev-Ops Suggestions](#dev-ops-suggestions)
+* [Closing Notes](#closing-notes)
 
-## Purpose
-
-The purpose of this document is to explain the systen design of Khateeb Remind and some reasons for many of the design desicions. It should aid anyone wanting to replicate the app or contribute to the project in understanding the project on a deeper level.
 
 # Project Stack
 
@@ -42,3 +59,83 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 #### Development Tools
 * Nodemon - hot reload of server
 * Jest - testing framework
+
+
+# Notes on Project Structure
+
+todo
+
+
+# Authorization Across the App
+
+todo
+
+
+# Reasons for using Vue
+
+todo
+
+
+# Web App Routing
+
+todo
+
+
+# Client Side Runtimes
+
+todo
+
+
+# Client Side Issues
+
+todo
+
+
+# Client Side Configurations
+
+todo
+
+
+# Reasons for Using Node
+
+todo
+
+
+# Server Side Controllers
+
+todo
+
+
+# About Database and Schemas
+
+todo
+
+
+# The Nefarious Notification Loop
+
+todo
+
+
+# About Notifications and Third Party Services
+
+todo
+
+
+# Server Side Configurations
+
+todo
+
+
+# Server Initialization
+
+todo
+
+
+# Dev Ops Suggestions
+
+todo
+
+
+# Closing Notes
+
+todo
