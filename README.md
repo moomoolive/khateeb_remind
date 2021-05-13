@@ -34,3 +34,4 @@ May Allah make this a long-lasting and beneficial project. Ameen.
 ### Credits and Licenses
 * A special thanks to the University of Calgary MSA's previous khateeb managers for their valuable input on this project. In particular, Jazakum Allah khair to Mohamed Ghanduri who helped extensively test the app and provided an incredible amount of useful feedback.
 * Khateeb Remind logo, navigation icons, and most other icons are provided by Font-Awesome under [license](https://fontawesome.com/license/free).                               
+* A big thank you to all the authors of the npm packages this project is using on both the client and server side.
