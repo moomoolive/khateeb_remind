@@ -1,10 +1,14 @@
 # Khateeb Remind System Design Document
 
+## Table of Contents
+
+* [Project Stack](#project-stack)
+
 ## Purpose
 
 The purpose of this document is to explain the systen design of Khateeb Remind and some reasons for many of the design desicions. It should aid anyone wanting to replicate the app or contribute to the project in understanding the project on a deeper level.
 
-## The Stack Used
+# Project Stack
 
 ### Client (Frontend) - Javascript
 * Vuejs - javascript framework
