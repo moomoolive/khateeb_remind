@@ -12,6 +12,7 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 * [Reasons for using Vue](#reasons-for-using-vue)
 * [Web App Routing](#web-app-routing)
 * [Client Side 'Runtimes'](#client-side-runtimes)
+* [Progressive Web App Testing](#progressive-web-app-testing)
 * [Client Side Issues](#client-side-issues)
 * [Client Side Configurations](#client-side-configurations)
 * [Reasons for Using Node](#reasons-for-using-node)
@@ -82,6 +83,11 @@ todo
 
 
 # Client Side Runtimes
+
+todo
+
+
+# Progressive Web App Testing
 
 todo
 
