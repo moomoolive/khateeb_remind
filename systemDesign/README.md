@@ -64,8 +64,49 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 
 # Notes on Project Structure
 
-todo
+#### Libraries
+All custom client and server libraries are found in the "libraries" folder at the root folder of each respective project. In general, each library will include two files:
 
+* main.js  
+* helpers.js 
+
+The "main.js" file repersents the library's public interface which is meant to be used. The "helpers.js" repersents the libraries private interface and backend implementations, which are NOT intended to be used, but serve only as implementation details for the public interface.
+
+There a few libraries that stray from this rule, such as the "requests" client library. Usually these libraries will be compilation of sub-libraries which follow the convention mentioned above or will be a single file will are meant to be a public interface such as the "globalUtilities.js" client and server libraries.
+
+Also on the server side there is a "middleware" folder, which essentially is a library, but I felt as if the distinction was helpful for distinguishing between general libraries and one's that are only used as API middleware.
+
+#### App and Server Entry points
+The client entry point is found in the src folder and is name "App.js", while the entrypoint Vue instance is called "Main.vue".
+
+The server entry point is called "Server.js" and is found in the root folder of the server.
+
+### Config Files
+As a general rule all configuration files are found in the root folder of each project. The only exception to this is the "icon.config.js" client configuration file which is found in the src folder of the client.
+
+On the client side the "App.config.js" file found in the root folder is simply a compilation of neccessary environmental variables and configurations that are specific to the Khateeb Remind client. The "globalConfig" object is globally imported across the entire web-app via Vue prototyping.
+
+On the server side the "Server.config.js" file found in the root folder servers the same purpose as "App.config.js" on the client. For obvious reasons the environmental variables for the server side are not included in this public repository, but you can recreate the .env file for both production and development by finding all the "process.env" references in the "Server.config.js" file.
+
+
+#### Global Variables and Functions
+Each project has it's own global variables and functions. Any global configurations are found in either "App.config.js" or "Server.config.js" depending on the project. Any other global variables are found in the entry point for each respective app. 
+
+Global variables are prepended by _ in the client app. This convention was chosen to avoid namespace conflicts with Vue's reserved properties which are prepend with "$". Variables are:
+
+* \_api: all api requests
+* \_utils: useful utility functions
+* \_config: global app configurations 
+
+On the server side global variables are prepended by "$", and are attached to the global Node object. Variables are:
+
+* $rootDir: absolute path to the project's root directory
+* $config: global server configurations
+* $utils: useful utility functions
+* $db: a reference to a list of all database models
+
+#### NPM scripts
+The README files at the root of the client and server provide brief explantions of the npm scripts for each respective project.
 
 # Authorization Across the App
 
