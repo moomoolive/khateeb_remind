@@ -112,11 +112,6 @@ On the server side global variables are prepended by "$", and are attached to th
 ## NPM scripts
 The README files at the root of the client and server provide brief explantions of the npm scripts for each respective project.
 
-## A note on Programming Paradigmn
-This entire project is written an object-oriented way (with the occasional use of the functional paradigmn) - which isn't special because most software is written as such. I point this out only to mention that unfortunately due to poor planning and inconsistency, some of the project creates objects using ES6 classes while other parts use factory-functions. 
-
-Both approaches are valid ways of creating objects and both have their merits and vices but it definitely would have been better to just pick one and stick with it - as it can be confusing sometimes when working with both methods.
-
 # Environmental Variables
 
 ## Client
@@ -222,7 +217,33 @@ todo
 
 # Client Side Configurations
 
-todo
+All these configurations are found in the *"App.config.js"* file found in the root folder of the client. All configurations are immutable and can only be changed by directly editing the file.
+
+## Network - Everything related to Ajax calls and IO
+* serverURL: an alias for [VUE_APP_API_SERVER_URL environmental variable](#environmental-variables)
+* offlineModeRequestCountThreshold: a casted-to-number version of [VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT environmental variable](#environmental-variables)
+* pwaTestingServerURL: a url to the server endpoint to be used during PWA testing
+* defaultIOLoadingTime: a casted-to-number version of [VUE_APP_DEFAULT_IO_LOADING_TIME environmental variable](#environmental-variables)
+* defaultAuthIOLoadingTime: a casted-to-number version of [VUE_APP_DEFAULT_AUTH_IO_LOADING_TIME environmental variable](#environmental-variables)
+
+## Security - All matters related to client side security
+* vapidPublicKey - a copy of the public vapid key produced by the server, same value as [VAPID_PUBLIC_KEY environmental variable](#environmental-variables). This is not an alias for that value though, as this must be inputted manually at the present time.
+
+## Third Party Services
+* feedbackFormURL - a url to external feedback form for Khateeb Remind
+
+## User Restrictions - any client side restrictions the web-app artifically puts on users
+* notificationLoopMaxRunCountPerWeek: an alias for [VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_FOR_WEEK environmental variable](#environmental-variables)
+* notificationLoopMaxRunCountPerJummah: an alias for [VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_INDIVIDAUL_JUMMAH environmental variable](#environmental-variables)
+
+## Global - configurations that are imported into every Vue instance
+* nullId - the canonical value for a null id, usually when used when foreign key reference is empty
+
+## Router - all settings related to the Vue-router
+* animationName - the page transition animation choosen for the web app. For all other options check out the [vue-page-transition package](https://www.npmjs.com/package/vue-page-transition)
+
+## PWA - configurations related to the progressive web functionality
+* reloadDelayAfterNewServiceWorkerDetected - delay in seconds before reload is initated when new service worker is detected. Essentially the reload allows for the new service worker to take control of the webpage and thereby add any new content to the website code.
 
 
 # Reasons for Using Node
@@ -252,7 +273,7 @@ todo
 
 # Server Side Configurations
 
-todo
+All these configurations are found in the *"Server.config.js"* file found in the root folder of the client. All configurations are immutable and can only be changed by directly editing the file.
 
 
 # Server Initialization
