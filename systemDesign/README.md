@@ -42,7 +42,6 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 ### Development Tools
 * Serve - a javascript library for running webservers (used for testing PWA)
 * ESLint - a linting tool
-* Jest - testing framework
 * VueCLI - managing webpack, dev server, etc.
 
 ## Server (Backend) - Javascript
@@ -59,8 +58,11 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 
 ### Development Tools
 * Nodemon - hot reload of server
-* Jest - testing framework
 
+## Testing
+* Unit-testing: Jest
+* Integration-testing: Jest
+* End-to-End: Cypress
 
 # Notes on Project Structure
 
