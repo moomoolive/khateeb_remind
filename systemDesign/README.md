@@ -275,6 +275,38 @@ todo
 
 All these configurations are found in the *"Server.config.js"* file found in the root folder of the client. All configurations are immutable and can only be changed by directly editing the file.
 
+## Global - configurations accessible from all files
+* rootInstitution - this is a sort of fake institution reserved for the [special user types](#authorization-across-the-app) so that the web-application can treat them exactly like normal users.
+* cron.timezone - the timezone all cron jobs are referenced against if the timezone options is set to true.
+* consts.* - these are variables that used across the server for consistency
+* customHeaders.* - headers that are not part of the HTTP request spec and are specific to Khateeb Remind.
+* notifications.automatedNotificationSignature - signature of any message that is sent by Khateeb Remind.
+
+## Database
+* mongoose.* - options for the MongoDB ODM mongoose - khateeb remind's chosen MongoDB middleware
+* URI - the URI to database, where it's hosted locally or on another machine
+
+## Initialization
+All explanation is provided in the [section below](#server-initialization)
+
+## Security - all configurations related to Khateeb Remind Security
+* jwtSecret - an alias for [JWT_SECRET environmental variable](#environmental-variables)
+* thirdPartyServices.AWSAuthCredentials.region - an alias for [AWS_HOSTING_REGION environmental variable](#environmental-variables)
+* thirdPartyServices.AWSAuthCredentials.credentials.secretAccessKey - an alias for [AWS_S3_ACCESS_KEY environmental variable](#environmental-variables)
+* thirdPartyServices.AWSAuthCredentials.credentials.accessKeyId - an alias for [accessKeyId environmental variable](#environmental-variables)
+* vapid.subject - an alias for [VAPID_SUBJECT_FIELD environmental variable](#environmental-variables)
+* vapid.publicKey - an alias for [VAPID_PUBLIC_KEY environmental variable](#environmental-variables)
+* vapid.privateKey - an alias for [VAPID_PRIVATE_KEY environmental variable](#environmental-variables)
+
+## Third Party Services
+* AWS.email - an alias for [AWS_SES_EMAIL environmental variable](#environmental-variables)
+* AWS.cloudStorageBucketName - an alias for [AWS_S3_BUCKET_NAME environmental variable](#environmental-variables)
+* AWS.cloudSubDirectories.* - where all cloud storage folders are specified
+
+## Network - All configurations related to incoming requests from client
+* port - which TCP port is the server listening on
+* maxJSONSize - maximum size a request can be (default metric is in megabytes)
+
 
 # Server Initialization
 
