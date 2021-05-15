@@ -155,7 +155,8 @@ The client and server use the same authorization system to give access to resour
 | \*System Administrator | 5 | Someone who helps adminster the entire Khateeb Remind System |
 | \*Root System Administrator | 6 | The user with the highest authentication across the whole system; has unrestricted permissions |
 
-* Special user type - any user who holds this authorization can only hold this authorization and will NOT be allowed to hold any other authorization.
+\* Special user type - any user who holds this authorization can only hold this authorization and will NOT be allowed to hold any other authorization.
+
 ** A specialized authorization key is just a key that indicates whether the current user is logged in as special user or logged into an institution. Any user can hold multiple specialized authorization keys (unless they are a special user) and before they want enter into any institution they are considered a "generic" user who cannot view any information related to institutions.
 
 ## Authorization Method
