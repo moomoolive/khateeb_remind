@@ -316,8 +316,8 @@ todo
 
 # Dev Ops Suggestions
 
-todo
-
+![khateeb remind backend archiecture](khateebRemindBackend.png)
+Since the docker image is already ready to go, it's recommended that you just use the docker file at the root of the server to build an image. Then host the image on a virtual machine and put infront of it a reverse-proxy of some kind - which serves traffic over https. It is highly-recommended for the server to be served over secure traffic because the client needs to be served over secure traffic - to function properly (due to service worker). If you intend to use insecure protocols (such as http) to fulfill server requests be aware that the client must also use an insecure protocol or all ajaz calls will be blocked by most browsers.
 
 # Closing Notes
 
