@@ -34,12 +34,12 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
   * Vuex - for state management
   * Vue PWA Plugin - useful library for creating PWAs with vue
 
-## Build Tools
+### Build Tools
 * Webpack - module bundler
 * SASS - CSS preprocessor
 * Babel - javascript transpiler
 
-## Development Tools
+### Development Tools
 * Serve - a javascript library for running webservers (used for testing PWA)
 * ESLint - a linting tool
 * Jest - testing framework
@@ -49,15 +49,15 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 * Expressjs - a node server framework
 * Docker - for containerization
 
-## Database
+### Database
 * MongoDB - a NoSQL database
 * Mongoose - a mongoDB middleware for node
 
-## Software Development Kits (SDKs)
+### Software Development Kits (SDKs)
 * Amazon Web Services (AWS) client s3 - a library for uploading files to the cloud
 * AWS client SES - a library for sending emails
 
-## Development Tools
+### Development Tools
 * Nodemon - hot reload of server
 * Jest - testing framework
 
@@ -108,10 +108,54 @@ On the server side global variables are prepended by "$", and are attached to th
 ## NPM scripts
 The README files at the root of the client and server provide brief explantions of the npm scripts for each respective project.
 
+## A note on Programming Paradigmn
+This entire project is written an object-oriented way (with the occasional use of the functional paradigmn) - which isn't special because most software is written as such. I point this out only to mention that unfortunately due to poor planning and inconsistency, some of the project creates objects using ES6 classes while other parts use factory-functions. 
+
+Both approaches are valid ways of creating objects and both have their merits and vices but it definitely would have been better to just pick one and stick with it - as it can be confusing sometimes when working with both methods.
+
 # Authorization Across the App
 
-todo
+The client and server use the same authorization system to give access to resources. User types are mapped to an authorization level (integer).
 
+| User Type  | Authorization Level | User Description |
+| ------------- | ------------- | ------------|
+| User Not Logged In | 0 | This user can be someone who has just landed on the website for the first time or a user who hasn't logged in yet |
+| \*\*User Logged In Without a Specialized Authoization Key  | 1 | User who has an account and is logged in but isn't currently carrying the authorization key for any particular institution or role |
+| Khateeb | 2 | Someone who gives Friday Khutbahs (sermons) |
+| Institution Administrator | 3 | Someone who helps schedule khateebs at an institution |
+| Root Institution Administrator | 4 | The leader (aka user with highest authority) of an institution; has unrestricted permissions |
+| \*System Administrator | 5 | Someone who helps adminster the entire Khateeb Remind System |
+| \*Root System Administrator | 6 | The user with the highest authentication across the whole system; has unrestricted permissions |
+
+* Special user type - any user who holds this authorization can only hold this authorization and will NOT be allowed to hold any other authorization.
+** A specialized authorization key is just a key that indicates whether the current user is logged in as special user or logged into an institution. Any user can hold multiple specialized authorization keys (unless they are a special user) and before they want enter into any institution they are considered a "generic" user who cannot view any information related to institutions.
+
+## Authorization Method
+Khateeb Remind uses JWTs (json web tokens) to verify user identity. JWTs can hold up to 6 properties in the payload (implying that every JWT payload is an object), with only two attributes being mandatory:
+
+* \_id: the user's identification hast
+* __t: the user's type
+* institutionID (optional): which institution are they logged into
+* authId (optional): if logged into institution, what is their authorization reference (read more about this in the [schemas section](#about-database-and-schemas))
+* SpecialStatus (optional): is the user as special user type
+* specialInstitution (optional): reserved for special user type
+
+Authorization is required to be in the request header in order to access API resources. JWT Token from last login is automatically stored in local storage on the client-side.
+
+## On Header Mutations
+If you look into the source code, you'll find that once a user is authenticated and their token deemed acceptable, a middleware then mutates (by appending) the incoming request header to include information about the incoming user based on the above mentioned JWT attributes. If JWT's attribute isn't present the header is either not included or recorded as undefined. Information includes: 
+
+* institutionid --> JWT.institutionID or undefined
+* userid: usertype --> JWT.__t
+* targetusermodel --> derived from JWT.__t
+* specialStatus --> JWT.specialStatus or not included at all
+* specialInstitution --> JWT.specialInstitution or "default"
+* authLevel --> derived from JWT.__t
+
+## Client-side Authorization
+The client-side app doesn't do any REAL authentication but relies on the server to do so for it. This posses no obvious security threat (as far as I can see, but I might be wrong) because the user cannot access any information without first requesting from the server. If the server returns a 401 (unauthorized) or 403 (forbidden) status code, the app will then either direct the user back to a page they have authorization to see and alert them that they are unauthorized to view the page they are on.
+
+It is important to note that if a user tries to access a view (webpage) that requires a higher authorization level than their JWT claims they have the web-app will take preventative measures and not allow the user to direct to that pages. Unfortunately becauase the client app always assumes that the JWT has not been forged, a user *could* theortically forge their own JWT and add a higher level of authorization to the payload - which would allow them to see views that require higher authorization. But again the server would ideally detect something like this and the view wouldn't recieve any information from the server. 
 
 # Reasons for using Vue
 
