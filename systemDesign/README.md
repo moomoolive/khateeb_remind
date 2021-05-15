@@ -231,4 +231,8 @@ todo
 
 # Closing Notes
 
-todo
+## Some Limitations and Regrets
+* Using some kind of statically-typed language on the server-side would have been very useful. Although this would have slowed down development speed slightly, it would have lead to better documentation and type saftey at runtime. Typescript or another language entirely, such as Rust, Go, C## etc would have been viable options.
+* Using both ES6 Classes and Factory functions to initalize JavaScript objects, made the code a little confusing to follow and could have been avoided by choosing one method and sticking with it.
+* Using an SQL or graph database would have probably been a better fit for Khateeb Remind instead of mongoDB. As the whole project started to grow in size the data only became more relation-oriented, which definintely in NOT the strength of Mongo in terms of performance or database interaction. Although MongoDB has an interface equivalent to SQL's "JOIN" (not exactly but close enough), it is neither as performant, intutive, or as well-documented as the SQL alternative.
+
