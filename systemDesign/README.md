@@ -316,7 +316,12 @@ todo
 
 # Dev Ops Suggestions
 
+![khateeb remind frontend archiecture](khateebRemindFrontend.png)
+
+Because the Khateeb Remind Client App is a PWA it is required to served over a secure protocol (https) in order to function properly. It's also important to note that the server that is meant to serve the client app to requesting browsers must be configured to fallback to the file "index.html". This because the Vue-router is meant to handle routing but cannot do so unless all requests for static files are ultimately directed to the the Vue-app entry point.
+
 ![khateeb remind backend archiecture](khateebRemindBackend.png)
+
 Since the docker image is already ready to go, it's recommended that you just use the docker file at the root of the server to build an image. Then host the image on a virtual machine and put infront of it a reverse-proxy of some kind - which serves traffic over https. It is highly-recommended for the server to be served over secure traffic because the client needs to be served over secure traffic - to function properly (due to service worker). If you intend to use insecure protocols (such as http) to fulfill server requests be aware that the client must also use an insecure protocol or all ajaz calls will be blocked by most browsers.
 
 # Closing Notes
