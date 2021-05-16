@@ -158,11 +158,11 @@ export default {
 .topnav {
   background-color: get-color("grey", 0.5);
   height: 5vh;
-  min-height: 40px;
+  min-height: 43px;
   max-height: 50px;
   width: 100vw;
   overflow: visible;
-  min-width: $minimum-app-width;
+  min-width: 190px;
 }
 
 .logo {
@@ -268,10 +268,6 @@ export default {
 
       .no-wifi {
         left: 45px;
-      }
-
-      .signup-buttons-container {
-        margin-right: 0px;
       }
 
 }

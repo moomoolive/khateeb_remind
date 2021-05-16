@@ -44,29 +44,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.hompage-background {
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-    background-size: cover;
-}
-
-.main-image {
-    width: 100vw;
-    min-width: 450px;
-}
-
-a {
-    text-decoration: none;
-}
-
-.image-container {
-    max-height: 1000px;
-    overflow-y: hidden;
-    position: relative;
-    z-index: 1;
-    max-height: 1550px;
-}
-
 .content-layer {
     width: 90vw;
     @include center-margin();

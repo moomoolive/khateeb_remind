@@ -127,6 +127,7 @@ export default {
     padding-bottom: 2px;
     position: relative;
     z-index: 1;
+    min-height: 12.08vh;
 }
 
 .bottom-nav {

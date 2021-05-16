@@ -90,7 +90,8 @@ select {
     outline: none;
     height: 4vh;
     max-height: 40px;
-    font-size: 1.5vh;
+    min-height: 33px;
+    font-size: 17px;
     color: get-color("off-white");
     background-color: get-color("grey", 1);
     &:focus {

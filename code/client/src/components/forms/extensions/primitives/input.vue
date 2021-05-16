@@ -70,7 +70,8 @@ input {
     border-radius: 4px;
     height: 3vh;
     max-height: 30px;
-    font-size: 1.5vh;
+    min-height: 27px;
+    font-size: 17px;
     color: get-color("off-white");
     background-color: get-color("grey", 1);
     &:focus {

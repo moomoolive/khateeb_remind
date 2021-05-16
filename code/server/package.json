@@ -8,7 +8,11 @@
     "dev": "nodemon Server.js",
     "server": "node Server.js",
     "test:unit": "jest",
-    "test:int": "jest"
+    "test:int": "jest",
+    "docker:remove-old": "docker rm kr -f && docker image prune -f",
+    "docker:create-test-container": "docker image build . -t khateeb-remind-test && docker create -p 80:80 --name kr khateeb-remind-test:latest",
+    "docker:run-test-container": "docker container start kr -a",
+    "docker:test": "npm run docker:remove-old && npm run docker:create-test-container && npm run docker:run-test-container"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",

@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     
+    <!-- the cool green streak on wide display -->
     <div class="big-app-background"></div>
 
     <!-- popup notifications -->
@@ -17,49 +18,52 @@
 
     </div>
 
-    <div class="app-container">
+    <!-- the actual app -->
+    <div class="app-container-wrapper">
+      <div class="app-container">
 
-    <!-- navigation and header -->
-      <div class="header">
+      <!-- navigation and header -->
+        <div class="header">
 
-        <collapse-transition>
-          <website-banner v-show="$store.state.websiteBanner.show" />
+          <collapse-transition>
+            <website-banner v-show="$store.state.websiteBanner.show" />
+          </collapse-transition>
+
+          <header-navigation />
+
+        </div>
+
+        <!-- main router (displayed page) -->
+        <div :class="`main-content-background`">
+
+          <default-app-background />
+
+          <vue-page-transition :name="routerConfig.animationName">
+            <router-view 
+              :class="`displayed-page page-padding`"
+            />
+          </vue-page-transition>
+
+        </div>
+
+        <!-- app runtimes -->
+        <request-manager />
+
+        <notifications-manager 
+          @toggle-notification-display="toggleNotificationDisplay()" 
+        />
+
+        <!-- footer popup messages -->
+        <collapse-transition :duration="600">
+            <footer-popup
+              v-show="$store.state.footerPopup.show"
+              class="footer-popup" 
+            />
         </collapse-transition>
 
-        <header-navigation />
+        <Footer />
 
       </div>
-
-      <!-- main router (displayed page) -->
-      <div :class="`main-content-background`">
-
-        <default-app-background />
-
-        <vue-page-transition :name="routerConfig.animationName">
-          <router-view 
-            :class="`displayed-page page-padding`"
-          />
-        </vue-page-transition>
-
-      </div>
-
-      <!-- app runtimes -->
-      <request-manager />
-
-      <notifications-manager 
-        @toggle-notification-display="toggleNotificationDisplay()" 
-      />
-
-      <!-- footer popup messages -->
-      <collapse-transition :duration="600">
-          <footer-popup
-            v-show="$store.state.footerPopup.show"
-            class="footer-popup" 
-          />
-      </collapse-transition>
-
-      <Footer />
-
     </div>
   </div>
 </template>
@@ -213,11 +217,11 @@ export default {
     position: relative;
     z-index: 0;
     margin: auto;
-    min-height: 76vh;
+    min-height: 74vh;
 }
 
 .page-padding {
-  padding-bottom: 60px;
+  padding-bottom: 100px !important;
   padding-top: 100px !important;
 }
 
@@ -268,10 +272,29 @@ export default {
   @include floating-box-shadow(0.4);
 }
 
+.app-container-wrapper {
+  background: get-color('grey');
+  max-width: 1400px;
+  @include center-margin();
+}
+
 @media screen and (max-width: $phone-width) {
       .page-padding {
-        padding-bottom: 5%;
-        padding-top: 13% !important;
+        padding-bottom: 75px !important;
+        padding-top: 75px !important;
+      }
+
+      .displayed-page {
+          position: relative;
+          z-index: 0;
+          margin: auto;
+          min-height: 495px;
+      }
+}
+
+@media screen and (max-width: 349px) {
+      body {
+        overflow-x: scroll;
       }
 }
 

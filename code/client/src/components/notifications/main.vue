@@ -71,6 +71,7 @@ export default {
     max-height: 40px;
     height: 35px;
     background-color: darken(get-color("silver"), 7%);
+    cursor: pointer;
 }
 
 .close-notification-container {
@@ -78,6 +79,10 @@ export default {
     align-items: center;
     justify-content: center;
     height: 100%;
+}
+
+span {
+    cursor: pointer;
 }
 
 .content {
