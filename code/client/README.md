@@ -1,11 +1,5 @@
 # Khateeb Remind Client
 
-## Required Enviromental Variables
-### Note: these variables are case-sensitive
-```
-* VUE_APP_API_SERVER_URL: a url pointing to the khateeb remind server, needs to be prefixed by protocol ("http://", "https://", "ws://", etc...)
-```
-
 ## Project setup
 ```
 npm install
@@ -29,6 +23,21 @@ npm run test:unit
 ### Lints and fixes files
 ```
 npm run lint
+```
+
+### Compiles Progressive Web App (PWA) Testing Files
+```
+npm run build:pwa-test
+```
+
+### Serves PWA Testing Files (no hot reload) 
+```
+npm run serve:pwa
+```
+
+### Compile and Serve PWA Testing Files
+```
+npm run pwa
 ```
 
 ### Customize configuration
