@@ -340,6 +340,8 @@ export default {
 <style lang="scss" scoped>
 button {
     width: 90%;
+    padding-top: 10px;
+    padding-bottom: 10px;
     color: black;
     font-size: 17px;
     @include floating-box-shadow(0.5);
@@ -389,7 +391,7 @@ button {
 }
 
 .formTitle {
-    font-size: 4vh;
+    font-size: 40px;
     font-weight: 800;
 }
 
@@ -407,6 +409,10 @@ button {
         font-size: 14px;
     }
 
+    .formTitle {
+        font-size: 28px;
+    }
+
     .invalidFeedback {
         font-size: 11px;
     }
@@ -416,7 +422,6 @@ button {
     }
 
     button {
-        height: 25px;
         font-size: 14px;
     }
 }

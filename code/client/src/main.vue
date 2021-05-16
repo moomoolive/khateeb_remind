@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     
+    <!-- the cool green streak on wide display -->
     <div class="big-app-background"></div>
 
     <!-- popup notifications -->
@@ -17,6 +18,7 @@
 
     </div>
 
+    <!-- the actual app -->
     <div class="app-container-wrapper">
       <div class="app-container">
 
@@ -215,11 +217,11 @@ export default {
     position: relative;
     z-index: 0;
     margin: auto;
-    min-height: 76vh;
+    min-height: 74vh;
 }
 
 .page-padding {
-  padding-bottom: 60px;
+  padding-bottom: 100px !important;
   padding-top: 100px !important;
 }
 
@@ -278,20 +280,20 @@ export default {
 
 @media screen and (max-width: $phone-width) {
       .page-padding {
-        padding-bottom: 5%;
-        padding-top: 13% !important;
+        padding-bottom: 75px !important;
+        padding-top: 75px !important;
       }
 
       .displayed-page {
           position: relative;
           z-index: 0;
           margin: auto;
-          min-height: 550px;
+          min-height: 495px;
       }
 }
 
-@media screen and (max-width: 300px) {
-      #app {
+@media screen and (max-width: 349px) {
+      body {
         overflow-x: scroll;
       }
 }

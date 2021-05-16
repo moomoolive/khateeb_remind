@@ -16,9 +16,6 @@ const globalConfig = {
         name: "root",
         abbreviatedName: 'root'
     },
-    network: {
-        port: 80
-    },
     cron: {
         // can be substituted with any valid 'moment.js' timezone
         timezone: "America/Edmonton"

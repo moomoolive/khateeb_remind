@@ -123,7 +123,7 @@ p {
     cursor: pointer;
 
     &:hover {
-        color: get-color("dark-blue");
+        color: get-color("yellow");
     }
 }
 

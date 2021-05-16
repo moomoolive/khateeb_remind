@@ -6,9 +6,8 @@ node_modules/
 # although keys are already in env I keep original copy in case of emergency
 vapidKeys.json
 
-# build and upload scripts for production docker image
-dBuild.bat
-dUpload.bat
+# windows scripts
+*.bat
 
 # database migration scripts and schema updates
 **dbUpdates/
