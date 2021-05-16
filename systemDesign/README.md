@@ -326,8 +326,8 @@ Since the docker image is already ready to go, it's recommended that you just us
 
 # Closing Notes
 
-## Some Limitations and Regrets
 * Using some kind of statically-typed language on the server-side would have been very useful. Although this would have slowed down development speed slightly, it would have lead to better documentation and type saftey at runtime. Typescript or another language entirely, such as Rust, Go, C## etc would have been viable options.
 * Using both ES6 Classes and Factory functions to initalize JavaScript objects, made the code a little confusing to follow and could have been avoided by choosing one method and sticking with it.
 * Using an SQL or graph database would have probably been a better fit for Khateeb Remind instead of mongoDB. As the whole project started to grow in size the data only became more relation-oriented, which definintely in NOT the strength of Mongo in terms of performance or database interaction. Although MongoDB has an interface equivalent to SQL's "JOIN" (not exactly but close enough), it is neither as performant, intutive, or as well-documented as the SQL alternative.
+* The authentication system should be more loosely coupled than it is right now. Instead of having hard-coded roles, it would have been better for the authorization to be based on read, write, modify, and delete permission for specific resources (eg. announcements). This would have lead to a more flexible, and powerful authorization system. 
 
