@@ -188,8 +188,37 @@ It is important to note that if a user tries to access a view (webpage) that req
 
 # Reasons for using Vue
 
-todo
+To understand why the progressive-javascript framework Vuejs was used for the client, one must first understand what the initial criteria for the client app entailed. The inital criteria for the client-side about were:
 
+* Works well on mobile
+* To be available offline
+
+## Native-Mobile Application or a Progressive Web Application
+
+This lead to the formulation of two general approaches to the client, either the client was to be a mobile-application or a web-application. The most promising solution for either type of app were:
+
+* A cross-platform mobile application, using something like React-Native or Apache Cordova
+* Or a mobile-first web-application + service worker
+
+Ultimately the latter approach was chosen for a variety of reasons. Some of the main reason include:
+
+* A web-application requires only one code base. Peroid. Although creating a mobile application in any framework built on the React-Native Engine or Apache Cordova would have more or less lead to one codebase, mobile applications cannot be accessed on desktop and thus a less versatile medium for creating a client.
+* Not only are mobile applications less versatile than web applications but web applications use the most-widely supported languages (if you can call them that) used to create graphical user interfaces, HTML, CSS, and Javascript.
+* Khateeb Remind doesn't require any native mobile APIs like geofencing.
+* A web-app with a service worker (service workers by the way [supported by all modern browsers](https://caniuse.com/serviceworkers)) can be used offline and are quite efficent compared to websites without one.
+* Web-app performance bottlenecks such as inital render times would be be dramatically reduced after the first visit because of service worker's caching ability. Initial render times can be further cut down via lazy loading non-essential script files.
+* Web-apps can be forced to update (which is what Khateeb Remind client does), so legacy client-side code doesn't have to be supported by the Khateeb Remind servers.
+* Web-apps don't have to be on the app store thus saving potential distrubition problems.  
+
+## Why Use a Javascript Framework At All?
+
+Keeping in mind that the app originally was very close to being a mobile application, modern single-page-application (SPA) frameworks such as Reactjs, Angularjs, or Vuejs offer a similar experience to native mobile clients with features like page transitions. More importantly though, SPAs offer an easy way to create reactive and extremely interactive client applications relative to normal javascript.
+
+Other benefits of SPA frameworks include taking client-side routing and rendering pressure off the server thus making it available for more traffic, in theory.
+
+## Out of All SPA Frameworks, Why Vue?
+
+No reason in particular, I believe that React or Angular would have done just as well in Vue's place - but I believe Vue is a slightly more intitutive and simple library relative to the alternatives.
 
 # Web App Routing
 
