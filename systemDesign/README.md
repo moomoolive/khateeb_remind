@@ -278,13 +278,26 @@ All these configurations are found in the *"App.config.js"* file found in the ro
 
 # Reasons for Using Node
 
-todo
+The reason for using Node as a server runtime really came down to a few reasons: 
 
+* Development speed with Node and JavaScript is fast, as compared to lower-level languages like Go and Rust.
+* Node is offers great server performance (for a scripting language) straight out of the box and generally doesn't need any special configurations like putting another server infront of Node (eg. NGINX) to handle web traffic - like many other scripting languages.
+* Node has a massive ecosystem of open-source libraries, so it was easy to find libraries for almost everything, most notably cryptography. 
 
 # Server Side Controllers
 
-todo
-
+* Announcements - CRUD Operations for announcements.
+* Auth - anything related to signing into the application, account recovery, and signing up to Khateeb Remind.
+* InstitutionAdmin - CRUD Operations for institution administrators.
+* Institution - CRUD Operations for institutions and institution settings.
+* Logos - CRUD Operations for logos.
+* SysAdmin - all routes related to system administration, setting system settings, confirming institutions, etc.
+* Timings - CRUD Operations for timings.
+* User - all things related to individual users, setting modification, signing into institutions, requesting authorization for institution, etc.
+* Locations - CRUD Operations for locations.
+* Jummahs - CRUD Operations for jummah preferences and jummah related notifications.
+* Misc - any route that didn't fit in any of the above categories.
+* Khateebs - CRUD Operations related to institution khateebs. 
 
 # About Database and Schemas
 
