@@ -15,7 +15,6 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 * [Client Side 'Runtimes'](#client-side-runtimes)
 * [Progressive Web App Testing](#progressive-web-app-testing)
 * [Offline Mode](#offline-mode)
-* [Client Side Issues](#client-side-issues)
 * [Client Side Configurations](#client-side-configurations)
 * [Reasons for Using Node](#reasons-for-using-node)
 * [Server Side Controllers](#server-side-controllers)
@@ -233,7 +232,11 @@ All referenced modules can be found in the src/router/routes client folder.
 
 # Client Side Runtimes
 
-todo
+Within the web application there are two "runtimes" built on top of the Vue runtime. I use runtime for a lack of a better term, but they could also be called "managers". These runtimes help execute and manage processes associated with Vuex (Vuex is the state management library used within Khateeb Remind) modules that bear the same name. All vuex modules can be found in the src/store/modules client folder.
+
+## The Notification Runtime --> Vuex.notifications
+
+## The Request Runtime --> Vuex.requests
 
 
 # Progressive Web App Testing
