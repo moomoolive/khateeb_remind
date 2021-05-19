@@ -222,7 +222,13 @@ No reason in particular, I believe that React or Angular would have done just as
 
 # Web App Routing
 
-todo
+All referenced modules can be found in the src/router/routes client folder.
+
+* Auth - all routes related to signing in, signing up, and account recovery.
+* User - all routes that are reserved for those holding [level 1 authorization](#Authorization-Across-the-App).
+* Khateebs - all routes that are reserved for those holding [level 2 authorization](#Authorization-Across-the-App).
+* InstitutionAdmin - all routes that are reserved for those holding [level 3-4 authorization](#Authorization-Across-the-App).
+* SysAdmin - all routes that are reserved for those holding [level 5+ authorization](#Authorization-Across-the-App).
 
 
 # Client Side Runtimes
@@ -236,11 +242,6 @@ todo
 
 
 # Offline Mode
-
-todo
-
-
-# Client Side Issues
 
 todo
 
