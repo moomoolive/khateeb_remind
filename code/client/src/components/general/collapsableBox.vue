@@ -17,7 +17,7 @@
                 />
             </div>
         </button>
-        <transition name="dropdown">
+        <collapse-transition :duration="600">
             <div
                 v-if="isActive"
                 :class="`content ${bodyColor}`"
@@ -26,7 +26,7 @@
             >
                 <slot></slot>
             </div>
-        </transition>
+        </collapse-transition>
     </div>
 </template>
 
@@ -35,11 +35,14 @@ import tagBox from '@/components/general/tagBox.vue'
 
 import { mixin as clickaway } from 'vue-clickaway'
 
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+
 export default {
     name:'collapsableBox',
     mixins: [clickaway],
     components: {
-        tagBox
+        tagBox,
+        CollapseTransition
     },
     props: {
         headline: {
