@@ -236,7 +236,11 @@ Within the web application there are two "runtimes" built on top of the Vue runt
 
 ## The Notification Runtime --> Vuex.notifications
 
+todo
+
 ## The Request Runtime --> Vuex.requests
+
+todo
 
 
 # Progressive Web App Testing
@@ -357,7 +361,28 @@ All explanation is provided in the [section below](#server-initialization)
 
 # Server Initialization
 
-todo
+Every time the server is initalized (whether it's the first time running it or after a restart) the Khateeb Remind server schedules all cron jobs (check "server/cron/") and runs a couple of initiation scripts.
+
+## Root User Creation
+
+The first initiation script checks if the root user (or root system administrator) account exists and then creates it if it doesn't exist. The root user account cannot be created any other way. The root user account password is initially set by the [DEFAULT_ROOT_PASS environmental variable](#environmental-variables). 
+
+All other related to the root user defaults can be changed by editing the initializationConfig.rootUser object found in "Server.config.js".
+
+## Test Institution Creation
+
+Another script that runs on server initialization creates a "test institution", whose purpose is to make development easier by having default accounts that will be created even if database is wiped and to simulated real bugs in production. 
+
+This script first creates:
+
+* An institution
+* A related root institution administrator. Root institution administrator account details can be edited by modifying the initializationConfig.testInstitution.rootAdmin object found in "Server.config.js"
+* One related institution administrator
+* An variable number of locations which are determined by initializationConfig.testInstitution.locationCount key found in "Server.config.js"
+* A variable number of timings related to each location which are determined by initializationConfig.testInstitution.timingsPerLocation key found in "Server.config.js"
+* A variable number of related khateebs which are determined by initializationConfig.testInstitution.khateebCount key found in "Server.config.js". Khateeb account details can be edited by modifying the initializationConfig.testInstitution.khateebs object found in the same file.
+
+All user account passwords created by the script are determined by the [DEFAULT_TEST_USER_PASS environmental variable](#environmental-variables).
 
 
 # Dev Ops Suggestions
