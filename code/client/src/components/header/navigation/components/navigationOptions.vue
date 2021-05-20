@@ -179,7 +179,7 @@ p {
 
 .menu-item {
     background-color: get-color("grey", 0.9);
-    cursor: default;
+    cursor: pointer;
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 10px;
