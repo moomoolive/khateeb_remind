@@ -121,6 +121,9 @@ Both development and production:
 * VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_INDIVIDAUL_JUMMAH <Number> - the maximum amount of times an administrator can run the [notification loop](#the-nefarious-notification-loop) for one particular jummah before disabling it
 * VUE_APP_DEFAULT_IO_LOADING_TIME <Number> - the default time (in milliseconds) the loading overlay screen is visible when page requires AJAX call on creation
 * VUE_APP_DEFAULT_AUTH_IO_LOADING_TIME <Number> - the default time (in milliseconds) the loading icon appears for when authorization key (json web token) change is requested
+ 
+ For PWA testing only:
+ * VUE_APP_PWA - a variable to test whether bundle is being build for pwa testing.
 
 ## Server
 Both development and production:
@@ -245,12 +248,21 @@ todo
 
 # Progressive Web App Testing
 
-todo
+Unfortunately there is no default way to test Vue PWA apps, as Vue CLI doesn't support it. Khateeb Remind provides a custom script that allows you to do so easily, just go to the root client folder and enter "npm run pwa". It's important to note that the "npm run pwa" command actually builds a distribution bundle (with source maps and comments intact) and then deploys it via a server package called "lite-server".
+
+During the PWA build process you have access to the [VUE_APP_PWA environmental variable](#environmental-variables).
+
+The developement server can be further configured by editing the "lite-server.config.js" file found in the client folder. Please consult the package for further [configurations](https://www.npmjs.com/package/lite-server).
+* Note: lite-server provides API fallback
 
 
 # Offline Mode
 
-todo
+Offline mode is initiated in the app after an X (determined by the [VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT environmental variable](#environmental-variables)) number of requests don't respond or timeout within a 30 second interval.
+
+This seemed a much better approach than using "window.navigator.onLine" to determine if app is offline in real-time, as the previous approach needs to be constantly checked in order to sense if the app is offline.
+
+Once app is offline, all outbound requests are cancelled and the app is served directly from a service worker.
 
 
 # Client Side Configurations
