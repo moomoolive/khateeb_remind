@@ -123,6 +123,7 @@ export default {
 
 <style lang="scss" scoped>
 .footer-container {
+    @include alternate-font();
     background: get-color('grey');
     padding-bottom: 2px;
     position: relative;

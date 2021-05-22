@@ -73,6 +73,7 @@ export default {
     &.grey {
         color: get-color("off-white");
         background-color: get-color("grey");
+        @include alternate-font();
     }
 
     &.square {

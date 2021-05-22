@@ -129,6 +129,7 @@ export default {
     padding-top: 25px;
     @include floating-box-shadow();
     @include normal-border-rounding();
+    @include alternate-font();
 }
 
 .buttons-container {
