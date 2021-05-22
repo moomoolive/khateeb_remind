@@ -123,7 +123,7 @@ Both development and production:
 * VUE_APP_DEFAULT_AUTH_IO_LOADING_TIME <Number> - the default time (in milliseconds) the loading icon appears for when authorization key (json web token) change is requested
  
  For PWA testing only:
- * VUE_APP_PWA - a variable to test whether bundle is being build for pwa testing.
+ * VUE_APP_PWA - a variable to test whether bundle is being built for pwa testing.
 
 ## Server
 Both development and production:
@@ -239,10 +239,21 @@ Within the web application there are two "runtimes" built on top of the Vue runt
 
 ## The Notification Runtime --> Vuex.notifications
 
+### Managing Notification Queue
+todo
+ 
+### Displaying Notifications on Screen
+todo
+ 
+### Differentiating Between Notifications that Originate from the User and Application
 todo
 
 ## The Request Runtime --> Vuex.requests
 
+### Managing Delayed Requests
+todo
+ 
+### Initiating Offline Mode and Offline Polling
 todo
 
 
@@ -331,6 +342,13 @@ todo
 
 # About Notifications and Third Party Services
 
+## Email
+todo
+ 
+## Web Push Notifications
+todo
+ 
+## Cloud Storage
 todo
 
 
