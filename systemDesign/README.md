@@ -15,7 +15,6 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 * [Client Side 'Runtimes'](#client-side-runtimes)
 * [Progressive Web App Testing](#progressive-web-app-testing)
 * [Offline Mode](#offline-mode)
-* [Client Side Issues](#client-side-issues)
 * [Client Side Configurations](#client-side-configurations)
 * [Reasons for Using Node](#reasons-for-using-node)
 * [Server Side Controllers](#server-side-controllers)
@@ -122,6 +121,9 @@ Both development and production:
 * VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_INDIVIDAUL_JUMMAH <Number> - the maximum amount of times an administrator can run the [notification loop](#the-nefarious-notification-loop) for one particular jummah before disabling it
 * VUE_APP_DEFAULT_IO_LOADING_TIME <Number> - the default time (in milliseconds) the loading overlay screen is visible when page requires AJAX call on creation
 * VUE_APP_DEFAULT_AUTH_IO_LOADING_TIME <Number> - the default time (in milliseconds) the loading icon appears for when authorization key (json web token) change is requested
+ 
+ For PWA testing only:
+ * VUE_APP_PWA - a variable to test whether bundle is being built for pwa testing.
 
 ## Server
 Both development and production:
@@ -188,32 +190,90 @@ It is important to note that if a user tries to access a view (webpage) that req
 
 # Reasons for using Vue
 
-todo
+To understand why the progressive-javascript framework Vuejs was used for the client, one must first understand what the initial criteria for the client app entailed. The inital criteria for the client-side about were:
 
+* Works well on mobile
+* To be available offline
+
+## Native-Mobile Application or a Progressive Web Application
+
+This lead to the formulation of two general approaches to the client, either the client was to be a mobile-application or a web-application. The most promising solution for either type of app were:
+
+* A cross-platform mobile application, using something like React-Native or Apache Cordova
+* Or a mobile-first web-application + service worker
+
+Ultimately the latter approach was chosen for a variety of reasons. Some of the main reason include:
+
+* A web-application requires only one code base. Peroid. Although creating a mobile application in any framework built on the React-Native Engine or Apache Cordova would have more or less lead to one codebase, mobile applications cannot be accessed on desktop and thus a less versatile medium for creating a client.
+* Not only are mobile applications less versatile than web applications but web applications use the most-widely supported languages (if you can call them that) used to create graphical user interfaces, HTML, CSS, and Javascript.
+* Khateeb Remind doesn't require any native mobile APIs like geofencing.
+* A web-app with a service worker (service workers by the way [supported by all modern browsers](https://caniuse.com/serviceworkers)) can be used offline and are quite efficent compared to websites without one.
+* Web-app performance bottlenecks such as inital render times would be be dramatically reduced after the first visit because of service worker's caching ability. Initial render times can be further cut down via lazy loading non-essential script files.
+* Web-apps can be forced to update (which is what Khateeb Remind client does), so legacy client-side code doesn't have to be supported by the Khateeb Remind servers.
+* Web-apps don't have to be on the app store thus saving potential distrubition problems.  
+
+## Why Use a Javascript Framework At All?
+
+Keeping in mind that the app originally was very close to being a mobile application, modern single-page-application (SPA) frameworks such as Reactjs, Angularjs, or Vuejs offer a similar experience to native mobile clients with features like page transitions. More importantly though, SPAs offer an easy way to create reactive and extremely interactive client applications relative to normal javascript.
+
+Other benefits of SPA frameworks include taking client-side routing and rendering pressure off the server thus making it available for more traffic, in theory.
+
+## Out of All SPA Frameworks, Why Vue?
+
+No reason in particular, I believe that React or Angular would have done just as well in Vue's place - but I believe Vue is a slightly more intitutive and simple library relative to the alternatives.
 
 # Web App Routing
 
-todo
+All referenced modules can be found in the src/router/routes client folder.
+
+* Auth - all routes related to signing in, signing up, and account recovery.
+* User - all routes that are reserved for those holding [level 1 authorization](#Authorization-Across-the-App).
+* Khateebs - all routes that are reserved for those holding [level 2 authorization](#Authorization-Across-the-App).
+* InstitutionAdmin - all routes that are reserved for those holding [level 3-4 authorization](#Authorization-Across-the-App).
+* SysAdmin - all routes that are reserved for those holding [level 5+ authorization](#Authorization-Across-the-App).
 
 
 # Client Side Runtimes
 
+Within the web application there are two "runtimes" built on top of the Vue runtime. I use runtime for a lack of a better term, but they could also be called "managers". These runtimes help execute and manage processes associated with Vuex (Vuex is the state management library used within Khateeb Remind) modules that bear the same name. All vuex modules can be found in the src/store/modules client folder.
+
+## The Notification Runtime --> Vuex.notifications
+
+### Managing Notification Queue
+todo
+ 
+### Displaying Notifications on Screen
+todo
+ 
+### Differentiating Between Notifications that Originate from the User and Application
+todo
+
+## The Request Runtime --> Vuex.requests
+
+### Managing Delayed Requests
+todo
+ 
+### Initiating Offline Mode and Offline Polling
 todo
 
 
 # Progressive Web App Testing
 
-todo
+Unfortunately there is no default way to test Vue PWA apps, as Vue CLI doesn't support it. Khateeb Remind provides a custom script that allows you to do so easily, just go to the root client folder and enter "npm run pwa". It's important to note that the "npm run pwa" command actually builds a distribution bundle (with source maps and comments intact) and then deploys it via a server package called "lite-server".
+
+During the PWA build process you have access to the [VUE_APP_PWA environmental variable](#environmental-variables).
+
+The developement server can be further configured by editing the "lite-server.config.js" file found in the client folder. Please consult the package for further [configurations](https://www.npmjs.com/package/lite-server).
+* Note: lite-server provides API fallback
 
 
 # Offline Mode
 
-todo
+Offline mode is initiated in the app after an X (determined by the [VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT environmental variable](#environmental-variables)) number of requests don't respond or timeout within a 30 second interval.
 
+This seemed a much better approach than using "window.navigator.onLine" to determine if app is offline in real-time, as the previous approach needs to be constantly checked in order to determine if the app is offline.
 
-# Client Side Issues
-
-todo
+Once app is offline, all outbound requests are blocked. The app then starts to poll the API health endpoint (aka "/misc/health-endpoint") every 10 seconds, if the endpoint responds with a 200 status code, offline mode is turned off and all requests are unblocked, otherwise the app will continue to poll. All polling and request blocking is managed by the [requests runtime](#client-side-runtimes).
 
 
 # Client Side Configurations
@@ -249,13 +309,26 @@ All these configurations are found in the *"App.config.js"* file found in the ro
 
 # Reasons for Using Node
 
-todo
+The reason for using Node as a server runtime really came down to a few reasons: 
 
+* Development speed with Node and JavaScript is fast, as compared to lower-level languages like Go and Rust.
+* Node is offers great server performance (for a scripting language) straight out of the box and generally doesn't need any special configurations like putting another server infront of Node (eg. NGINX) to handle web traffic - like many other scripting languages.
+* Node has a massive ecosystem of open-source libraries, so it was easy to find libraries for almost everything, most notably cryptography. 
 
 # Server Side Controllers
 
-todo
-
+* Announcements - CRUD Operations for announcements.
+* Auth - anything related to signing into the application, account recovery, and signing up to Khateeb Remind.
+* InstitutionAdmin - CRUD Operations for institution administrators.
+* Institution - CRUD Operations for institutions and institution settings.
+* Logos - CRUD Operations for logos.
+* SysAdmin - all routes related to system administration, setting system settings, confirming institutions, etc.
+* Timings - CRUD Operations for timings.
+* User - all things related to individual users, setting modification, signing into institutions, requesting authorization for institution, etc.
+* Locations - CRUD Operations for locations.
+* Jummahs - CRUD Operations for jummah preferences and jummah related notifications.
+* Misc - any route that didn't fit in any of the above categories.
+* Khateebs - CRUD Operations related to institution khateebs. 
 
 # About Database and Schemas
 
@@ -269,6 +342,13 @@ todo
 
 # About Notifications and Third Party Services
 
+## Email
+todo
+ 
+## Web Push Notifications
+todo
+ 
+## Cloud Storage
 todo
 
 
@@ -311,7 +391,28 @@ All explanation is provided in the [section below](#server-initialization)
 
 # Server Initialization
 
-todo
+Every time the server is initalized (whether it's the first time running it or after a restart) the Khateeb Remind server schedules all cron jobs (check "server/cron/") and runs a couple of initiation scripts.
+
+## Root User Creation
+
+The first initiation script checks if the root user (or root system administrator) account exists and then creates it if it doesn't exist. The root user account cannot be created any other way. The root user account password is initially set by the [DEFAULT_ROOT_PASS environmental variable](#environmental-variables). 
+
+All other related to the root user defaults can be changed by editing the initializationConfig.rootUser object found in "Server.config.js".
+
+## Test Institution Creation
+
+Another script that runs on server initialization creates a "test institution", whose purpose is to make development easier by having default accounts that will be created even if database is wiped and to simulated real bugs in production. 
+
+This script first creates:
+
+* An institution
+* A related root institution administrator. Root institution administrator account details can be edited by modifying the initializationConfig.testInstitution.rootAdmin object found in "Server.config.js"
+* One related institution administrator
+* An variable number of locations which are determined by initializationConfig.testInstitution.locationCount key found in "Server.config.js"
+* A variable number of timings related to each location which are determined by initializationConfig.testInstitution.timingsPerLocation key found in "Server.config.js"
+* A variable number of related khateebs which are determined by initializationConfig.testInstitution.khateebCount key found in "Server.config.js". Khateeb account details can be edited by modifying the initializationConfig.testInstitution.khateebs object found in the same file.
+
+All user account passwords created by the script are determined by the [DEFAULT_TEST_USER_PASS environmental variable](#environmental-variables).
 
 
 # Dev Ops Suggestions

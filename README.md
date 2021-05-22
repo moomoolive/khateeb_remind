@@ -7,14 +7,12 @@
 
 ## بسم الله الرحمن الرحيم
 
-Khateeb Remind is a __*free* and *open-source*__, web-app designed to ease jummah khateeb scheduling and communication. 
+Khateeb Remind is a __*free*, *open-source*__, mobile-first, light-weight, web-application designed to ease jummah khateeb scheduling and communication. 
 
 Some highlights of the app:
 * Sends notifications to users via push-notifications
 * Centralizes all khateeb information in one place
 * Alert whoever is scheduling khateebs about availablity changes
-* Blazing fast application for it's size
-* Mobile-first design
 
 The official Khateeb Remind instance is currently hosted @ https://khateebs.com.
 
