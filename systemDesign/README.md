@@ -260,9 +260,9 @@ The developement server can be further configured by editing the "lite-server.co
 
 Offline mode is initiated in the app after an X (determined by the [VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT environmental variable](#environmental-variables)) number of requests don't respond or timeout within a 30 second interval.
 
-This seemed a much better approach than using "window.navigator.onLine" to determine if app is offline in real-time, as the previous approach needs to be constantly checked in order to sense if the app is offline.
+This seemed a much better approach than using "window.navigator.onLine" to determine if app is offline in real-time, as the previous approach needs to be constantly checked in order to determine if the app is offline.
 
-Once app is offline, all outbound requests are cancelled and the app is served directly from a service worker.
+Once app is offline, all outbound requests are blocked. The app then starts to poll the API health endpoint (aka "/misc/health-endpoint") every 10 seconds, if the endpoint responds with a 200 status code, offline mode is turned off and all requests are unblocked, otherwise the app will continue to poll. All polling and request blocking is managed by the [requests runtime](#client-side-runtimes).
 
 
 # Client Side Configurations
