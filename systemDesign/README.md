@@ -343,14 +343,28 @@ todo
 # About Notifications and Third Party Services
 
 ## Email
-todo
+Due to the fact that the [web-push API has not yet stabilized across all browsers](https://caniuse.com/push-api) Khateeb Remind relies on email notifications as it's primary method of notifying users. Currently the default implementation for email notifications uses AWS's Simple Email Service.
+ 
+Users are free to opt out of these reminders via user settings. 
+
+If you want to replace email with another method of notifying such as text, all you need to do is change the implementation of the interfaces provided by the "externalNotifications" library, in "server/libararies". Also, you'll need to modify the user database schema to accomodate any information needed to fulfill the replacement notification's requirements, such as logging phone number.
+ 
+Related Environmental Variables: [AWS_SES_EMAIL environmental variable](#environmental-variables), [AWS_S3_ACCESS_ID environmental variable](#environmental-variables), [AWS_S3_ACCESS_KEY environmental variable](#environmental-variables), [AWS_HOSTING_REGION environmental variable](#environmental-variables)
  
 ## Web Push Notifications
-todo
+Web push notifications are implemented in Khateeb Remind, check out the "server/libraries/pwaNotifications" for implementation details.
+ 
+Related Environmental Variables: [VAPID_PUBLIC_KEY environmental variable](#environmental-variables), [VAPID_PRIVATE_KEY environmental variable](#environmental-variables), [VAPID_SUBJECT_FIELD environmental variable](#environmental-variables)
  
 ## Cloud Storage
-todo
+Khateeb Remind currently uses an external cloud storage in order to store files related to the app. The default implemenation uses AWS's Simple-Storage (S3).
+ 
+All files are stored as raw binary in the cloud and are differianted only by the folder they are placed in. File extensions are not supported because S3 doesn't support requesting files with multiple extensions in one request. Keeping file extensions would mean at least making a couple of requests for every file, in case they have a different extension - which is an inefficency that isn't work the price or the effort to optimize. 
 
+All cloud storage interfaces are found in the "server/libraries/cloudStorage" folder.
+ 
+Related Environmental Variables: [AWS_S3_BUCKET_NAME environmental variable](#environmental-variables), [AWS_S3_ACCESS_ID environmental variable](#environmental-variables), [AWS_S3_ACCESS_KEY environmental variable](#environmental-variables), [AWS_HOSTING_REGION environmental variable](#environmental-variables)
+ 
 
 # Server Side Configurations
 
