@@ -8,6 +8,7 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 
 * [Project Stack](#project-stack)
 * [Notes on Project Structure](#notes-on-project-structure)
+* [NPM Scripts](#npm-scripts)
 * [Environmental Variables](#environmental-variables)
 * [Authorization Across the App](#authorization-across-the-app)
 * [Reasons for using Vue](#reasons-for-using-vue)
@@ -110,6 +111,10 @@ On the server side global variables are prepended by "$", and are attached to th
 
 ## NPM scripts
 The README files at the root of the client and server provide brief explantions of the npm scripts for each respective project.
+
+> [Client NPM scripts](https://github.com/moomoolive/khateeb_remind/blob/master/code/client/README.md)
+
+> [Server NPM scripts](https://github.com/moomoolive/khateeb_remind/blob/master/code/server/README.md)
 
 # Environmental Variables
 
