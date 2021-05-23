@@ -342,7 +342,25 @@ todo
 
 # The Nefarious Notification Loop
 
-todo
+The notification loop is a core part of the Khateeb Remind ecosystem. The notification loop is essentially a loop that sends of PWA notifications and emails to khateebs to remind them of jummah khutbahs they are supposed to be giving. The loop can be run manually or programmatically through a chron job.
+
+Generally speaking the loop will NOT run in a couple of situtions:
+* The particular jummah which the loop is being run for has already sent out it's notifications
+* The notification loop max run count has been exceeded
+* The khateeb has either email or push notifications turned off
+* The adminstrator has turned off all notifications for institution
+ 
+## Manual Execution
+ 
+Khateeb Remind gives administrators a default way to override the notification chron job, as there are cases where this may be neccessary. In order to run the notification loop administrators just need to navigate to the adminstration schedule page, then click the settings button, then click the notify button. There are artificial limits set on how many times an administrator can manually run the loop, so that the Khateeb Remind servers don't get labeled as servers where span originates thereby limiting the reachability of all notifications for all institutions.
+ 
+The artificially set limits are determined by [VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_INDIVIDAUL_JUMMAH environmental variable](#environmental-variables) and [VUE_APP_MAX_NOTIFICATION_LOOP_RUN_COUNT_FOR_WEEK environmental variable](#environmental-variables).
+ 
+## Cron Execution
+
+Every Sunday at 6AM Mountain Standard Time (UTC - 7) a cron job is run which sets the timing for when and who notifications will be sent out to for the following week. This implicates that if notification timing changes for a particular institution after Sunday, they can expect the change to take effect ONLY for the following week and beyond, and NOT the current week.
+
+The standard timezone the cron job is aligned with is Mountain Standard Time, but this can be configured by editing the [cron.timezone server configuration](#server-side-configurations).
 
 
 # About Notifications and Third Party Services
