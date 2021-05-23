@@ -337,7 +337,62 @@ The reason for using Node as a server runtime really came down to a few reasons:
 
 # About Database and Schemas
 
-todo
+All database related information and schemas are found in the "server/database" folder.
+
+## Locations
+Stores information about the seperate locations that an institution has. Any given institution can have multiple locations associated with it.
+ 
+## Timings
+Stores information about Jummah prayer timings at each location. Any given location can have multiple timings associated with it.
+ 
+This schema includes:
+* Default khateebs
+ 
+## Institution
+An entity that organizes jummah prayers.
+ 
+A note that there is a special institution status reserved for the test institution created at [server initialization](#server-initialization)
+ 
+This schema includes:
+* Institution settings
+ 
+## User
+An entity that can give khutabhs, adminster khutabh giving or run the Khateb Remind System. Check out [user types](#authorization-across-the-app) for more information.
+ 
+This schema includes:
+* A list of user's authorization keys
+* User settings
+* Any statuses on user
+ 
+## Announcement
+A notification that is sent out to every user in an institution.
+ 
+## Notification
+A message that is sent out to a particular user.
+ 
+This schema includes:
+* Notification meta data, including if PWA or email notification was sent associated with it along with other information useful for debugging purposes.
+ 
+## Verification Codes
+A code sent to users via email in case of account recovery. Expires in 15 minutes.
+ 
+## Jummah Preference
+Store information about scheduled jummah prayers date, khateeb, location and timing.
+ 
+## PWA subscription
+The security details to send users web push notifications. Users can have multiple subscriptions.
+ 
+## Authorization
+Authorization keys to priviledges within an institution. Each institution has authorization unique authorization keys for khateebs, institution adminstrator, and the root institution administrator. 
+ 
+Users can have multiple authorization keys and are not bound to particular institution or role, with the expection of [special user types](#authorization-across-the-app).
+
+Note that only one user can ever hold the root institution adminstrator key for a given institution at once. The root institution adminstrator can delegate his authorization to any confirmed user within the institution, thereby revoking their right to login to the institution as the root administrator.
+ 
+## User Schedule Restrictions
+Any user that is registered as a khateeb at any given institution will have data associated with their availability to give khutbahs at that particular institution. Khateebs can restrict particular dates or jummah slots at any given institution.
+ 
+It's important to note that a new copy is made for the user for each institution they are a khateeb at and schedule restictions are not shared across institutions.
 
 
 # The Nefarious Notification Loop
