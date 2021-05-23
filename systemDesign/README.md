@@ -6,6 +6,7 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 
 ## Table of Contents
 
+* [App Motivation](#app-motivation)
 * [Project Stack](#project-stack)
 * [Notes on Project Structure](#notes-on-project-structure)
 * [NPM Scripts](#npm-scripts)
@@ -26,6 +27,10 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 * [Server Initialization](#server-initialization)
 * [Dev-Ops Suggestions](#dev-ops-suggestions)
 * [Closing Notes](#closing-notes)
+
+# App Motivation
+
+todo
 
 
 # Project Stack
