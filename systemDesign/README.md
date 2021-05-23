@@ -259,25 +259,45 @@ All referenced modules can be found in the src/router/routes client folder.
 
 Within the web application there are two "runtimes" built on top of the Vue runtime. I use runtime for a lack of a better term, but they could also be called "managers". These runtimes help execute and manage processes associated with Vuex (Vuex is the state management library used within Khateeb Remind) modules that bear the same name. All vuex modules can be found in the src/store/modules client folder.
 
+To check out all the types of notifications that Khateeb Remind offers out of the box without configuration check the "client/src/libraries/notification" folder. These are all the pre-built notification interfaces and can be extended by creating new templates.
+
 ## The Notification Runtime --> Vuex.notifications
 
+The notification runtime deals with managing various aspects of the vuex "notifications" module found in "client/src/store/modules/".
+ 
 ### Managing Notification Queue
-todo
+The main role of the notification runtime is to manage the notification queue found in the previously-mention module. Khateeb Remind generally employs a queue for notifications so that the app can support notifying the user of multiple notifications at once. All notifications that are intended to be displayed on the screen are put on to the notification queue and have an "origin" key attached to them.
+ 
+Khateeb Remind has multiple origins where a notification can come from, including:
+* Server
+* The web application itself
+* Or from user interaction
+ 
+Once a notification is requested to be executed it is put on the queue and then the notification runtime (found in the main Vue instance of the app) will decide when and if the notification is to be displayed.
  
 ### Displaying Notifications on Screen
-todo
- 
-### Differentiating Between Notifications that Originate from the User and Application
-todo
+Once a notification is put on the queue the runtime analyzes the stated origin of the notification and decides how to execute the notification:
+
+* Notifications coming from the web-app or server are put onto the "fromServer" queue. Once put on the queue, the notifications will be displayed on the screen one after another and taking precedent over user initiated notifications.
+* Notifications created by user interactions or that state no origin at all are put on the "userPrompted" queue, only if the queue is empty. Therefore, a user cannot request another notificaton be displayed on the screen until the current one they prompted is no longer displayed. This measure we taken in order to prevent a circumstance where a user will click a button or any other element that prompts a notification, multiple times and then find a stack of notifications being displayed for that same element.
 
 ## The Request Runtime --> Vuex.requests
 
+The main role of the request runtime is to manage delayed request and offline mode.
+ 
 ### Managing Delayed Requests
-todo
+There are certain circumstances where it's desirable for a request to be delayed, such as updating the "name" field of an institution's location via text input. It may be desirable here because sending a request everytime the user types a letter would be awfully ineffiecent, and frankly may result in tens if not hundreds of requests while simply entering a location name.
+ 
+Khateeb Remind's request runtime provides a solution to this in delayed requests.
+ 
+A delayed request is essentially a request that is scheduled to run after X amount of seconds (defaults to 5 seconds) and if requested again before the specified delay, the request will be reset with the new request parameters. This cycle continues until the request is executed, thereby eliminating the need for tens if not hundreds of requests for a given user.
+ 
+It should be noted that you can recieve a response for these requests like any normal request. The implementation of this feature is quite long and boring, but the short and sweet version of it is that everytime a request is re-requested, then previous request's promise is overwritten by the new promise. If you're interested in the details of implementation details check out the "client/src/components/misc/requestManager.vue" file.  
  
 ### Initiating Offline Mode and Offline Polling
-todo
-
+If a request has timed out, due to the lack of a TCP connection with the server or a bug in server code, Khateeb Remind logs this in the "noResFromXHRinLast30Seconds" key of the requests Vuex module. The request runtime then keeps a track of how many requests have timed out in the following 30 seconds after the first timed out request. If the count passes the threshold of failed requests determined by the [VUE_APP_INITIATE_OFFLINE_MODE_FAIL_REQUEST_COUNT environmental variable](#environmental-variables) in those thirty seconds [offline mode](#offline-mode) is initated, otherwise the failed request count is reset.
+ 
+If the failed requests threshold is passed, the notification runtime blocks all outbound requests by the app and starts to continously send requests to the "misc/health-endpoint" url of the Khateeb Remind server every 10 seconds (polling) until it responds with a 200 code. Only when the "health-endpoint" responds correctly does the app return to it's normal state.
 
 # Progressive Web App Testing
 
