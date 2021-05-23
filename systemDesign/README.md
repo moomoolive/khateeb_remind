@@ -385,13 +385,15 @@ This schema includes:
 ## Institution
 An entity that organizes jummah prayers.
  
-A note that there is a special institution status reserved for the test institution created at [server initialization](#server-initialization)
+A note that there is a special institution status reserved for the test institution created at [server initialization](#server-initialization). The test institution cannot be permenantly deleted via the web-application interface as everytime it deletes itself it's reinitialized again right away. 
  
 This schema includes:
 * Institution settings
  
 ## User
 An entity that can give khutabhs, adminster khutabh giving or run the Khateb Remind System. Check out [user types](#authorization-across-the-app) for more information.
+ 
+A note that the root user cannot be permenantly deleted via the web-application interface as everytime the root user deletes their account it is reinitialized again right away. 
  
 This schema includes:
 * A list of user's authorization keys
