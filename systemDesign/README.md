@@ -207,6 +207,9 @@ The client-side app doesn't do any REAL authentication but relies on the server 
 It is important to note that if a user tries to access a view (webpage) that requires a higher authorization level than their JWT claims they have the web-app will take preventative measures and not allow the user to direct to that pages. Unfortunately becauase the client app always assumes that the JWT has not been forged, a user *could* theortically forge their own JWT and add a higher level of authorization to the payload - which would allow them to see views that require higher authorization. But again the server would ideally detect something like this and the view wouldn't recieve any information from the server. 
 
 <br/><br/><br/><br/>
+# Client
+<br/><br/>
+
 # Reasons for using Vue
 
 To understand why the progressive-javascript framework Vuejs was used for the client, one must first understand what the initial criteria for the client app entailed. The inital criteria for the client-side about were:
@@ -340,6 +343,9 @@ As stated before Khateeb Remind was close to being a mobile application, so in o
 * Large JavaScript utility libraries were avoided (such as Moment and LoDash) in favor of smaller, more specific in-house libraries.
 
 <br/><br/><br/><br/>
+# Server
+<br/><br/>
+
 # Reasons for Using Node
 
 The reason for using Node as a server runtime really came down to a few reasons: 
@@ -535,6 +541,9 @@ This script first creates:
 All user account passwords created by the script are determined by the [DEFAULT_TEST_USER_PASS environmental variable](#environmental-variables).
 
 <br/><br/><br/><br/>
+# Extra Information
+<br/><br/>
+
 # Dev Ops Suggestions
 
 ![khateeb remind frontend archiecture](khateebRemindFrontend.png)
