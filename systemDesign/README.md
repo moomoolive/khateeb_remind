@@ -4,6 +4,7 @@
 
 The purpose of this document is to explain the systen design of Khateeb Remind and some reasons for many of the design desicions. It should aid anyone wanting to replicate the app or contribute to the project in understanding the project on a deeper level.
 
+<br/><br/>
 ## Table of Contents
 
 * [App Motivation](#app-motivation)
@@ -35,10 +36,12 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 * [Dev-Ops Suggestions](#dev-ops-suggestions)
 * [Closing Notes](#closing-notes)
 
-<br/><br/><br/><br/>
+<br/><br/>
 # App Motivation
 
-todo
+Khateeb Remind was orignially designed to be used at the University of Calgary MSA to help those who schedule khateebs for jummah to easily make sense of the tens of volunteer khateebs' schedules' in the UofC jummah rotation. Whether that's which khateeb can give certain khutbahs, which khateebs are unavailable on certain days, and generally keep track of khutbah history.
+
+It turned out that this was a problem in more than one masjid and muslim community center and therefore was made to be free and open-source.
 
 
 # Project Stack
@@ -206,9 +209,8 @@ The client-side app doesn't do any REAL authentication but relies on the server 
 
 It is important to note that if a user tries to access a view (webpage) that requires a higher authorization level than their JWT claims they have the web-app will take preventative measures and not allow the user to direct to that pages. Unfortunately becauase the client app always assumes that the JWT has not been forged, a user *could* theortically forge their own JWT and add a higher level of authorization to the payload - which would allow them to see views that require higher authorization. But again the server would ideally detect something like this and the view wouldn't recieve any information from the server. 
 
-<br/><br/><br/><br/>
-# Client
 <br/><br/>
+# Client
 
 # Reasons for using Vue
 
@@ -362,9 +364,8 @@ As stated before Khateeb Remind was close to being a mobile application, so in o
 * Service worker caches > 95% of assets associated with the app and therefore repeat visits are even faster than initial. 
 * Large JavaScript utility libraries were avoided (such as Moment and LoDash) in favor of smaller, more specific in-house libraries.
 
-<br/><br/><br/><br/>
-# Server
 <br/><br/>
+# Server
 
 # Reasons for Using Node
 
@@ -562,9 +563,8 @@ This script first creates:
 
 All user account passwords created by the script are determined by the [DEFAULT_TEST_USER_PASS environmental variable](#environmental-variables).
 
-<br/><br/><br/><br/>
-# Extra Information
 <br/><br/>
+# Extra Information
 
 # Dev Ops Suggestions
 
