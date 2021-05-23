@@ -30,6 +30,8 @@ The purpose of this document is to explain the systen design of Khateeb Remind a
 * [About Notifications and Third Party Services](#about-notifications-and-third-party-services)
 * [Server Side Configurations](#server-side-configurations)
 * [Server Initialization](#server-initialization)
+
+### Extra Information
 * [Dev-Ops Suggestions](#dev-ops-suggestions)
 * [Closing Notes](#closing-notes)
 
@@ -326,9 +328,9 @@ All these configurations are found in the *"App.config.js"* file found in the ro
 # On Client Side Performance
  
 As stated before Khateeb Remind was close to being a mobile application, so in order to gap the bridge between native performance and web application performance, Khateeb Remind employs a few methods to make it a very performant client on both desktop and mobile:
-* There are virtually no pictures in the application and 90% of visuals are icons in the form of SVGs, most taken from the generous folks at [font-awesome](#https://fontawesome.com/).
+* There are virtually no pictures in the application and 90% of visuals are icons in the form of SVGs, most taken from the generous folks at [font-awesome](https://fontawesome.com/).
 * Client distribution servers heavily compress all files before serving.
-* > 90% of all views (pages) of Khateeb Remind are lazy-loaded.
+* \> 90% of all views (pages) of Khateeb Remind are lazy-loaded.
 * No CSS framework was used and all styling was done in-house.
 * Imported fonts (from Google Fonts) are inlined and lazy-loaded.
 * Source maps are not included in the distribution build.
