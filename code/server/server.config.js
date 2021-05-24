@@ -5,10 +5,13 @@ const dotenv = require('dotenv')
 
 // set enviromental variables from a .env file at project root
 // look at the README for required enviromental factors
-if (process.env.NODE_ENV === 'production')
+if (process.env.NODE_ENV === 'production') {
     dotenv.config({ path: path.resolve(__dirname + '/.env.production') })
-else
+} else if (process.env.NODE_ENV === 'test') {
+    dotenv.config({ path: path.resolve(__dirname + '/.env.test') })
+} else {
     dotenv.config({ path: path.resolve(__dirname + '/.env.development') })
+}
 
 const globalConfig = {
     rootInstitution: {
