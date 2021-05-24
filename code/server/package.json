@@ -7,8 +7,9 @@
   "scripts": {
     "dev": "nodemon Server.js",
     "server": "node Server.js",
-    "test:unit": "jest",
-    "test:int": "jest",
+    "test:unit": "jest ./unit",
+    "test:int": "jest ./integration",
+    "test:debug": "jest sample.test.js",
     "docker:remove-old": "docker rm kr -f && docker image prune -f",
     "docker:create-test-container": "docker image build . -t khateeb-remind-test && docker create -p 80:80 --name kr khateeb-remind-test:latest",
     "docker:run-test-container": "docker container start kr -a",
