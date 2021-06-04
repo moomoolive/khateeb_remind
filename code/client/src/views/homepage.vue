@@ -16,7 +16,11 @@
                         khateebs, eat shawarma, or do whatever else you want. 
                     </div>
                     <div class="usecase-text">
-                        <a href="/usecase"><span class="blue">Why use Khateeb Remind?</span></a>
+                        <a href="/usecase">
+                            <span class="blue green-hover">
+                                Why use Khateeb Remind?
+                            </span>
+                        </a>
                     </div>
                 </div>
                 <div class="buttons-container">
@@ -105,6 +109,12 @@ button {
     padding-bottom: 10px;
     margin-left: 0;
     @include floating-box-shadow(0.3);
+}
+
+.green-hover {
+    &:hover {
+        color: get-color("green");
+    }
 }
 
 @media screen and (max-width: $phone-width) {
