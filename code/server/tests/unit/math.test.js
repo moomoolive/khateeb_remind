@@ -13,19 +13,19 @@ describe("Random number generation function", () => {
     })
 
     it("Returns number with specified number of digits", () => {
-        expect(mathHelpers.generateRandomNumber(5).toString().length === 5).toBe(true)
-        expect(mathHelpers.generateRandomNumber(4).toString().length === 4).toBe(true)
-        expect(mathHelpers.generateRandomNumber(8).toString().length === 8).toBe(true)
+        expect(mathHelpers.generateRandomNumber(5).toString().length).toBe(5)
+        expect(mathHelpers.generateRandomNumber(4).toString().length).toBe(4)
+        expect(mathHelpers.generateRandomNumber(8).toString().length).toBe(8)
     })
 
     it("Returns number with 1 digit if 0 is inputted", () => {
-        expect(mathHelpers.generateRandomNumber(0).toString().length === 1).toBe(true)
+        expect(mathHelpers.generateRandomNumber(0).toString().length).toBe(1)
     })
 
     it("Returns number with 1 digit if input is less than 0", () => {
-        expect(mathHelpers.generateRandomNumber(-1).toString().length === 1).toBe(true)
-        expect(mathHelpers.generateRandomNumber(-5).toString().length === 1).toBe(true)
-        expect(mathHelpers.generateRandomNumber(-7).toString().length === 1).toBe(true)
+        expect(mathHelpers.generateRandomNumber(-1).toString().length).toBe(1)
+        expect(mathHelpers.generateRandomNumber(-5).toString().length).toBe(1)
+        expect(mathHelpers.generateRandomNumber(-7).toString().length).toBe(1)
     })
 
 })
