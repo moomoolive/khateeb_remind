@@ -258,8 +258,97 @@ describe("Date base date formating function", () => {
 
 describe("Get specificed date relative to timezone function", () => {
 
-    // TODO
     it("Returns a JS date object with correct timing relative to timezone", () => {
-        expect(true).toBe(true)
+        const june = 5
+        let year = 2021
+        let date = 4
+        let month = june
+        let hour = 2
+        let minute = 6
+        const mstTime = scheduleHelpers.getSpecificDateInTimezone({
+            timezone: "America/Edmonton",
+            year,
+            month,
+            date,
+            hour,
+            minute
+        })
+        let utcOffsetOnDate = 6
+        let utcTime = new Date()
+        utcTime.setUTCFullYear(year, month, date)
+        utcTime.setUTCHours(hour + utcOffsetOnDate, minute)
+        expect(mstTime.getUTCDate()).toBe(utcTime.getUTCDate())
+        expect(mstTime.getUTCFullYear()).toBe(utcTime.getUTCFullYear())
+        expect(mstTime.getUTCMonth()).toBe(utcTime.getUTCMonth())
+        expect(mstTime.getUTCHours()).toBe(utcTime.getUTCHours())
+        expect(mstTime.getUTCMinutes()).toBe(utcTime.getUTCMinutes())
+
+        const pstTime = scheduleHelpers.getSpecificDateInTimezone({
+            timezone: "America/Los_Angeles",
+            year,
+            month,
+            date,
+            hour,
+            minute
+        })
+        utcOffsetOnDate = 7
+        utcTime = new Date()
+        utcTime.setUTCFullYear(year, month, date)
+        utcTime.setUTCHours(hour + utcOffsetOnDate, minute)
+        expect(pstTime.getUTCDate()).toBe(utcTime.getUTCDate())
+        expect(pstTime.getUTCFullYear()).toBe(utcTime.getUTCFullYear())
+        expect(pstTime.getUTCMonth()).toBe(utcTime.getUTCMonth())
+        expect(pstTime.getUTCHours()).toBe(utcTime.getUTCHours())
+        expect(pstTime.getUTCMinutes()).toBe(utcTime.getUTCMinutes())
+
+        const faroeIslandsTime = scheduleHelpers.getSpecificDateInTimezone({
+            timezone: "Atlantic/Faroe",
+            year,
+            month,
+            date,
+            hour,
+            minute
+        })
+        utcOffsetOnDate = -1
+        utcTime = new Date()
+        utcTime.setUTCFullYear(year, month, date)
+        utcTime.setUTCHours(hour + utcOffsetOnDate, minute)
+        expect(faroeIslandsTime.getUTCDate()).toBe(utcTime.getUTCDate())
+        expect(faroeIslandsTime.getUTCFullYear()).toBe(utcTime.getUTCFullYear())
+        expect(faroeIslandsTime.getUTCMonth()).toBe(utcTime.getUTCMonth())
+        expect(faroeIslandsTime.getUTCHours()).toBe(utcTime.getUTCHours())
+        expect(faroeIslandsTime.getUTCMinutes()).toBe(utcTime.getUTCMinutes())
+
+        const germanyTime = scheduleHelpers.getSpecificDateInTimezone({
+            timezone: "Europe/Berlin",
+            year,
+            month,
+            date,
+            hour,
+            minute
+        })
+        utcOffsetOnDate = -2
+        utcTime = new Date()
+        utcTime.setUTCFullYear(year, month, date)
+        utcTime.setUTCHours(hour + utcOffsetOnDate, minute)
+        expect(germanyTime.getUTCDate()).toBe(utcTime.getUTCDate())
+        expect(germanyTime.getUTCFullYear()).toBe(utcTime.getUTCFullYear())
+        expect(germanyTime.getUTCMonth()).toBe(utcTime.getUTCMonth())
+        expect(germanyTime.getUTCHours()).toBe(utcTime.getUTCHours())
+        expect(germanyTime.getUTCMinutes()).toBe(utcTime.getUTCMinutes())
+    })
+})
+
+describe("Current time in specified timezone function", () => {
+    const hoursInDay = 23
+    const getCorrectHours = hours => hours < 0 ? hoursInDay + hours : hours
+
+    it("Should return current time in target timezone", () => {
+        const mstTimeNow = scheduleHelpers.getDateInTimezoneNow("America/Edmonton")
+        const dateNow = new Date()
+        const mstHours = mstTimeNow.getHours()
+        const possibleTime1 = getCorrectHours(dateNow.getUTCHours() - 7) === mstHours
+        const possibleTime2 = getCorrectHours(dateNow.getUTCHours() - 6) === mstHours
+        expect(possibleTime1 || possibleTime2).toBe(true)
     })
 })

@@ -11,15 +11,7 @@ const sameMonthAndYear = (a=new Date(), b=new Date()) => {
 }
 
 const convertDayJsToJSDateObject = (dayJs=dayjs()) => {
-    return new Date(
-        dayJs.year(),
-        dayJs.month(),
-        dayJs.date(),
-        dayJs.hour(),
-        dayJs.minute(),
-        dayJs.second(),
-        dayJs.millisecond()
-    )
+    return new Date(dayJs.toISOString())
 }
 
 module.exports = {
