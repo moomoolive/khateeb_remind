@@ -1,4 +1,4 @@
-const typeCheckingHelpers = require($rootDir + "/libraries/typeChecking/main.js")
+const typeCheckingHelpers = require("./main.js")
 const testHelpers = require($rootDir + "/tests/helpers/main.js")
 
 const { globalConfig } = require($rootDir + "/Server.config.js")

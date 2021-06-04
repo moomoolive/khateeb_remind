@@ -1,4 +1,4 @@
-const authHelpers = require($rootDir + "/libraries/auth/main.js")
+const authHelpers = require("./main.js")
 const testHelpers = require($rootDir + "/tests/helpers/main.js")
 
 const jwt = require("jsonwebtoken")
