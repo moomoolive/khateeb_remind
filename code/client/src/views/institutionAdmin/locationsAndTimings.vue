@@ -287,6 +287,8 @@ export default {
         async addNewLocation() {
             const length = this.locations.length + 1
             const { location, timing } = await this._api.locations.createNewLocation({ name: `Unknown Location ${length}`, address: `Unknown Address ${length}` })
+            // eslint-disable-next-line
+            console.log(timing)
             this.timings.push(timing)
             this.locations.push(location)
         },
