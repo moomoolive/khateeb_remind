@@ -3,6 +3,8 @@ const validator = require('express-validator')
 
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
+const { institutions } = require($rootDir + "/database/interfaces/index.js")
+
 const router = express.Router()
 
 router.post('/unique-username',
@@ -24,10 +26,10 @@ validationMiddleware.validateRequest(
 
 router.get('/institution-selection', async (req, res) => {
     try {
-        const data = await $db.institutions
-            .find({ confirmed: true, active: true })
-            .select(["-createdAt", "-updatedAt"])
-            .exec()
+        const data = await institutions.query({
+            filter: { confirmed: true, active: true },
+            sortBy: ["-createdAt", "-updatedAt"]
+        })
         return res.json({ data })
     } catch(err) {
         console.log(err)

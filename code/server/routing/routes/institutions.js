@@ -4,6 +4,8 @@ const validator = require('express-validator')
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
+const { institutions } = require($rootDir + "/database/interfaces/index.js")
+
 const router = express.Router()
 
 router.get(
@@ -11,8 +13,8 @@ router.get(
     authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
-            const data = await $db.institutions.findOne({ _id: req.headers.institutionid }).exec()
-            return res.json({ data })
+            const query = await institutions.query({ filter: { _id: req.headers.institutionid } })
+            return res.json({ data: query[0] })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ data: { settings: {} }, msg: `Couldn't retrieve institution. Err trace: ${err}` })
@@ -35,7 +37,11 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "institutions"),
     async (req, res) => {
         try {
-            const data = await $db.institutions.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            const data = await institutions.updateEntry({
+                filter: { _id: req.body._id },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -49,10 +55,10 @@ router.delete(
     authMiddleware.authenticate({ level: 4 }),
     async (req, res) => {
         try {
-            const targetInstitution = await $db[req.headers.specialInstitution || "institutions"]
-                .findOne({ _id: req.headers.institutionid })
-                .exec()
-            const data = await targetInstitution.deactivate()
+            const data = await institutions.deleteEntry({
+                filter: { _id: req.headers.institutionid },
+                specialInstitution: req.headers.specialInstitution 
+            })
             return res.json({ data })
         } catch(err) {
             console.log(err)

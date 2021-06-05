@@ -7,6 +7,8 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
+const { institutions } = require($rootDir + "/database/interfaces/index.js")
+
 const router = express.Router()
 
 router.post(
@@ -27,7 +29,9 @@ router.post(
             return res.json({ msg: `You cannot name your institution 'test'. Pick another name please.`, code: 2 })
         const rootUser = await $db.root.findOne({}).exec()
         const autoConfirm = rootUser.systemSettings.autoConfirmInstitutionRegistration 
-        const institutionEntry = await new $db.institutions({ ...req.body, confirmed: autoConfirm }).save()
+        const institutionEntry = await institutions.createEntry({
+            entry: { ...req.body, confirmed: autoConfirm }
+        })
         const institutionAuthorizations = await $db.authorizations.find({ institution: institutionEntry._id.toString() }).exec()
         await $db.users.update(
             { _id: req.headers.userid },

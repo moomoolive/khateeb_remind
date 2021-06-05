@@ -233,6 +233,7 @@ export default {
     margin-top: 20px;
     @include light-border-rounding();
     @include center-margin();
+    @include alternate-font();
 }
 
 .institution-selection-content-container {

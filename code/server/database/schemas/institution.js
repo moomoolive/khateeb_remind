@@ -117,7 +117,6 @@ institution.methods.deactivate = async function() {
     } catch(err) {
         console.error(err)
     }
-    res.institution = await this.deactivateInstitution()
     return res
 }
 
@@ -130,16 +129,6 @@ institution.methods.deleteAuthorizationKeys = async function() {
     let res = {}
     try {
         res = await $db.authorizations.deleteMany({ institution: this._id })
-    } catch(err) {
-        console.error(err)
-    }
-    return res
-}
-
-institution.methods.deactivateInstitution = async function() {
-    let res = {}
-    try {
-        res = await $db.institutions.update({ _id: this._id }, { active: false })
     } catch(err) {
         console.error(err)
     }

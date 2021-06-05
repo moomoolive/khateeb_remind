@@ -3,6 +3,8 @@ const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
 const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
+const { institutions } = require($rootDir + "/database/interfaces/index.js")
+
 const findDefaultPreferenceForThisWeek = (defaultKhateebID="12345", khateebs=[], upcomingFriday=new Date(), targetTiming={}, isBackup=true) => {
     const noneScheduled = { _id: $config.consts.nullId }
     if (!defaultKhateebID || defaultKhateebID === $config.consts.nullId)
@@ -36,13 +38,16 @@ const job = async () => {
         // > Are confirmed
         // > that aren't the root institution (aka "__ROOT__")
         // > and have jummah notifications turned on
-        const institutions = await $db.institutions.find({ 
-            confirmed: true, 
-            name: { $ne: "__ROOT__" },
-            "settings.allowJummahNotifications": true 
-        }).exec()
-        if (Array.isArray(institutions))
+        const institutions = await institutions.query({
+            filter: {
+                confirmed: true,
+                name: { $ne: "__ROOT__" },
+               "settings.allowJummahNotifications": true 
+            }
+        })
+        if (Array.isArray(institutions)) {
             confirmedInstitutions = institutions
+        }
     } catch(err) {
         console.log("Couldn't run notification chron ", err)
         return

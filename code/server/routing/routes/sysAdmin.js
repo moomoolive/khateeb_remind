@@ -4,13 +4,15 @@ const validator = require('express-validator')
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
+const { institutions } = require($rootDir + "/database/interfaces/index.js")
+
 const router = express.Router()
 
 router.use(authMiddleware.authenticate({ min: 5, max: 6 }))
 
 router.get('/institutions', async (req, res) => {
     try {
-        const data = await $db.institutions.find(req.query).exec()
+        const data = await institutions.query({ filter: req.query })
         return res.json({ data })
     } catch(err) {
         console.log(err)
@@ -26,7 +28,11 @@ router.put('/institutions',
     ]),
     async (req, res) => {
         try {
-            const data = await $db.institutions.findOneAndUpdate({ _id: req.body.institutionID }, req.body, { new: true }).exec()
+            const data = await institutions.updateEntry({
+                filter: { _id: req.body.institutionID },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             if (data.confirmed) {
                 const authorizations = await $db.authorizations.find({ institution: data._id.toString() }).exec()
                 await $db.users.update(
