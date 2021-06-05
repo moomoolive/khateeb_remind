@@ -8,26 +8,29 @@
                         Users
                     </div>
                     <div class="footer-links-header-divide"></div>
-                    <a
-                        class="green"
-                        :href="feedbackURL" 
-                        target="_blank"
-                    >
-                        Feedback
-                    </a>
-                    <a 
-                        v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
-                        class="green"
-                        @click="$store.dispatch('user/downgradeUserAuthorization')"
-                    >
-                        Exit Institution
-                    </a>
-                    <a 
-                        class="green"
-                        @click="logout()"
-                    >
-                        Logout
-                    </a>
+                    <nav>
+                        <a
+                            class="green"
+                            :href="feedbackURL"
+                            rel="noopener" 
+                            target="_blank"
+                        >
+                            Feedback
+                        </a>
+                        <a 
+                            v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
+                            class="green"
+                            @click="$store.dispatch('user/downgradeUserAuthorization')"
+                        >
+                            Exit Institution
+                        </a>
+                        <a 
+                            class="green"
+                            @click="logout()"
+                        >
+                            Logout
+                        </a>
+                    </nav>
                 </div>
             </collapse-transition>
 
@@ -36,20 +39,21 @@
                     Info
                 </div>
                 <div class="footer-links-header-divide"></div>
-                
-                <a 
-                    class="green" 
-                    @click="toUsecasePage()"
-                >
-                    Why Use Khateeb Remind?
-                </a>
+                <nav>
+                    <a 
+                        class="green" 
+                        @click="toUsecasePage()"
+                    >
+                        Why Use Khateeb Remind?
+                    </a>
 
-                <a 
-                    class="green" 
-                    @click="toHomepage()"
-                >
-                    Homepage
-                </a>
+                    <a 
+                        class="green" 
+                        @click="toHomepage()"
+                    >
+                        Homepage
+                    </a>
+                </nav>
 
             </div>
 
@@ -58,14 +62,16 @@
                     Devs
                 </div>
                 <div class="footer-links-header-divide"></div>
-                
-                <a 
-                    class="green" 
-                    href="https://github.com/moomoolive/khateeb_remind"
-                    target="_blank"
-                >
-                    Contribute to Source Code
-                </a>
+                <nav>
+                    <a 
+                        class="green" 
+                        :href="sourceCodeURL"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        Contribute to Source Code
+                    </a>
+                </nav>
                 
             </div>
 
@@ -94,13 +100,13 @@ export default {
     },
     data() {
         return {
-            feedbackURL: Config.thirdPartyServicesConfig.feedbackFormURL
+            feedbackURL: Config.thirdPartyServicesConfig.feedbackFormURL,
+            sourceCodeURL: Config.thirdPartyServicesConfig.sourceCodeRepoURL
         }
     },
     methods: {
         toUsecasePage() {
-            if (this.$router.currentRoute.fullPath !== '/usecase')
-                return this.$router.push({ path: "/usecase" })
+            return window.open(Config.thirdPartyServicesConfig.marketingPages, "_blank", "noopener")
         },
         toHomepage() {
             if (this.$router.currentRoute.fullPath !== '/')
@@ -174,7 +180,7 @@ a {
 
 .footer-links-section-header {
     font-size: 15px;
-    color: get-color("blue");
+    color: get-color("light-blue");
     font-weight: bold;
 }
 

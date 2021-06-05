@@ -25,11 +25,6 @@ const routes = [
     component: () => import ('@/views/404.vue')
   },
   {
-    path: "/usecase",
-    name: "khateebRemindUsecase",
-    component: () => import(/* webpackPrefetch: true */ "@/views/usecase.vue")
-  },
-  {
     path: '/',
     name: "homepage",
     component: homepage

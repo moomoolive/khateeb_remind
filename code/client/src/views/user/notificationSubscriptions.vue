@@ -62,13 +62,6 @@
                                         class="browser-logo" 
                                     />
                                 </span>
-                                <!--
-                                <img 
-                                    :src="require(`@/assets/logos/${browserLogo(subscription.browserBrand)}`)" 
-                                    class="browser-logo"
-                                    alt="internet browser logo"
-                                >
-                                -->
 
                                 <div v-if="subscription.deviceId === deviceId" class="current-device">
                                     Current Device

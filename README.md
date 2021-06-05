@@ -17,7 +17,7 @@ Some highlights of the app:
 The official Khateeb Remind instance is currently hosted @ https://khateebs.com.
 
 If you'd like to signup your institution to use Khateeb Remind click [here](https://khateebs.com).
-If your interested in seeing more reasons to use the app click [here](https://khateebs.com/usecase).
+If your interested in seeing more reasons to use the app click [here](https://khateebs.com/).
 
 Khateeb Remind was orignially designed to be used at the University of Calgary MSA to help those who schedule khateebs for jummah to easily make sense of the tens of volunteer khateebs' schedules' in the UofC jummah rotation. Whether that's which khateeb can give certain khutbahs, which khateebs are unavailable on certain days, and generally keep track of khutbah history.
 

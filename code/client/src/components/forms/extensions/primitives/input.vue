@@ -6,11 +6,14 @@
             v-model="data" 
             :maxlength="maxChars"
             :placeholder="placeholder"
+            :id="createInputNameHash()"
         >
     </div>
 </template>
 
 <script>
+import formValidationHelpers from '@/libraries/formValidation/main.js'
+
 export default {
     name: "formInputPrimitive",
     props: {
@@ -49,6 +52,9 @@ export default {
         },
         startVal() {
             return this.default !== undefined ? this.default : null
+        },
+        createInputNameHash() {
+            return formValidationHelpers.createFormElementNameHash("input")
         }
     },
     watch: {

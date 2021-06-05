@@ -16,7 +16,7 @@
                         khateebs, eat shawarma, or do whatever else you want. 
                     </div>
                     <div class="usecase-text">
-                        <a href="/usecase">
+                        <a :href="marketingWebsite" target="_blank" rel="noopener">
                             <span class="blue green-hover">
                                 Why use Khateeb Remind?
                             </span>
@@ -38,8 +38,15 @@
 </template>
 
 <script>
+import Config from '$config'
+
 export default {
     name: "khateebRemindHomepage",
+    data() {
+        return {
+            marketingWebsite: Config.thirdPartyServicesConfig.marketingPages
+        }
+    },
     created() {
         if (this.$store.state.router.firstPage && this.$store.getters['user/isLoggedIn'])
             this._utils.toHomePage()

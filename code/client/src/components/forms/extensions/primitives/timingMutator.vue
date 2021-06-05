@@ -1,17 +1,21 @@
 <template>
     <div>
-        <timing-mutator
-            class="mutator-container"
-            :timing="time"
-            :textColor="options.textColor || 'none'"
-            :elementSize="options.size || 'none'"
-            @changed="mutateAndEmit($event)"
-        />
+        <div :id="createTimingMutatorNameHash()">
+            <timing-mutator
+                class="mutator-container"
+                :timing="time"
+                :textColor="options.textColor || 'none'"
+                :elementSize="options.size || 'none'"
+                @changed="mutateAndEmit($event)"
+            />
+        </div>
     </div>
 </template>
 
 <script>
 import timingMutator from '@/components/general/timingMutator.vue'
+
+import formValidationHelpers from '@/libraries/formValidation/main.js'
 
 export default {
     name: "timingMutatorFormPrimitive",
@@ -50,6 +54,9 @@ export default {
                 this.time.minute = this.minutesValue
             if (this.hourValue && typeof this.hourValue === 'number')
                 this.time.hour = this.hourValue
+        },
+        createTimingMutatorNameHash() {
+            return formValidationHelpers.createFormElementNameHash("timingmutator")
         }
     },
     computed: {

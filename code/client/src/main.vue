@@ -23,7 +23,7 @@
       <div class="app-container">
 
       <!-- navigation and header -->
-        <div class="header">
+        <header class="header">
 
           <collapse-transition>
             <website-banner v-show="$store.state.websiteBanner.show" />
@@ -31,7 +31,7 @@
 
           <header-navigation />
 
-        </div>
+        </header>
 
         <!-- main router (displayed page) -->
         <div :class="`main-content-background`">
@@ -61,7 +61,9 @@
             />
         </collapse-transition>
 
-        <Footer />
+        <footer>
+          <Footer />
+        </footer>
 
       </div>
     </div>

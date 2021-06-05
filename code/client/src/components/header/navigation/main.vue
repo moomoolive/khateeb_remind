@@ -3,7 +3,8 @@
     <div class="topnav">
 
         <img 
-            class="logo" 
+            class="logo"
+            alt="khateeb remind logo" 
             :src="`${pathToPublicFolder}khateebRemind.png`"
             @click="_utils.toHomePage()"
         >

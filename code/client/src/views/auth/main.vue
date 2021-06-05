@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img :src="`${pathToPublicFolder}khateebRemind.png`">
+        <img alt="khateeb remind logo" :src="`${pathToPublicFolder}khateebRemind.png`">
 
         <div class="formContainer">
 

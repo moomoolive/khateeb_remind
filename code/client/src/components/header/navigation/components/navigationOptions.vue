@@ -1,85 +1,88 @@
 <template>
     <div v-on-clickaway="close">
 
-        <!-- generic user options -->
-        <div v-if="_utils.validAuthentication({ level: 1 })">
-            
-            <div class="menu-item" @click="redirect('/authorizations')">
-                <p>Login Selection</p>
+        <nav>
+            <!-- generic user options -->
+            <div v-if="_utils.validAuthentication({ level: 1 })">
+                
+                <div class="menu-item" @click="redirect('/authorizations')">
+                    <p>Login Selection</p>
+                </div>
+                
+                <div class="menu-item" @click="redirect('/institution-selection')">
+                    <p>Institution Signup</p>
+                </div>
+
             </div>
             
-            <div class="menu-item" @click="redirect('/institution-selection')">
-                <p>Institution Signup</p>
+            <!-- khateeb options -->
+            <div v-if="_utils.validAuthentication({ level: 2 })">
+                
+                <div class="menu-item" @click="redirect('/khateeb/')">
+                    <p>Schedule</p>
+                </div>
+                
+                <div class="menu-item" @click="redirect('/khateeb/announcements')">
+                    <p>Announcements</p>
+                </div>
+                
+                <div class="menu-item" @click="redirect('/khateeb/my-khutbahs')">
+                    <p>My Khutbahs</p>
+                </div>
+
             </div>
 
-        </div>
-        
-        <!-- khateeb options -->
-        <div v-if="_utils.validAuthentication({ level: 2 })">
+            <!-- insitutition admin options -->
+            <div v-if="_utils.validAuthentication({ min: 3, max: 4 })">
+                
+                <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
+                    <p>Set Schedule</p>
+                </div>
+                
+                <div class="menu-item" @click="redirect('/institutionAdmin/announcements')">
+                    <p>Announcements</p>
+                </div>
+                
+                <div class="menu-item" @click="redirect('/institutionAdmin')">
+                    <p>Admin Central</p>
+                </div>
+
+            </div>
+
+            <!-- System admin and root user options -->
+            <div v-if="_utils.validAuthentication({ min: 5 })" >
+                
+                <div class="menu-item" @click="redirect('/sysAdmin')">
+                    <p>Admin Central</p>
+                </div>
+
+            </div>
+
+            <div class="menu-item" @click="tutorials()">
+                <p>Tutorials</p>
+            </div>
+
+            <div
+                v-if="deferredPrompt && !$store.state.user.isBrowsingOnPWA"
+                class="menu-item get-the-app" 
+                @click="downloadApp()"
+            >
+                <p class="alternate-text-color">Download the App</p>
+            </div>
+
+            <div
+                v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
+                class="menu-item caution" 
+                @click="downgradeUserAuthorization()"
+            >
+                <p class="alternate-text-color">Exit Institution</p>
+            </div>
             
-            <div class="menu-item" @click="redirect('/khateeb/')">
-                <p>Schedule</p>
-            </div>
-            
-            <div class="menu-item" @click="redirect('/khateeb/announcements')">
-                <p>Announcements</p>
-            </div>
-            
-            <div class="menu-item" @click="redirect('/khateeb/my-khutbahs')">
-                <p>My Khutbahs</p>
+            <div class="menu-item caution-alternate" @click="logout()">
+                <p class="alternate-text-color">Logout</p>
             </div>
 
-        </div>
-
-        <!-- insitutition admin options -->
-        <div v-if="_utils.validAuthentication({ min: 3, max: 4 })">
-            
-            <div class="menu-item" @click="redirect('/institutionAdmin/schedule')">
-                <p>Set Schedule</p>
-            </div>
-            
-            <div class="menu-item" @click="redirect('/institutionAdmin/announcements')">
-                <p>Announcements</p>
-            </div>
-            
-            <div class="menu-item" @click="redirect('/institutionAdmin')">
-                <p>Admin Central</p>
-            </div>
-
-        </div>
-
-        <!-- System admin and root user options -->
-        <div v-if="_utils.validAuthentication({ min: 5 })" >
-            
-            <div class="menu-item" @click="redirect('/sysAdmin')">
-                <p>Admin Central</p>
-            </div>
-
-        </div>
-
-        <div class="menu-item" @click="tutorials()">
-            <p>Tutorials</p>
-        </div>
-
-        <div
-            v-if="deferredPrompt && !$store.state.user.isBrowsingOnPWA"
-            class="menu-item get-the-app" 
-            @click="downloadApp()"
-        >
-            <p class="alternate-text-color">Download the App</p>
-        </div>
-
-        <div
-            v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
-            class="menu-item caution" 
-            @click="downgradeUserAuthorization()"
-        >
-            <p class="alternate-text-color">Exit Institution</p>
-        </div>
-        
-        <div class="menu-item caution-alternate" @click="logout()">
-            <p class="alternate-text-color">Logout</p>
-        </div>
+        </nav>
 
     </div>
 </template>
