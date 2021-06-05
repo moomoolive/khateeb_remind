@@ -6,7 +6,7 @@ const noEmptyBody = (request, response, next) => {
     } 
 }
 
-const generalError = (err, _, response, _) => {
+const generalError = (err, _, response, _next) => {
     console.error(err)
     return response.status(500).json({ msg: "Server isn't responding right now, try later...", err })
 }

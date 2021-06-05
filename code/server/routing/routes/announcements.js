@@ -5,6 +5,8 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.js')
 
+const { announcements } = require($rootDir + "/database/interfaces/index.js")
+
 const router = express.Router()
 
 router.get(
@@ -12,11 +14,15 @@ router.get(
     authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
-            const data = await $db.announcements.find({ institutionID: req.headers.institutionid, ...req.query}).sort("-updatedAt").limit(20).exec()
+            const data = await announcements.query({
+                filter: { institutionID: req.headers.institutionid, ...req.query },
+                sortBy: "-updatedAt",
+                limit: 20
+            })
             res.set($config.customHeaders.serviceWorkerCache)
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: [], msg: `Couldn't retrieve announcements. Err trace: ${err}` })
         }
     }
@@ -35,7 +41,7 @@ router.post(
     ]),
     async (req, res) => {
         try {
-            const data = await $db.announcements(req.body).save()
+            const data = await announcements.create({ document: req.body })
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -57,7 +63,11 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "announcements"),
     async (req, res) => {
         try {
-            const data = await $db.announcements.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            const data = await announcements.updateDocument({
+                filter: { _id: req.body._id },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -75,7 +85,7 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "announcements"),
     async (req, res) => {
         try {
-            const data = await $db.announcements.deleteOne(req.query)
+            const data = await announcements.deleteDocument({ filter: req.query })
             return res.json({ data })
         } catch(err) {
             console.log(err)

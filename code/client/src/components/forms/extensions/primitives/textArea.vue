@@ -69,7 +69,7 @@ textarea {
     border-radius: 4px;
     height: 13vh;
     max-height: 300px;
-    font-size: 1.5vh;
+    font-size: 17px;
     color: get-color("off-white");
     background-color: get-color("grey", 1);
     &:focus {

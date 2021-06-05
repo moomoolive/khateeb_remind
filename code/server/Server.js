@@ -11,7 +11,7 @@ const path = require('path')
 global.$rootDir = path.resolve(__dirname)
 global.$config = globalConfig
 global.$utils = require('./libraries/globalUtilities.js')
-global.$db = require('./database/main.js')
+global.$db = require('./database/models.js')
 
 const cronJobs = require('./cron/jobPipeline.js')
 const globalMiddleWare = require('./middleware/global/main.js')
