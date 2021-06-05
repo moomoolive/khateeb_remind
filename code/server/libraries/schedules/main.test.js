@@ -340,7 +340,7 @@ describe("Get specificed date relative to timezone function", () => {
 })
 
 describe("Current time in specified timezone function", () => {
-    const hoursInDay = 23
+    const hoursInDay = 24
     const getCorrectHours = hours => hours < 0 ? hoursInDay + hours : hours
 
     it("Should return current time in target timezone", () => {
