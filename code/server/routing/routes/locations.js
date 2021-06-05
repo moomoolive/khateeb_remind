@@ -36,7 +36,7 @@ router.post(
     ]),
     async (req, res) => {
         try {
-            const data = await locations.create({ document: req.body })
+            const data = await locations.createEntry({ entry: req.body })
             return res.json({ data })
         } catch(err) {
             console.error(err)
@@ -56,14 +56,14 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "locations"),
     async (req, res) => {
         try {
-            const data = await locations.updateDocument({
+            const data = await locations.updateEntry({
                 filter: { _id: req.body._id },
                 updates: req.body,
                 returnOptions: { new: true }
             })
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: {}, msg: `Couldn't update location. Err trace: ${err}` })
         }
     }
@@ -78,7 +78,7 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "locations"),
     async (req, res) => {
         try {
-            const data = await locations.deleteDocument({ filter: req.query })
+            const data = await locations.deleteEntry({ filter: req.query })
             return res.json({ data })
         } catch(err) {
             console.log(err)

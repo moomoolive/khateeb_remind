@@ -5,6 +5,8 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.js')
 
+const { timings } = require($rootDir + "/database/interfaces/index.js")
+
 const router = express.Router()
 
 router.get(
@@ -12,7 +14,9 @@ router.get(
     authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
-            const data = await $db.timings.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
+            const data = await timings.query({
+                filter: { institutionID: req.headers.institutionid, ...req.query }
+            })
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -33,7 +37,7 @@ router.post(
     ]),
     async (req, res) => {
         try {
-            const data = await $db.timings(req.body).save()
+            const data = await timings.createEntry({ entry: req.body })
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -54,7 +58,11 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "timings"),
     async (req, res) => {
         try {
-            const data = await $db.timings.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            const data = await timings.updateEntry({
+                filter: { _id: req.body._id },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -72,9 +80,8 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "timings"),
     async (req, res) => {
         try {
-            const deactivedTiming= await $db.timings.findOneAndUpdate(req.query, { active: false }, { new: true })
-            const deletedDependants = await deactivedTiming.deleteDependants()
-            return res.json({ data: { timing: deactivedTiming, deletedDependants } })
+            const data = await timings.deleteEntry({ filter: req.query })
+            return res.json({ data })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ data: {}, msg: `Couldn't delete timing. Err trace: ${err}` })

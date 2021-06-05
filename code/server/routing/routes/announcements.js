@@ -41,7 +41,7 @@ router.post(
     ]),
     async (req, res) => {
         try {
-            const data = await announcements.create({ document: req.body })
+            const data = await announcements.createEntry({ entry: req.body })
             return res.json({ data })
         } catch(err) {
             console.log(err)
@@ -63,7 +63,7 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "announcements"),
     async (req, res) => {
         try {
-            const data = await announcements.updateDocument({
+            const data = await announcements.updateEntry({
                 filter: { _id: req.body._id },
                 updates: req.body,
                 returnOptions: { new: true }
@@ -85,7 +85,7 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "announcements"),
     async (req, res) => {
         try {
-            const data = await announcements.deleteDocument({ filter: req.query })
+            const data = await announcements.deleteEntry({ filter: req.query })
             return res.json({ data })
         } catch(err) {
             console.log(err)

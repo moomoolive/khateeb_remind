@@ -11,12 +11,12 @@ function query(options={}) {
         .exec()
 }
 
-function create(options={}) {
-    const document = options.document || {}
-    return announcements(document).save()
+function createEntry(options={}) {
+    const entry = options.entry || {}
+    return announcements(entry).save()
 }
 
-function updateDocument(options={}) {
+function updateEntry(options={}) {
     const updates = options.updates || {}
     const filter = options.filter || {}
     const returnOptions = options.returnOptions
@@ -25,7 +25,7 @@ function updateDocument(options={}) {
         .exec()
 }
 
-function deleteDocument(options={}) {
+function deleteEntry(options={}) {
     const filter = options.filter || {}
     return announcements.deleteOne(filter)
 }
@@ -33,7 +33,7 @@ function deleteDocument(options={}) {
 
 module.exports = {
     query,
-    create,
-    updateDocument,
-    deleteDocument
+    createEntry,
+    updateEntry,
+    deleteEntry
 }

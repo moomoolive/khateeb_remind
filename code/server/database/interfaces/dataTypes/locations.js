@@ -5,23 +5,22 @@ function query(options={}) {
     return locations.find(filter).exec()
 }
 
-async function create(options={}) {
+async function createEntry(options={}) {
     try {
-        const document = options.document || {}
-        const location = await locations(document).save()
+        const entry = options.entry || {}
+        const location = await locations(entry).save()
         // only one timing exists for location at this point in time
         // for this new location so we can be sure that it's the 
         // first entry returned from the related timings query
         const timings = await location.findTimings()
         return { location,  timing: timings[0] }
     } catch(err) {
-        console.error(err)
         throw err
     }
     
 }
 
-function updateDocument(options={}) {
+function updateEntry(options={}) {
     const updates = options.updates || {}
     const filter = options.filter || {}
     const returnOptions = options.returnOptions
@@ -30,7 +29,7 @@ function updateDocument(options={}) {
         .exec()
 }
 
-async function deleteDocument(options={}) {
+async function deleteEntry(options={}) {
     try {
         const filter = options.filter || {}
         const location = await locations.findOneAndUpdate(
@@ -41,7 +40,6 @@ async function deleteDocument(options={}) {
         const deletedDependants = await location.deleteDependants() 
         return { location, deletedDependants }
     } catch(err) {
-        console.error(err)
         throw err
     }
 }
@@ -49,7 +47,7 @@ async function deleteDocument(options={}) {
 
 module.exports = {
     query,
-    create,
-    updateDocument,
-    deleteDocument
+    createEntry,
+    updateEntry,
+    deleteEntry
 }
