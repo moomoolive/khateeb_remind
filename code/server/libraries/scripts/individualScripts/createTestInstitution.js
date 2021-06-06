@@ -3,6 +3,8 @@ const randomNamegenerate = require('project-name-generator')
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 const { initConfig } = require($rootDir + '/Server.config.js')
 
+const { timings, locations } = require($rootDir + "/database/public.js")
+
 const createTestInstitution = async () => {
     try {
         
@@ -56,18 +58,20 @@ const createTestInstitution = async () => {
         // check if test institution has as many locations as specified in
         // "Server.config.js" file, if not create enough to fulfill that
         // quota
-        let testInstitutionLocations = await $db.locations.find({ institutionID: testInstitution._id.toString() })
+        let testInstitutionLocations = await locations.query({ filter: { institutionID: testInstitution._id } })
         if (testInstitutionLocations.length === initConfig.testInstitution.locationCount)
             console.log(`Test Institution already has ${initConfig.testInstitution.locationCount} locations`)
         else {
             const ids = []
             for (let i = testInstitutionLocations.length; i < initConfig.testInstitution.locationCount; i++) {
                 try {
-                    const location = await new $db.locations({
-                        name: randomNamegenerate().dashed,
-                        address: `${randomNamegenerate().dashed} Street`,
-                        institutionID: testInstitution._id.toString()
-                    }).save()
+                    const location = await locations.createEntry({
+                        entry: {
+                            name: randomNamegenerate().dashed,
+                            address: `${randomNamegenerate().dashed} Street`,
+                            institutionID: testInstitution._id.toString()
+                        }
+                    })
                     ids.push(location._id)
                     
                     let hour = 13
@@ -101,7 +105,7 @@ const createTestInstitution = async () => {
             return console.log(`Test institution already has ${initConfig.testInstitution.khateebCount} khateebs`)
         else {
             const ids = []
-            const testInstitutionTimings = await $db.timings.find({ institutionID: testInstitution._id.toString() })
+            const testInstitutionTimings = await timings.query({ filter: { institutionID: testInstitution._id } })
             const date = scheduleHelpers.findUpcomingFridayDBFormat()
             const vCalendarId = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
             const institutionID = testInstitution._id.toString()

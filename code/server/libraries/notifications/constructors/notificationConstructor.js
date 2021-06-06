@@ -1,6 +1,8 @@
 const pwaNotifications = require($rootDir + '/libraries/pwaNotifications/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
+const { notifications } = require($rootDir + "/database/public.js")
+
 module.exports = class NotificationConstructor {
 
     constructor(userInfo, tag='none', options={}, PWAMessages=false, email=false) {
@@ -75,11 +77,10 @@ module.exports = class NotificationConstructor {
 
     async saveNotificationToDatabase(info) {
         try {
-            const note = await new $db.notifications(info).save()
+            const note = await notifications.createEntry({ entry: info })
             return note
         } catch(err) {
-            console.log(err)
-            console.log(`Couldn't create notification`)
+            console.error("Couldn't create notification", err)
         }
     }
 

@@ -1,4 +1,5 @@
-const { institutions, testInstitution } = require($rootDir + "/database/models.js")
+const institutions = require($rootDir + "/database/models/institutions.js")
+const testInstitution = require($rootDir + "/database/childModels/testInstitution.js")
 
 function query(options={}) {
     const filter = options.filter || {}

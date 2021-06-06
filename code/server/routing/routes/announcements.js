@@ -5,7 +5,7 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.js')
 
-const { announcements } = require($rootDir + "/database/interfaces/index.js")
+const { announcements } = require($rootDir + "/database/interfaces/announcements.js")
 
 const router = express.Router()
 

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+const timings = require($rootDir + "/database/interfaces/timings.js")
+
 const location = new mongoose.Schema({
     institutionID: {
         type: String,
@@ -27,7 +29,9 @@ const location = new mongoose.Schema({
 
 location.methods.findTimings = async function(options) {
     try {
-        const timings = await $db.timings.find({ locationID: this._id.toString(), ...options }).exec()
+        const timings = await timing.query({ 
+            filter: { locationID: this._id, ...options }
+        })
         return timings
     } catch(err) {
         console.log(err)
@@ -41,7 +45,10 @@ location.methods.deleteDependants = async function () {
         const timings = await this.findTimings()
         for (let i = 0; i < timings.length; i++) {
             const thisTimingRes = await timings[i].deleteDependants()
-            const deletedTiming = await $db.timings.update({ _id: timings[i]._id.toString() }, { active: false })
+            const deletedTiming = await timings.updateEntry({
+                filter: { _id: timings[i]._id },
+                updates: { active: false }
+            })
             res[`timing-${timings[i]._id.toString()}`] = { ...thisTimingRes, timing: deletedTiming}
         }
     } catch(err) {
@@ -53,12 +60,14 @@ location.methods.deleteDependants = async function () {
 
 location.methods.createAssociatedTiming = async function(minute=30, hour=12) {
     try {
-        const saved = await $db.timings({
-            institutionID: this.institutionID,
-            locationID: this._id.toString(),
-            hour,
-            minute
-        }).save()
+        const saved = await timings.createEntry({
+            entry: {
+                institutionID: this.institutionID,
+                locationID: this._id.toString(),
+                hour,
+                minute
+            }
+        })
         return saved
     } catch(err) {
         console.log(`${err}\nCouldn't create assoicated timing`)
@@ -73,4 +82,4 @@ location.post('save', async function(newLocation={}) {
     }
 })
 
-module.exports = location
+module.exports = mongoose.model('location', location)

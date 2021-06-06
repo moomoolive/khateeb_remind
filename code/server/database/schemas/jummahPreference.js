@@ -2,6 +2,9 @@ const mongoose = require('mongoose')
 
 const typeCheckingHelpers = require($rootDir + "/libraries/typeChecking/main.js")
 
+const timings = require($rootDir + "/database/interfaces/timings.js")
+const locations = require($rootDir + "/database/interfaces/locations.js")
+
 const jummahPreference = new mongoose.Schema({
     institutionID: {
         type: String,
@@ -70,11 +73,11 @@ const jummahPreference = new mongoose.Schema({
 
 jummahPreference.methods.gatherMeta = async function() {
     try {
-        const location = await $db.locations.findOne({ _id: this.locationID }).exec()
-        const timing = await $db.timings.findOne({ _id: this.timingID }).exec()
+        const locationQuery = await locations.query({ filter: { _id: this.locationID } })
+        const timingQuery = await timings.query({ filter: { _id: this.timingID } })
         return {
-            location,
-            timing
+            location: locationQuery[0],
+            timing: timingQuery[0]
         } 
     } catch(err) {
         console.log(err)

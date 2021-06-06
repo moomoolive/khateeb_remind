@@ -3,6 +3,8 @@ const bcyrpt = require('bcrypt')
 
 const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
+const notifications = require($rootDir + "/database/interfaces/notifications.js")
+
 const authorization = new mongoose.Schema({
     authId: {
         type: mongoose.Types.ObjectId,
@@ -151,14 +153,16 @@ user.pre('save', function(next) {
 
 user.post('save', async function(user, next) {
     try {
-        await new $db.notifications({
-            tag: 'welcome',
-            msg: `Asalam aliakoum ${user.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. If you ever need help take a look at the tutorials in your navigation!`,
-            userID: this._id
-        }).save()
+        await notifications.createEntry({
+            entry: {
+                tag: 'welcome',
+                msg: `Asalam aliakoum ${user.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. If you ever need help take a look at the tutorials in your navigation!`,
+                userID: this._id
+            }
+        })
         return next()
     } catch(err) {
-        console.log(err)
+        console.error(err)
     }
 })
 
@@ -248,7 +252,7 @@ user.methods.deletePwaSubscriptions = async function() {
 user.methods.deleteNotifications = async function() {
     let res = {}
     try {
-        res = await $db.notifications.deleteMany({ userID: this._id }) 
+        res = await notifications.deleteManyEntries({ filter: { userID: this._id } })
     } catch(err) {
         console.log(err)
     }

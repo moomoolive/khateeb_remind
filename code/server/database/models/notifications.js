@@ -40,4 +40,4 @@ const notification = new mongoose.Schema({
     }
 }, { timestamps: true, minimize: false })
 
-module.exports = notification
+module.exports = mongoose.model('notification', notification)

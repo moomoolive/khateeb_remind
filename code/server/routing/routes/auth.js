@@ -7,7 +7,7 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
-const { institutions } = require($rootDir + "/database/interfaces/index.js")
+const { institutions } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 

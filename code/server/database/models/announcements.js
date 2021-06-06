@@ -30,4 +30,4 @@ const announcement = new mongoose.Schema({
     },
 }, { timestamps: true })
 
-module.exports = announcement
+module.exports = mongoose.model('announcement', announcement)

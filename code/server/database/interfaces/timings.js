@@ -1,4 +1,4 @@
-const { timings } = require($rootDir + "/database/models.js")
+const timings = require($rootDir + "/database/models.js")
 
 function query(options={}) {
     const filter = options.filter || {}

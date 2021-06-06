@@ -111,4 +111,4 @@ timing.query.activeTimings = function(institutionID='none') {
     return this.where({ active: true, institutionID })
 }
 
-module.exports = timing
+module.exports = mongoose.model('timing', timing)

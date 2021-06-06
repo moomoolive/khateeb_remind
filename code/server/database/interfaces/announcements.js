@@ -1,4 +1,4 @@
-const { announcements } = require($rootDir + "/database/models.js")
+const announcements = require($rootDir + "/database/models/announcements.js")
 
 function query(options={}) {
     const query = options.filter || {}

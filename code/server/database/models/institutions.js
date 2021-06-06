@@ -204,4 +204,4 @@ institution.methods.getLocalTime = function () {
     return scheduleHelpers.getDateInTimezoneNow(this.timezone)
 }
 
-module.exports = institution
+module.exports = mongoose.model('institution', institution)

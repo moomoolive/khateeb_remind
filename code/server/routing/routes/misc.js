@@ -3,7 +3,7 @@ const validator = require('express-validator')
 
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
-const { institutions } = require($rootDir + "/database/interfaces/index.js")
+const { institutions } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 

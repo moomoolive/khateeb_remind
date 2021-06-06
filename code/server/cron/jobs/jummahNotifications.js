@@ -3,7 +3,7 @@ const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
 const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
-const { institutions } = require($rootDir + "/database/interfaces/index.js")
+const { timings: timingsInterfaces } = require($rootDir + "/database/public.js")
 
 const findDefaultPreferenceForThisWeek = (defaultKhateebID="12345", khateebs=[], upcomingFriday=new Date(), targetTiming={}, isBackup=true) => {
     const noneScheduled = { _id: $config.consts.nullId }
@@ -59,11 +59,17 @@ const job = async () => {
         const targetInstitution = confirmedInstitutions[i]
         let activeTimings = []
         try {
-            const timings = await $db.timings.find().activeTimings(targetInstitution._id.toString()).exec()
-            if (Array.isArray(timings))
+            const timings = timingsInterfaces.query({
+                filter: { 
+                    institutionID: targetInstitution._id, 
+                    active: true 
+                }
+            })
+            if (Array.isArray(timings)) {
                 activeTimings = timings
+            }
         } catch(err) {
-            console.log(`There was a problem finding timings for ${targetInstitution.name} `, err)
+            console.error(`There was a problem finding timings for ${targetInstitution.name} `, err)
             continue
         }
         // loop through all active timings

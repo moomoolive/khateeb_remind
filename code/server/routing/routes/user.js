@@ -1,7 +1,6 @@
 const express = require('express')
 const validator = require('express-validator')
 const DeviceDetector = require('device-detector-js')
-const mongoose = require('mongoose')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
@@ -10,6 +9,8 @@ const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const requestValidationHelpers = require($rootDir + '/libraries/requestValidation/main.js')
 const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
+
+const { notifications } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 1 }))
@@ -90,19 +91,16 @@ router.get('/authorizations', async (req, res) => {
 
 router.get('/notifications', async (req, res) => {
     try {
-        const [notifications, userInfo] = await Promise.all([
-            $db.notifications
-                .find({ userID: req.headers.userid })
-                .populate({
-                    path: 'institutionID',
-                    select: { abbreviatedName: 1 }
-                })
-                .sort('-createdAt')
-                .limit(20)
-                .exec(),
+        const [userNotifications, userInfo] = await Promise.all([
+            notifications.query({
+                filter: { userID: req.headers.userid },
+                populate: { path: 'institutionID', select: { abbreviatedName: 1 } },
+                sortBy: "-createdAt",
+                limit: 20
+            }),
             $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).exec()
         ])
-        return res.json({ data: { notifications, lastLogin: userInfo.lastLogin } })
+        return res.json({ data: { notifications: userNotifications, lastLogin: userInfo.lastLogin } })
     } catch(err) {
         console.error(err)
         return res.json({ data: { notifications: [], lastLogin: new Date() }, msg: `Couldn't get notifications ${err}` })
