@@ -3,7 +3,9 @@ const bcyrpt = require('bcrypt')
 
 const typeCheckingHelpers = require($rootDir + '/libraries/typeChecking/main.js')
 
-const notifications = require($rootDir + "/database/interfaces/notifications.js")
+const notifications = require($rootDir + "/database/models/notifications.js")
+const pwaSubscriptions = require($rootDir + "/database/models/pwaSubscriptions.js")
+const userScheduleRestrictions = require($rootDir + "/database/models/userScheduleRestrictions.js")
 
 const authorization = new mongoose.Schema({
     authId: {
@@ -153,13 +155,11 @@ user.pre('save', function(next) {
 
 user.post('save', async function(user, next) {
     try {
-        await notifications.createEntry({
-            entry: {
-                tag: 'welcome',
-                msg: `Asalam aliakoum ${user.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. If you ever need help take a look at the tutorials in your navigation!`,
-                userID: this._id
-            }
-        })
+        await new notifications({
+            tag: 'welcome',
+            msg: `Asalam aliakoum ${user.firstName}, welcome to khateeb remind! We hope you enjoy your experience insha'Allah. If you ever need help take a look at the tutorials in your navigation!`,
+            userID: this._id
+        }).save()
         return next()
     } catch(err) {
         console.error(err)
@@ -232,7 +232,7 @@ user.methods.deleteDependencies = async function() {
 user.methods.deleteScheduleRestrictions = async function() {
     let res = {}
     try {
-        res = await $db.userScheduleRestrictions.deleteMany({ user: this._id }) 
+        res = await userScheduleRestrictions.deleteMany({ user: this._id }) 
     } catch(err) {
         console.log(err)
     }
@@ -242,7 +242,7 @@ user.methods.deleteScheduleRestrictions = async function() {
 user.methods.deletePwaSubscriptions = async function() {
     let res = {}
     try {
-        res = await $db.pwaSubscriptions.deleteMany({ userID: this._id }) 
+        res = await pwaSubscriptions.deleteMany({ userID: this._id }) 
     } catch(err) {
         console.log(err)
     }
@@ -252,7 +252,7 @@ user.methods.deletePwaSubscriptions = async function() {
 user.methods.deleteNotifications = async function() {
     let res = {}
     try {
-        res = await notifications.deleteManyEntries({ filter: { userID: this._id } })
+        res = await notifications.deleteMany({ userID: this._id })
     } catch(err) {
         console.log(err)
     }

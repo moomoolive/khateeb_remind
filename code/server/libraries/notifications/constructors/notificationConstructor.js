@@ -1,9 +1,13 @@
 const pwaNotifications = require($rootDir + '/libraries/pwaNotifications/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
-const { notifications } = require($rootDir + "/database/public.js")
+const { 
+    notifications, 
+    authorizations,
+    pwaSubscriptions 
+} = require($rootDir + "/database/public.js")
 
-module.exports = class NotificationConstructor {
+class NotificationConstructor {
 
     constructor(userInfo, tag='none', options={}, PWAMessages=false, email=false) {
         this.setRecipents(userInfo)
@@ -48,11 +52,9 @@ module.exports = class NotificationConstructor {
 
     async getInstitutionAdmins(institutionID) {
         try {
-            const authorizations = await $db.authorizations
-                .find({ institution: institutionID })
-                .exec()
-            const rootAdminAuthorization = authorizations.find(a => a.role === 'rootInstitutionAdmin')
-            const adminAuthorization = authorizations.find(a => a.role === 'institutionAdmin')
+            const auths = await authorizations.query({ filter: { institution: institutionID } })
+            const rootAdminAuthorization = auths.find(a => a.role === 'rootInstitutionAdmin')
+            const adminAuthorization = auths.find(a => a.role === 'institutionAdmin')
             const allAdmins = await $db.users
                 .find({ 
                     "authorizations.authId": { $in: [rootAdminAuthorization._id, adminAuthorization._id] } 
@@ -108,13 +110,14 @@ module.exports = class NotificationConstructor {
 
     async getPWASubscriptions(userID="1234") {
         try {
-            const data = await $db.pwaSubscriptions.findOne({ userID }).exec()
-            if (!data)
+            const data = await pwaNotifications.query({ filter: { userID } })
+            if (!data) {
                 return []
-            else
+            } else {
                 return data.subscriptions.filter(s => s.active)
+            }
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return []
         }
     }
@@ -143,3 +146,5 @@ module.exports = class NotificationConstructor {
     }
 
 }
+
+module.exports = NotificationConstructor

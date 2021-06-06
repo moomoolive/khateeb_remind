@@ -9,17 +9,19 @@ const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
 const router = express.Router()
 
+const { authorizations, jummahPreferences } = require($rootDir + "/database/public.js")
+
 router.get(
     '/',
     authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
-            const khateebAuthorization = await $db.authorizations
-                .findOne({ 
-                    institution: req.headers.institutionid,
-                    role: 'khateeb'
-                })
-                .exec()
+            const khateebAuthorization = await authorizations.query({
+                filter: {
+                    institution: req.headers.institutionid, 
+                    role: "khateeb" 
+                }
+            })
             if (!khateebAuthorization) {
                 return res.status(422).json({ 
                     data: [], 
@@ -119,15 +121,17 @@ router.post(
             await note.setRecipentsToAdmins(req.headers.institutionid)
             await note.create()
             if (req.body.eraseKhateebIdQuery) {
-                await $db.jummahPreferences.deleteMany({
-                    institutionID: req.headers.institutionid,
-                    khateebID: req.headers.userid,
-                    ...req.body.eraseKhateebIdQuery    
+                await jummahPreferences.deleteManyEntries({
+                    filter: {
+                        institutionID: req.headers.institutionid,
+                        khateebID: req.headers.userid,
+                        ...req.body.eraseKhateebIdQuery  
+                    }  
                 })
             }
             return res.json({ code: 0 })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ code: 1, msg: `Couldn't notify admins about availability change. Err trace: ${err}` })
         }
     }

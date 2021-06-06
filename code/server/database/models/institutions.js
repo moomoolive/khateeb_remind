@@ -5,6 +5,8 @@ const cloudStorageHelpers = require($rootDir + '/libraries/cloudStorage/main.js'
 
 const { thirdPartyServicesConfig } = require($rootDir + '/Server.config.js')
 
+const authorizations = require($rootDir + "/database/models/authorizations.js")
+
 const institution = new mongoose.Schema({
     name: {
         type: String,
@@ -95,7 +97,7 @@ institution.methods.createStandardAuthorizations = async function() {
     const id = this._id.toString()
     for (const role of standardAuthorizationRoles) {
         try {
-            const auth = await new $db.authorizations({ institution: id, role }).save()
+            const auth = await new authorizations({ institution: id, role }).save()
             console.log(`created authorization ${auth.role} ${auth._id}`)
         } catch(err) {
             console.error(`Couldn't create standard authorizations for ${this.name} `, err)
@@ -128,7 +130,7 @@ institution.methods.deleteInstitutionLogo = async function() {
 institution.methods.deleteAuthorizationKeys = async function() {
     let res = {}
     try {
-        res = await $db.authorizations.deleteMany({ institution: this._id })
+        res = await authorizations.deleteMany({ institution: this._id })
     } catch(err) {
         console.error(err)
     }
@@ -159,10 +161,10 @@ institution.methods.removeAuthorizationKeysFromUsers = async function(authKeys=[
 institution.methods.getAuthorizationKeys = async function() {
     let res = []
     try {
-        const authorizations = await $db.authorizations
+        const auths = await authorizations
             .find({ institution: this._id })
             .exec()
-        res = authorizations.map(a => a._id)
+        res = auths.map(a => a._id)
     } catch(err) {
         console.error(err)
     }

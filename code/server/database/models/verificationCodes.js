@@ -30,4 +30,4 @@ verificationCode.pre('save', function(next) {
     next()
 })
 
-module.exports = verificationCode
+module.exports = mongoose.model('verificationCode', verificationCode)

@@ -9,16 +9,20 @@ const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
 const router = express.Router()
 
+const { authorizations } = require($rootDir + "/database/public.js")
+
 router.use(authMiddleware.authenticate({ level: 4 }))
 
 router.get(
     "/", 
     async (req, res) => {
         try {
-            const institutionAdminAuthorization = await $db.authorizations.findOne({ 
-                institution: req.headers.institutionid, 
-                role: "institutionAdmin" 
-            }).exec()
+            const institutionAdminAuthorization = await authorizations.query({
+                filter: {
+                    institution: req.headers.institutionid, 
+                    role: "institutionAdmin" 
+                }
+            })
             const data = await $db.users.aggregate([
                 // find users that have the 'institutionAdmin' key
                 // for requesting institution

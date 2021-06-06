@@ -48,5 +48,4 @@ const pwaSubscription = new mongoose.Schema({
     },
 }, { timestamps: true })
 
-
-module.exports = pwaSubscription
+module.exports = mongoose.model('pwaSubscription', pwaSubscription)

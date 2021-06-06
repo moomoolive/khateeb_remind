@@ -34,4 +34,4 @@ const userScheduleRestriction = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-module.exports = userScheduleRestriction
+module.exports = mongoose.model('userScheduleRestriction', userScheduleRestriction)

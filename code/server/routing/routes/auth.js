@@ -7,7 +7,7 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
-const { institutions } = require($rootDir + "/database/public.js")
+const { institutions, verificationCodes, authorizations } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 
@@ -32,7 +32,7 @@ router.post(
         const institutionEntry = await institutions.createEntry({
             entry: { ...req.body, confirmed: autoConfirm }
         })
-        const institutionAuthorizations = await $db.authorizations.find({ institution: institutionEntry._id.toString() }).exec()
+        const institutionAuthorizations = await authorizations.query({ filter: { institution: institutionEntry._id } })
         await $db.users.update(
             { _id: req.headers.userid },
             { 
@@ -156,7 +156,7 @@ router.post(
         try {
             const account = await $db.users.findOne(req.body).exec()
             if (account) {
-                const verificationCode = await new $db.verificationCodes({ username: account.username }).save()
+                const verificationCode = await verificationCodes.createEntry({ username: account.username })
                 await externalNotificationHelpers.sendExternalNotification(
                     account.email, 
                     `Khateeb Remind Password Recovery`, 
@@ -182,9 +182,10 @@ router.put(
     ),
     async (req, res) => {
         try {
-            const verificationCode = await $db.verificationCodes.findOne({ code: req.body.code }).exec()
-            if (!verificationCode || verificationCode.username !== req.body.username)
+            const verificationCode = await verificationCodes.findEntry({ code: req.body.code })
+            if (!verificationCode || verificationCode.username !== req.body.username) {
                 return res.json({ msg: "Incorrect code", code: 2 })
+            }
             await $db.users.updateOne({ username: req.body.username }, { password: req.body.newPassword })
             return res.json({ msg: "Password successfully updated", code: 0 })
         } catch(err) {
@@ -213,9 +214,7 @@ router.post(
             })
             if (!targetUser || !isUserInRequestingInstitution)
                 return res.status(403).json({ code: 2, msg: `Cannot add permissions to user` })
-            const institutionAuthorizations = await $db.authorizations
-                .find({ institution: req.headers.institutionid })
-                .exec()
+            const institutionAuthorizations = await authorizations.query({ filter: { institution: req.headers.institutionid } })
             const rootInstitutionAdminAuthorization = institutionAuthorizations.find(a => a.role === 'rootInstitutionAdmin')
             const institutionAdminAuthorization = institutionAuthorizations.find(a => a.role === 'institutionAdmin')
             const newRootAdmin = await $db.users.bulkWrite([

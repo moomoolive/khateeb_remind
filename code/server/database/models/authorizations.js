@@ -15,4 +15,4 @@ const authorization = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-module.exports = authorization
+module.exports = mongoose.model('authorization', authorization)

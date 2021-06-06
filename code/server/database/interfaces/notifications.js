@@ -4,7 +4,7 @@ function query(options={}) {
     const filter = options.filter || {}
     const sortBy = options.sortBy || "-createdAt"
     const limit = options.limit || 20
-    const populate = options.populate || {}
+    const populate = options.populate || ""
     return notifications
         .find(filter)
         .populate(populate)
@@ -18,6 +18,15 @@ function createEntry(options={}) {
     return new notifications(entry).save()
 }
 
+function updateEntry(options={}) {
+    const filter = options.filter || {}
+    const updates = options.updates || {}
+    const returnOptions = options.returnOptions || {}
+    return notifications
+        .findOneAndUpdate(filter, updates, returnOptions)
+        .exec()
+}
+
 function deleteManyEntries(options={}) {
     const filter = options.filter || {}
     return notifications.deleteMany(filter)
@@ -26,5 +35,6 @@ function deleteManyEntries(options={}) {
 module.exports = {
     query,
     createEntry,
-    deleteManyEntries
+    deleteManyEntries,
+    updateEntry
 }

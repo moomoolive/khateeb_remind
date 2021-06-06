@@ -3,7 +3,11 @@ const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
 const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
-const { timings: timingsInterfaces } = require($rootDir + "/database/public.js")
+const { 
+    timings: timingsInterfaces, 
+    authorizations,
+    jummahPreferences
+} = require($rootDir + "/database/public.js")
 
 const findDefaultPreferenceForThisWeek = (defaultKhateebID="12345", khateebs=[], upcomingFriday=new Date(), targetTiming={}, isBackup=true) => {
     const noneScheduled = { _id: $config.consts.nullId }
@@ -79,11 +83,14 @@ const job = async () => {
             // week
             let targetTimingJummahPreferences = []
             try {
-                const jummahPreferences = await $db.jummahPreferences.find({ timingID: targetTiming._id.toString(), date: upcomingFriday }).exec()
-                if (Array.isArray(jummahPreferences))
-                    targetTimingJummahPreferences = jummahPreferences
+                const jPreferences = await jummahPreferences.query({ 
+                   filter: { timingID: targetTiming._id.toString(), date: upcomingFriday } 
+                })
+                if (Array.isArray(jPreferences)) {
+                    targetTimingJummahPreferences = jPreferences
+                }
             } catch(err) {
-                console.log(`There was a problem finding jummah preferences for timing ${targetTiming._id} at ${targetInstitution.name} `, err)
+                console.error(`There was a problem finding jummah preferences for timing ${targetTiming._id} at ${targetInstitution.name} `, err)
             }
             // compensate for zero indexing
             const defaultKhateebsForThisWeek = targetTiming.defaultKhateebs[thisIsFridayNumberInCurrentMonth - 1]
@@ -95,12 +102,12 @@ const job = async () => {
             if (!mainKhateeb || !backupKhateeb) {
                 let khateebsAtThisInstitution = []
                 try {
-                    const khateebAuthorization = await $db.authorizations
-                        .findOne({ 
+                    const khateebAuthorization = await authorizations.query({
+                        filter: { 
                             institution: targetInstitution._id,
-                            role: 'khateeb'
-                        })
-                        .exec()
+                            role: 'khateeb' 
+                        }
+                    })
                     if (!khateebAuthorization) {
                         throw TypeError(`khateeb authorization doesn't exist`)
                     }

@@ -3,24 +3,26 @@ const randomNamegenerate = require('project-name-generator')
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 const { initConfig } = require($rootDir + '/Server.config.js')
 
-const { timings, locations } = require($rootDir + "/database/public.js")
+const { 
+    timings, 
+    locations, 
+    testInstitution: testInstitutionInterfaces,
+    authorizations: authorizationsInterfaces,
+    userScheduleRestrictions 
+} = require($rootDir + "/database/public.js")
 
 const createTestInstitution = async () => {
     try {
         
         // check if test institution exists if not create it
-        let testInstitution = await $db.testInstitution
-            .findOne({})
-            .exec()
-        if (testInstitution)
+        let testInstitution = await testInstitutionInterfaces.testInstitutionExists()
+        if (testInstitution) {
             console.log('Test institution already exists')
-        else
-            testInstitution = await new $db.testInstitution(
-                initConfig.testInstitution.institution
-            ).save()
-        const authorizations = await $db.authorizations.find({ institution: testInstitution._id.toString() }).exec()
-        
+        } else {
+            testInstitution = await testInstitutionInterfaces.create(initConfig.testInstitution.institution)
+        }
 
+        const authorizations = await authorizationsInterfaces.query({ filter: { institution: testInstitution._id } })
         // check if test institution root admin exists if not create it
         const rootInstitutionAdminAuthorization = authorizations.find(a => a.role === 'rootInstitutionAdmin')
         let testInstitutionRootAdmin = await $db.users.findOne({ 
@@ -124,12 +126,14 @@ const createTestInstitution = async () => {
 
                     // create fake schedule restrictions for each khateeb
                     // that is somewhat random
-                    const scheduleRestriction = await new $db.userScheduleRestrictions({
-                        institution: institutionID,
-                        user: khateeb._id,
-                        availableTimings: i % 2 === 0 ? [] : testInstitutionTimings[i] ? [testInstitutionTimings[i]._id.toString()] : [],
-                        unavailableDates: i % 2 === 0 ? [{ vCalendarId, date }] : [],
-                    }).save()
+                    const scheduleRestriction = await userScheduleRestrictions.createEntry({
+                        entry : {
+                            institution: institutionID,
+                            user: khateeb._id,
+                            availableTimings: i % 2 === 0 ? [] : testInstitutionTimings[i] ? [testInstitutionTimings[i]._id.toString()] : [],
+                            unavailableDates: i % 2 === 0 ? [{ vCalendarId, date }] : [],
+                        }
+                    })
                     
                     await $db.users.update(
                         { _id: khateeb._id },

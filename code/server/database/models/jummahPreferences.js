@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const typeCheckingHelpers = require($rootDir + "/libraries/typeChecking/main.js")
 
-const timings = require($rootDir + "/database/interfaces/timings.js")
-const locations = require($rootDir + "/database/interfaces/locations.js")
+const timings = require($rootDir + "/database/models/timings.js")
+const locations = require($rootDir + "/database/models/locations.js")
 
 const jummahPreference = new mongoose.Schema({
     institutionID: {
@@ -73,8 +73,8 @@ const jummahPreference = new mongoose.Schema({
 
 jummahPreference.methods.gatherMeta = async function() {
     try {
-        const locationQuery = await locations.query({ filter: { _id: this.locationID } })
-        const timingQuery = await timings.query({ filter: { _id: this.timingID } })
+        const locationQuery = await locations.find({ _id: this.locationID }).exec()
+        const timingQuery = await timings.find({ _id: this.timingID }).exec()
         return {
             location: locationQuery[0],
             timing: timingQuery[0]
@@ -87,13 +87,15 @@ jummahPreference.methods.gatherMeta = async function() {
 
 jummahPreference.query.upcomingJummahsForInstitution = function (date=new Date(), institutionID='none') {
     institutionID = institutionID.toString()
-    if (!institutionID || institutionID === $config.consts.nullId)
+    if (!institutionID || institutionID === $config.consts.nullId) {
         throw TypeError(`You must provide a valid institution id`)
-    return this.where({
-        institutionID,
-        date,
-        khateebID: { $ne: $config.consts.nullId }
-    })
+    } else {
+        return this.where({
+            institutionID,
+            date,
+            khateebID: { $ne: $config.consts.nullId }
+        })
+    }
 }
 
-module.exports = jummahPreference
+module.exports = mongoose.model('jummahPreference', jummahPreference)

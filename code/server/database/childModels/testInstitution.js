@@ -42,7 +42,7 @@ testInstitution.methods.deleteAllUsers = async function(authKeys=[]) {
 
 testInstitution.methods.deleteInstitution = async function() {
     try {
-        const res = await $db.testInstitution.deleteOne({ _id: this._id })
+        const res = await institutions.deleteOne({ _id: this._id })
         return res
     } catch(err) {
         console.error(err)

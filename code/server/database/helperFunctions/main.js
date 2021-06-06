@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+const userScheduleRestrictions = require($rootDir + "/database/models/userScheduleRestrictions.js")
+
 const removeAuthorizationFromUserCommand = (authorizationId="1234") => {
     return {
         $pull: {
@@ -10,7 +12,7 @@ const removeAuthorizationFromUserCommand = (authorizationId="1234") => {
 
 const getUserScheduleRestrictionsAssociatedWithInstitution = async (userId="1234", institutionId="1234") => {
     try {
-        const scheduleRestrictions = await $db.userScheduleRestrictions
+        const scheduleRestrictions = await userScheduleRestrictions
             .find({ user: userId, institution: institutionId })
             .exec()
         return scheduleRestrictions.map(sR => sR._id)

@@ -4,7 +4,7 @@ const validator = require('express-validator')
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
-const { institutions } = require($rootDir + "/database/public.js")
+const { institutions, authorizations } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 
@@ -34,15 +34,15 @@ router.put('/institutions',
                 returnOptions: { new: true }
             })
             if (data.confirmed) {
-                const authorizations = await $db.authorizations.find({ institution: data._id.toString() }).exec()
+                const auths = await authorizations.query({ filter: { institution: data._id } })
                 await $db.users.update(
-                    { "authorizations.authId": authorizations.find(a => a.role === 'rootInstitutionAdmin')._id.toString() },
+                    { "authorizations.authId": auths.find(a => a.role === 'rootInstitutionAdmin')._id.toString() },
                     { $set: { "authorizations.$.confirmed": true } }
                 )
             }
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: {}, msg: `there was a problem updating institution status. Err trace: ${err}` })
         }
 

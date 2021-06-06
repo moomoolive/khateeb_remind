@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 
 const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
+const authorizations = require($rootDir + "/database/models/authorizations.js")
+
 const defaultKhateebForWeek = new mongoose.Schema({
     mainKhateeb: {
         type: String,
@@ -69,7 +71,7 @@ timing.methods.deleteDependants = async function() {
     const res = {}
     try {
         const timingID = this._id.toString()
-        const khateebAuthorization = await $db.authorizations
+        const khateebAuthorization = await authorizations
             .findOne({ 
                 institution: this.institutionID,
                 role: 'khateeb'
@@ -98,8 +100,7 @@ timing.methods.deleteDependants = async function() {
         if (!res.khateebs)
             res.khateebs = `None modified`
     } catch(err) {
-        console.log(err)
-        console.log(`Couldn't delete dependant data structures`)
+        console.error(`Couldn't delete dependant data structures`, err)
     }
     return res
 }

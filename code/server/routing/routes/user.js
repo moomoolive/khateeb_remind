@@ -10,7 +10,12 @@ const requestValidationHelpers = require($rootDir + '/libraries/requestValidatio
 const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 
-const { notifications } = require($rootDir + "/database/public.js")
+const { 
+    notifications, 
+    authorizations,
+    pwaSubscriptions,
+    userScheduleRestrictions
+} = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 1 }))
@@ -172,11 +177,12 @@ router.post(
     async (req, res) => {
         try {
             const [authInfo, userInfo] = await Promise.all([
-                $db.authorizations.findOne(req.body).populate('institution').exec(),
+                authorizations.findEntry({ filter: req.body, populate: "institution" }),
                 $db.users.findOne({ _id: req.headers.userid }).exec()
             ])
-            if (!authInfo || !userInfo)
+            if (!authInfo || !userInfo) {
                 return res.status(422).json({ code: 2, msg: `Couldn't find requested authorization or user` })
+            }
             const authorizationAlreadyExists = userInfo.authorizations.find(a => a.authId === authInfo._id)
             if (authorizationAlreadyExists)
                 return res.status(403).json({ code: 3, msg: `Illegal operation. Authorization already exists` })
@@ -192,10 +198,10 @@ router.post(
                 } 
             }
             if (req.body.role === 'khateeb') {
-                const scheduleRestriction = await new $db.userScheduleRestrictions({ 
+                const scheduleRestriction = await userScheduleRestrictions.createEntry({ 
                     user: req.headers.userid, 
                     institution: req.body.institution 
-                }).save()
+                })
                 updateCommand.$push.scheduleRestrictions = scheduleRestriction._id
                 const note = new notificationConstructors.KhateebSignupNotificationConstructor(userInfo, autoConfirmPolicy, req.body.institution)
                 await note.setRecipentsToAdmins(authInfo.institution._id)
@@ -227,8 +233,8 @@ router.post(
                     req.headers.userid,
                     req.body.institution
                 )
-                await $db.userScheduleRestrictions.deleteMany({ 
-                    _id: { $in: scheduleRestrictionIds }
+                await userScheduleRestrictions.deleteManyEntries({ 
+                   filter: { _id: { $in: scheduleRestrictionIds } }
                 })
                 updateCommand.$pull.scheduleRestrictions = {
                     $in: scheduleRestrictionIds
@@ -255,13 +261,19 @@ router.put(
     ),
     async (req, res) => {
         try {
-            const notification = await $db.notifications.findOne({ _id: req.body._id }).exec()
-            if (notification.userID.toString() !== req.headers.userid)
+            const targetNotification = await notifications.query({ filter: { _id: req.body._id } })
+            const notification = targetNotification[0]
+            if (notification.userID.toString() !== req.headers.userid) {
                 return res.status(403).json({ msg: `You're not allowed to edit this notification (id: ${req.body._id})` })
-            const updated = await $db.notifications.findOneAndUpdate({_id: req.body._id }, req.body, { new: true })
+            }
+            const updated = await notifications.updateEntry({
+                filter: {_id: req.body._id },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json(updated)
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.json(`Couldn't update notification`)
         }
     }
@@ -282,21 +294,27 @@ router.delete('/', async (req, res) => {
 
 router.get('/pwa-subscription', async (req, res) => {
     try {
-        const data = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).select(["-subscriptions.browserSubscriptionDetails"]).exec()
+        const data = await pwaSubscriptions.query({
+            filter: { userID: req.headers.userid },
+            dataShape: ["-subscriptions.browserSubscriptionDetails"]
+        })
         return res.json({ data: data ? data.subscriptions : [] })
     } catch(err) {
-        console.log(err)
+        console.error(err)
         return res.json({ data: [], msg: `There was an error retrieving your subscriptions. ${err}` })
     }
 })
 
 router.post('/pwa-subscription', async (req, res) => {
     try {
-        let subscriptions = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).exec()
-        if (!subscriptions)
-            subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid }).save()
-        if (subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid))
+        let subscriptions = await pwaSubscriptions.query({ filter: { userID: req.headers.userid } })
+        if (!subscriptions) {
+            subscriptions = await pwaSubscriptions.createEntry({ entry: { userID: req.headers.userid } })
+        }
+        const subscriptionExists = subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid)
+        if (subscriptionExists) {
             return res.json({ code: 0, msg: `This device is already subscribed to notifications` })
+        }
         const deviceIdentification = new DeviceDetector().parse(req.headers["user-agent"])
         const deviceInfo = {
             deviceId: req.headers.deviceid,
@@ -305,10 +323,13 @@ router.post('/pwa-subscription', async (req, res) => {
             browserBrand: deviceIdentification.client.type === 'browser' ? deviceIdentification.client.name : "unknown"
         }
         const newSubscriptionsArray = [...subscriptions.subscriptions, { ...deviceInfo, browserSubscriptionDetails: req.body, } ]
-        await $db.pwaSubscriptions.updateOne({ _id: subscriptions._id.toString() }, { subscriptions: newSubscriptionsArray })
+        await pwaSubscriptions.updateEntry({
+            filter: { _id: subscriptions._id },
+            updates: { subscriptions: newSubscriptionsArray }
+        })
         return res.json({ code: 0 })
     } catch(err) {
-        console.log(`Couldn't create subscription`, err)
+        console.error(`Couldn't create subscription`, err)
         return res.json({ code: 1, msg: `Couldn't create subscription. ${err}` })
     }
 })
@@ -322,26 +343,27 @@ router.put('/pwa-subscription',
     ),
     async (req, res) => {
         try {
-            const data = await $db.pwaSubscriptions.findOneAndUpdate(
-                { userID: req.headers.userid, "subscriptions.deviceId": req.body.deviceId },
-                { $set: { "subscriptions.$.active": req.body.status } },
-                { new: true }
-            ).select(["-subscriptions.browserSubscriptionDetails"]) || { subscriptions: [] }
+            const data = await pwaSubscriptions.updateEntry({
+                filter: { userID: req.headers.userid, "subscriptions.deviceId": req.body.deviceId },
+                updates: { $set: { "subscriptions.$.active": req.body.status } },
+                returnOptions: { new: true },
+                dataShape: ["-subscriptions.browserSubscriptionDetails"]
+            }) || { subscriptions: [] }
             return res.json({ data: data.subscriptions.find(s => s.deviceId === req.body.deviceId) || {} })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: {}, msg: `Couldn't delete subscription. ${err}` })
         }
 })
 
 router.get('/schedule-restrictions', async (req, res) => {
     try {
-        const data = await $db.userScheduleRestrictions
-            .findOne({
+        const data = await userScheduleRestrictions.findEntry({
+            filter: {
                 institution: req.headers.institutionid,
                 user: req.headers.userid
-            })
-            .exec()
+            }
+        })
         return res.json({ data })
     } catch(err) {
         console.error(err)
@@ -359,16 +381,14 @@ router.put(
     ),
     async (req, res) => {
         try {
-            const data = await $db.userScheduleRestrictions
-                .findOneAndUpdate(
-                    { user: req.headers.userid, institution: req.headers.institutionid },
-                    req.body,
-                    { new: true }
-                )
-                .exec()
+            const data = await userScheduleRestrictions.updateEntry({
+                filter: { user: req.headers.userid, institution: req.headers.institutionid },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: null, msg: `An error occured when updating profile. Err trace: ${err}` })
         }
     }
