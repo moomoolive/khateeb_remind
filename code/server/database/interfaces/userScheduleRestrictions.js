@@ -26,9 +26,16 @@ function updateEntry(options={}) {
         .exec()
 }
 
+function deleteAllEntriesWithAnyOfIds(ids=[]) {
+    return deleteManyEntries({ 
+        filter: { _id: { $in: ids } }
+     })
+}
+
 module.exports = {
     createEntry,
     deleteManyEntries,
     findEntry,
-    updateEntry
+    updateEntry,
+    deleteAllEntriesWithAnyOfIds
 }

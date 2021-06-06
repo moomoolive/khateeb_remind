@@ -233,7 +233,11 @@ function confirmAuthorization(userAuthId="1234", confirmed) {
     )
 }
 
-function removeAuthorization(userId="1234", userAuthorizationId="1234", options={}) {
+function removeAuthorization(userId="1234", userAuthorizationId="1234", extraOperations={}) {
+    let options = {}
+    if (extraOperations.removeAssociatedSchedules) {
+        options.$pull = { scheduleRestrictions: { $in: extraOperations.scheduleIds } }
+    }
     return users.update(
         { _id: userId },
         {
@@ -307,6 +311,14 @@ async function updateProfile(options={}) {
     }
 }
 
+function findAuthorizationHolders(authorizations=[]) {
+    return query({
+        filter: {
+            "authorizations.authId": { $in: authorizations } 
+        }
+    })
+}
+
 module.exports = {
     findKhateebs,
     getUserScheduleRestrictionsAssociatedWithInstitution,
@@ -322,5 +334,6 @@ module.exports = {
     populateScheduleRestrictionsAndAuthorizations,
     findEntryRelatedAuthorizations,
     addAuthorization,
-    updateProfile
+    updateProfile,
+    findAuthorizationHolders
 }

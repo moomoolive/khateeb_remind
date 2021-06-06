@@ -220,14 +220,12 @@ router.post(
                     req.headers.userid,
                     req.body.institution
                 )
-                await userScheduleRestrictions.deleteManyEntries({ 
-                   filter: { _id: { $in: scheduleRestrictionIds } }
-                })
+                await userScheduleRestrictions.deleteAllEntriesWithAnyOfIds(scheduleRestrictionIds)
             }
             await users.removeAuthorization(
                 req.headers.userid,
                 req.body.id,
-                { $pull: { scheduleRestrictions: { $in: scheduleRestrictionIds } } }
+                { removeAssociatedSchedules: true, scheduleIds:  scheduleRestrictionIds }
             )
             return res.json({ code: 0 })
         } catch(err) {
@@ -332,11 +330,10 @@ router.put('/pwa-subscription',
     ),
     async (req, res) => {
         try {
-            const data = await pwaSubscriptions.updateEntry({
-                filter: { userID: req.headers.userid, "subscriptions.deviceId": req.body.deviceId },
-                updates: { $set: { "subscriptions.$.active": req.body.status } },
-                returnOptions: { new: true },
-                dataShape: ["-subscriptions.browserSubscriptionDetails"]
+            const data = await pwaSubscriptions.updateSubscriptionStatus({
+                userId: req.headers.userid,
+                deviceId: req.body.deviceId,
+                subscriptionStatus: req.body.status
             }) || { subscriptions: [] }
             return res.json({ data: data.subscriptions.find(s => s.deviceId === req.body.deviceId) || {} })
         } catch(err) {

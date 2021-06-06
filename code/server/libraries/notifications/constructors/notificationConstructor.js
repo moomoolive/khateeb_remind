@@ -56,13 +56,9 @@ class NotificationConstructor {
             const auths = await authorizations.query({ filter: { institution: institutionID } })
             const rootAdminAuthorization = auths.find(a => a.role === 'rootInstitutionAdmin')
             const adminAuthorization = auths.find(a => a.role === 'institutionAdmin')
-            const allAdmins = await users.query({
-                filter: {
-                    "authorizations.authId": { 
-                        $in: [rootAdminAuthorization._id, adminAuthorization._id] 
-                    } 
-                }
-            })
+            const allAdmins = users.findAuthorizationHolders([
+                rootAdminAuthorization._id, adminAuthorization._id
+            ])
             return Array.isArray(allAdmins) ? allAdmins : []
         } catch(err) {
             console.error(err)

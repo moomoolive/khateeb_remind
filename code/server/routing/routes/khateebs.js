@@ -90,7 +90,7 @@ router.delete(
             const data = await users.removeAuthorization(
                 targetUser._id,
                 targetAuthorization._id,
-                { $pull: { scheduleRestrictions: { $in: targetScheduleRestrictions } } }
+                { removeAssociatedSchedules: true, scheduleIds: targetScheduleRestrictions }
             )
             return res.json({ data })
         } catch(err) {

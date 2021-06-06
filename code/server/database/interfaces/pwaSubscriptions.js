@@ -25,8 +25,21 @@ function updateEntry(options={}) {
         .exec()
 }
 
+function updateSubscriptionStatus(options={}) {
+    const deviceId = options.deviceId || ""
+    const userId = options.userId || ""
+    const subscriptionStatus = option.subscriptionStatus || null
+    return updateEntry({
+        filter: { userID: userId, "subscriptions.deviceId": deviceId },
+        updates: { $set: { "subscriptions.$.active": subscriptionStatus } },
+        returnOptions: { new: true },
+        dataShape: ["-subscriptions.browserSubscriptionDetails"]
+    })
+}
+
 module.exports = {
     query,
     createEntry,
-    updateEntry
+    updateEntry,
+    updateSubscriptionStatus
 }

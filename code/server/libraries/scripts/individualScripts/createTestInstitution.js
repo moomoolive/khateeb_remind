@@ -105,9 +105,7 @@ const createTestInstitution = async () => {
         // "Server.config.js" file, if not create enough to fulfill that
         // quota
         const khateebAuthorization = authorizations.find(a => a.role === 'khateeb')
-        let testInstitutionKhateebs = await users.query({ 
-            filter: { "authorizations.authId": khateebAuthorization._id }
-        })
+        let testInstitutionKhateebs = await users.findAuthorizationHolders([khateebAuthorization._id])
         if (testInstitutionKhateebs.length === initConfig.testInstitution.khateebCount) {
             return console.log(`Test institution already has ${initConfig.testInstitution.khateebCount} khateebs`)
         } else {
