@@ -16,7 +16,11 @@
                         khateebs, eat shawarma, or do whatever else you want. 
                     </div>
                     <div class="usecase-text">
-                        <a href="/usecase"><span class="blue">Why use Khateeb Remind?</span></a>
+                        <a :href="marketingWebsite" target="_blank" rel="noopener">
+                            <span class="blue green-hover">
+                                Why use Khateeb Remind?
+                            </span>
+                        </a>
                     </div>
                 </div>
                 <div class="buttons-container">
@@ -34,8 +38,15 @@
 </template>
 
 <script>
+import Config from '$config'
+
 export default {
     name: "khateebRemindHomepage",
+    data() {
+        return {
+            marketingWebsite: Config.thirdPartyServicesConfig.marketingPages
+        }
+    },
     created() {
         if (this.$store.state.router.firstPage && this.$store.getters['user/isLoggedIn'])
             this._utils.toHomePage()
@@ -105,6 +116,12 @@ button {
     padding-bottom: 10px;
     margin-left: 0;
     @include floating-box-shadow(0.3);
+}
+
+.green-hover {
+    &:hover {
+        color: get-color("green");
+    }
 }
 
 @media screen and (max-width: $phone-width) {

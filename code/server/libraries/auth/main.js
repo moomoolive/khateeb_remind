@@ -11,18 +11,6 @@ const createToken = (info={}, expiresAfter='60-days') => {
     return jwt.sign(info, securityConfig.jwtSecret, { expiresIn: expiration })
 }
 
-const refreshToken = async (userId) => {
-    try {
-        const unwantedFields = ["-password", "-__v", "-confirmed"]
-        let user = await $db.users.findOne({ _id: userId }).select(unwantedFields).exec()
-        user = JSON.parse(JSON.stringify(user))
-        return createToken(user)
-    } catch(err) {
-        console.log(err)
-        return err
-    }
-}
-
 const userTypeToAuthLevel = (userType) => {
     const index = helpers.authLevels.findIndex(level => level === userType)
     return index === -1 ? 0 : index + 1
@@ -55,7 +43,6 @@ const mutateHeadersToIncludeUserInfo = (request, decodedToken) => {
 
 module.exports = {
     createToken,
-    refreshToken,
     validUserAuthentication,
     userTypeToAuthLevel,
     mutateHeadersToIncludeUserInfo,

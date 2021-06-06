@@ -1,6 +1,8 @@
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 
+const { jummahPreferences, users } = require($rootDir + "/database/public.js")
+
 const cronNotificationTiming = (upcomingFriday=new Date(), chronTimingInfo={}, timezone="America/Edmonton") => {
     const targetDayOfWeek = scheduleHelpers.findDayOfWeek(
         upcomingFriday,
@@ -26,10 +28,11 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
 
     const createAndOverwritePreference = async () => {
         const toBeSavedPreference = $utils.deepCopy(preferenceInfo)
-        if (toBeSavedPreference._id)
+        if (toBeSavedPreference._id) {
             delete toBeSavedPreference._id
+        }
         try {
-            const databaseLoggedPreference = await new $db.jummahPreferences(toBeSavedPreference).save()
+            const databaseLoggedPreference = await jummahPreferences.createEntry({ entry: toBeSavedPreference })
             if (typeof databaseLoggedPreference !== 'object')
                 throw TypeError(`Database responded with invalid type`)
             return databaseLoggedPreference
@@ -54,14 +57,12 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
     }
     const findJummahKhateebInfo = async () => {
         try {
-            const khateeb = await $db.users
-                .find()
-                .safelyFindOne(preferenceInfo.khateebID)
-                .exec()
-            if (!khateeb)
+            const khateeb = await users.query({ filter: { _id: preferenceInfo.khateebID } })
+            if (!khateeb) {
                 throw TypeError(`Database responded with incorrect type of khateeb info`)
-            else
+            } else {
                 return khateeb
+            }
         } catch(err) {
             console.log(err)
             return null
@@ -69,21 +70,22 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
     }
     const updateJummahStatus = async (updates={}) => {
         try {
-            const updated = await $db.jummahPreferences.findOneAndUpdate(
-                { _id: preferenceInfo._id.toString() },
-                { 
+            const updated = await jummahPreferences.updateEntry({
+                filter: { _id: preferenceInfo._id.toString() },
+                updates: { 
                     isGivingKhutbah: targetPreference,
                     $inc: { loopRunCount: 1 },
                     ...updates 
                 },
-                { new: true }
-            ).exec()
-            if (!updated)
+                returnOptions: { new: true }
+            })
+            if (!updated) {
                 throw TypeError(`Database didn't correctly update jummah`)
-            else
+            } else {
                 return updated
+            }
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return null
         }
     }

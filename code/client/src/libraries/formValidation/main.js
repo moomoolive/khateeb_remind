@@ -1,6 +1,8 @@
 import helpers from './helpers.js'
 import validators from './validatorsList.js'
 
+import { nanoid } from 'nanoid'
+
 const getValidators = async (validatorName, data, fieldName) => {
     if (typeof validatorName === 'string')
         validatorName = [validatorName]
@@ -23,6 +25,12 @@ const getValidators = async (validatorName, data, fieldName) => {
     return validationInfo
 }
 
+const createFormElementNameHash = (typeOfElement='input') => {
+    const idLength = 21
+    return `${typeOfElement}-${nanoid(idLength)}-${window.location.pathname}`
+}
+
 export default {
-    getValidators
+    getValidators,
+    createFormElementNameHash
 }

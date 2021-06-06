@@ -2,6 +2,7 @@
     <div>
         <select 
             v-model="currentlySelected"
+            :id="createDropdownNameHash()"
             @change="toMain()"
         >
             <option
@@ -16,6 +17,8 @@
 </template>
 
 <script>
+import formValidationHelpers from '@/libraries/formValidation/main.js'
+
 export default {
     name: "formDropdownPrimitive",
     props: {
@@ -50,6 +53,9 @@ export default {
         },
         toMain(options) {
             this.$emit('changed', { val: this.currentlySelected, ...options})
+        },
+        createDropdownNameHash() {
+            return formValidationHelpers.createFormElementNameHash("dropdown")
         }
     },
     computed: {

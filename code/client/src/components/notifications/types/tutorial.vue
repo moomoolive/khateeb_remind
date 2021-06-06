@@ -23,7 +23,7 @@
         <div class="tutorial-scroll-divider"></div>
         <div class="tutorial-scroller">
             <div class="tutorial-container">
-                <img src="~@/assets/tutorials/bismillahBlue.png">
+                <img src="~@/assets/tutorials/bismillahBlue.png" alt="'in the name of god the most gracious the most merciful' in Arabic">
                 <component :is="tutorial" @close="$emit('close')" />
             </div>
         </div>

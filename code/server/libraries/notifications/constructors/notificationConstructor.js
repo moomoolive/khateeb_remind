@@ -1,7 +1,14 @@
 const pwaNotifications = require($rootDir + '/libraries/pwaNotifications/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
-module.exports = class NotificationConstructor {
+const { 
+    notifications, 
+    authorizations,
+    pwaSubscriptions,
+    users 
+} = require($rootDir + "/database/public.js")
+
+class NotificationConstructor {
 
     constructor(userInfo, tag='none', options={}, PWAMessages=false, email=false) {
         this.setRecipents(userInfo)
@@ -46,19 +53,15 @@ module.exports = class NotificationConstructor {
 
     async getInstitutionAdmins(institutionID) {
         try {
-            const authorizations = await $db.authorizations
-                .find({ institution: institutionID })
-                .exec()
-            const rootAdminAuthorization = authorizations.find(a => a.role === 'rootInstitutionAdmin')
-            const adminAuthorization = authorizations.find(a => a.role === 'institutionAdmin')
-            const allAdmins = await $db.users
-                .find({ 
-                    "authorizations.authId": { $in: [rootAdminAuthorization._id, adminAuthorization._id] } 
-                })
-                .exec()
+            const auths = await authorizations.query({ filter: { institution: institutionID } })
+            const rootAdminAuthorization = auths.find(a => a.role === 'rootInstitutionAdmin')
+            const adminAuthorization = auths.find(a => a.role === 'institutionAdmin')
+            const allAdmins = users.findAuthorizationHolders([
+                rootAdminAuthorization._id, adminAuthorization._id
+            ])
             return Array.isArray(allAdmins) ? allAdmins : []
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return []
         }
     }
@@ -75,11 +78,10 @@ module.exports = class NotificationConstructor {
 
     async saveNotificationToDatabase(info) {
         try {
-            const note = await new $db.notifications(info).save()
+            const note = await notifications.createEntry({ entry: info })
             return note
         } catch(err) {
-            console.log(err)
-            console.log(`Couldn't create notification`)
+            console.error("Couldn't create notification", err)
         }
     }
 
@@ -107,13 +109,14 @@ module.exports = class NotificationConstructor {
 
     async getPWASubscriptions(userID="1234") {
         try {
-            const data = await $db.pwaSubscriptions.findOne({ userID }).exec()
-            if (!data)
+            const data = await pwaSubscriptions.query({ filter: { userID } })
+            if (!data) {
                 return []
-            else
+            } else {
                 return data.subscriptions.filter(s => s.active)
+            }
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return []
         }
     }
@@ -142,3 +145,5 @@ module.exports = class NotificationConstructor {
     }
 
 }
+
+module.exports = NotificationConstructor

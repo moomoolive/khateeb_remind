@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img :src="`${pathToPublicFolder}khateebRemind.png`">
+        <img alt="khateeb remind logo" :src="`${pathToPublicFolder}khateebRemind.png`">
 
         <div class="formContainer">
 
@@ -28,11 +28,10 @@
                 @submitted="login($event)"
             />
 
-            <div
-                class="forgot-credentials-text " 
-                @click="forgotCredentials()"
-            >
-                Forgot Username or Password?
+            <div @click="forgotCredentials()">
+                <span class="forgot-credentials-text">
+                    Forgot Username or Password?
+                </span>
             </div>
 
         </div>

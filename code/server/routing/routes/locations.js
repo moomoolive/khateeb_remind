@@ -5,6 +5,8 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 const postRequestMiddleware = require($rootDir + '/middleware/postRequests/main.js')
 
+const { locations } = require($rootDir + "/database/public.js")
+
 const router = express.Router()
 
 router.get(
@@ -12,10 +14,12 @@ router.get(
     authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
-            const data = await $db.locations.find({ institutionID: req.headers.institutionid, ...req.query}).exec()
+            const data = await locations.query({
+                filter: { institutionID: req.headers.institutionid, ...req.query } 
+            })
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: [], msg: `Error retrieving jummahs. Err trace: ${err}` })
         }
     }
@@ -32,11 +36,10 @@ router.post(
     ]),
     async (req, res) => {
         try {
-            const newLocation = await $db.locations(req.body).save()
-            const newTiming = await newLocation.findTimings()
-            return res.json({ data: { location: newLocation, timing: newTiming[0] }})
+            const data = await locations.createEntry({ entry: req.body })
+            return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: { location: {}, timing: {} }, msg: `Couldn't create new location. Err trace: ${err}` })
         }
     }
@@ -53,10 +56,14 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "locations"),
     async (req, res) => {
         try {
-            const data = await $db.locations.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            const data = await locations.updateEntry({
+                filter: { _id: req.body._id },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: {}, msg: `Couldn't update location. Err trace: ${err}` })
         }
     }
@@ -71,9 +78,8 @@ router.delete(
     authMiddleware.isAllowedToDeleteResource(["institutionID"], "locations"),
     async (req, res) => {
         try {
-            const deactivedLocation = await $db.locations.findOneAndUpdate(req.query, { active: false }, { new: true })
-            const deletedDependants = await deactivedLocation.deleteDependants()
-            return res.json({ data: { location: deactivedLocation, deletedDependants } })
+            const data = await locations.deleteEntry({ filter: req.query })
+            return res.json({ data })
         } catch(err) {
             console.log(err)
             return res.status(503).json({ data: {}, msg: `Couldn't delete location. Err trace: ${err}` })

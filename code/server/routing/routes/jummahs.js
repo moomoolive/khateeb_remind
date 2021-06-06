@@ -9,6 +9,8 @@ const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const requestValidationHelpers = require($rootDir + "/libraries/requestValidation/main.js")
 
+const { jummahPreferences, users } = require($rootDir + "/database/public.js")
+
 const router = express.Router()
 
 router.get(
@@ -16,10 +18,13 @@ router.get(
     authMiddleware.authenticate({ min: 2, max: 4 }), 
     async (req, res) => {
         try {
-            const data = await $db.jummahPreferences.find({ institutionID: req.headers.institutionid, ...req.query }).sort("-date").exec()
+            const data = await jummahPreferences.query({
+                filter: { institutionID: req.headers.institutionid, ...req.query },
+                sortBy: "-date"
+            })
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: [], msg: `An error occured when retrieving jummahs. Err trace:${err}` })
         }
 })
@@ -41,26 +46,29 @@ router.post(
     ]),
     async (req, res) => {
         try {
-            const duplicateEntry = await $db.jummahPreferences.findOne({ 
-                institutionID: req.body.institutionID, 
-                timingID: req.body.timingID, 
-                locationID: req.body.locationID,
-                isBackup: req.body.isBackup, 
-                date: req.body.date, 
-            }).exec()
-            if (duplicateEntry)
+            const duplicateEntry = await jummahPreferences.findEntry({
+                filter: {
+                    institutionID: req.body.institutionID, 
+                    timingID: req.body.timingID, 
+                    locationID: req.body.locationID,
+                    isBackup: req.body.isBackup, 
+                    date: req.body.date, 
+                }
+            })
+            if (duplicateEntry) {
                 return res.status(422).json({ data: {}, msg: `You cannot create duplicate entries!` })
-            const data = await new $db.jummahPreferences(req.body).save()
+            }
+            const data = await jummahPreferences.createEntry({ entry: req.body })
             if (req.headers.usertype === 'khateeb') {
                 const jummahMeta = await data.gatherMeta()
-                const khateeb = await $db.users.findOne({ _id: req.headers.userid }).exec()
+                const khateeb = await users.findEntry({ filter: { _id: req.headers.userid } })
                 const note = new notificationConstructors.khateebJummahSignupConstructor(khateeb, data, jummahMeta)
                 await note.setRecipentsToAdmins(req.headers.institutionid)
                 note.create()
             }
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: {}, msg: `Couldn't create new jummah preference. Err trace: ${err}` })
         }
     } 
@@ -79,10 +87,14 @@ router.put(
     authMiddleware.isAllowedToUpdateResource(["institutionID"], "jummahPreferences"),
     async (req, res) => {
         try {
-            const data = await $db.jummahPreferences.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true })
+            const data = await jummahPreferences.updateEntry({
+                filter: { _id: req.body._id },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: {}, msg: `Couldn't update jummah. Err trace: ${err}` })
         }
     }
@@ -121,20 +133,21 @@ router.put(
                 return res.status(403).json({ msg: 'forbidden resource' })
             
             if (!targetPreference.upsert) {
-                targetPreference = await $db.jummahPreferences.findOne({ _id: targetPreference._id }).exec()
-                if (!targetPreference)
+                targetPreference = await jummahPreferences.findEntry({ filter: { _id: targetPreference._id } })
+                if (!targetPreference) {
                     return res.status(422).json({ msg: `Target preference does not exist` })
+                }
             }
             
             let otherPreference = req.body[!req.query.backup ? 'backup' : 'main']
-            if (otherPreference._id && otherPreference._id !== 'none')
-                otherPreference = await $db.jummahPreferences.findOne({ _id: otherPreference._id }) || otherPreference
-            
+            if (otherPreference._id && otherPreference._id !== $config.consts.nullId) {
+                otherPreference = await jummahPreferences.findEntry({ filter: { _id: otherPreference._id } }) || otherPreference
+            }    
             const target = await jummahHelpers.jummahPreferenceNotifier(targetPreference, true).sendNotification()
             const other = await jummahHelpers.jummahPreferenceNotifier(otherPreference, false).sendNotification()
             return res.json({ data: { targetPreference: target, otherPreference: other } })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: { targetPreference: {}, otherPreference: {} }, msg: `Couldn't run notification loop. Err trace: ${err}` })
         }
     }

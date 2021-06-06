@@ -1,12 +1,14 @@
 const typeCheckingHelpers = require($rootDir + "/libraries/typeChecking/main.js")
 
-const validIdOrNullIdInField = (val="none") => {
-    if (!typeCheckingHelpers.validIdOrNullId(val))
+const validIdOrNullIdInField = (val) => {
+    if (!typeCheckingHelpers.validIdOrNullId(val)) {
         throw TypeError(`Invalid id format`)
-    return true
+    } else {
+        return true
+    }
 }
 
-const validInstitutionId = (val="root") => {
+const validInstitutionId = (val) => {
     if (val !== 'root' && val.length !== $config.consts.mongooseIdLength) {
         throw TypeError(`Invalid institution id`)
     } else {

@@ -11,7 +11,9 @@ const securityConfig = {
 }
 
 const thirdPartyServicesConfig = {
-    feedbackFormURL: "https://docs.google.com/forms/d/e/1FAIpQLSdoUhgTg8TgnYGCXRtWSIJam0k8MkPbIB4wIoeJDvqL8B3Jjg/viewform?usp=sf_link" 
+    feedbackFormURL: "https://docs.google.com/forms/d/e/1FAIpQLSdoUhgTg8TgnYGCXRtWSIJam0k8MkPbIB4wIoeJDvqL8B3Jjg/viewform?usp=sf_link",
+    marketingPages: "https://khateebs.com",
+    sourceCodeRepoURL: "https://github.com/moomoolive/khateeb_remind" 
 }
 
 const userRestrictionsConfig = {

@@ -1,10 +1,14 @@
 <template>
     <div>
-        <p><pre>{{ display(options.default) }}</pre></p>
+        <p :id="createReadOnlyNameHash()">
+            <pre>{{ display(options.default) }}</pre>
+        </p>
     </div>
 </template>
 
 <script>
+import formValidationHelpers from '@/libraries/formValidation/main.js'
+
 export default {
     name: 'formReadOnlyPrimitive',
     props: {
@@ -36,6 +40,9 @@ export default {
             const last4 = data.slice(6, 10)
             const country = '+1' //hardcoded
             return `${country} ${area}-${first3}-${last4}`
+        },
+        createReadOnlyNameHash() {
+            return formValidationHelpers.createFormElementNameHash("readonly")
         }
     }
 }

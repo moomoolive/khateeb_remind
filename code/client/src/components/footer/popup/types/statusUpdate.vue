@@ -5,6 +5,7 @@
         </div>
         <img 
             :src="require(`@/assets/gifs/${this.componentsProps.gif || 'loading'}.gif`)" 
+            alt="footer popup"
             class="gif"
         >
         <div v-if="componentsProps.bottomMessage" class="message-box">

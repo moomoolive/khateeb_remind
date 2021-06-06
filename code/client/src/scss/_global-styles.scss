@@ -23,7 +23,7 @@ a {
     text-decoration: none;
 }
 
-body, html {
+body {
     margin: 0 0 0 0;
     background: silver;
     color: get-color("off-white");
@@ -117,4 +117,12 @@ button {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+
+@media screen and (max-width: $large-screen-view) {
+
+    body {
+        background: get-color("grey");
+    }
 }

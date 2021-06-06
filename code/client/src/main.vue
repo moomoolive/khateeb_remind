@@ -23,7 +23,7 @@
       <div class="app-container">
 
       <!-- navigation and header -->
-        <div class="header">
+        <header class="header">
 
           <collapse-transition>
             <website-banner v-show="$store.state.websiteBanner.show" />
@@ -31,7 +31,7 @@
 
           <header-navigation />
 
-        </div>
+        </header>
 
         <!-- main router (displayed page) -->
         <div :class="`main-content-background`">
@@ -61,7 +61,9 @@
             />
         </collapse-transition>
 
-        <Footer />
+        <footer>
+          <Footer />
+        </footer>
 
       </div>
     </div>
@@ -198,7 +200,7 @@ export default {
 }
 
 .app-container {
-  max-width: $maxAppWidth;
+  max-width: $large-screen-view;
   min-width: $minimum-app-width;
   @include center-margin();
   @include floating-box-shadow(0.6);
@@ -274,7 +276,7 @@ export default {
 
 .app-container-wrapper {
   background: get-color('grey');
-  max-width: 1400px;
+  max-width: $maxAppWidth + 50px;
   @include center-margin();
 }
 
@@ -298,11 +300,15 @@ export default {
       }
 }
 
-@media screen and (min-width: $maxAppWidth) {
+@media screen and (min-width: $large-screen-view) {
     .app-container {
       margin-top: 50px;
       margin-bottom: 50px;
-      width: 1400px;
+      width: $maxAppWidth;
+    }
+
+    .app-container-wrapper {
+      max-width: $maxAppWidth;
     }
 }
 </style>

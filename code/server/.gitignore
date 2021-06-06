@@ -1,7 +1,8 @@
 node_modules/
 
 # environmental variables both dev and production
-.env*
+.env.development
+.env.production
 
 # although keys are already in env I keep original copy in case of emergency
 vapidKeys.json

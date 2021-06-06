@@ -1,15 +1,21 @@
 const express = require('express')
 const validator = require('express-validator')
 const DeviceDetector = require('device-detector-js')
-const mongoose = require('mongoose')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const requestValidationHelpers = require($rootDir + '/libraries/requestValidation/main.js')
-const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
+
+const { 
+    notifications, 
+    authorizations,
+    pwaSubscriptions,
+    userScheduleRestrictions,
+    users
+} = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 router.use(authMiddleware.authenticate({ min: 1 }))
@@ -33,14 +39,15 @@ router.put(
     ),
     async (req, res) => {
         try {
-            // the reason why I use updateOne and then findOne instead of
-            // findOneAndUpdate is because there are 'pre update' hooks for
-            // the user schema that won't work with findOneAndUpdate
-            await $db[req.headers.targetusermodel].updateOne({ _id: req.headers.userid }, req.body)
-            const mongooseRes = await $db[req.headers.targetusermodel].findOne({ _id: req.headers.userid }).select(["-__v", "-password"]).exec()
-            return res.json({ data: mongooseRes, msg: `Successfully updated`, mongooseRes })
+            const data = await users.updateProfile({
+                filter: { _id: req.headers.userid },
+                updates: req.body,
+                targetModel: req.headers.targetusermodel,
+                dataShape: ["-__v", "-password"]
+            })
+            return res.json({ data, msg: `Successfully updated` })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: null, msg: `An error occured when updating profile. Err trace: ${err}` })
         }
     }
@@ -48,21 +55,7 @@ router.put(
 
 router.get('/authorizations', async (req, res) => {
     try {
-        let data = await $db.users
-            .findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
-            .populate({ 
-                path: 'authorizations.authId',
-                select: { __v: 0 },
-                populate: {
-                    path: 'institution',
-                    select: {
-                        settings: 0,
-                        __v: 0
-                    }
-                }
-            })
-            .select(["-__v", "-statuses", "-password"])
-            .exec()
+        let data = await users.findEntryRelatedAuthorizations(req.headers.userid)
         if (req.headers.specialStatus) {
             // special status is reserved for the root user
             // and any system administrators
@@ -90,19 +83,19 @@ router.get('/authorizations', async (req, res) => {
 
 router.get('/notifications', async (req, res) => {
     try {
-        const [notifications, userInfo] = await Promise.all([
-            $db.notifications
-                .find({ userID: req.headers.userid })
-                .populate({
-                    path: 'institutionID',
-                    select: { abbreviatedName: 1 }
-                })
-                .sort('-createdAt')
-                .limit(20)
-                .exec(),
-            $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).exec()
+        const [userNotifications, userInfo] = await Promise.all([
+            notifications.query({
+                filter: { userID: req.headers.userid },
+                populate: { path: 'institutionID', select: { abbreviatedName: 1 } },
+                sortBy: "-createdAt",
+                limit: 20
+            }),
+            user.updateEntry({
+                filter: { _id: req.headers.userid },
+                updates: { lastLogin: new Date() }
+            })
         ])
-        return res.json({ data: { notifications, lastLogin: userInfo.lastLogin } })
+        return res.json({ data: { notifications: userNotifications, lastLogin: userInfo.lastLogin } })
     } catch(err) {
         console.error(err)
         return res.json({ data: { notifications: [], lastLogin: new Date() }, msg: `Couldn't get notifications ${err}` })
@@ -123,7 +116,7 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const user = await $db.users.findOne({ _id: req.headers.userid }).exec()
+            const user = await user.findEntry({ filter: { _id: req.headers.userid } })
             const userHasRequestedAuthorization = user.authorizations
                 .map(a => a.authId)
                 .find(id => id.toString() === req.body.authId)
@@ -174,36 +167,34 @@ router.post(
     async (req, res) => {
         try {
             const [authInfo, userInfo] = await Promise.all([
-                $db.authorizations.findOne(req.body).populate('institution').exec(),
-                $db.users.findOne({ _id: req.headers.userid }).exec()
+                authorizations.findEntry({ filter: req.body, populate: "institution" }),
+                users.findEntry({ filter: { _id: req.headers.userid } })
             ])
-            if (!authInfo || !userInfo)
+            if (!authInfo || !userInfo) {
                 return res.status(422).json({ code: 2, msg: `Couldn't find requested authorization or user` })
-            const authorizationAlreadyExists = userInfo.authorizations.find(a => a.authId === authInfo._id)
-            if (authorizationAlreadyExists)
-                return res.status(403).json({ code: 3, msg: `Illegal operation. Authorization already exists` })
-            const autoConfirmPolicy = authInfo.institution.settings.autoConfirmRegistration
-            const updateCommand = { 
-                $push: { 
-                    authorizations: { 
-                        authId: authInfo._id, 
-                        // system administrators can never be autoconfirmed
-                        // only khateebs can be if administrator turns on that setting
-                        confirmed: req.body.role !== 'khateeb' ? false : autoConfirmPolicy
-                    } 
-                } 
             }
+            const authorizationAlreadyExists = userInfo.authorizations.find(a => a.authId === authInfo._id)
+            if (authorizationAlreadyExists) {
+                return res.status(403).json({ code: 3, msg: `Illegal operation. Authorization already exists` })
+            }
+            const autoConfirmPolicy = authInfo.institution.settings.autoConfirmRegistration
+            let extraUpdates = {}
             if (req.body.role === 'khateeb') {
-                const scheduleRestriction = await new $db.userScheduleRestrictions({ 
+                const scheduleRestriction = await userScheduleRestrictions.createEntry({ 
                     user: req.headers.userid, 
                     institution: req.body.institution 
-                }).save()
-                updateCommand.$push.scheduleRestrictions = scheduleRestriction._id
+                })
+                extraUpdates.$push.scheduleRestrictions = scheduleRestriction._id
                 const note = new notificationConstructors.KhateebSignupNotificationConstructor(userInfo, autoConfirmPolicy, req.body.institution)
                 await note.setRecipentsToAdmins(authInfo.institution._id)
                 note.create()
             }
-            await $db.users.update({ _id: userInfo._id }, updateCommand)
+            await users.addAuthorization(
+                userInfo._id,
+                authInfo._id,
+                req.body.role !== 'khateeb' ? false : autoConfirmPolicy,
+                extraUpdates
+            )
             return res.json({ code: 0 })
         } catch(err) {
             console.log(err)
@@ -223,20 +214,19 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const updateCommand = databaseHelpers.removeAuthorizationFromUserCommand(req.body.id)
+            let scheduleRestrictionIds = []
             if (req.body.role === 'khateeb') {
-                const scheduleRestrictionIds = await databaseHelpers.getUserScheduleRestrictionsAssociatedWithInstitution(
+                scheduleRestrictionIds = await users.getUserScheduleRestrictionsAssociatedWithInstitution(
                     req.headers.userid,
                     req.body.institution
                 )
-                await $db.userScheduleRestrictions.deleteMany({ 
-                    _id: { $in: scheduleRestrictionIds }
-                })
-                updateCommand.$pull.scheduleRestrictions = {
-                    $in: scheduleRestrictionIds
-                }
+                await userScheduleRestrictions.deleteAllEntriesWithAnyOfIds(scheduleRestrictionIds)
             }
-            await $db.users.update({ _id: req.headers.userid }, updateCommand) 
+            await users.removeAuthorization(
+                req.headers.userid,
+                req.body.id,
+                { removeAssociatedSchedules: true, scheduleIds:  scheduleRestrictionIds }
+            )
             return res.json({ code: 0 })
         } catch(err) {
             console.error(err)
@@ -257,13 +247,19 @@ router.put(
     ),
     async (req, res) => {
         try {
-            const notification = await $db.notifications.findOne({ _id: req.body._id }).exec()
-            if (notification.userID.toString() !== req.headers.userid)
+            const targetNotification = await notifications.query({ filter: { _id: req.body._id } })
+            const notification = targetNotification[0]
+            if (notification.userID.toString() !== req.headers.userid) {
                 return res.status(403).json({ msg: `You're not allowed to edit this notification (id: ${req.body._id})` })
-            const updated = await $db.notifications.findOneAndUpdate({_id: req.body._id }, req.body, { new: true })
+            }
+            const updated = await notifications.updateEntry({
+                filter: {_id: req.body._id },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json(updated)
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.json(`Couldn't update notification`)
         }
     }
@@ -271,9 +267,10 @@ router.put(
 
 router.delete('/', async (req, res) => {
     try {
-        const user = await $db[req.headers.targetusermodel]
-            .findOne({ _id: req.headers.userid })
-            .exec()
+        const user = await users.findEntry({
+            filter: { _id: req.headers.userid },
+            targetModel: req.headers.targetusermodel
+        })
         const data = await user.deactivateAccount()
         return res.json({ data })
     } catch(err) {
@@ -284,21 +281,27 @@ router.delete('/', async (req, res) => {
 
 router.get('/pwa-subscription', async (req, res) => {
     try {
-        const data = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).select(["-subscriptions.browserSubscriptionDetails"]).exec()
+        const data = await pwaSubscriptions.query({
+            filter: { userID: req.headers.userid },
+            dataShape: ["-subscriptions.browserSubscriptionDetails"]
+        })
         return res.json({ data: data ? data.subscriptions : [] })
     } catch(err) {
-        console.log(err)
+        console.error(err)
         return res.json({ data: [], msg: `There was an error retrieving your subscriptions. ${err}` })
     }
 })
 
 router.post('/pwa-subscription', async (req, res) => {
     try {
-        let subscriptions = await $db.pwaSubscriptions.findOne({ userID: req.headers.userid }).exec()
-        if (!subscriptions)
-            subscriptions = await new $db.pwaSubscriptions({ userID: req.headers.userid }).save()
-        if (subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid))
+        let subscriptions = await pwaSubscriptions.query({ filter: { userID: req.headers.userid } })
+        if (!subscriptions) {
+            subscriptions = await pwaSubscriptions.createEntry({ entry: { userID: req.headers.userid } })
+        }
+        const subscriptionExists = subscriptions.subscriptions.find(s => s.deviceId === req.headers.deviceid)
+        if (subscriptionExists) {
             return res.json({ code: 0, msg: `This device is already subscribed to notifications` })
+        }
         const deviceIdentification = new DeviceDetector().parse(req.headers["user-agent"])
         const deviceInfo = {
             deviceId: req.headers.deviceid,
@@ -307,10 +310,13 @@ router.post('/pwa-subscription', async (req, res) => {
             browserBrand: deviceIdentification.client.type === 'browser' ? deviceIdentification.client.name : "unknown"
         }
         const newSubscriptionsArray = [...subscriptions.subscriptions, { ...deviceInfo, browserSubscriptionDetails: req.body, } ]
-        await $db.pwaSubscriptions.updateOne({ _id: subscriptions._id.toString() }, { subscriptions: newSubscriptionsArray })
+        await pwaSubscriptions.updateEntry({
+            filter: { _id: subscriptions._id },
+            updates: { subscriptions: newSubscriptionsArray }
+        })
         return res.json({ code: 0 })
     } catch(err) {
-        console.log(`Couldn't create subscription`, err)
+        console.error(`Couldn't create subscription`, err)
         return res.json({ code: 1, msg: `Couldn't create subscription. ${err}` })
     }
 })
@@ -324,26 +330,26 @@ router.put('/pwa-subscription',
     ),
     async (req, res) => {
         try {
-            const data = await $db.pwaSubscriptions.findOneAndUpdate(
-                { userID: req.headers.userid, "subscriptions.deviceId": req.body.deviceId },
-                { $set: { "subscriptions.$.active": req.body.status } },
-                { new: true }
-            ).select(["-subscriptions.browserSubscriptionDetails"]) || { subscriptions: [] }
+            const data = await pwaSubscriptions.updateSubscriptionStatus({
+                userId: req.headers.userid,
+                deviceId: req.body.deviceId,
+                subscriptionStatus: req.body.status
+            }) || { subscriptions: [] }
             return res.json({ data: data.subscriptions.find(s => s.deviceId === req.body.deviceId) || {} })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: {}, msg: `Couldn't delete subscription. ${err}` })
         }
 })
 
 router.get('/schedule-restrictions', async (req, res) => {
     try {
-        const data = await $db.userScheduleRestrictions
-            .findOne({
+        const data = await userScheduleRestrictions.findEntry({
+            filter: {
                 institution: req.headers.institutionid,
                 user: req.headers.userid
-            })
-            .exec()
+            }
+        })
         return res.json({ data })
     } catch(err) {
         console.error(err)
@@ -361,16 +367,14 @@ router.put(
     ),
     async (req, res) => {
         try {
-            const data = await $db.userScheduleRestrictions
-                .findOneAndUpdate(
-                    { user: req.headers.userid, institution: req.headers.institutionid },
-                    req.body,
-                    { new: true }
-                )
-                .exec()
+            const data = await userScheduleRestrictions.updateEntry({
+                filter: { user: req.headers.userid, institution: req.headers.institutionid },
+                updates: req.body,
+                returnOptions: { new: true }
+            })
             return res.json({ data })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: null, msg: `An error occured when updating profile. Err trace: ${err}` })
         }
     }

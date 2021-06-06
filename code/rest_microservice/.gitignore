@@ -1,0 +1,5 @@
+# binaries
+target/
+
+# windows batch files
+*.bat

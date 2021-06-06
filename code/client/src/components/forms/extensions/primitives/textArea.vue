@@ -1,10 +1,16 @@
 <template>
     <div>
-        <textarea v-model="data" @input="toMain()"></textarea>
+        <textarea 
+            v-model="data"
+            :id="createTextAreaNameHash()" 
+            @input="toMain()"
+        ></textarea>
     </div>
 </template>
 
 <script>
+import formValidationHelpers from '@/libraries/formValidation/main.js'
+
 export default {
     name: 'formTextAreaPrimitive',
     props: {
@@ -29,6 +35,9 @@ export default {
     methods: {
         toMain(options) {
             this.$emit('changed', { val: this.data, state: this.valid, msgs: this.invalidMsgs, ...options })
+        },
+        createTextAreaNameHash() {
+            return formValidationHelpers.createFormElementNameHash("textarea")
         }
     },
     computed: {
@@ -60,7 +69,7 @@ textarea {
     border-radius: 4px;
     height: 13vh;
     max-height: 300px;
-    font-size: 1.5vh;
+    font-size: 17px;
     color: get-color("off-white");
     background-color: get-color("grey", 1);
     &:focus {

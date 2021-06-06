@@ -3,11 +3,11 @@
         <h1>
             Multiple Option Selector
         </h1>
-        <img :src="require(`@/assets/tutorials/general1/openInfo.gif`)">
+        <img alt="how to select selector tutorial" :src="require(`@/assets/tutorials/general1/openInfo.gif`)">
         <p>
             Click the <u>bottom section</u> of an option to show or close extra information about the option.
         </p>
-        <img :src="require(`@/assets/tutorials/general1/selectUnselect.gif`)">
+        <img alt="how to unselect selector tutorial" :src="require(`@/assets/tutorials/general1/selectUnselect.gif`)">
         <p>
             Click or tap the <u>top section</u> of a selected option to unselect and vice-versa.
         </p>

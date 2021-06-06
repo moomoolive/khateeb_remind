@@ -1,6 +1,8 @@
 const resourceOwnerChecker = require('./resourceOwnerChecker.js')
 const helpers = require('./helpers.js')
 
+const { legacySupport } = require($rootDir + "/database/public.js")
+
 const isValidResourceCreator = (request={}, keysToValidateAgainst=[]) => {
     const validator = new resourceOwnerChecker({
         keysToValidateAgainst,
@@ -12,9 +14,13 @@ const isValidResourceCreator = (request={}, keysToValidateAgainst=[]) => {
 
 const isValidResourceModifier = async (request={}, keysToValidateAgainst=[], resourceType="location", resourceIdentfierFoundIn="query") => {
     try {
-        if (helpers.noResourceIdentiferFound(request, resourceIdentfierFoundIn))
+        if (helpers.noResourceIdentiferFound(request, resourceIdentfierFoundIn)) {
             throw TypeError(`No resource identifier found`)
-        const resource = await $db[resourceType].find({ _id: request[resourceIdentfierFoundIn]._id }).exec()
+        }
+        const resource = await legacySupport.findModelEntry({
+            filter: { _id: request[resourceIdentfierFoundIn]._id },
+            model: resourceType
+        })
         const validator = new resourceOwnerChecker({
             keysToValidateAgainst,
             checkRequestSection: 'header',
@@ -22,7 +28,7 @@ const isValidResourceModifier = async (request={}, keysToValidateAgainst=[], res
         })
         return validator.isUserValidResourceOwner(request)
     } catch(err) {
-        console.log(err)
+        console.error(err)
         return false
     }
 }

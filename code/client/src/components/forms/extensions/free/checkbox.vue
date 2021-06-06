@@ -3,6 +3,7 @@
         <input-primitive
             class='right' 
             :inputType="`checkbox`"
+            :id="createCheckboxNameHash()"
             :width="4"
             :default="options.default || false"
             @changed="process($event)" 
@@ -12,6 +13,8 @@
 
 <script>
 import inputPrimitive from '@/components/forms/extensions/primitives/input.vue'
+
+import formValidationHelpers from '@/libraries/formValidation/main.js'
 
 export default {
     name: 'formCheckbox',
@@ -27,6 +30,9 @@ export default {
     methods: {
         process($event) {
             this.$emit('changed', $event)
+        },
+        createCheckboxNameHash() {
+            return formValidationHelpers.createFormElementNameHash("checkbox")
         }
     }
 }
