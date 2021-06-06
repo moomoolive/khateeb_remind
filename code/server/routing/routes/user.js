@@ -7,14 +7,14 @@ const validationMiddleware = require($rootDir + '/middleware/validation/main.js'
 
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const requestValidationHelpers = require($rootDir + '/libraries/requestValidation/main.js')
-const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 
 const { 
     notifications, 
     authorizations,
     pwaSubscriptions,
-    userScheduleRestrictions
+    userScheduleRestrictions,
+    users
 } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
@@ -46,7 +46,7 @@ router.put(
             const mongooseRes = await $db[req.headers.targetusermodel].findOne({ _id: req.headers.userid }).select(["-__v", "-password"]).exec()
             return res.json({ data: mongooseRes, msg: `Successfully updated`, mongooseRes })
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return res.status(503).json({ data: null, msg: `An error occured when updating profile. Err trace: ${err}` })
         }
     }
@@ -54,21 +54,7 @@ router.put(
 
 router.get('/authorizations', async (req, res) => {
     try {
-        let data = await $db.users
-            .findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() })
-            .populate({ 
-                path: 'authorizations.authId',
-                select: { __v: 0 },
-                populate: {
-                    path: 'institution',
-                    select: {
-                        settings: 0,
-                        __v: 0
-                    }
-                }
-            })
-            .select(["-__v", "-statuses", "-password"])
-            .exec()
+        let data = await users.findEntryRelatedAuthorizations(req.headers.userid)
         if (req.headers.specialStatus) {
             // special status is reserved for the root user
             // and any system administrators
@@ -103,7 +89,10 @@ router.get('/notifications', async (req, res) => {
                 sortBy: "-createdAt",
                 limit: 20
             }),
-            $db.users.findOneAndUpdate({ _id: req.headers.userid }, { lastLogin: new Date() }).exec()
+            user.updateEntry({
+                filter: { _id: req.headers.userid },
+                updates: { lastLogin: new Date() }
+            })
         ])
         return res.json({ data: { notifications: userNotifications, lastLogin: userInfo.lastLogin } })
     } catch(err) {
@@ -126,7 +115,7 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const user = await $db.users.findOne({ _id: req.headers.userid }).exec()
+            const user = await user.findEntry({ filter: { _id: req.headers.userid } })
             const userHasRequestedAuthorization = user.authorizations
                 .map(a => a.authId)
                 .find(id => id.toString() === req.body.authId)
@@ -178,36 +167,33 @@ router.post(
         try {
             const [authInfo, userInfo] = await Promise.all([
                 authorizations.findEntry({ filter: req.body, populate: "institution" }),
-                $db.users.findOne({ _id: req.headers.userid }).exec()
+                users.findEntry({ filter: { _id: req.headers.userid } })
             ])
             if (!authInfo || !userInfo) {
                 return res.status(422).json({ code: 2, msg: `Couldn't find requested authorization or user` })
             }
             const authorizationAlreadyExists = userInfo.authorizations.find(a => a.authId === authInfo._id)
-            if (authorizationAlreadyExists)
+            if (authorizationAlreadyExists) {
                 return res.status(403).json({ code: 3, msg: `Illegal operation. Authorization already exists` })
-            const autoConfirmPolicy = authInfo.institution.settings.autoConfirmRegistration
-            const updateCommand = { 
-                $push: { 
-                    authorizations: { 
-                        authId: authInfo._id, 
-                        // system administrators can never be autoconfirmed
-                        // only khateebs can be if administrator turns on that setting
-                        confirmed: req.body.role !== 'khateeb' ? false : autoConfirmPolicy
-                    } 
-                } 
             }
+            const autoConfirmPolicy = authInfo.institution.settings.autoConfirmRegistration
+            let extraUpdates = {}
             if (req.body.role === 'khateeb') {
                 const scheduleRestriction = await userScheduleRestrictions.createEntry({ 
                     user: req.headers.userid, 
                     institution: req.body.institution 
                 })
-                updateCommand.$push.scheduleRestrictions = scheduleRestriction._id
+                extraUpdates.$push.scheduleRestrictions = scheduleRestriction._id
                 const note = new notificationConstructors.KhateebSignupNotificationConstructor(userInfo, autoConfirmPolicy, req.body.institution)
                 await note.setRecipentsToAdmins(authInfo.institution._id)
                 note.create()
             }
-            await $db.users.update({ _id: userInfo._id }, updateCommand)
+            await users.addAuthorization(
+                userInfo._id,
+                authInfo._id,
+                req.body.role !== 'khateeb' ? false : autoConfirmPolicy,
+                extraUpdates
+            )
             return res.json({ code: 0 })
         } catch(err) {
             console.log(err)
@@ -227,20 +213,21 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const updateCommand = databaseHelpers.removeAuthorizationFromUserCommand(req.body.id)
+            let scheduleRestrictionIds = []
             if (req.body.role === 'khateeb') {
-                const scheduleRestrictionIds = await databaseHelpers.getUserScheduleRestrictionsAssociatedWithInstitution(
+                scheduleRestrictionIds = await users.getUserScheduleRestrictionsAssociatedWithInstitution(
                     req.headers.userid,
                     req.body.institution
                 )
                 await userScheduleRestrictions.deleteManyEntries({ 
                    filter: { _id: { $in: scheduleRestrictionIds } }
                 })
-                updateCommand.$pull.scheduleRestrictions = {
-                    $in: scheduleRestrictionIds
-                }
             }
-            await $db.users.update({ _id: req.headers.userid }, updateCommand) 
+            await users.removeAuthorization(
+                req.headers.userid,
+                req.body.id,
+                { $pull: { scheduleRestrictions: { $in: scheduleRestrictionIds } } }
+            )
             return res.json({ code: 0 })
         } catch(err) {
             console.error(err)

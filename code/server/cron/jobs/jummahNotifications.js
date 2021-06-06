@@ -1,12 +1,12 @@
 const { cronWrapper } = require($rootDir + '/libraries/cron/main.js')
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
-const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
 
 const { 
     timings: timingsInterfaces, 
     authorizations,
-    jummahPreferences
+    jummahPreferences,
+    users
 } = require($rootDir + "/database/public.js")
 
 const findDefaultPreferenceForThisWeek = (defaultKhateebID="12345", khateebs=[], upcomingFriday=new Date(), targetTiming={}, isBackup=true) => {
@@ -111,7 +111,7 @@ const job = async () => {
                     if (!khateebAuthorization) {
                         throw TypeError(`khateeb authorization doesn't exist`)
                     }
-                    const khateebs = await databaseHelpers.getKhateebs(
+                    const khateebs = await users.findKhateebs(
                         targetInstitution._id, 
                         khateebAuthorization, 
                         { active: true }

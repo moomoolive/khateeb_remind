@@ -1,7 +1,7 @@
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 
-const { jummahPreferences } = require($rootDir + "/database/public.js")
+const { jummahPreferences, users } = require($rootDir + "/database/public.js")
 
 const cronNotificationTiming = (upcomingFriday=new Date(), chronTimingInfo={}, timezone="America/Edmonton") => {
     const targetDayOfWeek = scheduleHelpers.findDayOfWeek(
@@ -57,14 +57,12 @@ const jummahPreferenceNotifier = (initPreferenceInfo={}, isTargetPreference=true
     }
     const findJummahKhateebInfo = async () => {
         try {
-            const khateeb = await $db.users
-                .find()
-                .safelyFindOne(preferenceInfo.khateebID)
-                .exec()
-            if (!khateeb)
+            const khateeb = await users.query({ filter: { _id: preferenceInfo.khateebID } })
+            if (!khateeb) {
                 throw TypeError(`Database responded with incorrect type of khateeb info`)
-            else
+            } else {
                 return khateeb
+            }
         } catch(err) {
             console.log(err)
             return null

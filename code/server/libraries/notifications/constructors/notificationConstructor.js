@@ -4,7 +4,8 @@ const externalNotificationHelpers = require($rootDir + '/libraries/externalNotif
 const { 
     notifications, 
     authorizations,
-    pwaSubscriptions 
+    pwaSubscriptions,
+    users 
 } = require($rootDir + "/database/public.js")
 
 class NotificationConstructor {
@@ -55,14 +56,16 @@ class NotificationConstructor {
             const auths = await authorizations.query({ filter: { institution: institutionID } })
             const rootAdminAuthorization = auths.find(a => a.role === 'rootInstitutionAdmin')
             const adminAuthorization = auths.find(a => a.role === 'institutionAdmin')
-            const allAdmins = await $db.users
-                .find({ 
-                    "authorizations.authId": { $in: [rootAdminAuthorization._id, adminAuthorization._id] } 
-                })
-                .exec()
+            const allAdmins = await users.query({
+                filter: {
+                    "authorizations.authId": { 
+                        $in: [rootAdminAuthorization._id, adminAuthorization._id] 
+                    } 
+                }
+            })
             return Array.isArray(allAdmins) ? allAdmins : []
         } catch(err) {
-            console.log(err)
+            console.error(err)
             return []
         }
     }
@@ -110,7 +113,7 @@ class NotificationConstructor {
 
     async getPWASubscriptions(userID="1234") {
         try {
-            const data = await pwaNotifications.query({ filter: { userID } })
+            const data = await pwaSubscriptions.query({ filter: { userID } })
             if (!data) {
                 return []
             } else {

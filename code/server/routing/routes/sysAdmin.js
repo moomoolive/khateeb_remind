@@ -4,7 +4,7 @@ const validator = require('express-validator')
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
-const { institutions, authorizations } = require($rootDir + "/database/public.js")
+const { institutions, authorizations, users } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 
@@ -35,10 +35,8 @@ router.put('/institutions',
             })
             if (data.confirmed) {
                 const auths = await authorizations.query({ filter: { institution: data._id } })
-                await $db.users.update(
-                    { "authorizations.authId": auths.find(a => a.role === 'rootInstitutionAdmin')._id.toString() },
-                    { $set: { "authorizations.$.confirmed": true } }
-                )
+                const userAuthId = auths.find(a => a.role === 'rootInstitutionAdmin')._id
+                await users.confirmAuthorization(userAuthId, true)
             }
             return res.json({ data })
         } catch(err) {

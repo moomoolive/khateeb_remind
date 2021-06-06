@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
 
-const databaseHelpers = require($rootDir + '/database/helperFunctions/main.js')
-
 const authorizations = require($rootDir + "/database/models/authorizations.js")
+const userInterfaces = require($rootDir + "/database/interfaces/users.js")
+const users = require($rootDir + "/database/models/users.js")
 
 const defaultKhateebForWeek = new mongoose.Schema({
     mainKhateeb: {
@@ -80,7 +80,7 @@ timing.methods.deleteDependants = async function() {
         if (!khateebAuthorization) {
             throw TypeError(`Khateeb Authorization doesn't exist`)
         }
-        const khateebs =await databaseHelpers.getKhateebs(
+        const khateebs =await userInterfaces.findKhateebs(
             this.institutionID, 
             khateebAuthorization, 
             { active: true }
@@ -88,7 +88,7 @@ timing.methods.deleteDependants = async function() {
         for (let i = 0; i < khateebs.length; i++) {
             const khateeb = khateebs[i]
             const availableTimings = khateeb.availableTimings.filter(timing => timing !== timingID)
-            const khateebTimingRes = await $db.users.updateOne(
+            const khateebTimingRes = await users.updateOne(
                 { _id: khateeb._id }, 
                 { availableTimings }
             )

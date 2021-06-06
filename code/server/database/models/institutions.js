@@ -6,6 +6,7 @@ const cloudStorageHelpers = require($rootDir + '/libraries/cloudStorage/main.js'
 const { thirdPartyServicesConfig } = require($rootDir + '/Server.config.js')
 
 const authorizations = require($rootDir + "/database/models/authorizations.js")
+const users = require($rootDir + "/database/models/users.js")
 
 const institution = new mongoose.Schema({
     name: {
@@ -139,7 +140,7 @@ institution.methods.deleteAuthorizationKeys = async function() {
 
 institution.methods.removeAuthorizationKeysFromUsers = async function(authKeys=[]) {
     try {
-        const res = await $db.users
+        const res = await users
             .update(
                 {},
                 {

@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const scripts = require($rootDir + '/libraries/scripts/index.js')
 
 const institutions = require($rootDir + "/database/models/institutions.js")
+const users = require($rootDir + "/database/models/users.js")
 
 const testInstitution = new mongoose.Schema(
     {},
@@ -30,7 +31,7 @@ testInstitution.methods.deactivate = async function() {
 
 testInstitution.methods.deleteAllUsers = async function(authKeys=[]) {
     try {
-        const res = await $db.users.deleteMany({
+        const res = await users.deleteMany({
             "authorizations.authId": { $in: authKeys }
         })
         return res

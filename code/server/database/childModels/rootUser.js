@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 
 const scripts = require($rootDir + '/libraries/scripts/index.js')
 
+const users = require($rootDir + "/database/models/users.js")
+
 const root = new mongoose.Schema({
     systemSettings: {
         autoConfirmInstitutionRegistration: {
@@ -44,5 +46,4 @@ root.post("deleteOne", function() {
     }, threeSecondsInMilliseconds)
 })
 
-
-module.exports = root
+module.exports = users.discriminator('root', root)

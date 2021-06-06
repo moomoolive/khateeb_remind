@@ -11,6 +11,7 @@ const authorizations = require("./interfaces/authorizations.js")
 const pwaSubscriptions = require("./interfaces/pwaSubscriptions.js")
 const userScheduleRestrictions = require("./interfaces/userScheduleRestrictions.js")
 const jummahPreferences = require("./interfaces/jummahPreferences.js")
+const users = require("./interfaces/users.js")
 
 module.exports = {
     announcements,
@@ -23,5 +24,6 @@ module.exports = {
     authorizations,
     pwaSubscriptions,
     userScheduleRestrictions,
-    jummahPreferences
+    jummahPreferences,
+    users
 }

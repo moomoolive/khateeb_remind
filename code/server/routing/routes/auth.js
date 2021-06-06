@@ -7,7 +7,12 @@ const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const externalNotificationHelpers = require($rootDir + '/libraries/externalNotifications/main.js')
 
-const { institutions, verificationCodes, authorizations } = require($rootDir + "/database/public.js")
+const { 
+    institutions, 
+    verificationCodes, 
+    authorizations,
+    users 
+} = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 
@@ -33,17 +38,8 @@ router.post(
             entry: { ...req.body, confirmed: autoConfirm }
         })
         const institutionAuthorizations = await authorizations.query({ filter: { institution: institutionEntry._id } })
-        await $db.users.update(
-            { _id: req.headers.userid },
-            { 
-                $push: { 
-                    authorizations: { 
-                        authId: institutionAuthorizations.find(a => a.role === 'rootInstitutionAdmin')._id.toString(), 
-                        confirmed: autoConfirm
-                    } 
-                } 
-            }
-        )
+        const authorizationId = institutionAuthorizations.find(a => a.role === 'rootInstitutionAdmin')._id
+        await users.addAuthorizationKey(req.headers.userid, authorizationId, autoConfirm)
         return res.json({ 
             code: 0, 
             msg: `Alhamdillah! ${institutionEntry.name} was created.${ autoConfirm ? ' You can now start setting schedules.' : ' Please wait a day or two for Khateeb Remind to confirm your institution before logging in.' }`
@@ -76,7 +72,7 @@ router.post(
                 return res.status(422).json({ msg: `An error occured`, code: 2 })
             if (!root.systemSettings.autoConfirmUserRegistration)
                 return res.json({ msg: `Unfortunately user registration is currently offline`, code: 3 })
-            const userEntry = await new $db.users(req.body).save()
+            const userEntry = await users.createEntry({ entry: req.body })
             return res.json({ 
                 code: 0, 
                 msg: `Asalam alaikoum ${userEntry.firstName}, your account has been created (username: ${userEntry.username}). Please login to start using Khateeb Remind.`
@@ -97,15 +93,17 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const user = await $db.users
-                .findOne({ username: req.body.username, active: true })
-                .select(["-__v"])
-                .exec()
-            if (!user)
+            const user = await users.findEntry({
+                filter: { username: req.body.username, active: true },
+                dataShape: ["-__v"]
+            })
+            if (!user) {
                 return res.status(401).json({  msg: 'unauthorized', token: null })
+            }
             validPassword = await user.comparePassword(req.body.password)
-            if (!validPassword)
+            if (!validPassword) {
                 return res.status(401).json({  msg: 'unauthorized', token: null })
+            }
             const tokenInfo = { _id: user._id, __t: 'user' }
             if (user.__t) {
                 tokenInfo.specialStatus = user.__t
@@ -126,7 +124,7 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const accounts = await $db.users.find(req.body).exec()
+            const accounts = await users.query({ filter: req.body })
             if (accounts.length > 0) {
                 const accountsString = accounts
                     .map(a => a.username)
@@ -154,7 +152,7 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const account = await $db.users.findOne(req.body).exec()
+            const account = await users.findEntry({ filter: req.body })
             if (account) {
                 const verificationCode = await verificationCodes.createEntry({ username: account.username })
                 await externalNotificationHelpers.sendExternalNotification(
@@ -186,7 +184,10 @@ router.put(
             if (!verificationCode || verificationCode.username !== req.body.username) {
                 return res.json({ msg: "Incorrect code", code: 2 })
             }
-            await $db.users.updateOne({ username: req.body.username }, { password: req.body.newPassword })
+            await users.updateEntry({
+                filter: { username: req.body.username }, 
+                updates: { password: req.body.newPassword }
+            })
             return res.json({ msg: "Password successfully updated", code: 0 })
         } catch(err) {
             console.error(err)
@@ -204,51 +205,23 @@ router.post(
     ),
     async (req, res) => {
         try {
-            console.log(req.body)
-            const [targetUser] = await $db.users
-                .find({ _id: req.body.targetUserId })
-                .populate("authorizations.authId")
-                .exec()
-            const isUserInRequestingInstitution = targetUser.authorizations.find(a =>{
+            const [targetUser] = await users.query({
+                filter: { _id: req.body.targetUserId },
+                populate: "authorizations.authId"
+            })
+            const isUserInRequestingInstitution = targetUser.authorizations.find(a => {
                 return a.confirmed && a.authId.institution.toString() === req.headers.institutionid
             })
-            if (!targetUser || !isUserInRequestingInstitution)
+            if (!targetUser || !isUserInRequestingInstitution) {
                 return res.status(403).json({ code: 2, msg: `Cannot add permissions to user` })
+            }
             const institutionAuthorizations = await authorizations.query({ filter: { institution: req.headers.institutionid } })
-            const rootInstitutionAdminAuthorization = institutionAuthorizations.find(a => a.role === 'rootInstitutionAdmin')
-            const institutionAdminAuthorization = institutionAuthorizations.find(a => a.role === 'institutionAdmin')
-            const newRootAdmin = await $db.users.bulkWrite([
-                {
-                    updateOne: {
-                        filter: { _id: req.body.targetUserId },
-                        update: {
-                            $push: {
-                                authorizations: { authId: rootInstitutionAdminAuthorization._id, confirmed: true }
-                            },
-                        }
-                    }
-                },
-                {
-                    updateOne: {
-                        filter: { _id: req.body.targetUserId },
-                        update: {
-                            // remove institutionAdmin permissions in case they have them
-                            $pull: {
-                                authorizations: { authId: institutionAdminAuthorization._id }
-                            }
-                        }
-                    }
-                },
-            ])
-            const delegatingUser = await $db.users.update(
-                { _id: req.headers.userid },
-                {
-                    $pull: {
-                        authorizations: { authId: rootInstitutionAdminAuthorization._id }
-                    }
-                }
+            const delegationResponse = await users.delegateRootInstitutionAdminAuthorization(
+                req.body.targetUserId,
+                req.headers.userid,
+                institutionAuthorizations
             )
-            return res.json({ code: 0, msg: `Permissions successfully delegated`, newRootAdmin, delegatingUser })
+            return res.json({ code: 0, msg: `Permissions successfully delegated`, delegationResponse })
         } catch(err) {
             console.error(err)
             return res.status(503).json({ code: 1, msg: `An error occured when delgating authorization ${err}` })

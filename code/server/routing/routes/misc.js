@@ -3,7 +3,7 @@ const validator = require('express-validator')
 
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
-const { institutions } = require($rootDir + "/database/public.js")
+const { institutions, users } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 
@@ -16,10 +16,11 @@ validationMiddleware.validateRequest(
     async (req, res) =>
     {
         try {
-            const exists = await $db.users.findOne({ username: req.body.username }).exec()
+            const exists = await users.findEntry({ filter: { username: req.body.username } })
             return res.json(!exists)
         } catch(err) {
-            res.json(`Couldn't verify uniqueness`)
+            console.error(err)
+            return res.json(`Couldn't verify uniqueness`)
         }
     }
 )

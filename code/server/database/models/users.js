@@ -129,6 +129,8 @@ user.blah = {
     default: true
 }
 
+const model = mongoose.model('user', user)
+
 user.query.safelyFindOne = function(_id='none') {
     if (!_id || _id.toLocaleLowerCase() === $config.consts.nullId)
         throw TypeError('Please provide a valid khateeb id')
@@ -190,8 +192,7 @@ user.methods.comparePassword = async function (submittedPassword) {
         const isMatched = await bcyrpt.compare(submittedPassword, this.password)
         return isMatched
     } catch(err) {
-        console.log('There was a problem verifying password')
-        console.log(err)
+        console.error('There was a problem verifying password', err)
         return null
     }
 }
@@ -205,7 +206,7 @@ user.methods.deactivateAccount = async function () {
 user.methods.setAccountToInactive = async function() {
     let res = {}
     try {
-        res = await $db.users.update(
+        res = await model.update(
             { _id: this._id },
             { 
                 active: false , 
@@ -234,7 +235,7 @@ user.methods.deleteScheduleRestrictions = async function() {
     try {
         res = await userScheduleRestrictions.deleteMany({ user: this._id }) 
     } catch(err) {
-        console.log(err)
+        console.error(err)
     }
     return res
 }
@@ -244,7 +245,7 @@ user.methods.deletePwaSubscriptions = async function() {
     try {
         res = await pwaSubscriptions.deleteMany({ userID: this._id }) 
     } catch(err) {
-        console.log(err)
+        console.error(err)
     }
     return res
 }
@@ -254,9 +255,9 @@ user.methods.deleteNotifications = async function() {
     try {
         res = await notifications.deleteMany({ userID: this._id })
     } catch(err) {
-        console.log(err)
+        console.error(err)
     }
     return res
 }
 
-module.exports = user
+module.exports = model

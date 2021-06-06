@@ -9,7 +9,7 @@ const jummahHelpers = require($rootDir + '/libraries/jummahs/main.js')
 const notificationConstructors = require($rootDir + '/libraries/notifications/index.js')
 const requestValidationHelpers = require($rootDir + "/libraries/requestValidation/main.js")
 
-const { jummahPreferences } = require($rootDir + "/database/public.js")
+const { jummahPreferences, users } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
 
@@ -61,7 +61,7 @@ router.post(
             const data = await jummahPreferences.createEntry({ entry: req.body })
             if (req.headers.usertype === 'khateeb') {
                 const jummahMeta = await data.gatherMeta()
-                const khateeb = await $db.users.findOne({ _id: req.headers.userid }).exec()
+                const khateeb = await users.findEntry({ filter: { _id: req.headers.userid } })
                 const note = new notificationConstructors.khateebJummahSignupConstructor(khateeb, data, jummahMeta)
                 await note.setRecipentsToAdmins(req.headers.institutionid)
                 note.create()

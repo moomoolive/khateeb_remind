@@ -8,7 +8,8 @@ const {
     locations, 
     testInstitution: testInstitutionInterfaces,
     authorizations: authorizationsInterfaces,
-    userScheduleRestrictions 
+    userScheduleRestrictions,
+    users 
 } = require($rootDir + "/database/public.js")
 
 const createTestInstitution = async () => {
@@ -25,35 +26,39 @@ const createTestInstitution = async () => {
         const authorizations = await authorizationsInterfaces.query({ filter: { institution: testInstitution._id } })
         // check if test institution root admin exists if not create it
         const rootInstitutionAdminAuthorization = authorizations.find(a => a.role === 'rootInstitutionAdmin')
-        let testInstitutionRootAdmin = await $db.users.findOne({ 
-            "authorizations.authId": rootInstitutionAdminAuthorization._id
-        }).exec()
-        if (testInstitutionRootAdmin)
+        let testInstitutionRootAdmin = await users.findEntry({ 
+            filter: { "authorizations.authId": rootInstitutionAdminAuthorization._id }
+        })
+        if (testInstitutionRootAdmin) {
             console.log('Test root institution admin already exists')
-        else {
-            testInstitutionRootAdmin = await new $db.users({
-                ...initConfig.testInstitution.rootAdmin,
-                authorizations: [{ authId: rootInstitutionAdminAuthorization._id, confirmed: true }]
-            }).save()
+        } else {
+            testInstitutionRootAdmin = await users.createEntry({
+                entry: {
+                    ...initConfig.testInstitution.rootAdmin,
+                    authorizations: [{ authId: rootInstitutionAdminAuthorization._id, confirmed: true }]
+                }
+            })
             console.log(`Created root admin for test institution, id: ${testInstitutionRootAdmin._id}`)
         }
 
         // check one institution admin 
         // for test institution exists if not create it
         const institutionAdminAuthorization = authorizations.find(a => a.role === 'institutionAdmin')
-        let testInstitutionAdmin = await $db.users.findOne({ 
-            "authorizations.authId": institutionAdminAuthorization._id
-        }).exec()
-        if (testInstitutionAdmin)
+        let testInstitutionAdmin = await users.findEntry({ 
+            filter: { "authorizations.authId": institutionAdminAuthorization._id }
+        })
+        if (testInstitutionAdmin) {
             console.log('Test institution already has one institution admin')
-        else {
-            testInstitutionAdmin = await new $db.users({
-                ...initConfig.testInstitution.institutionAdmin,
-                handle: randomNamegenerate().dashed,
-                firstName: randomNamegenerate().dashed,
-                lastName: randomNamegenerate().dashed,
-                authorizations: [{ authId: institutionAdminAuthorization._id, confirmed: false }]
-            }).save()
+        } else {
+            testInstitutionAdmin = await await users.createEntry({
+                entry: {
+                    ...initConfig.testInstitution.institutionAdmin,
+                    handle: randomNamegenerate().dashed,
+                    firstName: randomNamegenerate().dashed,
+                    lastName: randomNamegenerate().dashed,
+                    authorizations: [{ authId: institutionAdminAuthorization._id, confirmed: false }]
+                }
+            })
             console.log(`Created institution admin for test institution, id: ${testInstitutionAdmin._id}`)
         }
         
@@ -100,12 +105,12 @@ const createTestInstitution = async () => {
         // "Server.config.js" file, if not create enough to fulfill that
         // quota
         const khateebAuthorization = authorizations.find(a => a.role === 'khateeb')
-        let testInstitutionKhateebs = await $db.users.find({ 
-            "authorizations.authId": khateebAuthorization._id
-        }).exec()
-        if (testInstitutionKhateebs.length === initConfig.testInstitution.khateebCount)
+        let testInstitutionKhateebs = await users.query({ 
+            filter: { "authorizations.authId": khateebAuthorization._id }
+        })
+        if (testInstitutionKhateebs.length === initConfig.testInstitution.khateebCount) {
             return console.log(`Test institution already has ${initConfig.testInstitution.khateebCount} khateebs`)
-        else {
+        } else {
             const ids = []
             const testInstitutionTimings = await timings.query({ filter: { institutionID: testInstitution._id } })
             const date = scheduleHelpers.findUpcomingFridayDBFormat()
@@ -113,15 +118,17 @@ const createTestInstitution = async () => {
             const institutionID = testInstitution._id.toString()
             for (let i = testInstitutionKhateebs.length; i < initConfig.testInstitution.khateebCount; i++) {
                 try {
-                    const khateeb = await new $db.users({
-                        username: `${initConfig.testInstitution.khateebs.baseUsername}${i + 1}`,
-                        ...initConfig.testInstitution.khateebs.info,
-                        handle: randomNamegenerate().dashed,
-                        firstName: randomNamegenerate().dashed,
-                        lastName: randomNamegenerate().dashed,
-                        title: i % 3 === 0 ? 'shiekh' : i % 2 === 0 ? 'imam' : 'none',
-                        authorizations: [{ authId: khateebAuthorization._id.toString(), confirmed: i % 5 !== 0 }]
-                    }).save()
+                    const khateeb = await users.createEntry({
+                        entry: {
+                            username: `${initConfig.testInstitution.khateebs.baseUsername}${i + 1}`,
+                            ...initConfig.testInstitution.khateebs.info,
+                            handle: randomNamegenerate().dashed,
+                            firstName: randomNamegenerate().dashed,
+                            lastName: randomNamegenerate().dashed,
+                            title: i % 3 === 0 ? 'shiekh' : i % 2 === 0 ? 'imam' : 'none',
+                            authorizations: [{ authId: khateebAuthorization._id.toString(), confirmed: i % 5 !== 0 }]
+                        }
+                    })
                     ids.push(khateeb._id)
 
                     // create fake schedule restrictions for each khateeb
@@ -135,10 +142,10 @@ const createTestInstitution = async () => {
                         }
                     })
                     
-                    await $db.users.update(
-                        { _id: khateeb._id },
-                        { scheduleRestrictions: [scheduleRestriction._id] }
-                    )
+                    await users.updateEntry({
+                        filter: { _id: khateeb._id },
+                        updates: { scheduleRestrictions: [scheduleRestriction._id] }
+                    })
 
                 } catch(err) {
                     ids.push(`Error occured creating khateeb #${i + 1}. Err trace: ${err}`)
@@ -147,8 +154,7 @@ const createTestInstitution = async () => {
             console.log(`Created ${initConfig.testInstitution.khateebCount - testInstitutionKhateebs.length} khateebs for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
         }
     } catch(err) {
-        console.log(err)
-        console.log(`Couldn't create test school`)
+        console.error(`Couldn't create test school`, err)
     }
 }
 
