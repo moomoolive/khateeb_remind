@@ -39,12 +39,13 @@ router.put(
     ),
     async (req, res) => {
         try {
-            // the reason why I use updateOne and then findOne instead of
-            // findOneAndUpdate is because there are 'pre update' hooks for
-            // the user schema that won't work with findOneAndUpdate
-            await $db[req.headers.targetusermodel].updateOne({ _id: req.headers.userid }, req.body)
-            const mongooseRes = await $db[req.headers.targetusermodel].findOne({ _id: req.headers.userid }).select(["-__v", "-password"]).exec()
-            return res.json({ data: mongooseRes, msg: `Successfully updated`, mongooseRes })
+            const data = await users.updateProfile({
+                filter: { _id: req.headers.userid },
+                updates: req.body,
+                targetModel: req.headers.targetusermodel,
+                dataShape: ["-__v", "-password"]
+            })
+            return res.json({ data, msg: `Successfully updated` })
         } catch(err) {
             console.error(err)
             return res.status(503).json({ data: null, msg: `An error occured when updating profile. Err trace: ${err}` })
@@ -268,9 +269,10 @@ router.put(
 
 router.delete('/', async (req, res) => {
     try {
-        const user = await $db[req.headers.targetusermodel]
-            .findOne({ _id: req.headers.userid })
-            .exec()
+        const user = await users.findEntry({
+            filter: { _id: req.headers.userid },
+            targetModel: req.headers.targetusermodel
+        })
         const data = await user.deactivateAccount()
         return res.json({ data })
     } catch(err) {

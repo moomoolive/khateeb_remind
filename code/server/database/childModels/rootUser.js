@@ -19,6 +19,8 @@ const root = new mongoose.Schema({
     }
 }, { timestamps: true })
 
+const model = users.discriminator('root', root)
+
 root.methods.deactivateAccount = async function() {
     const dependants = await this.deleteDependencies() // method found in parent schema 'user'
     const userRes = await this.deleteAccount()
@@ -30,7 +32,7 @@ root.methods.deactivateAccount = async function() {
 root.methods.deleteAccount = async function() {
     let res = {}
     try {
-        res = await $db.root
+        res = await model
             .deleteOne({ _id: this._id })
             .exec()
     } catch(err) {
@@ -46,4 +48,4 @@ root.post("deleteOne", function() {
     }, threeSecondsInMilliseconds)
 })
 
-module.exports = users.discriminator('root', root)
+module.exports = model

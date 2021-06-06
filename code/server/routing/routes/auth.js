@@ -11,7 +11,8 @@ const {
     institutions, 
     verificationCodes, 
     authorizations,
-    users 
+    users,
+    rootUser 
 } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
@@ -30,10 +31,11 @@ router.post(
     ), 
     async (req, res) => {
     try {
-        if (req.body.name === 'test')
+        if (req.body.name === 'test') {
             return res.json({ msg: `You cannot name your institution 'test'. Pick another name please.`, code: 2 })
-        const rootUser = await $db.root.findOne({}).exec()
-        const autoConfirm = rootUser.systemSettings.autoConfirmInstitutionRegistration 
+        }
+        const root = await rootUser.find()
+        const autoConfirm = root.systemSettings.autoConfirmInstitutionRegistration 
         const institutionEntry = await institutions.createEntry({
             entry: { ...req.body, confirmed: autoConfirm }
         })
@@ -67,11 +69,12 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const root = await $db.root.findOne({}).exec()
-            if (!root)
+            const root = await rootUser.find()
+            if (!root) {
                 return res.status(422).json({ msg: `An error occured`, code: 2 })
-            if (!root.systemSettings.autoConfirmUserRegistration)
+            } else if (!root.systemSettings.autoConfirmUserRegistration) {
                 return res.json({ msg: `Unfortunately user registration is currently offline`, code: 3 })
+            }
             const userEntry = await users.createEntry({ entry: req.body })
             return res.json({ 
                 code: 0, 

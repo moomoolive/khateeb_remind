@@ -1,10 +1,9 @@
 const mongoose = require("mongoose")
 
 const users = require($rootDir + "/database/models/users.js")
-const sysAdmins = require($rootDir + "/database/childModels/sysAdmins.js")
-const rootUser = require($rootDir + "/database/childModels/rootUser.js")
 const userScheduleRestrictions = require($rootDir + "/database/models/userScheduleRestrictions.js")
 
+const helpers = ($rootDir + "/database/helperFunctions/main.js")
 
 function findKhateebs(institutionId="1234", khateebAuthorization="1234", query={}) {
     return users.aggregate([
@@ -149,10 +148,11 @@ function query(options={}) {
 }
 
 function findEntry(options={}) {
+    const targetModel = helpers.dynamicUserModel(options.targetModel)
     const filter = options.filter || {}
     const dataShape = options.dataShape || []
     const populate = options.populate || ""
-    return users
+    return targetModel
         .findOne(filter)
         .populate(populate)
         .select(dataShape)
@@ -288,6 +288,25 @@ function addAuthorization(userId="1234", userAuthId="1234", confirmed, options={
     )
 }
 
+// the reason why I use updateOne and then findOne instead of
+// findOneAndUpdate is because there are 'pre update' hooks for
+// the user schema that won't work with findOneAndUpdate
+async function updateProfile(options={}) {
+    try {
+        const targetModel = helpers.dynamicUserModel(options.targetModel)
+        const filter = options.filter || {}
+        const updates = options.updates || {}
+        await targetModel.updateOne(filter, updates)
+        const dataShape = options.dataShape || []
+        return targetModel
+            .findOne(filter)
+            .select(dataShape)
+            .exec()
+    } catch(err) {
+        throw err
+    }
+}
+
 module.exports = {
     findKhateebs,
     getUserScheduleRestrictionsAssociatedWithInstitution,
@@ -302,5 +321,6 @@ module.exports = {
     removeAuthorization,
     populateScheduleRestrictionsAndAuthorizations,
     findEntryRelatedAuthorizations,
-    addAuthorization
+    addAuthorization,
+    updateProfile
 }

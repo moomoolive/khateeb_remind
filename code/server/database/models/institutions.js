@@ -7,6 +7,11 @@ const { thirdPartyServicesConfig } = require($rootDir + '/Server.config.js')
 
 const authorizations = require($rootDir + "/database/models/authorizations.js")
 const users = require($rootDir + "/database/models/users.js")
+const locations = require($rootDir + "/database/models/locations.js")
+const timings = require($rootDir + "/database/models/timings.js")
+const userScheduleRestrictions = require($rootDir + "/database/models/userScheduleRestrictions.js")
+const announcements = require($rootDir + "/database/models/announcements.js")
+const jummahPreferences = require($rootDir + "/database/models/jummahPreferences.js")
 
 const institution = new mongoose.Schema({
     name: {
@@ -173,30 +178,28 @@ institution.methods.getAuthorizationKeys = async function() {
 }
 
 const directDependenciesList = [
-    { name: "locations", key: "institutionID" },
-    { name: "timings", key: "institutionID" },
-    { name: "jummahPreferences", key: "institutionID" },
-    { name: "userScheduleRestrictions", key: "institution" },
-    { name: "announcements", key: "institutionID" },
+    { name: "locations", key: "institutionID", model: locations },
+    { name: "timings", key: "institutionID", model: timings },
+    { name: "jummahPreferences", key: "institutionID", model: userScheduleRestrictions },
+    { name: "userScheduleRestrictions", key: "institution", model: jummahPreferences },
+    { name: "announcements", key: "institutionID", model: announcements },
 ]
 institution.methods.deleteDirectDependencies = async function() {
     const res = {}
     for (const dependency of directDependenciesList) {
-        res[dependency.name] = await this.deleteTargetDependency(dependency.name, dependency.key)
+        res[dependency.name] = await this.deleteTargetDependency(dependency.model, dependency.key)
     }
     return res
 }
 
 
 // "institutionReferenceKey" is taken a input for legacy reasons
-institution.methods.deleteTargetDependency = async function(targetModelName="timings", institutionReferenceKey="institutionID") {
+institution.methods.deleteTargetDependency = async function(targetModel={}, institutionReferenceKey="institutionID") {
     let res = {}
     try {
         const query = {}
         query[institutionReferenceKey] = this._id
-        res = await $db[targetModelName]
-            .deleteMany(query)
-            .exec()
+        res = await targetModel.deleteMany(query).exec()
     } catch(err) {
         console.error(err)
     }
