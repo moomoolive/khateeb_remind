@@ -8,6 +8,5 @@ module.exports = {
         $rootDir: path.resolve(__dirname),
         $config: require(path.resolve("Server.config.js")).globalConfig,
         $utils: require(path.resolve('libraries/globalUtilities.js')),
-        $db: path.resolve('database/main.js')
     }
 }
