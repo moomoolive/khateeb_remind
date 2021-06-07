@@ -109,7 +109,7 @@ export default {
   }
 
   &.paper-plane {
-    color: get-color("mint"); 
+    color: get-color("mint");
     animation-delay:5s;
     animation-duration:16s;
     left:50%;

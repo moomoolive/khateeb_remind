@@ -4,16 +4,17 @@
         <div class="content-layer">
             <div class="signup-now-container">
                 <div class="main-header">
-                    Stress-free Khateeb Scheduling
+                    Effortless Khateeb Scheduling
+                </div>
+                <div class="sub-header">
+                    Automated. Centralized.
                 </div>
                 <div class="description-container">
                     <div class="description">
-                        Scheduling khateebs every week can be tough,
-                        especially when most of them are volunteers.
-                        Khateeb Remind automates your khateeb schedule for you - 
-                        no matter how complex your situation is (insha'Allah), 
-                        leaving you extra time to think about better ways to train your 
-                        khateebs, eat shawarma, or do whatever else you want. 
+                        Khateeb Remind automates the boring khateeb scheduling 
+                        stuff, leaving you time to tend to important
+                        things: training khateebs, writing khutbahs, 
+                        eating shawarma, etc.
                     </div>
                     <div class="usecase-text">
                         <a :href="marketingWebsite" target="_blank" rel="noopener">
@@ -28,7 +29,7 @@
                         class="purple" 
                         @click="$router.push({ path: '/create/user' })"
                     >
-                        Get Started
+                        Get started
                     </button>
                 </div>
             </div>
@@ -58,7 +59,7 @@ export default {
 .content-layer {
     width: 90vw;
     @include center-margin();
-    min-height: 79vh !important;
+    min-height: 50vh !important;
     padding-top: 10vh;
 }
 
@@ -85,7 +86,12 @@ export default {
 .main-header {
     font-weight: bold;
     font-size: 20px;
-    line-height: 23px;
+    line-height: 24px;
+    margin-bottom: 20px;
+}
+
+.sub-header {
+    font-size: 18px;
 }
 
 .main-features {
@@ -104,7 +110,7 @@ export default {
 }
 
 .description-container {
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 .buttons-container {
@@ -139,9 +145,7 @@ button {
     }
 
     .main-header {
-        font-weight: bold;
         font-size: 19px;
-        line-height: 18px;
     }
 }
 
