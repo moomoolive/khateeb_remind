@@ -188,7 +188,7 @@ export default {
 @import '~@/scss/_global-styles.scss';
 
 #app {
-    font-family: 'Oxygen', Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Oxygen', Avenir, Helvetica, Arial, "Times New Roman", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
@@ -346,5 +346,19 @@ export default {
       right: 0;
       width: 12px;
     }
+}
+
+// styles exclusive to firefox
+@-moz-document url-prefix() {
+
+  .large-screen-header-fill {
+    height: 48px;
+    width: 8px;
+  }
+
+  .big-app-background {
+    height: 98px;
+  }
+
 }
 </style>

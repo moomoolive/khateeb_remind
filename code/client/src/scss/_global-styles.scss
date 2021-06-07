@@ -39,6 +39,7 @@ p {
     padding: 0 0 0 0;
 }
 
+// Chrome, Safari, and Edge scrollbar
 ::-webkit-scrollbar {
     width: 12px;
 }
@@ -46,8 +47,6 @@ p {
 ::-webkit-scrollbar-track {
     background: transparent;
 }
-
-
 
 ::-webkit-scrollbar-thumb {
     background: get-color("light-grey", 0.6);
@@ -58,6 +57,12 @@ p {
 ::-webkit-scrollbar-thumb:hover {
     background: get-color("grey", 0.6);
     @include scrollbar-padding();
+}
+
+// Firefox scrollbar
+* {
+    scrollbar-width: thin;
+    scrollbar-color: get-color("grey", 0.6) transparent;
 }
 
 h2 {

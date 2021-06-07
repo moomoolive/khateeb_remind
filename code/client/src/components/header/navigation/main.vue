@@ -177,7 +177,6 @@ export default {
 .signup-buttons {
   float: right;
   font-size: 13px;
-  font-weight: bold;
   border-radius: 0;
   color: black;
   height: 60%;
