@@ -129,8 +129,6 @@ user.blah = {
     default: true
 }
 
-const model = mongoose.model('user', user)
-
 user.query.safelyFindOne = function(_id='none') {
     if (!_id || _id.toLocaleLowerCase() === $config.consts.nullId)
         throw TypeError('Please provide a valid khateeb id')
@@ -202,6 +200,8 @@ user.methods.deactivateAccount = async function () {
     const userRes = await this.setAccountToInactive()
     return { userRes, dependants }
 }
+
+const model = mongoose.model('user', user)
 
 user.methods.setAccountToInactive = async function() {
     let res = {}

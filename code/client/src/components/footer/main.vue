@@ -1,5 +1,8 @@
 <template>
     <div class="footer-container">
+
+        <div class="footer-divider"></div>
+
         <div class="bottom-nav">
             
             <collapse-transition :duration="600">
@@ -10,7 +13,6 @@
                     <div class="footer-links-header-divide"></div>
                     <nav>
                         <a
-                            class="green"
                             :href="feedbackURL"
                             rel="noopener" 
                             target="_blank"
@@ -19,13 +21,11 @@
                         </a>
                         <a 
                             v-if="!$store.getters['user/isLoggedInAsGenericUser']" 
-                            class="green"
                             @click="$store.dispatch('user/downgradeUserAuthorization')"
                         >
                             Exit Institution
                         </a>
                         <a 
-                            class="green"
                             @click="logout()"
                         >
                             Logout
@@ -41,17 +41,15 @@
                 <div class="footer-links-header-divide"></div>
                 <nav>
                     <a 
-                        class="green" 
-                        @click="toUsecasePage()"
-                    >
-                        Why Use Khateeb Remind?
-                    </a>
-
-                    <a 
-                        class="green" 
                         @click="toHomepage()"
                     >
                         Homepage
+                    </a>
+
+                    <a 
+                        @click="toUsecasePage()"
+                    >
+                        Why Use Khateeb Remind?
                     </a>
                 </nav>
 
@@ -64,7 +62,6 @@
                 <div class="footer-links-header-divide"></div>
                 <nav>
                     <a 
-                        class="green" 
                         :href="sourceCodeURL"
                         target="_blank"
                         rel="noopener"
@@ -79,7 +76,7 @@
 
         <div class="footer-logo" @click="_utils.toHomePage()">
             <div class="khateeb-remind-name">
-                <span class="green bottom-logo">
+                <span class="bottom-logo">
                     <fa-icon :icon="['far', 'paper-plane']" />
                 </span>
                 Khateeb Remind
@@ -126,15 +123,22 @@ export default {
     },
 }
 </script>
-
+ 
 <style lang="scss" scoped>
 .footer-container {
-    @include alternate-font();
-    background: get-color('grey');
     padding-bottom: 2px;
     position: relative;
     z-index: 1;
     min-height: 12.08vh;
+}
+
+.footer-divider {
+    background: get-color("mint", 0.6);
+    width: 20%;
+    min-width: 60px;
+    height: 3px;
+    @include center-margin();
+    @include completely-round-border();
 }
 
 .bottom-nav {
@@ -157,18 +161,17 @@ a {
     font-size: 12px;
     margin-bottom: 9px;
     cursor: pointer;
+    color: get-color("dark-blue");
+    @include alternate-font();
     
     &:hover {
-        color: get-color("blue") !important;
-    }
-    
-    &.green {
-        color: get-color("green");
+        color: get-color("mint") !important;
     }
 }
 
 .bottom-logo {
     margin-right: 3px;
+    color: get-color("mint");
 }
 
 .footer-links-section {
@@ -180,29 +183,23 @@ a {
 
 .footer-links-section-header {
     font-size: 15px;
-    color: get-color("light-blue");
     font-weight: bold;
+    color: get-color("dark-blue")
 }
 
 .footer-links-header-divide {
     height: 2px;
     width: 5em;
     margin-top: 2px;
-    margin-bottom: 8px;
-    background: get-color("purple");
-}
-
-.khateeb-remind-logo {
-    width: 12px;
-    margin-right: 5px;
+    margin-bottom: 6px;
 }
 
 .khateeb-remind-name {
     font-size: 11px;
-    color: get-color("off-white");
+    @include alternate-font();
 
     &:hover {
-        color: get-color("blue") !important;
+        color: get-color("mint") !important;
     }
 }
 
@@ -216,11 +213,10 @@ a {
 
 @media screen and (max-width: $phone-width) {
     a {
-        margin-bottom: 12px;
+        margin-bottom: 20px;
     }
 
     .footer-links-section-header {
-        font-size: 13px;
         margin-right: 0px;
     }
 
@@ -254,6 +250,7 @@ a {
 
     .footer-links-header-divide {
         width: 3.5em;
+        margin-bottom: 20px;
     }
 
 }

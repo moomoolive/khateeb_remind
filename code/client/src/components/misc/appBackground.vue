@@ -1,13 +1,10 @@
 <template>
     <div
         ref="container"
-        class="background-container" 
-        v-resize 
-        @resize="onResize($event)" 
+        class="background-container"  
     >
         <div 
             class="bubbles"
-            :style="`height: ${bubbleBackgroundHeight}px !important;`"
         >
             <div v-for="x in 10" :key="x" class="bubble"></div>
             <fa-icon
@@ -67,18 +64,19 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 0;
+    z-index: 1;
     width: 100%;
-    height: 100%;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .bubbles{
   position:absolute;
   width: 100%;
   z-index: 1;
-  overflow: hidden;
   top:0;
   left:0;
+  height: 110vh;
 }
 
 .bubble {
@@ -111,6 +109,7 @@ export default {
   }
 
   &.paper-plane {
+    color: get-color("mint"); 
     animation-delay:5s;
     animation-duration:16s;
     left:50%;
@@ -207,5 +206,11 @@ export default {
   left:25%;
   animation-duration:10s;
   animation-delay:4s;
+}
+
+@media screen and (min-width: $large-screen-view) {
+  .background-container {
+    height: 90vh;
+  }
 }
 </style>

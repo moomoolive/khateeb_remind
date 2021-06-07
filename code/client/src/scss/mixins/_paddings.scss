@@ -1,0 +1,5 @@
+// gives scroll bar "padding" effect
+@mixin scrollbar-padding {
+    border: 2px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+}

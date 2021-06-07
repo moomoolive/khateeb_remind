@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const users = require($rootDir + "/database/models/users.js")
 const userScheduleRestrictions = require($rootDir + "/database/models/userScheduleRestrictions.js")
 
-const helpers = ($rootDir + "/database/helperFunctions/main.js")
+const helpers = require($rootDir + "/database/helperFunctions/main.js")
 
 function findKhateebs(institutionId="1234", khateebAuthorization="1234", query={}) {
     return users.aggregate([

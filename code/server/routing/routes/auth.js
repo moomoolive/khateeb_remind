@@ -100,6 +100,7 @@ router.post(
                 filter: { username: req.body.username, active: true },
                 dataShape: ["-__v"]
             })
+            console.log(user.prototype)
             if (!user) {
                 return res.status(401).json({  msg: 'unauthorized', token: null })
             }

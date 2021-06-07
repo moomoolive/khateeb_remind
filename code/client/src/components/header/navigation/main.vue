@@ -22,7 +22,7 @@
 
         <div class="right-side-menu">
 
-          <div v-if="!$store.getters['user/isLoggedIn']" class="signup-buttons-container">
+          <div v-if="!$store.getters['user/isLoggedIn']">
 
             <button 
               class="blue signup-buttons pale-hover" 
@@ -187,21 +187,17 @@ export default {
   @include floating-box-shadow();
 }
 
-.signup-buttons-container {
-  margin-right: 15px;
-}
-
 .icons-container {
   @include flexbox-default();
   height: 5vh;
   min-height: 40px;
   max-height: 50px;
-  width: 180px;
+  width: 160px;
 }
 
 .right-side-menu {
   position: absolute;
-  right: 8px;
+  right: 0px;
 }
 
 ::v-deep .menu-icon-svg {
@@ -271,5 +267,23 @@ export default {
         left: 45px;
       }
 
+}
+
+@media screen and (min-width: $large-screen-view) {
+
+  .menu-container {
+    position: absolute;
+    z-index: 8;
+    right: 0;
+    width: 600px;
+  }
+
+  .profile-options {
+    position: absolute;
+    z-index: 8;
+    width: 190px;
+    right: 25px;
+    top: 40px;
+  }
 }
 </style>
