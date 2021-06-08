@@ -15,6 +15,7 @@
                 :backgroundColor="`none`"
                 :basedOn="{ username: $store.state.user.userInfo.username }"
                 :buttonText="`Change Username`"
+                :textColor="`off-white`"
                 @submitted="updateInfo($event)"
             />
         </collapsable-box>
@@ -33,6 +34,7 @@
                 :bindedExts="['confirms']"
                 :backgroundColor="`none`"
                 :buttonText="`Change Password`"
+                :textColor="`off-white`"
                 @submitted="updateInfo($event)"
             />
         </collapsable-box>
@@ -46,7 +48,8 @@
                 :formProps="{
                     backgroundColor: 'none',
                     buttonText: 'Update Profile',
-                    basedOn: $store.state.user.userInfo
+                    basedOn: $store.state.user.userInfo,
+                    textColor: 'off-white'
                 }"
                 @submitted="updateInfo($event)"
             />

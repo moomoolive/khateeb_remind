@@ -154,6 +154,7 @@ export default {
 
 .notification-date, .institution-name {
     font-size: 12px;
+    @include alternate-font();
 }
 
 

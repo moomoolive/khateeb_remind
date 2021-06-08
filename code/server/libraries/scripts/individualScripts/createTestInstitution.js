@@ -66,7 +66,7 @@ const createTestInstitution = async () => {
         // "Server.config.js" file, if not create enough to fulfill that
         // quota
         let testInstitutionLocations = await locations.query({ filter: { institutionID: testInstitution._id } })
-        if (testInstitutionLocations.length === initConfig.testInstitution.locationCount) {
+        if (testInstitutionLocations.length >= initConfig.testInstitution.locationCount) {
             console.log(`Test Institution already has ${initConfig.testInstitution.locationCount} locations`)
         } else {
             const ids = []
@@ -105,7 +105,7 @@ const createTestInstitution = async () => {
         // quota
         const khateebAuthorization = authorizations.find(a => a.role === 'khateeb')
         let testInstitutionKhateebs = await users.findAuthorizationHolders([khateebAuthorization._id])
-        if (testInstitutionKhateebs.length === initConfig.testInstitution.khateebCount) {
+        if (testInstitutionKhateebs.length >= initConfig.testInstitution.khateebCount) {
             return console.log(`Test institution already has ${initConfig.testInstitution.khateebCount} khateebs`)
         } else {
             const ids = []

@@ -205,6 +205,7 @@ div {
 }
 
 .updated-at-text {
+    @include alternate-font();
     font-size: 13px;
     text-align: left;
     margin-bottom: 10px;

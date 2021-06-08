@@ -15,7 +15,8 @@
     "docker:run-test-container": "docker container start kr -a",
     "docker:test": "npm run docker:remove-old && npm run docker:create-test-container && npm run docker:run-test-container",
     "docker:kill-test": "docker kill kr",
-    "debug:circular-imports": "node developmentDebugScripts/circularImports.js"
+    "debug:circular-imports": "node developmentDebugScripts/circularImports.js",
+    "test": "jest ./libraries/JSObjectRestructuring"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",

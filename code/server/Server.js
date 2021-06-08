@@ -24,7 +24,7 @@ const db = mongoose.connection
 server.use(cors())
 server.use(express.json({ limit: networkConfig.maxJSONSize }))
 server.use(globalMiddleWare.generalError)
-server.set('query parser', str => qs.parse(str, { comma: true }))
+server.set('query parser', q => qs.parse(q, { comma: true }))
 server.use(queryType.middleware())
 
 server.options('*', cors())

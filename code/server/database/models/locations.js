@@ -39,14 +39,11 @@ location.methods.findTimings = async function(options) {
 location.methods.deleteDependants = async function () {
     let res = {}
     try {
-        const timings = await this.findTimings()
-        for (let i = 0; i < timings.length; i++) {
-            const thisTimingRes = await timings[i].deleteDependants()
-            const deletedTiming = await timings.updateEntry({
-                filter: { _id: timings[i]._id },
-                updates: { active: false }
-            })
-            res[`timing-${timings[i]._id.toString()}`] = { ...thisTimingRes, timing: deletedTiming}
+        const ts = await this.findTimings()
+        for (let i = 0; i < ts.length; i++) {
+            const thisTimingRes = await ts[i].deleteDependants()
+            const deletedTiming = await timings.update({ _id: ts[i]._id }, { active: false })
+            res[`timing-${ts[i]._id.toString()}`] = { ...thisTimingRes, timing: deletedTiming}
         }
     } catch(err) {
         console.error(`Couldn't delete location dependants`, err)

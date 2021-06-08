@@ -49,14 +49,16 @@
                                 class="authorization-button"
                                 @click="upgradeUserAuthorization(authorization)"
                             >
-                                Sign in as a
-                                <span class="blue">
-                                    {{ _utils.stringFormat(authorization.authId.role) }}
-                                </span>
-                                @
-                                <span class="red">
-                                    {{ _utils.stringFormat(authorization.authId.institution.name) }}
-                                </span>
+                                <div class="authorization-text-description">
+                                    Sign in as a
+                                    <span class="blue">
+                                        {{ _utils.stringFormat(authorization.authId.role) }}
+                                    </span>
+                                    @
+                                    <span class="red">
+                                        {{ _utils.stringFormat(authorization.authId.institution.name) }}
+                                    </span>
+                                </div>
                                 <div class="authorization-bottom-section">
                                     
                                     <div class="confirmation-status">
@@ -301,6 +303,10 @@ export default {
 <style lang="scss" scoped>
 .loading-to-settings-animation-container {
     height: 15px;
+}
+
+.authorization-text-description {
+    min-height: 42px;
 }
 
 .loading-to-settings-animation {

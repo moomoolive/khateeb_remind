@@ -183,9 +183,9 @@ export default {
             const update = { }
             update["settings." + key] = newVal
             const res = await this._api.user.updateInfo(update)
-            if (!res.data)
+            if (!res.data) {
                 return this._utils.alert(`There was a problem updating your profile`)
-            return
+            }
         }
     },
     computed: {
