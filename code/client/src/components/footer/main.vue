@@ -153,12 +153,18 @@ export default {
     margin-bottom: 40px;
 }
 
+.footer-links-section-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: get-color("dark-blue")
+}
+
 a {
     position: relative;
     display: block;
     text-decoration: none;
     color: get-color("silver");
-    font-size: 12px;
+    font-size: 15px;
     margin-bottom: 9px;
     cursor: pointer;
     color: get-color("dark-blue");
@@ -169,22 +175,10 @@ a {
     }
 }
 
-.bottom-logo {
-    margin-right: 3px;
-    color: get-color("mint");
-}
-
 .footer-links-section {
     margin-top: 15px;
     margin-left: 20px;
     margin-right: 40px;
-}
-
-
-.footer-links-section-header {
-    font-size: 15px;
-    font-weight: bold;
-    color: get-color("dark-blue")
 }
 
 .footer-links-header-divide {
@@ -195,12 +189,17 @@ a {
 }
 
 .khateeb-remind-name {
-    font-size: 11px;
+    font-size: 13px;
     @include alternate-font();
 
     &:hover {
         color: get-color("mint") !important;
     }
+}
+
+.bottom-logo {
+    margin-right: 3px;
+    color: get-color("mint");
 }
 
 .footer-logo {

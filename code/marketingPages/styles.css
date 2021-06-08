@@ -157,7 +157,8 @@ button.slight-rounding {
 }
 
 .benefit-container.dark,
-.other-benefits-container {
+.other-benefits-container,
+.main-photo-container {
     background: #161617;
 }
 

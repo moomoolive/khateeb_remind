@@ -23,20 +23,21 @@
         <div class="right-side-menu">
 
           <div v-if="!$store.getters['user/isLoggedIn']">
+            <nav>
+              <button 
+                class="blue signup-buttons pale-hover" 
+                @click="redirect('/login')"
+              >
+                Log In
+              </button>
 
-            <button 
-              class="blue signup-buttons pale-hover" 
-              @click="redirect('/login')"
-            >
-              Log In
-            </button>
-
-            <button 
-              class="green signup-buttons pale-hover"
-              @click="redirect('/create/user')"
-            >
-              Sign Up
-            </button>
+              <button 
+                class="green signup-buttons pale-hover"
+                @click="redirect('/create/user')"
+              >
+                Sign Up
+              </button>
+            </nav>
           
           </div>
 
@@ -163,7 +164,7 @@ export default {
   max-height: 50px;
   width: 100vw;
   overflow: visible;
-  min-width: 190px;
+  min-width: 220px;
 }
 
 .logo {
@@ -176,7 +177,7 @@ export default {
 
 .signup-buttons {
   float: right;
-  font-size: 13px;
+  font-size: 17px;
   border-radius: 0;
   color: black;
   height: 60%;
@@ -235,8 +236,8 @@ export default {
 @media screen and (max-width: $phone-width) {
 
       .signup-buttons {
-        font-size: 8px;
-        width: 60px;
+        font-size: 14px;
+        width: 83px;
         height: 25px;
       }
 
