@@ -164,7 +164,7 @@ function createEntry(options={}) {
     return new users(entry).save()
 }
 
-function updateEntry(options={}) {
+function updateEntryAndReturnOldCopy(options={}) {
     const filter = options.filter || {}
     const updates = options.updates || {}
     const returnOptions = options.returnOptions
@@ -313,7 +313,7 @@ function addAuthorization(userId="1234", userAuthId="1234", confirmed, extraOper
 // the reason why I use updateOne and then findOne instead of
 // findOneAndUpdate is because there are 'pre update' hooks for
 // the user schema that won't work with findOneAndUpdate
-async function updateProfile(options={}) {
+async function updateEntry(options={}) {
     try {
         const targetModel = helpers.dynamicUserModel(options.targetModel)
         const filter = options.filter || {}
@@ -358,6 +358,13 @@ function findAuthorizationHolders(authorizations=[]) {
     })
 }
 
+function confirmAuthorizationByKey(key="1234", confirmed) {
+    return users.update(
+        { "authorizations.authId": key },
+        { $set: { "authorizations.$.confirmed": confirmed } }
+    )
+}
+
 module.exports = {
     findKhateebs,
     getUserScheduleRestrictionsAssociatedWithInstitution,
@@ -373,7 +380,8 @@ module.exports = {
     populateScheduleRestrictionsAndAuthorizations,
     findEntryRelatedAuthorizations,
     addAuthorization,
-    updateProfile,
     findAuthorizationHolders,
-    deleteEntry
+    deleteEntry,
+    confirmAuthorizationByKey,
+    updateEntryAndReturnOldCopy
 }

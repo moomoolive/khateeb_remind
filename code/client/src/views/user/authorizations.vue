@@ -194,7 +194,8 @@ export default {
             if (
                 !this.$store.state.app.hasLoggedInViaLoginPage && 
                 landingPage !== this.$route.path &&
-                landingPage !== '/login'
+                landingPage !== '/login' &&
+                landingPage !== "/"
             ) {
                 this.$router.push(landingPage)
                 this.$store.commit('app/loggedInViaLoginPage')
@@ -203,8 +204,9 @@ export default {
             }
         },
         async removeAuthorization(authorization={}, authIndex=0) {
-            if (authorization.authId.role === 'rootInstitutionAdmin')
+            if (authorization.authId.role === 'rootInstitutionAdmin') {
                 return this.pushToDelegationPage(authorization) 
+            }
             const confirm = await this._utils.confirm(
                 `Are you sure you want to remove these permissions? You'll no longer be able log into ${authorization.authId.institution.name} as a ${authorization.authId.role}`,
                 "yellow",
@@ -238,7 +240,7 @@ export default {
         async pushToDelegationPage(authorization={}) {
             const confirm = await this._utils.confirm(`You cannot remove root admin permissions from here, you must login then do so from the institution settings page by pressing 'delgate permissions' or deleting the institution entirely. Would you like to be taken there now?`)
             this.promptLoadingAlternateIconOnPressingRemovingPermissions(authorization._id)
-            if (!confirm) {
+            if (!confirm || !authorization.confirmed) {
                 return this.resetLoadingAuthToSetting()
             }
             const token = await this.upgradeAuth(authorization)

@@ -103,8 +103,8 @@ router.put(
 router.put(
     '/run-loop',
     validationMiddleware.validateRequest([
-        validator.body("main._id").isLength({ min: 4 }).isString(),
-        validator.body("main.khateebID").isLength($config.consts.mongooseIdLength).isString().optional(),
+        validator.body("main._id").isString().custom(requestValidationHelpers.validIdOrNullIdInField),
+        validator.body("main.khateebID").isString().custom(requestValidationHelpers.validIdOrNullIdInField).optional(),
         validator.body("main.isGivingKhutbah").isBoolean().optional(),
         validator.body("main.isBackup").isBoolean().optional(),
         validator.body("main.notified").isBoolean().optional(),
@@ -114,8 +114,8 @@ router.put(
         validator.body("main.timingID").isLength($config.consts.mongooseIdLength).isString().optional(),
         validator.body("main.locationID").isLength($config.consts.mongooseIdLength).isString().optional(),
 
-        validator.body("backup._id").isLength({ min: 4 }).isString(),
-        validator.body("backup.khateebID").isLength($config.consts.mongooseIdLength).isString().optional(),
+        validator.body("backup._id").isString().custom(requestValidationHelpers.validIdOrNullIdInField).isString(),
+        validator.body("backup.khateebID").isString().custom(requestValidationHelpers.validIdOrNullIdInField).optional(),
         validator.body("backup.isGivingKhutbah").isBoolean().optional(),
         validator.body("backup.isBackup").isBoolean().optional(),
         validator.body("backup.notified").isBoolean().optional(),

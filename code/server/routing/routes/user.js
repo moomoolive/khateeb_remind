@@ -42,7 +42,7 @@ router.put(
     ),
     async (req, res) => {
         try {
-            const data = await users.updateProfile({
+            const data = await users.updateEntry({
                 filter: { _id: req.headers.userid },
                 updates: req.body,
                 targetModel: req.headers.targetusermodel,
@@ -93,7 +93,7 @@ router.get('/notifications', async (req, res) => {
                 sortBy: "-createdAt",
                 limit: 20
             }),
-            users.updateEntry({
+            users.updateEntryAndReturnOldCopy({
                 filter: { _id: req.headers.userid },
                 updates: { lastLogin: new Date() }
             })
@@ -119,11 +119,17 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const user = await users.findEntry({ filter: { _id: req.headers.userid } })
-            const userHasRequestedAuthorization = user.authorizations
-                .map(a => a.authId)
-                .find(id => id.toString() === req.body.authId)
-            if (!userHasRequestedAuthorization && !req.headers.specialStatus) {
+            const user = await users.findEntry({ 
+                filter: { _id: req.headers.userid },
+                populate: "authorizations" 
+            })
+            const targetAuthorization = user.authorizations.find(a => {
+                return a.authId.toString() === req.body.authId
+            })
+            if (
+                (!targetAuthorization && !req.headers.specialStatus) || 
+                (!req.headers.specialStatus && !targetAuthorization.confirmed)
+            ) {
                 return res.status(403).json({ token: null })
             }
             const tokenInfo = {
