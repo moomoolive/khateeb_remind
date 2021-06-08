@@ -129,7 +129,7 @@ p {
 @media screen and (max-width: $phone-width) {
 
     .forgot-credentials-text  {
-        font-size: 15px;
+        font-size: 18px;
     }
 }
 

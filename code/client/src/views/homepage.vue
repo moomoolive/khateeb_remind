@@ -7,7 +7,7 @@
                     Effortless Khateeb Scheduling
                 </div>
                 <div class="sub-header">
-                    Automated. Centralized.
+                    Automate. Centralize.
                 </div>
                 <div class="description-container">
                     <div class="description">

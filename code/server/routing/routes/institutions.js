@@ -4,6 +4,8 @@ const validator = require('express-validator')
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
 
+const scripts = require($rootDir + '/libraries/scripts/index.js')
+
 const { institutions } = require($rootDir + "/database/public.js")
 
 const router = express.Router()
@@ -57,7 +59,17 @@ router.delete(
         try {
             const data = await institutions.deleteEntry({
                 filter: { _id: req.headers.institutionid },
-                specialInstitution: req.headers.specialInstitution 
+                specialInstitution: req.headers.specialInstitution,
+                postHook: async () => {
+                    const threeSecondsInMilliseconds = 3_000
+                    global.setTimeout(async () => { 
+                        try {
+                            await scripts.createTestInstitution() 
+                        } catch(err) {
+                            console.error(err)
+                        }
+                    }, threeSecondsInMilliseconds)
+                } 
             })
             return res.json({ data })
         } catch(err) {

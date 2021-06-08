@@ -66,13 +66,13 @@ const createTestInstitution = async () => {
         // "Server.config.js" file, if not create enough to fulfill that
         // quota
         let testInstitutionLocations = await locations.query({ filter: { institutionID: testInstitution._id } })
-        if (testInstitutionLocations.length === initConfig.testInstitution.locationCount)
+        if (testInstitutionLocations.length === initConfig.testInstitution.locationCount) {
             console.log(`Test Institution already has ${initConfig.testInstitution.locationCount} locations`)
-        else {
+        } else {
             const ids = []
             for (let i = testInstitutionLocations.length; i < initConfig.testInstitution.locationCount; i++) {
                 try {
-                    const location = await locations.createEntry({
+                    const { location } = await locations.createEntry({
                         entry: {
                             name: randomNamegenerate().dashed,
                             address: `${randomNamegenerate().dashed} Street`,
@@ -80,7 +80,6 @@ const createTestInstitution = async () => {
                         }
                     })
                     ids.push(location._id)
-                    
                     let hour = 13
                     let minute = 20
                     // locations by default create an associated timing, so we'll skip right to index 1
@@ -89,13 +88,13 @@ const createTestInstitution = async () => {
                         if (minute > 59) {
                             minute = 0
                             hour++
-                        }
-                        if (hour > 23)
+                        } else if (hour > 23) {
                             hour = 0
+                        }
                         await location.createAssociatedTiming(minute, hour)
                     }
                 } catch(err) {
-                    ids.push(`Error occured creating khateeb #${i + 1}. Err trace: ${err}`)
+                    ids.push(`Error occured creating timing #${i + 1}. Err trace: ${err}`)
                 }
             }
             console.log(`Created ${initConfig.testInstitution.locationCount - testInstitutionLocations.length} locations for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')

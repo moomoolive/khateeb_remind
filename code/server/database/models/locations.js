@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const timings = require($rootDir + "/database/interfaces/timings.js")
+const timings = require($rootDir + "/database/models/timings.js")
 
 const location = new mongoose.Schema({
     institutionID: {
@@ -29,13 +29,10 @@ const location = new mongoose.Schema({
 
 location.methods.findTimings = async function(options) {
     try {
-        const timings = await timing.query({ 
-            filter: { locationID: this._id, ...options }
-        })
-        return timings
+        const ts = await timings.find({ locationID: this._id, ...options })
+        return ts
     } catch(err) {
-        console.log(err)
-        console.log(`Couldn't find associated timings`)
+        console.error(`Couldn't find associated timings`, err)
     }
 }
 
@@ -52,25 +49,22 @@ location.methods.deleteDependants = async function () {
             res[`timing-${timings[i]._id.toString()}`] = { ...thisTimingRes, timing: deletedTiming}
         }
     } catch(err) {
-        console.log(err)
-        console.log(`Couldn't delete location dependants`)
+        console.error(`Couldn't delete location dependants`, err)
     }
     return res
 }
 
 location.methods.createAssociatedTiming = async function(minute=30, hour=12) {
     try {
-        const saved = await timings.createEntry({
-            entry: {
-                institutionID: this.institutionID,
-                locationID: this._id.toString(),
-                hour,
-                minute
-            }
-        })
+        const saved = await timings({
+            institutionID: this.institutionID,
+            locationID: this._id.toString(),
+            hour,
+            minute
+        }).save()
         return saved
     } catch(err) {
-        console.log(`${err}\nCouldn't create assoicated timing`)
+        console.error(`${err}\nCouldn't create assoicated timing`)
     }
 }
 
@@ -78,7 +72,7 @@ location.post('save', async function(newLocation={}) {
     try {
         await newLocation.createAssociatedTiming()
     } catch(err) {
-        console.log(err)
+        console.error(err)
     }
 })
 

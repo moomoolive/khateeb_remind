@@ -4,6 +4,7 @@ const DeviceDetector = require('device-detector-js')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
+const scripts = require($rootDir + '/libraries/scripts/index.js')
 
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const requestValidationHelpers = require($rootDir + '/libraries/requestValidation/main.js')
@@ -267,11 +268,10 @@ router.put(
 
 router.delete('/', async (req, res) => {
     try {
-        const user = await users.findEntry({
+        const data = await users.deleteEntry({
             filter: { _id: req.headers.userid },
             targetModel: req.headers.targetusermodel
         })
-        const data = await user.deactivateAccount()
         return res.json({ data })
     } catch(err) {
         console.error(err)

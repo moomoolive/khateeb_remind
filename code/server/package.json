@@ -14,7 +14,8 @@
     "docker:create-test-container": "docker image build . -t khateeb-remind-test && docker create -p 80:80 --name kr khateeb-remind-test:latest",
     "docker:run-test-container": "docker container start kr -a",
     "docker:test": "npm run docker:remove-old && npm run docker:create-test-container && npm run docker:run-test-container",
-    "docker:kill-test": "docker kill kr"
+    "docker:kill-test": "docker kill kr",
+    "debug:circular-imports": "node developmentDebugScripts/circularImports.js"
   },
   "author": "Mostafa Elbannan",
   "license": "MIT",
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "jest": "^27.0.1",
+    "madge": "^4.0.2",
     "nodemon": "^2.0.6",
     "supertest": "^6.1.3"
   }

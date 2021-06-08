@@ -4,6 +4,7 @@ const users = require($rootDir + "/database/models/users.js")
 const userScheduleRestrictions = require($rootDir + "/database/models/userScheduleRestrictions.js")
 
 const helpers = require($rootDir + "/database/helperFunctions/main.js")
+const scripts = require($rootDir + '/libraries/scripts/index.js')
 
 function findKhateebs(institutionId="1234", khateebAuthorization="1234", query={}) {
     return users.aggregate([
@@ -311,6 +312,41 @@ async function updateProfile(options={}) {
     }
 }
 
+async function deleteEntry(options={}) {
+    try {
+        const targetModel = helpers.dynamicUserModel(options.targetModel)
+        const filter = options.filter || {}
+        const user = await users.findEntry({ filter, targetModel })
+        // postHook is only used for the deletion of the root admin
+        // where after deletion it reinitializes the root admin
+        // account, all other accounts do not actually execute
+        // this hook
+        const postHook = () => {
+            const threeSecondsInMilliseconds = 3_000
+            global.setTimeout(async () => {
+                try {
+                    await scripts.createRootUser()
+                } catch(err) {
+                    console.error(err)
+                }
+            }, threeSecondsInMilliseconds)
+        }
+        const dependantsRes = await user.deactivateAccount(postHook)
+        const userUpdateRes = await users.updateOne(
+            filter,
+            { 
+                active: false , 
+                scheduleRestrictions: [],
+                // remove username - refer to explanation in schema section
+                $unset: { username: "" } 
+            }
+        )
+        return { dependantsRes, userUpdateRes }
+    } catch(err) {
+        throw err
+    }
+}
+
 function findAuthorizationHolders(authorizations=[]) {
     return query({
         filter: {
@@ -335,5 +371,6 @@ module.exports = {
     findEntryRelatedAuthorizations,
     addAuthorization,
     updateProfile,
-    findAuthorizationHolders
+    findAuthorizationHolders,
+    deleteEntry
 }
