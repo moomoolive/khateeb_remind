@@ -19,7 +19,7 @@ router.get(
     authMiddleware.authenticate({ min: 2, max: 4 }),
     async (req, res) => {
         try {
-            const khateebAuthorization = await authorizations.query({
+            const [khateebAuthorization] = await authorizations.query({
                 filter: {
                     institution: req.headers.institutionid, 
                     role: "khateeb" 
@@ -77,7 +77,7 @@ router.delete(
     ], "query"),
     async (req, res) => {
         try {
-            const targetUser = await users.populateScheduleRestrictionsAndAuthorizations(req.query.khateebId)
+            const [targetUser] = await users.populateScheduleRestrictionsAndAuthorizations(req.query.khateebId)
             const targetAuthorization = targetUser.authorizations.find(a => {
                 return a.authId.role === 'khateeb' && a.authId.institution.toString() === req.headers.institutionid
             })

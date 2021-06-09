@@ -16,7 +16,12 @@ function findEntry(options={}) {
         .exec()
 }
 
+function findByRole(institution="1234", role="khateeb") {
+    return findEntry({ filter: { institution, role } })
+}
+
 module.exports = {
     query,
-    findEntry
+    findEntry,
+    findByRole
 }

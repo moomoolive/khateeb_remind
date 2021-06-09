@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
 
-const scripts = require($rootDir + '/libraries/scripts/index.js')
-
 const users = require($rootDir + "/database/models/users.js")
 
 const root = new mongoose.Schema({
@@ -19,11 +17,10 @@ const root = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-const model = users.discriminator('root', root)
-
-root.methods.deactivateAccount = async function() {
+root.methods.deactivateAccount = async function(postHook=()=>{}) {
     const dependants = await this.deleteDependencies() // method found in parent schema 'user'
     const userRes = await this.deleteAccount()
+    postHook()
     return { userRes, dependants }
 }
 
@@ -41,11 +38,4 @@ root.methods.deleteAccount = async function() {
     return res
 }
 
-root.post("deleteOne", function() {
-    const threeSecondsInMilliseconds = 3_000
-    global.setTimeout(async () => { 
-        await scripts.createRootUser() 
-    }, threeSecondsInMilliseconds)
-})
-
-module.exports = model
+module.exports = users.discriminator('root', root)

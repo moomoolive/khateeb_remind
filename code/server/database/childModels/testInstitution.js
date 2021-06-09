@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
 
-const scripts = require($rootDir + '/libraries/scripts/index.js')
-
 const institutions = require($rootDir + "/database/models/institutions.js")
 const users = require($rootDir + "/database/models/users.js")
 
@@ -41,26 +39,15 @@ testInstitution.methods.deleteAllUsers = async function(authKeys=[]) {
     }
 }
 
-testInstitution.methods.deleteInstitution = async function() {
+testInstitution.methods.deleteInstitution = async function(postHook=()=>{}) {
     try {
         const res = await institutions.deleteOne({ _id: this._id })
+        postHook()
         return res
     } catch(err) {
         console.error(err)
         throw new Error(err)
     }
 }
-
-// the test institution always recreates itself
-testInstitution.post('deleteOne', async function() {
-    const threeSecondsInMilliseconds = 3_000
-    global.setTimeout(async () => { 
-        try {
-            await scripts.createTestInstitution() 
-        } catch(err) {
-            console.error(err)
-        }
-    }, threeSecondsInMilliseconds)
-})
 
 module.exports = institutions.discriminator('testInstitution', testInstitution)

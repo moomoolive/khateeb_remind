@@ -52,7 +52,8 @@
                             </button>
                         </div>
                         <div class="month-indicator-text">
-                            {{ this.selectedDate.toLocaleString('en-US', { month: "long", year: "2-digit" }) + "'" }}
+                            {{ 
+                                this.selectedDate.toLocaleString('en-US', { month: "long", day: "2-digit" ,year: "2-digit" }) + "'" }}
                         </div>
                         <div>
                             <button class="yellow change-month-buttons" @click="changeViewingMonth(1)">

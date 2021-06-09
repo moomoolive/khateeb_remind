@@ -1,8 +1,11 @@
 <template>
   <div id="app">
     
-    <!-- the cool green streak on wide display -->
+    <!-- the green streak on wide display -->
     <div class="big-app-background"></div>
+
+    <!-- the khateeb remind logo seen in the large screen display -->
+    <fa-icon class="large-display-background-logo" :icon="['far', 'paper-plane']" />
 
     <!-- popup notifications -->
     <div 
@@ -20,9 +23,18 @@
 
     <!-- the actual app -->
     <div class="app-container-wrapper">
+
+      <!-- 
+        an element that fills an awkward gap in header
+        on large screen view 
+      -->
+      <div class="large-screen-header-fill"></div>
+
+      <!-- bubbles background -->
+      <default-app-background />
+
       <div class="app-container">
 
-      <!-- navigation and header -->
         <header class="header">
 
           <collapse-transition>
@@ -36,12 +48,8 @@
         <!-- main router (displayed page) -->
         <div :class="`main-content-background`">
 
-          <default-app-background />
-
           <vue-page-transition :name="routerConfig.animationName">
-            <router-view 
-              :class="`displayed-page page-padding`"
-            />
+            <router-view :class="`displayed-page page-padding`" />
           </vue-page-transition>
 
         </div>
@@ -49,9 +57,7 @@
         <!-- app runtimes -->
         <request-manager />
 
-        <notifications-manager 
-          @toggle-notification-display="toggleNotificationDisplay()" 
-        />
+        <notifications-manager @toggle-notification-display="toggleNotificationDisplay()" />
 
         <!-- footer popup messages -->
         <collapse-transition :duration="600">
@@ -67,6 +73,7 @@
 
       </div>
     </div>
+
   </div>
 </template>
 
@@ -181,7 +188,7 @@ export default {
 @import '~@/scss/_global-styles.scss';
 
 #app {
-    font-family: 'Oxygen', Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Oxygen', Avenir, Helvetica, Arial, "Times New Roman", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
@@ -192,11 +199,19 @@ export default {
 
 .big-app-background {
   background: get-color("green");
-  height: 250px;
+  height: 97px;
   position: absolute;
   top: 0;
   width: 100%;
   z-index: 0;
+}
+
+.large-display-background-logo {
+  position: absolute;
+  bottom: 20px;
+  right: 150px;
+  font-size: 90px;
+  color: get-color("green");
 }
 
 .app-container {
@@ -205,20 +220,22 @@ export default {
   @include center-margin();
   @include floating-box-shadow(0.6);
   position: relative;
-  z-index: 0;
+  z-index: 1;
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .main-content-background {
-  background: get-color("blue");
   overflow: hidden !important;
   position: relative;
-  z-index: 0;
+  z-index: 1;
+  width: 100%;
 }
 
 .displayed-page {
     position: relative;
-    z-index: 0;
-    margin: auto;
+    z-index: 1;
     min-height: 74vh;
 }
 
@@ -275,9 +292,15 @@ export default {
 }
 
 .app-container-wrapper {
-  background: get-color('grey');
+  background: get-color('blue');
   max-width: $maxAppWidth + 50px;
   @include center-margin();
+  position: relative;
+  z-index: 1;
+}
+
+.large-screen-header-fill {
+  display: none;
 }
 
 @media screen and (max-width: $phone-width) {
@@ -294,21 +317,48 @@ export default {
       }
 }
 
-@media screen and (max-width: 349px) {
-      body {
-        overflow-x: scroll;
-      }
-}
-
 @media screen and (min-width: $large-screen-view) {
     .app-container {
       margin-top: 50px;
       margin-bottom: 50px;
       width: $maxAppWidth;
+      height: 90vh;
     }
 
     .app-container-wrapper {
       max-width: $maxAppWidth;
     }
+
+    #app {
+      overflow: hidden;
+    }
+
+    .header {
+        position: sticky;
+    }
+
+    .large-screen-header-fill {
+      position: absolute;
+      z-index: 10;
+      height: 47px;
+      background-color: get-color("grey", 0.5);
+      display: block;
+      right: 0;
+      width: 12px;
+    }
+}
+
+// styles exclusive to firefox
+@-moz-document url-prefix() {
+
+  .large-screen-header-fill {
+    height: 48px;
+    width: 8px;
+  }
+
+  .big-app-background {
+    height: 98px;
+  }
+
 }
 </style>

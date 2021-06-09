@@ -4,6 +4,7 @@ const DeviceDetector = require('device-detector-js')
 
 const authMiddleware = require($rootDir + '/middleware/auth/main.js')
 const validationMiddleware = require($rootDir + '/middleware/validation/main.js')
+const scripts = require($rootDir + '/libraries/scripts/index.js')
 
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
 const requestValidationHelpers = require($rootDir + '/libraries/requestValidation/main.js')
@@ -35,11 +36,13 @@ router.put(
             validator.body("systemSettings.autoConfirmUserRegistration").isBoolean().optional(),
             validator.body("settings.recieveExternalNotification").isBoolean().optional(),
             validator.body("settings.recievePWAPush").isBoolean().optional(),
-        ]
+        ],
+        "body",
+        { doNotParseObjectSyntax: true }
     ),
     async (req, res) => {
         try {
-            const data = await users.updateProfile({
+            const data = await users.updateEntry({
                 filter: { _id: req.headers.userid },
                 updates: req.body,
                 targetModel: req.headers.targetusermodel,
@@ -90,7 +93,7 @@ router.get('/notifications', async (req, res) => {
                 sortBy: "-createdAt",
                 limit: 20
             }),
-            user.updateEntry({
+            users.updateEntryAndReturnOldCopy({
                 filter: { _id: req.headers.userid },
                 updates: { lastLogin: new Date() }
             })
@@ -116,11 +119,17 @@ router.post(
     ),
     async (req, res) => {
         try {
-            const user = await user.findEntry({ filter: { _id: req.headers.userid } })
-            const userHasRequestedAuthorization = user.authorizations
-                .map(a => a.authId)
-                .find(id => id.toString() === req.body.authId)
-            if (!userHasRequestedAuthorization && !req.headers.specialStatus) {
+            const user = await users.findEntry({ 
+                filter: { _id: req.headers.userid },
+                populate: "authorizations" 
+            })
+            const targetAuthorization = user.authorizations.find(a => {
+                return a.authId.toString() === req.body.authId
+            })
+            if (
+                (!targetAuthorization && !req.headers.specialStatus) || 
+                (!req.headers.specialStatus && !targetAuthorization.confirmed)
+            ) {
                 return res.status(403).json({ token: null })
             }
             const tokenInfo = {
@@ -181,10 +190,16 @@ router.post(
             let extraUpdates = {}
             if (req.body.role === 'khateeb') {
                 const scheduleRestriction = await userScheduleRestrictions.createEntry({ 
-                    user: req.headers.userid, 
-                    institution: req.body.institution 
+                    entry: {
+                        user: req.headers.userid, 
+                        institution: req.body.institution 
+                    }
                 })
-                extraUpdates.$push.scheduleRestrictions = scheduleRestriction._id
+                extraUpdates = { 
+                    ...extraUpdates, 
+                    addScheduleRestriction: true,
+                    scheduleRestrictionId: scheduleRestriction._id 
+                }
                 const note = new notificationConstructors.KhateebSignupNotificationConstructor(userInfo, autoConfirmPolicy, req.body.institution)
                 await note.setRecipentsToAdmins(authInfo.institution._id)
                 note.create()
@@ -225,7 +240,7 @@ router.post(
             await users.removeAuthorization(
                 req.headers.userid,
                 req.body.id,
-                { removeAssociatedSchedules: true, scheduleIds:  scheduleRestrictionIds }
+                { removeAssociatedSchedules: true, scheduleIds: scheduleRestrictionIds }
             )
             return res.json({ code: 0 })
         } catch(err) {
@@ -267,11 +282,24 @@ router.put(
 
 router.delete('/', async (req, res) => {
     try {
-        const user = await users.findEntry({
+        const data = await users.deleteEntry({
             filter: { _id: req.headers.userid },
-            targetModel: req.headers.targetusermodel
+            targetModel: req.headers.targetusermodel,
+            // postHook is only used for the deletion of the root admin
+            // where after deletion it reinitializes the root admin
+            // account, all other accounts do not actually execute
+            // this hook
+            postHook: () => {
+                const threeSecondsInMilliseconds = 3_000
+                global.setTimeout(async () => {
+                    try {
+                        await scripts.createRootUser()
+                    } catch(err) {
+                        console.error(err)
+                    }
+                }, threeSecondsInMilliseconds)
+            }
         })
-        const data = await user.deactivateAccount()
         return res.json({ data })
     } catch(err) {
         console.error(err)

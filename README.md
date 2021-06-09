@@ -1,7 +1,5 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-vue.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/open-source.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/contains-technical-debt.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](https://forthebadge.com)
 
 # Khateeb Remind
 
@@ -21,7 +19,7 @@ If your interested in seeing more reasons to use the app click [here](https://kh
 
 Khateeb Remind was orignially designed to be used at the University of Calgary MSA to help those who schedule khateebs for jummah to easily make sense of the tens of volunteer khateebs' schedules' in the UofC jummah rotation. Whether that's which khateeb can give certain khutbahs, which khateebs are unavailable on certain days, and generally keep track of khutbah history.
 
-If you have any suggestions to improve the app or find bugs please open a pull request or file an issue.
+If you have any suggestions to improve the app or find bugs please open a pull request or file an issue. Please create merge requests to the "develop" branch ONLY and not "master".
 
 This app intends to stay open-source and free forever, insha'Allah.
 

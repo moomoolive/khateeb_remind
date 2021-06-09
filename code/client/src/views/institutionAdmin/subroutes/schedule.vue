@@ -100,10 +100,12 @@ export default {
             this.jummahs.splice(this.findJummahIndexById(updated._id), 1, updated)
         },
         fillIdIfEmpty(main={}, backup={}) {
-            if (!main._id)
-                main = { ...main, _id: this._config.nullId }
-            if (!backup._id)
+            if (!main._id) {
+                 main = { ...main, _id: this._config.nullId }
+            }
+            if (!backup._id) {
                 backup = { ...backup, _id: this._config.nullId }
+            }
             return { main, backup }
         },
         async runNotificationLoop({ main: preprocessedMain, backup: preprocessedBackup, isBackup }) {

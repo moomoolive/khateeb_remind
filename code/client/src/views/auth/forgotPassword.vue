@@ -33,8 +33,9 @@ export default {
     methods: {
         async sendVerification({ username='moomoo' }) {
             const { msg, code } = await this._api.auth.sendVerificationCode(username)
-            if (code !== 0)
+            if (code !== 0) {
                 return this._utils.alert(msg)
+            }
             this.verificationSent = true
             this.username = username
             this._utils.alert(msg, 'success')

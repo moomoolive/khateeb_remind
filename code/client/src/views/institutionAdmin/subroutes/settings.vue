@@ -18,7 +18,8 @@
                             basedOn: institution,
                             bindedExts: ['states'],
                             backgroundColor: 'none',
-                            buttonText: 'Update Institution'
+                            buttonText: 'Update Institution',
+                            textColor: 'off-white'
                         }"
                         @submitted="saveInstitutionDetails($event)"
                     />
@@ -90,6 +91,7 @@
                         }"
                         :backgroundColor="`none`"
                         :basedOn="institution.settings"
+                        :textColor="`off-white`"
                         @submitted="saveInstitutionDetails({ _id: institution._id, settings: $event })"
                     />
                 </collapsable-box>
@@ -142,6 +144,7 @@
                                 }
                             } 
                         })"
+                        :textColor="`off-white`"
                     />
                 </collapsable-box>
 
@@ -356,6 +359,7 @@ export default {
 .insert-image-container {
     padding-top: 20px;
     padding-bottom: 20px;
+    @include alternate-font();
 }
 
 .institution-image-container {

@@ -30,11 +30,16 @@ body {
     font-size: 16px;
 }
 
+html {
+    overflow: hidden;
+}
+
 p {
     margin: 0 0 0 0;
     padding: 0 0 0 0;
 }
 
+// Chrome, Safari, and Edge scrollbar
 ::-webkit-scrollbar {
     width: 12px;
 }
@@ -45,10 +50,19 @@ p {
 
 ::-webkit-scrollbar-thumb {
     background: get-color("light-grey", 0.6);
+    @include completely-round-border();
+    @include scrollbar-padding();
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: get-color('grey');
+    background: get-color("grey", 0.6);
+    @include scrollbar-padding();
+}
+
+// Firefox scrollbar
+* {
+    scrollbar-width: thin;
+    scrollbar-color: get-color("grey", 0.6) transparent;
 }
 
 h2 {
@@ -119,10 +133,8 @@ button {
   opacity: 0;
 }
 
-
-@media screen and (max-width: $large-screen-view) {
-
+@media screen and (max-width: 349px) {
     body {
-        background: get-color("grey");
+      overflow-x: scroll;
     }
 }

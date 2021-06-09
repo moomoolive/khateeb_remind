@@ -34,9 +34,8 @@ router.put('/institutions',
                 returnOptions: { new: true }
             })
             if (data.confirmed) {
-                const auths = await authorizations.query({ filter: { institution: data._id } })
-                const userAuthId = auths.find(a => a.role === 'rootInstitutionAdmin')._id
-                await users.confirmAuthorization(userAuthId, true)
+                const auth = await authorizations.findByRole(data._id, "rootInstitutionAdmin")
+                await users.confirmAuthorizationByKey(auth._id, true)
             }
             return res.json({ data })
         } catch(err) {

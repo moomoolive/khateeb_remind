@@ -22,21 +22,22 @@
 
         <div class="right-side-menu">
 
-          <div v-if="!$store.getters['user/isLoggedIn']" class="signup-buttons-container">
+          <div v-if="!$store.getters['user/isLoggedIn']">
+            <nav>
+              <button 
+                class="blue signup-buttons pale-hover" 
+                @click="redirect('/login')"
+              >
+                Log In
+              </button>
 
-            <button 
-              class="blue signup-buttons pale-hover" 
-              @click="redirect('/login')"
-            >
-              Log In
-            </button>
-
-            <button 
-              class="green signup-buttons pale-hover"
-              @click="redirect('/create/user')"
-            >
-              Sign Up
-            </button>
+              <button 
+                class="green signup-buttons pale-hover"
+                @click="redirect('/create/user')"
+              >
+                Sign Up
+              </button>
+            </nav>
           
           </div>
 
@@ -163,7 +164,7 @@ export default {
   max-height: 50px;
   width: 100vw;
   overflow: visible;
-  min-width: 190px;
+  min-width: 220px;
 }
 
 .logo {
@@ -176,8 +177,7 @@ export default {
 
 .signup-buttons {
   float: right;
-  font-size: 13px;
-  font-weight: bold;
+  font-size: 17px;
   border-radius: 0;
   color: black;
   height: 60%;
@@ -187,21 +187,17 @@ export default {
   @include floating-box-shadow();
 }
 
-.signup-buttons-container {
-  margin-right: 15px;
-}
-
 .icons-container {
   @include flexbox-default();
   height: 5vh;
   min-height: 40px;
   max-height: 50px;
-  width: 180px;
+  width: 160px;
 }
 
 .right-side-menu {
   position: absolute;
-  right: 8px;
+  right: 0px;
 }
 
 ::v-deep .menu-icon-svg {
@@ -240,8 +236,8 @@ export default {
 @media screen and (max-width: $phone-width) {
 
       .signup-buttons {
-        font-size: 8px;
-        width: 60px;
+        font-size: 14px;
+        width: 83px;
         height: 25px;
       }
 
@@ -271,5 +267,23 @@ export default {
         left: 45px;
       }
 
+}
+
+@media screen and (min-width: $large-screen-view) {
+
+  .menu-container {
+    position: absolute;
+    z-index: 8;
+    right: 0;
+    width: 600px;
+  }
+
+  .profile-options {
+    position: absolute;
+    z-index: 8;
+    width: 190px;
+    right: 25px;
+    top: 40px;
+  }
 }
 </style>

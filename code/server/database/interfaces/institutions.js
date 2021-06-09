@@ -35,7 +35,8 @@ async function deleteEntry(options={}) {
         const institution = await targetDatabaseModel
             .findOneAndUpdate(filter, { active: false }, { new: true })
             .exec()
-        const deletedDependants = await institution.deactivate()
+        const postHook = options.postHook
+        const deletedDependants = await institution.deactivate(postHook)
         return { institution, deletedDependants }
     } catch(err) {
         throw err

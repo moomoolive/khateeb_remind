@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const users = require($rootDir + "/database/models/users.js")
 const userScheduleRestrictions = require($rootDir + "/database/models/userScheduleRestrictions.js")
 
-const helpers = ($rootDir + "/database/helperFunctions/main.js")
+const helpers = require($rootDir + "/database/helperFunctions/main.js")
 
 function findKhateebs(institutionId="1234", khateebAuthorization="1234", query={}) {
     return users.aggregate([
@@ -164,7 +164,7 @@ function createEntry(options={}) {
     return new users(entry).save()
 }
 
-function updateEntry(options={}) {
+function updateEntryAndReturnOldCopy(options={}) {
     const filter = options.filter || {}
     const updates = options.updates || {}
     const returnOptions = options.returnOptions
@@ -203,7 +203,7 @@ async function delegateRootInstitutionAdminAuthorization(toBeDelegatedUserId, de
             // remove their institution admin authorizations if they exist
             {
                 updateOne: {
-                    filter: { _id: req.body.targetUserId },
+                    filter: { _id: toBeDelegatedUserId },
                     update: {
                         $pull: {
                             authorizations: { authId: institutionAdminAuthorization._id }
@@ -238,15 +238,20 @@ function removeAuthorization(userId="1234", userAuthorizationId="1234", extraOpe
     if (extraOperations.removeAssociatedSchedules) {
         options.$pull = { scheduleRestrictions: { $in: extraOperations.scheduleIds } }
     }
-    return users.update(
-        { _id: userId },
+    return users.bulkWrite([
         {
-            $pull: {
-                authorizations: { _id: userAuthorizationId }
-            },
-            ...options
+            updateOne: {
+                filter: { _id: userId },
+                update: { $pull: { "authorizations" : { _id : userAuthorizationId } } }
+            }
+        },
+        {
+            updateOne: {
+                filter: { _id: userId },
+                update: options
+            }
         }
-    )
+    ])
 }
 
 function populateScheduleRestrictionsAndAuthorizations(userId="1234") {
@@ -275,27 +280,40 @@ function findEntryRelatedAuthorizations(userId="1234") {
     })
 } 
 
-function addAuthorization(userId="1234", userAuthId="1234", confirmed, options={}) {
-    return users.update(
-        { _id: userId },
-        { 
-            $push: { 
-                authorizations: { 
-                    authId: userAuthId, 
-                    // system administrators can never be autoconfirmed
-                    // only khateebs can be if administrator turns on that setting
-                    confirmed
+function addAuthorization(userId="1234", userAuthId="1234", confirmed, extraOperations={}) {
+    const options = {}
+    if (extraOperations.addScheduleRestriction) {
+        options.$push = { scheduleRestrictions: extraOperations.scheduleRestrictionId }
+    }
+    return users.bulkWrite([
+        {
+            updateOne: {
+                filter: { _id: userId },
+                update: { 
+                    $push: { 
+                        authorizations: { 
+                            authId: userAuthId, 
+                            // system administrators can never be autoconfirmed
+                            // only khateebs can be if administrator turns on that setting
+                            confirmed
+                        }
+                    },
                 }
-            },
-            ...options 
+            }
+        },
+        {
+            updateOne: {
+                filter: { _id: userId },
+                update: { ...options }
+            }
         }
-    )
+    ])
 }
 
 // the reason why I use updateOne and then findOne instead of
 // findOneAndUpdate is because there are 'pre update' hooks for
 // the user schema that won't work with findOneAndUpdate
-async function updateProfile(options={}) {
+async function updateEntry(options={}) {
     try {
         const targetModel = helpers.dynamicUserModel(options.targetModel)
         const filter = options.filter || {}
@@ -311,12 +329,40 @@ async function updateProfile(options={}) {
     }
 }
 
+async function deleteEntry(options={}) {
+    try {
+        const targetModel = helpers.dynamicUserModel(options.targetModel)
+        const filter = options.filter || {}
+        const user = await users.findEntry({ filter, targetModel })
+        const dependantsRes = await user.deactivateAccount(options.postHook)
+        const userUpdateRes = await users.updateOne(
+            filter,
+            { 
+                active: false , 
+                scheduleRestrictions: [],
+                // remove username - refer to explanation in schema section
+                $unset: { username: "" } 
+            }
+        )
+        return { dependantsRes, userUpdateRes }
+    } catch(err) {
+        throw err
+    }
+}
+
 function findAuthorizationHolders(authorizations=[]) {
     return query({
         filter: {
             "authorizations.authId": { $in: authorizations } 
         }
     })
+}
+
+function confirmAuthorizationByKey(key="1234", confirmed) {
+    return users.update(
+        { "authorizations.authId": key },
+        { $set: { "authorizations.$.confirmed": confirmed } }
+    )
 }
 
 module.exports = {
@@ -334,6 +380,8 @@ module.exports = {
     populateScheduleRestrictionsAndAuthorizations,
     findEntryRelatedAuthorizations,
     addAuthorization,
-    updateProfile,
-    findAuthorizationHolders
+    findAuthorizationHolders,
+    deleteEntry,
+    confirmAuthorizationByKey,
+    updateEntryAndReturnOldCopy
 }

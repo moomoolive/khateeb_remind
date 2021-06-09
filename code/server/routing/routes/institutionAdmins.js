@@ -14,7 +14,7 @@ router.get(
     "/", 
     async (req, res) => {
         try {
-            const institutionAdminAuthorization = await authorizations.query({
+            const [institutionAdminAuthorization] = await authorizations.query({
                 filter: {
                     institution: req.headers.institutionid, 
                     role: "institutionAdmin" 

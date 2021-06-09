@@ -143,10 +143,6 @@ button.slight-rounding {
     background: #4CAF50;
 }
 
-.main-text-container {
-    background: #a739bc;
-}
-
 .signup-button,
 .final-signup-button {
     background: #4F3ABB;
@@ -161,7 +157,8 @@ button.slight-rounding {
 }
 
 .benefit-container.dark,
-.other-benefits-container {
+.other-benefits-container,
+.main-photo-container {
     background: #161617;
 }
 
@@ -179,8 +176,7 @@ button.slight-rounding {
 
 .header-link,
 .benefit-outbound-link:hover,
-.footer-navigation-link:hover,
-.other-benefits-icon {
+.footer-navigation-link:hover {
     color: #4CAF50;
 }
 
@@ -193,7 +189,8 @@ button.slight-rounding {
     color: #86868b;
 }
 
-.other-benefits-text.blue {
+.other-benefits-text.blue,
+.other-benefits-icon {
     color: #2196F3;
 }
 
@@ -245,7 +242,8 @@ button.float-effect {
     position: relative;
     z-index: 0;
     height: 95vh;
-    background-image: url("./tile_background.png");
+    background-image: url("./masjid-3.jpg");
+    background-size: cover;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -258,7 +256,6 @@ button.float-effect {
     width: 80%;
     padding: 20px 20px 20px 20px;
     color: black;
-    background:rgba(167, 57, 188, 0.5);
     max-width: 500px;
 }
 

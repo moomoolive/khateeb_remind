@@ -287,8 +287,6 @@ export default {
         async addNewLocation() {
             const length = this.locations.length + 1
             const { location, timing } = await this._api.locations.createNewLocation({ name: `Unknown Location ${length}`, address: `Unknown Address ${length}` })
-            // eslint-disable-next-line
-            console.log(timing)
             this.timings.push(timing)
             this.locations.push(location)
         },
@@ -312,14 +310,15 @@ export default {
             }
         },
         async deleteLocation(location) {
-            if (this.locations.length < 2)
+            if (this.locations.length < 2) {
                 return this._utils.alert(`You must have at least one location`)
+            }
             const confirm = await this._utils.confirm(`Are you sure you want to delete this location?`)
             if (confirm) {
                 const res = await this._api.locations.deleteLocation(location._id)
                 if (requestHelpers.dataWasDeleted(res)) {
                     this.locations.splice(this.findIndexById(location._id, 'locations'), 1)
-                    this.timings = this.timings.filter(t => t.locationID === location._id)
+                    this.timings = this.timings.filter(t => t.locationID !== location._id)
                 }
             }
         },

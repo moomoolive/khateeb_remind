@@ -129,8 +129,6 @@ user.blah = {
     default: true
 }
 
-const model = mongoose.model('user', user)
-
 user.query.safelyFindOne = function(_id='none') {
     if (!_id || _id.toLocaleLowerCase() === $config.consts.nullId)
         throw TypeError('Please provide a valid khateeb id')
@@ -199,27 +197,7 @@ user.methods.comparePassword = async function (submittedPassword) {
 
 user.methods.deactivateAccount = async function () {
     const dependants = await this.deleteDependencies()
-    const userRes = await this.setAccountToInactive()
-    return { userRes, dependants }
-}
-
-user.methods.setAccountToInactive = async function() {
-    let res = {}
-    try {
-        res = await model.update(
-            { _id: this._id },
-            { 
-                active: false , 
-                scheduleRestrictions: [],
-                // remove username - refer to explanation in schema section
-                // above
-                $unset: { username: "" } 
-            }
-        )
-    } catch(err) {
-        console.error(err)
-    }
-    return res
+    return dependants
 }
 
 user.methods.deleteDependencies = async function() {
@@ -260,4 +238,4 @@ user.methods.deleteNotifications = async function() {
     return res
 }
 
-module.exports = model
+module.exports = mongoose.model('user', user)

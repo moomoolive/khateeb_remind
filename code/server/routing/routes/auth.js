@@ -39,9 +39,8 @@ router.post(
         const institutionEntry = await institutions.createEntry({
             entry: { ...req.body, confirmed: autoConfirm }
         })
-        const institutionAuthorizations = await authorizations.query({ filter: { institution: institutionEntry._id } })
-        const authorizationId = institutionAuthorizations.find(a => a.role === 'rootInstitutionAdmin')._id
-        await users.addAuthorizationKey(req.headers.userid, authorizationId, autoConfirm)
+        const auth = await authorizations.findByRole(institutionEntry._id , "rootInstitutionAdmin")
+        await users.addAuthorizationKey(req.headers.userid, auth._id, autoConfirm)
         return res.json({ 
             code: 0, 
             msg: `Alhamdillah! ${institutionEntry.name} was created.${ autoConfirm ? ' You can now start setting schedules.' : ' Please wait a day or two for Khateeb Remind to confirm your institution before logging in.' }`
@@ -100,6 +99,7 @@ router.post(
                 filter: { username: req.body.username, active: true },
                 dataShape: ["-__v"]
             })
+            console.log(user.prototype)
             if (!user) {
                 return res.status(401).json({  msg: 'unauthorized', token: null })
             }
@@ -157,14 +157,14 @@ router.post(
         try {
             const account = await users.findEntry({ filter: req.body })
             if (account) {
-                const verificationCode = await verificationCodes.createEntry({ username: account.username })
+                const verificationCode = await verificationCodes.createEntry({ entry: { username: account.username } })
                 await externalNotificationHelpers.sendExternalNotification(
                     account.email, 
                     `Khateeb Remind Password Recovery`, 
                     `You're recieving this message because you requested help recovering your password.\n\nThis code will be invalid after 15 minutes insha'Allah. Your code is:\n\n${verificationCode.code}`
                 )
             }
-            return res.json({ code: 0, msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username}'s will be recieving an email with a verification code in the next few minutes insha'Allah. Make sure to check all inboxes, including spam.` })
+            return res.json({ code: 0, msg: `If ${req.body.username} is in the Khateeb Remind database, then ${req.body.username} will be recieving an email with a verification code in the next few minutes insha'Allah. Make sure to check all inboxes, including spam.` })
         } catch(err) {
             console.error(err)
             return res.status(503).json({ code: 1, msg: `Something went wrong when sending verification code.`, err })

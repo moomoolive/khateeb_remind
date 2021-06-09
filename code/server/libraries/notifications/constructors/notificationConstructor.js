@@ -21,34 +21,46 @@ class NotificationConstructor {
     }
 
     setRecipents(recipents) {
-        if (!Array.isArray(recipents))
+        if (!Array.isArray(recipents)) {
             recipents = [recipents]
-        this.userInfo = recipents
+        } else {
+            this.userInfo = recipents
+        }
     }
 
     async create() {
-        const msgsInfo = []
-        for (let i = 0; i < this.userInfo.length; i++) {
-            const user = this.userInfo[i]
-            const savedNotification = await this.saveNotificationToDatabase(this.compileNotificationInfo(user))
-            msgsInfo.push(savedNotification)
-            if (this.sendPWAPush && user.settings.recievePWAPush && this.pwaMsgObject) {
-                const pwaRes = await this.executePWANotifications(user._id.toString())
-                msgsInfo.push(pwaRes)
+        try {
+            const msgsInfo = []
+            for (let i = 0; i < this.userInfo.length; i++) {
+                const user = this.userInfo[i]
+                const savedNotification = await this.saveNotificationToDatabase(this.compileNotificationInfo(user))
+                msgsInfo.push(savedNotification)
+                if (this.sendPWAPush && user.settings.recievePWAPush && this.pwaMsgObject) {
+                    const pwaRes = await this.executePWANotifications(user._id.toString())
+                    msgsInfo.push(pwaRes)
+                }
+                if (this.sendEmail && user.settings.recieveExternalNotification && this.externalNotificationMsg) {
+                    const externalNotificationRes = await this.executeExternalNotification(user)
+                    msgsInfo.push(externalNotificationRes)
+                }
             }
-            if (this.sendEmail && user.settings.recieveExternalNotification && this.externalNotificationMsg) {
-                const externalNotificationRes = await this.executeExternalNotification(user)
-                msgsInfo.push(externalNotificationRes)
-            }
+            return msgsInfo
+        } catch(err) {
+            console.error(err)
+            throw []
         }
-        return msgsInfo
     }
 
     async setRecipentsToAdmins(institutionID) {
-        let recipents = []
-        const admins = await this.getInstitutionAdmins(institutionID)
-        recipents = admins
-        this.setRecipents(recipents)
+        try {
+            let recipents = []
+            const admins = await this.getInstitutionAdmins(institutionID)
+            recipents = admins
+            this.setRecipents(recipents)
+        } catch(err) {
+            this.setRecipents([])
+            console.error(err)
+        }
     }
 
     async getInstitutionAdmins(institutionID) {
@@ -56,7 +68,7 @@ class NotificationConstructor {
             const auths = await authorizations.query({ filter: { institution: institutionID } })
             const rootAdminAuthorization = auths.find(a => a.role === 'rootInstitutionAdmin')
             const adminAuthorization = auths.find(a => a.role === 'institutionAdmin')
-            const allAdmins = users.findAuthorizationHolders([
+            const allAdmins = await users.findAuthorizationHolders([
                 rootAdminAuthorization._id, adminAuthorization._id
             ])
             return Array.isArray(allAdmins) ? allAdmins : []

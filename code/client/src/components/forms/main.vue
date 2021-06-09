@@ -1,6 +1,15 @@
 <template>
     <div v-if="showForm">
-        <div :class="`${backgroundColor}-form ${ backgroundColor === 'none' ? '' : 'box-shadow'} formContainer`" v-if="data">
+
+        <div 
+             v-if="data"
+            :class="`
+                ${backgroundColor}-form 
+                ${ backgroundColor === 'none' ? '' : 'box-shadow'} 
+                formContainer 
+                ${textColor}-text
+                `" 
+        >
             
             <div v-if="formTitle" class="formTitle">
                 {{ formTitle }}
@@ -8,7 +17,7 @@
 
             <div v-for="(fieldData, fieldName) in structureCopy" :key="fieldName">
                 
-                <div class="formLabel" :for="fieldName">
+                <div class="form-label" :for="fieldName">
                     {{  fieldData.alias || _utils.stringFormat(fieldName) }}
                 </div>
 
@@ -58,7 +67,7 @@
                             @changed="extensionInterface(bindedExtName(fieldName).slice(0, -1), $event)"
                         >
                             <template #default>
-                                <div class="formLabel">
+                                <div class="form-label">
                                     {{ _utils.stringFormat(bindedExtName(fieldName)).slice(0, -1) }}
                                 </div>
                             </template>
@@ -173,6 +182,11 @@ export default {
             type: Boolean,
             required: false,
             default: true
+        },
+        textColor: {
+            type: String,
+            required: false,
+            default: "black"
         }
     },
     components: {
@@ -367,18 +381,22 @@ button {
     width: 80%;
     max-width: 500px;
     @include center-margin();
+    color: black;
+
+    &.off-white-text {
+        color: get-color("off-white") !important;
+    }
 }
 
 .box-shadow {
     @include floating-box-shadow();
 }
 
-.formLabel {
+.form-label {
     text-align: left;
     margin-top: 20px;
     @include center-margin();
     font-size: 18px;
-    color: black;
     width: 90%;
 }
 
@@ -405,7 +423,7 @@ button {
 
 @media screen and (max-width: $phone-width) {
 
-    .formLabel {
+    .form-label {
         font-size: 14px;
     }
 

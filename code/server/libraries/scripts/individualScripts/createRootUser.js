@@ -1,6 +1,6 @@
 const { initConfig } = require($rootDir + '/Server.config.js')
 
-const { rootUser } = require($rootDir + "/database/public.js")
+const rootUser = require($rootDir + "/database/interfaces/rootUser.js")
 
 const createRootUser = async () => {
     try {

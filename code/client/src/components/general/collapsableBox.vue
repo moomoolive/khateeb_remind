@@ -1,7 +1,12 @@
 <template>
     <div>
         <button
-            :class="`collapsible ${buttonColor} ${isActive ? `active` : ``} ${boxShadow ? 'box-shadow' : ''}`"
+            :class="`
+                collapsible 
+                ${buttonColor} 
+                ${buttonBorderRadius} 
+                ${boxShadow ? 'box-shadow' : ''}
+            `"
             @click="clicked()"
             ref="open-dropdown"
         >
@@ -17,7 +22,7 @@
                 />
             </div>
         </button>
-        <collapse-transition :duration="600">
+        <collapse-transition :duration="collapseDuration">
             <div
                 v-if="isActive"
                 :class="`content ${bodyColor}`"
@@ -83,11 +88,17 @@ export default {
             type: Boolean,
             required: false,
             default: true
+        },
+        collapseDuration: {
+            type: Number,
+            required: false,
+            default: 600
         }
     },
     data() {
         return {
-            isActive: false
+            isActive: false,
+            buttonBorderRadius: ""
         }
     },
     methods: {
@@ -95,23 +106,36 @@ export default {
             this.isActive = !this.isActive
         },
         clickedAwayFromContent() {
-            if (this.isActive && this.closeOnClickAway)
+            if (this.isActive && this.closeOnClickAway) {
                 this.isActive = false
+            }
         }
     },
     computed: {
         tagsArray() {
-            if (this.tagDetails && this.tagDetails.length > 0)
+            if (this.tagDetails && this.tagDetails.length > 0) {
                 return this.tagDetails
-            else if (this.invisibleTagIfEmpty)
+            } else if (this.invisibleTagIfEmpty) {
                 return [{
                     words: 'Imporant',
                     symbol: '⭐',
                     color: 'important',
                     isInvisible: true
                 }]
-            else
+            } else {
                 return []
+            }
+        }
+    },
+    watch: {
+        isActive(newVal) {
+            const isClosed = !newVal
+            if (isClosed) {
+                const milliseconds = 13
+                window.setTimeout(() => this.buttonBorderRadius = "", this.collapseDuration + milliseconds)
+            } else {
+                this.buttonBorderRadius = "active"
+            }
         }
     }
 }

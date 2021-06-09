@@ -27,7 +27,6 @@
     "v-calendar": "^2.2.3",
     "vue": "^2.6.11",
     "vue-clickaway": "^2.2.2",
-    "vue-element-resize-detector": "^1.0.6",
     "vue-page-transition": "^0.2.2",
     "vue-pwa-install": "^1.1.0",
     "vue-router": "^3.2.0",

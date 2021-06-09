@@ -10,9 +10,10 @@ const requests = {
     async updateInfo(updates={}) {
         try {
             const res = await axios.put(extension + '/', updates)
-            if (!res || !typeCheckingHelpers.isAnObject(res.data))
+            if (!res || !typeCheckingHelpers.isAnObject(res.data)) {
                 return { data: null }
-            store.commit('user/updateUserInfo', res.data)
+            }
+            store.dispatch('user/updateUserInfo', res.data)
             return res
         } catch {
             return { data: null }
