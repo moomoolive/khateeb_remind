@@ -1,7 +1,7 @@
 import auth from '@/libraries/auth/main.js'
 import userIdentification from '@/libraries/userIdentification/main.js'
 import localStorageHelpers from '@/libraries/localStorageManagement/main.js'
-import _utils from '@/libraries/globalUtilities.js'
+import _utils from '@/libraries/globalStateMutators.js'
 import requestHelpers from '@/libraries/requests/index.js'
 
 import axios from 'axios'

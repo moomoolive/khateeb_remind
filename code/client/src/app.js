@@ -6,6 +6,7 @@ import './registerServiceWorker.js'
 
 import requests from '@/libraries/requests/index.js'
 import funcs from '@/libraries/globalUtilities.js'
+import stateMutators from '@/libraries/globalStateMutators.js'
 
 import VCalendar from 'v-calendar'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -25,7 +26,7 @@ Vue.component('fa-icon', FontAwesomeIcon)
 // I wanted to prepend with '$' instead, but vue generally uses that
 // to repersent it's own variables
 Vue.prototype._api = requests
-Vue.prototype._utils = funcs
+Vue.prototype._utils = { ...funcs, ...stateMutators }
 Vue.prototype._config = Config.globalConfig
 
 Vue.config.productionTip = false
