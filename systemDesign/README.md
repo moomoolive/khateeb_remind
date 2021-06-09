@@ -123,7 +123,6 @@ On the server side global variables are prepended by "$", and are attached to th
 * $rootDir: absolute path to the project's root directory
 * $config: global server configurations
 * $utils: useful utility functions
-* $db: a reference to a list of all database models
 
 ## NPM scripts
 The README files at the root of the client and server provide brief explantions of the npm scripts for each respective project.
@@ -393,6 +392,10 @@ The reason for using Node as a server runtime really came down to a few reasons:
 # About Database and Schemas
 
 All database related information and schemas are found in the "server/database" folder.
+ 
+## Interfaces
+ 
+In the "database" folder in the server code, there is a file called "public.js". This file is suppossed to be the public interface for all all database interactions and database models are not meant to be directly referenced in the server. 
 
 ## Locations
 Stores information about the seperate locations that an institution has. Any given institution can have multiple locations associated with it.
