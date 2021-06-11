@@ -20,6 +20,12 @@ npm run build
 npm run test:unit
 ```
 
+### Run all tests in specificied folder/file on save 
+```
+npm run test:development
+```
+* To change target folder change the argument following "test:unit" keyword
+
 ### Lints and fixes files
 ```
 npm run lint
