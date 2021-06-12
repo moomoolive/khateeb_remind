@@ -3,12 +3,15 @@ import globalHelpers from '@/libraries/globalUtilities.js'
 
 const tagLoader = (announcement={}, lastLogin=new Date(), wiggle=false) => {
     let tagArray = []
-    if (announcement.important) 
+    if (announcement.important) {
         tagArray.push('important')
-    if (announcement.urgent) 
+    }
+    if (announcement.urgent) {
         tagArray.push('urgent')
-    if (helpers.isNew(announcement.updatedAt, lastLogin)) 
+    }
+    if (helpers.isNew(announcement.updatedAt, lastLogin)) {
         tagArray.push(`new${wiggle ? '_wiggle' : ''}`)
+    }
     return tagArray
 }
 
