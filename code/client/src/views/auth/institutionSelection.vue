@@ -165,10 +165,9 @@ export default {
             return this.selectedInstitution !== 'none'
         },
         signupPipeline(institutionInfo={}, role="khateeb") {
-            if (this.$store.getters['user/isLoggedIn'])
+            if (this.$store.getters['user/isLoggedIn']) {
                 return this.addAuthorization(institutionInfo, role)
-            else
-                return
+            }
         },
         async addAuthorization(institutionInfo={}, role="khateeb") {
             this.promptLoadingIconOnPressingInstitution(institutionInfo._id)

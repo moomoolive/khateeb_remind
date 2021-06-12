@@ -8,19 +8,21 @@ const isValidDate = (date) => {
 }
 
 const castToArray = (data) => {
-    if (!Array.isArray(data))
+    if (!Array.isArray(data)) {
         return [data]
-    else
+    } else {
         return data
+    }
 }
 
 const isJWT = (candidate="akjfdalsfdjaii32390-1") => {
     try {
-        if (typeof candidate !== 'string')
+        if (typeof candidate !== 'string') {
             return false
+        }
         const jwtSections = candidate.split('.')
-        return jwtSections.length === 3 && window.atob(jwtSections[1])
-    } catch(err) {
+        return jwtSections.length === 3 && Boolean(window.atob(jwtSections[1]))
+    } catch {
         return false
     }
 }
