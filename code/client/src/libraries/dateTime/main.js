@@ -26,8 +26,9 @@ const monthsFromDate = (fixedDate, comparisonDate) => {
 const dateFormatYM = (date, includeDate=false) => {
     const format = new Date(date)
     let base = `${format.getFullYear()}-${format.getMonth() + 1}`
-    if (includeDate)
+    if (includeDate) {
         base += `-${format.getDate()}`
+    }
     return base
 }
 
@@ -40,8 +41,9 @@ const sameDateMonthAndYear = (a=new Date(), b=new Date()) => {
 const setDayOfWeek = (date=new Date(), dayOfWeek=4, nextWeek=true) => {
     const newDate = new Date(date)
     const increment = nextWeek ? 1 : -1
-    while (newDate.getDay() !== dayOfWeek)
+    while (newDate.getDay() !== dayOfWeek) {
         newDate.setDate(newDate.getDate() + increment)
+    }
     return newDate
 }
 

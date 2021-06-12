@@ -44,13 +44,13 @@ describe("Tag factory function", () => {
 
 describe("annoucement headline text", () => {
 
-    describe("returns correct headline format part 1", () => {
+    it("returns correct headline format part 1", () => {
         const announcement = { updatedAt: new Date("2012-2-20"), headline: "hey" }
         const headline = library.headlineText(announcement)
         expect(headline).toBe("2/20/2012 12:00 AM || hey")
     })
 
-    describe("returns correct headline format part 2", () => {
+    it("returns correct headline format part 2", () => {
         const announcement = { updatedAt: new Date("2012-2-20"), headline: "new headline" }
         const headline = library.headlineText(announcement)
         expect(headline).toBe("2/20/2012 12:00 AM || new headline")
