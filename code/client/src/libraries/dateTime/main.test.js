@@ -215,3 +215,96 @@ describe("Find first friday of month function", () => {
         expect(firstFriday.getMonth()).toBe(may)
     })
 })
+
+describe("Date formatting string function", () => {
+
+    it("should return correctly formatted string part 1", () => {
+        const year = 2021
+        const month = 2
+        const date = new Date(`${year}-${month}-${2}`)
+        const str = library.dateFormatYM(date)
+        expect(str).toBe(`${year}-${month}`)
+    })
+
+    it("should return correctly formatted string part 2", () => {
+        const year = 2021
+        const month = 5
+        const date = new Date(`${year}-${month}-${2}`)
+        const str = library.dateFormatYM(date)
+        expect(str).toBe(`${year}-${month}`)
+    })
+
+    it("should return correctly formatted string part 3", () => {
+        const year = 1999
+        const month = 2
+        const day = 2
+        const date = new Date(`${year}-${month}-${day}`)
+        const str = library.dateFormatYM(date, true)
+        expect(str).toBe(`${year}-${month}-${day}`)
+    })
+
+})
+
+describe("difference of months between two dates function", () => {
+
+    it("should return 0 if both dates are in same month", () => {
+        const a = new Date("2021-5-1")
+        const b = new Date("2021-5-25")
+        expect(library.monthsFromDate(a, b)).toBe(0)
+    })
+
+    it("should return correct number of months between dates part 1", () => {
+        const a = new Date("2021-5-1")
+        const b = new Date("2021-6-25")
+        expect(library.monthsFromDate(a, b)).toBe(1)
+    })
+
+    it("should return correct number of months between dates part 2", () => {
+        const a = new Date("2021-5-1")
+        const b = new Date("2021-4-25")
+        expect(library.monthsFromDate(a, b)).toBe(-1)
+    })
+
+    it("should return correct number of months between dates part 2", () => {
+        const a = new Date("2021-5-1")
+        const b = new Date("2022-5-25")
+        expect(library.monthsFromDate(a, b)).toBe(12)
+    })
+
+})
+
+describe("set date to beginning of day X days in the past", () => {
+
+    it("should return correct js date object part 1", () => {
+        const jsDate = library.daysInThePast(0)
+        const today = new Date()
+        expect(jsDate.getDate()).toBe(today.getDate())
+        expect(jsDate.getMonth()).toBe(today.getMonth())
+        expect(jsDate.getFullYear()).toBe(today.getFullYear())
+        expect(jsDate.getHours()).toBe(0)
+        expect(jsDate.getMinutes()).toBe(0)
+    })
+
+    it("should return correct js date object part 2", () => {
+        const jsDate = library.daysInThePast(1)
+        const pastDate = new Date()
+        pastDate.setDate(pastDate.getDate() - 1)
+        expect(jsDate.getDate()).toBe(pastDate.getDate())
+        expect(jsDate.getMonth()).toBe(pastDate.getMonth())
+        expect(jsDate.getFullYear()).toBe(pastDate.getFullYear())
+        expect(jsDate.getHours()).toBe(0)
+        expect(jsDate.getMinutes()).toBe(0)
+    })
+
+    it("should return correct js date object part 3", () => {
+        const jsDate = library.daysInThePast(7)
+        const pastDate = new Date()
+        pastDate.setDate(pastDate.getDate() - 7)
+        expect(jsDate.getDate()).toBe(pastDate.getDate())
+        expect(jsDate.getMonth()).toBe(pastDate.getMonth())
+        expect(jsDate.getFullYear()).toBe(pastDate.getFullYear())
+        expect(jsDate.getHours()).toBe(0)
+        expect(jsDate.getMinutes()).toBe(0)
+    })
+
+})

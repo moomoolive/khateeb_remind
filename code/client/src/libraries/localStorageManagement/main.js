@@ -1,14 +1,16 @@
 const get = (key) => {
     const data = window.localStorage.getItem(key)
-    if (data)
+    if (data) {
         return JSON.parse(data)
-    else
+    } else {
         return null
+    }
 }
 
 const commit = (key, value) => {
-    if (value !== undefined)
+    if (value !== undefined) {
         window.localStorage.setItem(key, JSON.stringify(value))
+    }
 }
 
 export default {
