@@ -5,9 +5,9 @@ export default {
     deepCopy(item) {
         return JSON.parse(JSON.stringify(item))
     },
-    stringFormat(string, format='camel', outputCase='title', raw=false) {
+    stringFormat(string, format='camel', outputCase='title') {
         const casedArray = stringHelpers[format + `CaseToArray`](string)
-        return stringHelpers.arrayToString(casedArray, outputCase, raw)
+        return stringHelpers.arrayToString(casedArray, outputCase)
     },
     isNumeric(value) {
         return /^\d+$/.test(value)

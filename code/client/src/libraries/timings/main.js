@@ -8,7 +8,7 @@ const timingDisplay = ({ minute=50, hour=12 }) => {
 
 const chronTiming = ({ dayOfWeek=3, minute=50, hour=12 }) => {
     let date = new Date()
-    date = datetime.setDayOfWeek(date, dayOfWeek)
+    date = new Date(datetime.setDayOfWeek(date, dayOfWeek))
     date.setHours(hour, minute, 0, 0)
     return date
 }

@@ -4,11 +4,12 @@ const camelCaseToArray = (camelCase) => {
     return camelCase.split(/(?=[A-Z])/)
 }
 
-const arrayToString = (arrayOfWords, format, raw) => {
+const arrayToString = (arrayOfWords, format) => {
+    if (arrayOfWords.length < 1) {
+        return ""
+    }
     const modifiedArray = helpers.toXCase(arrayOfWords, format)
-    if (raw)
-        return modifiedArray
-    else return helpers.arrayToString(modifiedArray)
+    return helpers.arrayToString(modifiedArray)
 }
 
 export default {

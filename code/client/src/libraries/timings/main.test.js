@@ -46,4 +46,15 @@ describe("cron timing function", () => {
         expect(jsDate.getHours()).toBe(hour)
     })
 
+    it("returns correct chron timing js date object part 3", () => {
+        const dayOfWeek = 5
+        const minute = 59
+        const hour = 19
+        const cronTime = { dayOfWeek, minute, hour }
+        const jsDate = library.chronTiming(cronTime)
+        expect(jsDate.getDay()).toBe(dayOfWeek)
+        expect(jsDate.getMinutes()).toBe(minute)
+        expect(jsDate.getHours()).toBe(hour)
+    })
+
 })

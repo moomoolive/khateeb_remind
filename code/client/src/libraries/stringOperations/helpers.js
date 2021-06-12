@@ -1,7 +1,7 @@
 const toXCase = (arrayOfWords, format) => {
     return arrayOfWords.map((word) =>
         format === 'title' ? 
-            word.charAt(0).toUpperCase() + word.slice(1) : this.otherCases(word, format)
+            word.charAt(0).toUpperCase() + word.slice(1) : otherCases(word, format)
     )
 }
 
