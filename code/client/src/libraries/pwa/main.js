@@ -1,6 +1,6 @@
 import helpers from './helpers.js'
 
-import Config from '$config'
+import Config from 'config$'
 
 const subscribeUserToPushNotifications = async (serviceWorkerReg={}) => {
     try {

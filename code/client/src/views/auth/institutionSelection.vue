@@ -106,7 +106,7 @@ import generalMessage from '@/components/misc/generalMessage.vue'
 
 import sleepHelpers from '@/libraries/sleep/main.js'
 
-import Config from '$config'
+import Config from 'config$'
 
 export default {
     name: "institutionSelections",
