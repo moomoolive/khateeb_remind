@@ -11,6 +11,7 @@
     "test:int": "jest ./integration",
     "test:debug": "jest sample.test.js",
     "test:all": "jest",
+    "test:development": "jest ./libraries/auth --watch",
     "docker:remove-old": "docker rm kr -f && docker image prune -f",
     "docker:create-test-container": "docker image build . -t khateeb-remind-test && docker create -p 80:80 --name kr khateeb-remind-test:latest",
     "docker:run-test-container": "docker container start kr -a",

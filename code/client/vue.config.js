@@ -7,7 +7,7 @@ module.exports = {
     configureWebpack: {
         resolve: {
             alias: {
-                'config$': path.resolve(__dirname, 'App.config.js')
+                '$config': path.resolve(__dirname, 'App.config.js')
             }
         }
     },

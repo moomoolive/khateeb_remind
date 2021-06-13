@@ -4,6 +4,7 @@ import router from '@/router/index.js'
 import routerHelpers from '@/libraries/router/main.js'
 import requestManagerHelpers from '@/libraries/requests/requestManager/main.js'
 import notificationHelpers from '@/libraries/notifications/main.js'
+import authHelpers from '@/libraries/auth/main.js'
 
 function alert(msg, type="caution", options) {
     const info = {

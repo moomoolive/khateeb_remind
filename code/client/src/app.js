@@ -13,7 +13,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import VuePageTransition from 'vue-page-transition'
  
-import Config from 'config$'
+import Config from '$config'
 import iconsList from './icon.config.js'
 library.add(...iconsList)
 

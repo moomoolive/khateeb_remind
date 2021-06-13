@@ -94,7 +94,7 @@ import localStorageHelpers from './libraries/localStorageManagement/main.js'
 
 import { nanoid } from 'nanoid'
 
-import Config from 'config$'
+import Config from '$config'
 
 export default {
   components: {

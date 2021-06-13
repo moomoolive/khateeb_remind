@@ -5,7 +5,7 @@ module.exports = {
     testMatch: ["**/*.test.js"],
     verbose: true,
     moduleNameMapper: {
-        //"*config$": "<rootDir>/App.config.js"
+        //"$config": "<rootDir>/App.config.js"
     }
 }
   

@@ -126,10 +126,8 @@ router.post(
             const targetAuthorization = user.authorizations.find(a => {
                 return a.authId.toString() === req.body.authId
             })
-            if (
-                (!targetAuthorization && !req.headers.specialStatus) || 
-                (!req.headers.specialStatus && !targetAuthorization.confirmed)
-            ) {
+            const notValidAuthorization = !authHelpers.isValidAuthorizationKey(targetAuthorization, req.headers.specialStatus)
+            if (notValidAuthorization) {
                 return res.status(403).json({ token: null })
             }
             const tokenInfo = {

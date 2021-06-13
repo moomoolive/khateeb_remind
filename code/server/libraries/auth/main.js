@@ -41,6 +41,12 @@ const mutateHeadersToIncludeUserInfo = (request, decodedToken) => {
     request.headers.authLevel = userTypeToAuthLevel(decodedToken.__t)
 } 
 
+const isValidAuthorizationKey = (targetAuthorization, specialStatus) => {
+    const validAuthorization = targetAuthorization && targetAuthorization.confirmed
+    const isSpecialUser = Boolean(specialStatus)
+    return validAuthorization || isSpecialUser
+}
+
 module.exports = {
     createToken,
     validUserAuthentication,
@@ -48,5 +54,5 @@ module.exports = {
     mutateHeadersToIncludeUserInfo,
     isValidResourceCreator: resourceOwnershipValidation.isValidResourceCreator,
     isValidResourceModifier: resourceOwnershipValidation.isValidResourceModifier,
-    
+    isValidAuthorizationKey
 }

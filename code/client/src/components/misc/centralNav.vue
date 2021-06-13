@@ -20,7 +20,7 @@
             <button class="back-to-central silver" @click="toCentral()">
                 <p>
                     <!-- eslint-disable-next-line -->
-                    <span class="back-arrow"> < </span> 
+                    <span class="back-arrow"> {{ "<" }} </span> 
                     Back
                 </p>
             </button>

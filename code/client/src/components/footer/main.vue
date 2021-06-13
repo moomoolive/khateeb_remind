@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import Config from 'config$'
+import Config from '$config'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 

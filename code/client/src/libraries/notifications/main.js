@@ -9,8 +9,9 @@ const tutorial = (category, number, fromSystem=false) => {
             color: "grey"
         }
     }
-    if (fromSystem)
+    if (fromSystem) {
         info.options.notificationOrigin = 'web-app'
+    }
     helpers.createNotification(info)
 }
 
@@ -21,6 +22,21 @@ const unauthorizedMsg = (options={}) => {
             color: "red",
             icon: "lock",
             msg: "Unauthorized",
+            origin: "server",
+            ...options
+        }
+    }
+    helpers.createNotification(info)
+}
+
+const signOutOfInstitution = (options={}) => {
+    const info = {
+        type: 'alert',
+        options: {
+            color: "yellow",
+            icon: "lock",
+            msg: "Please click 'exit institution' in navigation to login to other institutions",
+            textSize: "small",
             origin: "server",
             ...options
         }
@@ -102,5 +118,6 @@ export default {
     redirectionOptions,
     confirmationPrompt,
     popupMsg,
-    serverCaughtError
+    serverCaughtError,
+    signOutOfInstitution
 }

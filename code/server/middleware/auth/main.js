@@ -1,4 +1,5 @@
 const authHelpers = require($rootDir + '/libraries/auth/main.js')
+const { users } = require($rootDir + "/database/public.js")
 
 const jwt = require('jsonwebtoken')
 
@@ -6,11 +7,26 @@ const { securityConfig } = require($rootDir + "/Server.config.js")
 
 const authenticate = (authOptions={}) => {
     return (request, response, next) => {
-        jwt.verify(request.headers.authorization, securityConfig.jwtSecret, (err, decoded) => {
-            if (err || !authHelpers.validUserAuthentication(decoded.__t, authOptions))
+        jwt.verify(request.headers.authorization, securityConfig.jwtSecret, async (err, decoded) => {
+            if (err || !authHelpers.validUserAuthentication(decoded.__t, authOptions)) {
                 return response.status(401).json({ msg: `Invalid authorization check if authorization is present in header` })
+            }
             authHelpers.mutateHeadersToIncludeUserInfo(request, decoded)
-            return next()
+            if (request.headers.authLevel < 2) {
+                return next()
+            }
+            try {
+                const user = await users.findEntryByAuthorizationKey(decoded.authId)
+                const targetAuth = user.authorizations.find(a => a.authId.toString() === decoded.authId )
+                const notValidAuthorization = !authHelpers.isValidAuthorizationKey(targetAuth, request.headers.specialStatus)
+                if (notValidAuthorization) {
+                    return response.status(401).json({ msg: `detected authorization doesn't exist for user` })
+                }
+                next()
+            } catch(err) {
+                console.error(err)
+                return response.status(401).json({ msg: `error while authenticating`, err })
+            }
         })
     }
 }

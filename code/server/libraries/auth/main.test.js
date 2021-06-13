@@ -183,3 +183,33 @@ describe("Header mutation function", () => {
         expect(copy.headers.specialInstitution).toBe("test")
     })
 })
+
+describe("valid authorization key checking function", () => {
+
+    it("should return true for special user types regardless of key part 1", () => {
+        const key = {}
+        const specialUserType = "root"
+        expect(authHelpers.isValidAuthorizationKey(key, specialUserType)).toBe(true)
+    })
+
+    it("should return true for special user types regardless of key part 1", () => {
+        const key = {}
+        const specialUserType = "sysAdmin"
+        expect(authHelpers.isValidAuthorizationKey(key, specialUserType)).toBe(true)
+    })
+
+    it("should return true for non-special user with existent authorization key that is confirmed", () => {
+        const key = { confirmed: true }
+        expect(authHelpers.isValidAuthorizationKey(key)).toBe(true)
+    })
+
+    it("should return false for non-special user with unconfirmed authorization key", () => {
+        const key = { confirmed: false }
+        expect(authHelpers.isValidAuthorizationKey(key)).toBe(false)
+    })
+
+    it("should return false for non-special user missing authorization key", () => {
+        expect(authHelpers.isValidAuthorizationKey()).toBe(false)
+    })
+
+})

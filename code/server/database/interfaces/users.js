@@ -365,6 +365,13 @@ function confirmAuthorizationByKey(key="1234", confirmed) {
     )
 }
 
+function findEntryByAuthorizationKey(authId) {
+    return findEntry({ 
+        filer: { "authorizations.authId": authId },
+        dataShape: ["authorizations"] 
+    })
+}
+
 module.exports = {
     findKhateebs,
     getUserScheduleRestrictionsAssociatedWithInstitution,
@@ -383,5 +390,6 @@ module.exports = {
     findAuthorizationHolders,
     deleteEntry,
     confirmAuthorizationByKey,
-    updateEntryAndReturnOldCopy
+    updateEntryAndReturnOldCopy,
+    findEntryByAuthorizationKey
 }
