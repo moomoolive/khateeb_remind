@@ -97,7 +97,17 @@
                 :disabled="!validSubmission"
                 @click="submit()"
             >
-                {{ buttonText }}
+                <div class="submission-button-contents-container">
+                    <div v-if="!showLoadingSpinnerInButton">
+                        {{ buttonText }}
+                    </div>
+                    <img
+                        v-else 
+                        src="~@/assets/gifs/loading-alternate.gif"
+                        class="button-loading-spinner" 
+                        alt="loading animation"
+                    >
+                </div>
             </button>
 
             <slot></slot>
@@ -187,6 +197,11 @@ export default {
             type: String,
             required: false,
             default: "black"
+        },
+        showLoadingSpinnerInButton: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     components: {
@@ -359,6 +374,16 @@ button {
     color: black;
     font-size: 17px;
     @include floating-box-shadow(0.5);
+}
+
+.button-loading-spinner {
+    height: 25px;
+    position: relative;
+    bottom: 3px;
+}
+
+.submission-button-contents-container {
+    height: 20px;
 }
 
 .dark-blue-form {
