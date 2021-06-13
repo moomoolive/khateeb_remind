@@ -137,10 +137,11 @@
 
 <script>
 import loading from '@/components/general/loadingScreen.vue'
-
 import generalMessage from '@/components/misc/generalMessage.vue'
 
-import Config from '$config'
+import sleepHelpers from '@/libraries/sleep/main.js'
+
+import Config from 'config$'
 
 export default {
     name: "userAuthorizations",
@@ -166,12 +167,7 @@ export default {
         },
         promptLoadingIconOnPressingAuthorization(id="12345") {
             this.loadingAuth = id
-            this.readyToGoIntoInstitution = this.createDelay(Config.networkConfig.defaultAuthIOLoadingTime)
-        },
-        createDelay(milliseconds=2_000) {
-            return new Promise(resolve => {
-                window.setTimeout(() => resolve(true), milliseconds)
-            })
+            this.readyToGoIntoInstitution = sleepHelpers.nonBlockingSleep(Config.networkConfig.defaultAuthIOLoadingTime)
         },
         stashTokenAndInstitutionData(token="a.JWT.token", institution={}) {
             this.$store.dispatch('user/updateToken', token)
@@ -235,7 +231,7 @@ export default {
         },
         promptLoadingAlternateIconOnPressingRemovingPermissions(id="12345") {
             this.loadingAuthToSetting = id
-            this.readyToGoToSettings = this.createDelay(Config.networkConfig.defaultAuthIOLoadingTime)
+            this.readyToGoToSettings = sleepHelpers.nonBlockingSleep(Config.networkConfig.defaultAuthIOLoadingTime)
         },
         async pushToDelegationPage(authorization={}) {
             const confirm = await this._utils.confirm(`You cannot remove root admin permissions from here, you must login then do so from the institution settings page by pressing 'delgate permissions' or deleting the institution entirely. Would you like to be taken there now?`)

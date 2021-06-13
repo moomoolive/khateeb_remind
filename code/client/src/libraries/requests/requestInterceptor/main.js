@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import store from '@/store/index.js'
-import _utils from '@/libraries/globalUtilities.js'
+import _utils from '@/libraries/globalStateMutators.js'
 
 const offlineModeRequestCanceler = axios.CancelToken
 

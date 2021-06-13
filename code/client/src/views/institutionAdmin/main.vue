@@ -13,7 +13,7 @@
 <script>
 import centralNav from '@/components/misc/centralNav.vue'
 
-import Config from '$config'
+import Config from 'config$'
 
 export default {
     name: 'adminParentRoute',

@@ -104,7 +104,9 @@ import complexKeyBinder from '@/components/misc/complexKeyBinder.vue'
 import loading from '@/components/general/loadingScreen.vue'
 import generalMessage from '@/components/misc/generalMessage.vue'
 
-import Config from '$config'
+import sleepHelpers from '@/libraries/sleep/main.js'
+
+import Config from 'config$'
 
 export default {
     name: "institutionSelections",
@@ -147,9 +149,7 @@ export default {
         },
         promptLoadingIconOnPressingInstitution(id="1234") {
             this.selectedInstitution = id
-            this.readyToGoToAuthorizations = new Promise(resolve => {
-                window.setTimeout(() => resolve(true), Config.networkConfig.defaultAuthIOLoadingTime)
-            })
+            this.readyToGoToAuthorizations = sleepHelpers.nonBlockingSleep(Config.networkConfig.defaultAuthIOLoadingTime)
         },
         isKhateebAtGivenInstitution(id="1234") {
             return this.userPermissions[`${id}-khateeb`]
@@ -165,10 +165,9 @@ export default {
             return this.selectedInstitution !== 'none'
         },
         signupPipeline(institutionInfo={}, role="khateeb") {
-            if (this.$store.getters['user/isLoggedIn'])
+            if (this.$store.getters['user/isLoggedIn']) {
                 return this.addAuthorization(institutionInfo, role)
-            else
-                return
+            }
         },
         async addAuthorization(institutionInfo={}, role="khateeb") {
             this.promptLoadingIconOnPressingInstitution(institutionInfo._id)

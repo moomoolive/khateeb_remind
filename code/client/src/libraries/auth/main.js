@@ -8,12 +8,13 @@ const userTypeToAuthLevel = (userType) => {
 }
 
 const validUserAuthentication = (userType, authOptions={}) => {
-    if (!helpers.validInt(authOptions) && !typeCheckingHelpers.isAnObject(authOptions))
+    if (!helpers.validInt(authOptions) && !typeCheckingHelpers.isAnObject(authOptions)) {
         throw TypeError(`You must provide valid authentication options`)
-    else if (helpers.emptyAuthOptionObject(authOptions))
+    } else if (helpers.emptyAuthOptionObject(authOptions)) {
         return true
-    else
+    } else {
         return helpers.authenticate(userTypeToAuthLevel(userType), authOptions)
+    }
 }
 
 export default {

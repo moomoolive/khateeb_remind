@@ -174,7 +174,7 @@ import khateebHelpers from '@/libraries/khateebs/main.js'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
-import Config from '$config'
+import Config from 'config$'
 
 export default {
     name: "jummahScheduleDisplay",
