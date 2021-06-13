@@ -333,14 +333,14 @@ async function deleteEntry(options={}) {
     try {
         const targetModel = helpers.dynamicUserModel(options.targetModel)
         const filter = options.filter || {}
-        const user = await users.findEntry({ filter, targetModel })
+        const user = await findEntry({ filter, targetModel })
         const dependantsRes = await user.deactivateAccount(options.postHook)
         const userUpdateRes = await users.updateOne(
             filter,
             { 
                 active: false , 
                 scheduleRestrictions: [],
-                // remove username - refer to explanation in schema section
+                // remove username - refer to explanation in user schema
                 $unset: { username: "" } 
             }
         )
