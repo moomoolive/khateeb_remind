@@ -7,6 +7,7 @@
     "build": "vue-cli-service build",
     "test:debug": "vue-cli-service test:unit ./tests",
     "test:unit": "vue-cli-service test:unit ./src/libraries/*",
+    "test:all": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "build:pwa-test": "cross-env VUE_APP_PWA=1 vue-cli-service build --dest pwa_test --report-json",
     "serve:pwa": "lite-server --baseDir=\"pwa_test\" -c lite-server.config.json",

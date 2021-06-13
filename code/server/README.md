@@ -27,6 +27,11 @@ npm run test:unit
 npm run test:int
 ```
 
+### Runs All Server Tests
+```
+npm run test:int
+```
+
 ### Removes Unused Docker Images from Docker Daemon
 ```
 npm run docker:remove-old
