@@ -49,7 +49,7 @@
                     <a 
                         @click="toUsecasePage()"
                     >
-                        Why Use Khateeb Remind?
+                        Why Khateeb Remind?
                     </a>
                 </nav>
 
@@ -176,8 +176,8 @@ a {
 }
 
 .footer-links-section {
-    margin-top: 15px;
-    margin-left: 20px;
+    margin-top: 30px;
+    margin-left: 30px;
     margin-right: 40px;
 }
 
@@ -206,6 +206,7 @@ a {
     @include flexbox-default();
     margin-bottom: 10px;
     margin-left: auto;
+    margin-right: 7px;
     width: 118px;
     cursor: pointer;
 }

@@ -211,6 +211,7 @@ export default {
 @media screen and (min-width: $large-screen-view) {
   .background-container {
     height: 90vh;
+    width: 113%;
   }
 }
 </style>

@@ -35,7 +35,9 @@ import {
     faTimes,
     faCompass,
     faPlus,
-    faMinus
+    faMinus,
+    faArrowLeft,
+    faArrowRight
  } from '@fortawesome/free-solid-svg-icons'
 
  import {
@@ -95,5 +97,7 @@ export default [
     faTimes,
     faCompass,
     faPlus,
-    faMinus
+    faMinus,
+    faArrowLeft,
+    faArrowRight
 ]

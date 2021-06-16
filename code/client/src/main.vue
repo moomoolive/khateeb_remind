@@ -249,7 +249,7 @@ export default {
 .header {
     overflow: visible;
     position: fixed;
-    z-index: 10;
+    z-index: 12;
     left: 0;
     top: 0;
     height: auto;
@@ -348,6 +348,7 @@ $app-container-section-shadow-intensity: 0.6;
       margin-left: auto;
       margin-right: 0;
       height: 90vh;
+      box-shadow: none;
     }
     
     .large-screen-navigation {
@@ -357,11 +358,11 @@ $app-container-section-shadow-intensity: 0.6;
       background: get-color("grey");
       position: absolute;
       z-index: 2;
-      @include floating-box-shadow($app-container-section-shadow-intensity);
     }
 
     .app-container-wrapper {
       max-width: $maxAppWidth;
+      @include floating-box-shadow($app-container-section-shadow-intensity);
     }
 
     #app {
@@ -381,7 +382,7 @@ $app-container-section-shadow-intensity: 0.6;
 
     .large-screen-header-fill {
       height: 47px;
-      background-color: get-color("grey", 0.5);
+      background-color: get-color("grey", 0.9);
       width: 12px;
 
       &.silver {

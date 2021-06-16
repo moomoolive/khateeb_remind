@@ -1,13 +1,10 @@
 <template>
+
     <div v-on-clickaway="close">
         
-        <div class="topAnchor">
-            <div class="close-notification-container" @click="close()">
-                <span>
-                    {{ this.notificationInfo.type === 'confirm' ? 'Cancel' : 'Close' }}
-                </span>
-            </div>
-        </div>
+        <button class="top-anchor silver" @click="close()">
+            {{ this.notificationInfo.type === 'confirm' ? 'Cancel' : 'Close' }}
+        </button>
 
         <div :class="`content ${notificationInfo.options.color || 'yellow'}-background`">
             <component
@@ -66,12 +63,13 @@ export default {
 
 <style lang="scss" scoped>
 
-.topAnchor {
-    margin-bottom: 0;
-    max-height: 40px;
-    height: 35px;
-    background-color: darken(get-color("silver"), 7%);
-    cursor: pointer;
+.top-anchor {
+    margin: 0 0 0 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    height: 40px;
+    color: black;
+    width: 100%;
 }
 
 .close-notification-container {

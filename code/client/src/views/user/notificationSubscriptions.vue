@@ -206,11 +206,10 @@ export default {
 .no-notifications-text {
     margin-top: 30px;
     width: 80%;
-    max-width: 1000px;
+    max-width: 600px;
     font-size: 16px;
     margin-bottom: 20px;
-    margin-left: auto;
-    margin-right: auto;
+    @include center-margin();
 }
 
 .options-container {
@@ -236,19 +235,19 @@ export default {
     margin-right: 10px;
     margin-left: 15%;
     text-align: right;
-    font-size: 17px;
+    font-size: 18px;
 }
 
 .permissions-header {
-    font-size: 22px;
-    margin-bottom: 20px;
+    font-size: 27px;
+    margin-bottom: 50px;
 }
 
 .option-container {
     width: 100%;
     background: get-color("off-white");
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 12px;
+    padding-bottom: 12px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -382,6 +381,16 @@ export default {
 
     .device-recieving-pwa-header {
         font-size: 24px;
+    }
+
+    .option-container {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .permissions-header {
+        font-size: 22px;
+        margin-bottom: 30px;
     }
 
 }

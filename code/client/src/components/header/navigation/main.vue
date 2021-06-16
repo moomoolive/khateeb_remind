@@ -162,7 +162,7 @@ export default {
 
 <style lang="scss" scoped>
 .topnav {
-  background-color: get-color("grey", 0.5);
+  background-color: get-color("grey", 0.9);
   height: 5vh;
   min-height: 43px;
   max-height: 50px;
@@ -209,9 +209,10 @@ export default {
   margin-left: 10px;
   margin-right: 10px;
   cursor: pointer;
+  color: get-color("blue");
 
   &.active {
-    color: get-color("blue");
+    color: get-color("green");
   }
 }
 

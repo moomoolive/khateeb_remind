@@ -154,6 +154,20 @@
                 <collapsable-box
                     v-if="$store.getters['user/type'] === 'rootInstitutionAdmin'"
                     class="setting-container"
+                    :headline="`Developer Tools`"
+                    :tagDetails="[{
+                        words: 'No REST Token',
+                        color: `important`,
+                        symbol: '🔗'
+                    }]"
+                    ref="developer-tools"
+                >
+                    Coming soon insha'Allah
+                </collapsable-box>
+
+                <collapsable-box
+                    v-if="$store.getters['user/type'] === 'rootInstitutionAdmin'"
+                    class="setting-container"
                     :headline="`Danger Zone`"
                     :buttonColor="`red`"
                     :bodyColor="`silver`"

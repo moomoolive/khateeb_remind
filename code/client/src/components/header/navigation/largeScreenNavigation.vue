@@ -104,6 +104,10 @@
             </div>
         </nav>
 
+        <div class="bottom-section">
+            -{ وقل ربي زدني علماً }-
+        </div>
+
     </div>
 </template>
 
@@ -193,5 +197,13 @@ export default {
     padding-top: 7px;
     padding-bottom: 8px;
     width: 100%;
+}
+
+.bottom-section {
+    position: absolute;
+    bottom: 10px;
+    color: get-color("blue");
+    width: 100%;
+    @include alternate-font();
 }
 </style>
