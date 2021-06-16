@@ -1,10 +1,18 @@
 <template>
     <div class="banner-container">
-        <transition name="fade">
-            <span v-show="showMsg">
-                {{ currentlyDisplayedMsg }}
+            <transition name="fade">
+                <span v-show="showMsg">
+                    <span class="text-container">
+                        {{ currentlyDisplayedMsg }}
+                    </span>
+                </span>
+            </transition>
+            <span 
+                v-if="showCloseIcon && $store.state.websiteBanner.show" 
+                class="close-banner-icon"
+            >
+                <fa-icon icon="times" @click="$store.commit('websiteBanner/hide')" />
             </span>
-        </transition>
     </div>
 </template>
 
@@ -25,23 +33,26 @@ export default {
             displayIndex: 0,
             componentIsDestroyed: false,
             showMsg: true,
-            currentlyDisplayedMsg: ''
+            currentlyDisplayedMsg: '',
+            showCloseIcon: false
         }
     },
     methods: {
         loopThroughMsgs() {
-            if (this.displayIndex !== this.displayMsgs.length - 1)
+            if (this.displayIndex !== this.displayMsgs.length - 1) {
                 this.displayIndex++
-            else
+            } else {
                 this.displayIndex = 0
+            }
         },
         msgLoop() {
             const sevenSecondsInMilliseconds = 7_000
             const loop = window.setInterval(() => {
-                if (this.componentIsDestroyed)
+                if (this.componentIsDestroyed) {
                     window.clearInterval(loop)
-                else
+                } else {
                     this.loopThroughMsgs()
+                }
             }, sevenSecondsInMilliseconds)
         },
         scheduleBannerHiding() {
@@ -66,9 +77,10 @@ export default {
             }, oneSecondInMilliseconds)
         },
         fillBannerContent() {
-            const todayIsFriday = new Date().getDay() === 5
-            if (todayIsFriday)
+            const isFriday = new Date().getDay() === 5
+            if (isFriday) {
                 this.displayMsgs = this._utils.deepCopy(this.defaultDisplayMsgs.friday)
+            }
         }
     },
     computed: {
@@ -78,8 +90,9 @@ export default {
     },
     watch: {
         userIsLoggedIn(newVal) {
-            if (newVal && this.siteBannerHasContent())
-                this.createBanner()    
+            if (newVal && this.siteBannerHasContent()) {
+                this.createBanner()
+            }  
         },
         displayIndex(newVal) {
             this.showMsg = false
@@ -92,11 +105,14 @@ export default {
     },
     created() {
         this.fillBannerContent()
+        const milliseconds = 1_300
+        window.setTimeout(() => this.showCloseIcon = true, milliseconds)
     },
     mounted() {
         this.$nextTick(() => {
-            if (this.userIsLoggedIn && this.siteBannerHasContent())
+            if (this.userIsLoggedIn && this.siteBannerHasContent()) {
                 this.createBanner()
+            }
         })
     },
     destroyed() {
@@ -106,12 +122,46 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .banner-container {
     background: get-color("silver");
-    font-size: 18px;
-    padding-bottom: 3px;
-    padding-top: 3px;
-    height: 24px;
+    font-size: 20px;
+    padding-bottom: 7px;
+    padding-top: 7px;
+}
+
+.text-container {
+    width: 85%;
+    @include center-margin();
+}
+
+.close-banner-icon {
+    position: absolute;
+    left: 10px;
+    color: get-color("dark-red");
+
+    &:hover {
+        color: get-color("red");
+        cursor: pointer;
+    }
+}
+
+@media screen and (max-width: $phone-width) {
+    .banner-container {
+        background: get-color("silver");
+        font-size: 18px;
+    }
+
+}
+
+@media screen and (min-width: $large-screen-view) {
+    .banner-container {
+        background: get-color("silver");
+        font-size: 20px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+    }
+
 }
 
 </style>

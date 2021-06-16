@@ -122,16 +122,19 @@ export default {
         this.activeMenu = !this.activeMenu
       },
       closeProfileDetails() {
-        if (this.showProfileDetails)
+        if (this.showProfileDetails) {
           this.showProfileDetails = false
+        }
       },
       closeMenu() {
-        if (this.activeMenu)
+        if (this.activeMenu) {
           this.activeMenu = false
+        }
       },
       closeNotificationScroller() {
-        if (this.$store.state.notifications.display.show)
+        if (this.$store.state.notifications.display.show) {
           this.$store.commit('notifications/close')
+        }
       },
       closeAllMenus() {
         this.closeMenu()
@@ -139,8 +142,9 @@ export default {
         this.closeNotificationScroller()
       },
       redirect(path) {
-        if (path !== this.$router.currentRoute.fullPath)
+        if (path !== this.$router.currentRoute.fullPath) {
           this.$router.push(path)
+        }
         this.closeAllMenus()
       },
       logout() {
@@ -285,5 +289,10 @@ export default {
     right: 25px;
     top: 40px;
   }
+
+  .right-side-menu {
+    display: none;
+  }
+  
 }
 </style>

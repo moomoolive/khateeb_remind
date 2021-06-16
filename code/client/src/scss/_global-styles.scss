@@ -50,7 +50,6 @@ p {
 
 ::-webkit-scrollbar-thumb {
     background: get-color("light-grey", 0.6);
-    @include completely-round-border();
     @include scrollbar-padding();
 }
 

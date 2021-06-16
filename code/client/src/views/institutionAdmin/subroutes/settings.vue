@@ -1,7 +1,10 @@
 <template>
     <div>
         <loading>
-            <div v-if="showSettings && settingsArePresent" class="settings-container">
+            <div 
+                v-if="showSettings && settingsArePresent" 
+                class="settings-container"
+            >
                 
                 <collapsable-box
                     class="setting-container"

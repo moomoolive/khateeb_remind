@@ -146,8 +146,9 @@ export default {
         async logout() {
             this.close()
             const confirm = await this._utils.confirm(`Are you sure you want to logout?`)
-            if (!confirm)
+            if (!confirm) {
                 return
+            }
             this.$store.dispatch('user/logout')
         },
         downgradeUserAuthorization() {

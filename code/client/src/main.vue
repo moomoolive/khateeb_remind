@@ -28,10 +28,22 @@
         an element that fills an awkward gap in header
         on large screen view 
       -->
-      <div class="large-screen-header-fill"></div>
+      <div class="large-screen-header-fill-container">
+        <div 
+          v-show="$store.state.websiteBanner.show" 
+          class="large-screen-header-fill silver"
+        >
+        </div>
+        <div class="large-screen-header-fill"></div>
+      </div>
 
       <!-- bubbles background -->
       <default-app-background />
+
+      <!-- large screen navigation -->
+      <div class="large-screen-navigation">
+        <large-screen-navigation />
+      </div>
 
       <div class="app-container">
 
@@ -86,6 +98,7 @@ import headerNavigation from '@/components/header/navigation/main.vue'
 import requestManager from '@/components/misc/requestManager.vue'
 import footerPopup from '@/components/footer/popup/main.vue'
 import defaultAppBackground from '@/components/misc/appBackground.vue'
+import largeScreenNavigation from '@/components/header/navigation/largeScreenNavigation.vue'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
@@ -106,7 +119,8 @@ export default {
     headerNavigation,
     requestManager,
     footerPopup,
-    defaultAppBackground
+    defaultAppBackground,
+    largeScreenNavigation
   },
   data() {
     return {
@@ -214,18 +228,6 @@ export default {
   color: get-color("green");
 }
 
-.app-container {
-  max-width: $large-screen-view;
-  min-width: $minimum-app-width;
-  @include center-margin();
-  @include floating-box-shadow(0.6);
-  position: relative;
-  z-index: 1;
-  height: 100vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
 .main-content-background {
   overflow: hidden !important;
   position: relative;
@@ -240,8 +242,8 @@ export default {
 }
 
 .page-padding {
-  padding-bottom: 100px !important;
-  padding-top: 100px !important;
+  padding-bottom: 75px !important;
+  padding-top: 75px !important;
 }
 
 .header {
@@ -299,15 +301,29 @@ export default {
   z-index: 1;
 }
 
-.large-screen-header-fill {
+$app-container-section-shadow-intensity: 0.6;
+
+.app-container {
+  max-width: $large-screen-view;
+  min-width: $minimum-app-width;
+  @include center-margin();
+  @include floating-box-shadow($app-container-section-shadow-intensity);
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.large-screen-header-fill-container {
+  display: none;
+}
+
+.large-screen-navigation {
   display: none;
 }
 
 @media screen and (max-width: $phone-width) {
-      .page-padding {
-        padding-bottom: 75px !important;
-        padding-top: 75px !important;
-      }
 
       .displayed-page {
           position: relative;
@@ -318,11 +334,30 @@ export default {
 }
 
 @media screen and (min-width: $large-screen-view) {
+    $side-menu-width: 275px;
+
+    .page-padding {
+      padding-bottom: 40px !important;
+      padding-top: 40px !important;
+    }
+
     .app-container {
       margin-top: 50px;
       margin-bottom: 50px;
-      width: $maxAppWidth;
+      width: $maxAppWidth - $side-menu-width;
+      margin-left: auto;
+      margin-right: 0;
       height: 90vh;
+    }
+    
+    .large-screen-navigation {
+      display: block;
+      height: 100%;
+      width: $side-menu-width;
+      background: get-color("grey");
+      position: absolute;
+      z-index: 2;
+      @include floating-box-shadow($app-container-section-shadow-intensity);
     }
 
     .app-container-wrapper {
@@ -337,14 +372,21 @@ export default {
         position: sticky;
     }
 
-    .large-screen-header-fill {
+    .large-screen-header-fill-container {
       position: absolute;
       z-index: 10;
-      height: 47px;
-      background-color: get-color("grey", 0.5);
       display: block;
       right: 0;
+    }
+
+    .large-screen-header-fill {
+      height: 47px;
+      background-color: get-color("grey", 0.5);
       width: 12px;
+
+      &.silver {
+        background-color: get-color("silver");
+      }
     }
 }
 

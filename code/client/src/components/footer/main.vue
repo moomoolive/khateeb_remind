@@ -66,7 +66,7 @@
                         target="_blank"
                         rel="noopener"
                     >
-                        Contribute to Source Code
+                        Source Code
                     </a>
                 </nav>
                 
