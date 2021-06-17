@@ -150,6 +150,7 @@ const createTestInstitution = async () => {
             }
             console.log(`Created ${initConfig.testInstitution.khateebCount - testInstitutionKhateebs.length} khateebs for test institution. Ids: ${ids.reduce((total, i) => `${total}, ${i}`)}`, '')
         }
+        return testInstitution
     } catch(err) {
         console.error(`Couldn't create test school`, err)
     }
