@@ -80,7 +80,7 @@ export default {
 }
 
 span {
-    cursor: pointer;
+    @include is-clickable();
 }
 
 .content {

@@ -146,9 +146,16 @@
             </div>
         </nav>
 
-        <div class="bottom-section">
-            -{ وقل ربي زدني علماً }-
-        </div>
+        <collapse-transition :duration="600">
+            <div v-show="isLoggedIn" class="bottom-section">
+                <div>
+                    @{{ $store.state.user.userInfo.handle }}
+                </div>
+                <div :class="`institution-name ${!isLoggedIntoInstitution ? 'invisible' : ''}`">
+                    {{ $store.state.user.institution.abbreviatedName || "default" }}
+                </div>
+            </div>
+        </collapse-transition>
 
     </div>
 </template>
@@ -156,8 +163,13 @@
 <script>
 import notificationHelpers from '@/libraries/notifications/main.js'
 
+import { CollapseTransition } from "@ivanv/vue-collapse-transition"
+
 export default {
     name: "largeScreenNavigation",
+    components: {
+        CollapseTransition
+    },
     data() {
         return {
             route: this.$route.path
@@ -191,6 +203,9 @@ export default {
         },
         authLevel() {
             return this.$store.getters["user/authLevel"]
+        },
+        isLoggedIntoInstitution() {
+            return !this.$store.getters["user/isLoggedInAsGenericUser"]
         }
     },
     watch: {
@@ -202,13 +217,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$alternate-grey-lightness : 5%;
+
 .navigation-container {
     color: get-color("off-white");
     padding-top: 20px;
     padding-bottom: 20px;
     font-size: 18px;
-    cursor: pointer;
-    background: lighten(get-color("grey", 1), 5%);
+    @include is-clickable();
+    background: lighten(get-color("grey", 1), $alternate-grey-lightness);
     width: 100%;
 
     &:hover {
@@ -267,9 +284,21 @@ export default {
 
 .bottom-section {
     position: absolute;
-    bottom: 10px;
+    bottom: 0px;
+    padding-bottom: 20px;
+    padding-top: 20px;
     color: get-color("blue");
+    background: lighten(get-color("grey", 1), $alternate-grey-lightness);;
     width: 100%;
     @include alternate-font();
+}
+
+.institution-name {
+    color: get-color('off-white');
+    font-size: 14px;
+}
+
+.invisible {
+    visibility: hidden;
 }
 </style>

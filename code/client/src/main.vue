@@ -178,10 +178,12 @@ export default {
   },
   watch: {
     isLoggedIn(newVal) {
-      if (newVal)
+      if (newVal) {
         this.setFirstLogin()
-      if (this.isFirstLogin() || this.hasNotSignedUpForPushNotificationsYet())
+      }
+      if (this.isFirstLogin() || this.hasNotSignedUpForPushNotificationsYet()) {
         this.executePushNotificationWorkflow()
+      }
     }
   },
   mounted() {

@@ -123,7 +123,7 @@ p {
     top: 50px;
     font-size: 19px;
     font-weight: bold;
-    cursor: pointer;
+    @include is-clickable();
 
     &:hover {
         color: get-color("yellow");

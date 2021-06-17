@@ -77,8 +77,9 @@ span {
     opacity: 01;
     margin-top: auto;
     margin-bottom: auto;
+    
     &:hover {
-        cursor: pointer;
+        @include is-clickable();
     }
 }
 </style>

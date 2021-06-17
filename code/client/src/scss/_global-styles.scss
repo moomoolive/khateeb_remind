@@ -82,7 +82,7 @@ button {
     font-size: 16px;
     transition-duration: 0.4s;
     outline: none;
-    cursor: pointer;
+    @include is-clickable();
 
     $marginOne: 7px;
     margin: $marginOne $marginOne $marginOne $marginOne;

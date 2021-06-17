@@ -152,7 +152,6 @@
                 </collapsable-box>
 
                 <collapsable-box
-                    v-if="$store.getters['user/type'] === 'rootInstitutionAdmin'"
                     class="setting-container"
                     :headline="`Developer Tools`"
                     :tagDetails="[{

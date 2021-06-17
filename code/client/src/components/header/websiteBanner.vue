@@ -142,7 +142,7 @@ export default {
 
     &:hover {
         color: get-color("red");
-        cursor: pointer;
+        @include is-clickable();
     }
 }
 

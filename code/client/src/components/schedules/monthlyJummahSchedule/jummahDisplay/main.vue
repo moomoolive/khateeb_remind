@@ -341,12 +341,14 @@ div {
 
 .dropdown-arrow {
     margin-right: 10px;
+    @include is-clickable();
 }
 
 .unavailable-khateebs-this-timing-header {
     font-size: 15px;
     font-weight: bold;
     text-align: left;
+    @include is-clickable();
 }
 
 .unavailable-khateebs-this-timing-header-container {

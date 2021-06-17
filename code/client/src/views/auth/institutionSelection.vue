@@ -268,7 +268,7 @@ export default {
 
 .signup-link {
     margin-bottom: 7px;
-    cursor: pointer;
+    @include is-clickable();
 
     &:hover {
         color: get-color("blue");

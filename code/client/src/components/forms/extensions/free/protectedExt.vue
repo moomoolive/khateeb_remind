@@ -91,7 +91,7 @@ span {
     right: -5%;
     z-index: 1;
     &:hover {
-        cursor: pointer;
+        @include is-clickable();
     }
 }
 

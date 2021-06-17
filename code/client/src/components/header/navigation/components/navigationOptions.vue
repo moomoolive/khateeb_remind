@@ -183,7 +183,7 @@ p {
 
 .menu-item {
     background-color: get-color("grey", 0.9);
-    cursor: pointer;
+    @include is-clickable();
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 10px;

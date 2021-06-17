@@ -372,7 +372,7 @@ button {
     border-top-right-radius: 4px;
     margin-bottom: 0;
     @include floating-box-shadow(0.4);
-    cursor: pointer;
+    @include is-clickable();
     line-height: 22px;
 
     &:hover {

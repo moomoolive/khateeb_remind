@@ -166,7 +166,7 @@ a {
     color: get-color("silver");
     font-size: 15px;
     margin-bottom: 9px;
-    cursor: pointer;
+    @include is-clickable();
     color: get-color("dark-blue");
     @include alternate-font();
     
@@ -208,7 +208,7 @@ a {
     margin-left: auto;
     margin-right: 7px;
     width: 118px;
-    cursor: pointer;
+    @include is-clickable();
 }
 
 @media screen and (max-width: $phone-width) {

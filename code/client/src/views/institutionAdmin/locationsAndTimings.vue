@@ -91,6 +91,7 @@
                     :key="locationIndex"
                     :headline="location.name"
                     :closeOnClickAway="!showEditDefaultKhateebsContainer"
+                    class="location-container"
                 >
                     
                     <p>Location Name</p>
@@ -148,7 +149,7 @@
                     
                     <div>
                         <button
-                            class="timing-btns large" 
+                            class="timing-btns large green" 
                             @click="addTiming(location)"
                         >
                             New Timing
@@ -361,6 +362,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.location-container {
+    max-width: $singular-collapsable-box-max-width;
+    @include center-margin();
+}
+
 .locations-container {
     margin-top: 25px;
     width: 90%;
@@ -411,7 +417,7 @@ input {
     width: 65%;
     margin-left: auto;
     margin-right: auto;
-    max-width: 500px;
+    max-width: 250px;
     background: get-color("blue");
     border-radius: 7px;
     padding-top: 10px;
