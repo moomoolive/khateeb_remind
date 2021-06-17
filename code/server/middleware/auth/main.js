@@ -17,6 +17,9 @@ const authenticate = (authOptions={}) => {
             }
             try {
                 const user = await users.findEntryByAuthorizationKey(decoded.authId)
+                if (!user) {
+                    return response.status(401).json({ msg: `user doesn't exist` })
+                }
                 const targetAuth = user.authorizations.find(a => a.authId.toString() === decoded.authId )
                 const notValidAuthorization = !authHelpers.isValidAuthorizationKey(targetAuth, request.headers.specialStatus)
                 if (notValidAuthorization) {

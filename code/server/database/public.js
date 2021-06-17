@@ -14,6 +14,7 @@ const jummahPreferences = require("./interfaces/jummahPreferences.js")
 const users = require("./interfaces/users.js")
 const rootUser = require("./interfaces/rootUser.js")
 const legacySupport = require("./interfaces/legacySupport.js")
+const restTokens = require("./interfaces/restTokens.js")
 
 module.exports = {
     announcements,
@@ -29,5 +30,6 @@ module.exports = {
     jummahPreferences,
     users,
     rootUser,
-    legacySupport
+    legacySupport,
+    restTokens
 }

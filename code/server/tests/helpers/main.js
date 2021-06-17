@@ -1,10 +1,33 @@
 const mongoose = require("mongoose")
 
+const { createToken } = require($rootDir + '/libraries/auth/main.js')
+const { testInstitution, authorizations, users } = require($rootDir + "/database/public.js")
+
 function testModuleTitle(title="default title", subTitle="Tests will start now") {
     const mainTitle = title.toUpperCase()
     describe(`** ${mainTitle} **`, () => {
         it(subTitle, () => expect(true).toBe(true))
     })
+}
+
+async function createTestInstitutionRootAdminToken() {
+    try {
+        const institution = await testInstitution.testInstitutionExists()
+        const auths = await authorizations.query({ filter: { institution: institution._id } })
+        const rootInstitutionAdminAuthorization = auths.find(a => a.role === 'rootInstitutionAdmin')
+        let testInstitutionRootAdmin = await users.findEntry({ 
+            filter: { "authorizations.authId": rootInstitutionAdminAuthorization._id }
+        })
+        return createToken({
+            institutionID: institution._id,
+            __t: rootInstitutionAdminAuthorization.role,
+            authId: rootInstitutionAdminAuthorization._id,
+            _id: testInstitutionRootAdmin._id,
+            institutionStatus: "testInstitution"
+        })
+    } catch(err) {
+        console.error(err)
+    }
 }
 
 class ServerInstance {
@@ -31,9 +54,22 @@ class ServerInstance {
         mongoose.connection.close()
         this.server.close()
     }
+
+    getInstance() {
+        return this.server
+    }
+
+    async dropModel(modelName="restTokens") {
+        try {
+            await mongoose.connection.collections[modelName].drop()
+        } catch {
+            
+        }
+    }
 }
 
 module.exports = {
     testModuleTitle,
-    ServerInstance
+    ServerInstance,
+    createTestInstitutionRootAdminToken
 }

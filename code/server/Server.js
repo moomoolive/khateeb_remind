@@ -43,6 +43,7 @@ server.use('/auth', routes.auth)
 server.use('/sysAdmin', routes.sysAdmin)
 server.use('/user', routes.user)
 server.use('/logos', routes.logos)
+server.use("/rest-tokens", routes.restTokens)
 
 db.once('open', async () => { 
     const dbType = databaseConfig.URI.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
@@ -51,7 +52,7 @@ db.once('open', async () => {
 })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
 
-// for testing
+// returns instance of server - used for testing
 module.exports = server.listen(networkConfig.port, () => {
     console.log(`server is listening on port ${networkConfig.port}`) 
 })

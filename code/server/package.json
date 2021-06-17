@@ -11,7 +11,7 @@
     "test:int": "jest ./integration/* --silent",
     "test:debug": "jest sample.test.js",
     "test:all": "jest",
-    "test:development": "jest ./tests/integration/databaseInterfaces/restTokens",
+    "test:development": "jest ./tests/integration/routes/restTokens --watch",
     "docker:remove-old": "docker rm kr -f && docker image prune -f",
     "docker:create-test-container": "docker image build . -t khateeb-remind-test && docker create -p 80:80 --name kr khateeb-remind-test:latest",
     "docker:run-test-container": "docker container start kr -a",

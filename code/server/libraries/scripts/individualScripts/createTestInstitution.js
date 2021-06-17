@@ -3,7 +3,8 @@ const randomNamegenerate = require('project-name-generator')
 const scheduleHelpers = require($rootDir + '/libraries/schedules/main.js')
 const { initConfig } = require($rootDir + '/Server.config.js')
 
-const { 
+const {
+    restTokens, 
     timings, 
     locations, 
     testInstitution: testInstitutionInterfaces,
@@ -21,6 +22,7 @@ const createTestInstitution = async () => {
             console.log('Test institution already exists')
         } else {
             testInstitution = await testInstitutionInterfaces.create(initConfig.testInstitution.institution)
+            await restTokens.createEntry({ entry: { institution: testInstitution._id } })
         }
 
         const authorizations = await authorizationsInterfaces.query({ filter: { institution: testInstitution._id } })

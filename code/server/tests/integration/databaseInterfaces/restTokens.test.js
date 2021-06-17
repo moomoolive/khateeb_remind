@@ -1,4 +1,4 @@
-const { ServerInstance } = require($rootDir + "/tests/helpers/main.js")
+const { ServerInstance, testModuleTitle } = require($rootDir + "/tests/helpers/main.js")
 const { createEntry, query, deleteEntry } = require($rootDir + "/database/interfaces/restTokens.js")
 const { createTestInstitution } = require($rootDir + "/libraries/scripts/index.js")
 
@@ -15,7 +15,9 @@ afterAll(() => {
     server.cleanup()
 })
 
-describe("REST Token creation function", () => {
+testModuleTitle("Rest tokens interfaces")
+
+describe("REST Token creation interface", () => {
     it("Should throw error when incorret input is entered", async () => {
         try {
             await createEntry({ entry: {} })
@@ -41,7 +43,9 @@ describe("REST Token creation function", () => {
         expect(entry.institution.toString()).toBe(institution._id.toString())
         expect(entry.tag).toBe(tag)
     })
+})
 
+describe("Token finding interface", () => {
     it("Should be able to find tokens that are in database", async () => {
         const tag = "cool token"
         const entry = await createEntry({ 
@@ -50,7 +54,9 @@ describe("REST Token creation function", () => {
         const [token] = await query({ filter: { _id: entry._id } })
         expect(Boolean(token)).toBe(true) 
     })
+})
 
+describe("Token deleting interface", () => {
     it("Should be able to correctly delete existent tokens", async () => {
         const tag = "cool token"
         const entry = await createEntry({ 
