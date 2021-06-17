@@ -9,43 +9,73 @@
 
                 <div v-if="isLoggedIn">
                     <div v-if="authLevel === 1">
-                        <div class="navigation-container"  @click="redirect('/authorizations')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/authorizations')}`" 
+                            @click="redirect('/authorizations')"
+                        >
                             Login Selection
                         </div>
-                        <div class="navigation-container" @click="redirect('/institution-selection')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/institution-selection')}`"
+                            @click="redirect('/institution-selection')"
+                        >
                             Institution Signup
                         </div>
                     </div>
 
                     <div v-if="authLevel === 2">
-                        <div class="navigation-container" @click="redirect('/khateeb/')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/khateeb/')}`" 
+                            @click="redirect('/khateeb/')"
+                        >
                             Schedule
                         </div>
-                        <div class="navigation-container" @click="redirect('/khateeb/announcements')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/khateeb/announcements')}`" 
+                            @click="redirect('/khateeb/announcements')"
+                        >
                             Announcements
                         </div>
-                        <div class="navigation-container" @click="redirect('/khateeb/my-khutbahs')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/khateeb/my-khutbahs')}`" 
+                            @click="redirect('/khateeb/my-khutbahs')"
+                        >
                             My Khutbahs
                         </div>
-                        <div class="navigation-container" @click="redirect('/khateeb/availability')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/khateeb/availability')}`"
+                            @click="redirect('/khateeb/availability')"
+                        >
                             Availability
                         </div>
                     </div>
 
                     <div v-if="authLevel === 3 || authLevel === 4">
-                        <div class="navigation-container" @click="redirect('/institutionAdmin/schedule')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/institutionAdmin/schedule')}`" 
+                            @click="redirect('/institutionAdmin/schedule')"
+                        >
                             Set Schedule
                         </div>
-                        <div class="navigation-container" @click="redirect('/institutionAdmin/announcements')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/institutionAdmin/announcements')}`" 
+                            @click="redirect('/institutionAdmin/announcements')"
+                        >
                             Announcements
                         </div>
-                        <div class="navigation-container" @click="redirect('/institutionAdmin')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/institutionAdmin')}`" 
+                            @click="redirect('/institutionAdmin')"
+                        >
                             Admin Central
                         </div>
                     </div>
                     
                     <div v-if="authLevel >= 5">
-                        <div class="navigation-container" @click="redirect('/sysAdmin')">
+                        <div 
+                            :class="`navigation-container ${highlightContainer('/sysAdmin')}`"
+                            @click="redirect('/sysAdmin')"
+                        >
                             Admin Central
                         </div>
                     </div>
@@ -64,11 +94,17 @@
                         Notifications
                     </div>
 
-                    <div class="navigation-container" @click="redirect('/user')">
+                    <div 
+                        :class="`navigation-container ${highlightContainer('/user')}`"
+                        @click="redirect('/user')"
+                    >
                         Profile
                     </div>
 
-                    <div class="navigation-container" @click="redirect('/notification-subscriptions')">
+                    <div 
+                        :class="`navigation-container ${highlightContainer('/notification-subscriptions')}`" 
+                        @click="redirect('/notification-subscriptions')"
+                    >
                         Settings
                     </div>
 
@@ -93,10 +129,16 @@
                 </div>
 
                 <div v-else>
-                    <div class="navigation-container" @click="redirect('/login')">
+                    <div 
+                        :class="`navigation-container ${highlightContainer('/login')}`"
+                        @click="redirect('/login')"
+                    >
                         Login
                     </div>
-                    <div class="navigation-container" @click="redirect('/create/user')">
+                    <div 
+                        :class="`navigation-container ${highlightContainer('/create/user')}`" 
+                        @click="redirect('/create/user')"
+                    >
                         Signup
                     </div>
                 </div>
@@ -116,10 +158,20 @@ import notificationHelpers from '@/libraries/notifications/main.js'
 
 export default {
     name: "largeScreenNavigation",
+    data() {
+        return {
+            route: this.$route.path
+        }
+    },
     methods: {
         redirect(path) {
             if (path !== this.$router.currentRoute.fullPath) {
                 this.$router.push(path)
+            }
+        },
+        highlightContainer(path) {
+            if (path === this.route) {
+                return "silver-color"
             }
         },
         async logout() {
@@ -140,6 +192,11 @@ export default {
         authLevel() {
             return this.$store.getters["user/authLevel"]
         }
+    },
+    watch: {
+        $route(newValue) {
+            this.route = newValue.path
+        } 
     }
 }
 </script>
@@ -183,6 +240,15 @@ export default {
 
         &:hover {
             background-color: lighten(get-color("green", 1), 20%);
+        }
+    }
+
+    &.silver-color {
+        background: get-color("silver");
+        color: black;
+
+        &:hover {
+            background-color: lighten(get-color("silver", 1), 20%);
         }
     }
 }

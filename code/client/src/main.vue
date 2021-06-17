@@ -389,6 +389,10 @@ $app-container-section-shadow-intensity: 0.6;
         background-color: get-color("silver");
       }
     }
+
+    .notifications {
+        left: 155px;
+    }
 }
 
 // styles exclusive to firefox
