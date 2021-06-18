@@ -365,11 +365,21 @@ function confirmAuthorizationByKey(key="1234", confirmed) {
     )
 }
 
-function findEntryByAuthorizationKey(authId) {
-    return findEntry({ 
-        filer: { "authorizations.authId": authId },
-        dataShape: ["authorizations"] 
-    })
+async function findEntryByAuthorizationKey(userId, authId) {
+    try {
+        const user = await findEntry({ 
+            filter: { "_id": userId },
+            dataShape: ["authorizations", "firstName"] 
+        })
+        if (!user) {
+            return null
+        } else {
+            return user.authorizations.find(a => a.authId.toString() === authId )
+        }
+    } catch(err) {
+        console.error(err)
+        return null
+    }
 }
 
 module.exports = {

@@ -1,6 +1,10 @@
-FROM rust:1.52
+FROM rust:1.52 as builder
 
-WORKDIR /usr/src/myapp
-COPY . .
+WORKDIR /usr/src/rest-service
+COPY . /usr/src/rest-service
+
+RUN apt-get update
+
+EXPOSE 80
 
 CMD ["cargo", "run", "--release"]

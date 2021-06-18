@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const queryType = require('query-types')
 const qs = require('qs')
 const path = require('path')
+const helmet = require("helmet")
 
 // all added global variables are prepended with a '$'
 global.$rootDir = path.resolve(__dirname)
@@ -26,6 +27,8 @@ server.use(express.json({ limit: networkConfig.maxJSONSize }))
 server.use(globalMiddleWare.generalError)
 server.set('query parser', q => qs.parse(q, { comma: true }))
 server.use(queryType.middleware())
+server.disable("etag")
+server.use(helmet())
 
 server.options('*', cors())
 server.post('*', globalMiddleWare.noEmptyBody)
