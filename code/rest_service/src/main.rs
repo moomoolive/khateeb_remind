@@ -1,17 +1,16 @@
 mod database;
+mod state;
+mod routes;
 
+use state::{ AppState };
 use database::{ ConnectionOptions, DatabaseInterfaces };
+use routes::{ authenticate };
 
-use actix_web::{ get, App, HttpResponse, HttpServer, Result, web };
-use serde::{ Deserialize, Serialize };
+use actix_web::{ App, HttpServer, web };
 use actix_cors::Cors;
 
 use std::env::{ set_var };
 
-#[derive(Debug)]
-struct AppState {
-    db: web::Data<DatabaseInterfaces>
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -31,29 +30,9 @@ async fn main() -> std::io::Result<()> {
             .data(AppState {
                 db: web::Data::new(db.clone())
             })
-            .service(hello) 
+            .service(authenticate) 
     })
     .bind("0.0.0.0:80")?
     .run()
     .await
-}
-
-#[derive(Serialize, Deserialize)]
-struct MyObj<T> {
-    data: Vec<T>,
-    msg: i8
-}
-
-#[get("/")]
-async fn hello(data: web::Data<AppState>) -> Result<HttpResponse> {
-    let tokens = data
-        .as_ref()
-        .db
-        .find_auth_token()
-        .await;
-    let res = MyObj {
-        data: tokens,
-        msg: 0
-    };
-    Ok(HttpResponse::Ok().json(res))
 }

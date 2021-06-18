@@ -40,7 +40,7 @@ impl DatabaseInterfaces {
         self.target_collection(AUTH_TOKEN_COLLECTION)
     }
 
-    pub async fn find_auth_token(&self) -> Vec<Document> {
+    pub async fn find_auth_tokens(&self) -> Vec<Document> {
         let collection = self.auth_token_collection();
         let mut cursor = collection.find(doc!{}, None).await.unwrap();
         let mut auth_tokens = Vec::new();
