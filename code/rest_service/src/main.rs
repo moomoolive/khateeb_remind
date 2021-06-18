@@ -17,7 +17,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .service(hello) 
     })
-        .bind("localhost:80")?
+        .bind("0.0.0.0:80")?
         .run()
         .await
 }
