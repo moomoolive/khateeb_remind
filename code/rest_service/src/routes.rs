@@ -1,11 +1,12 @@
 use actix_web::{ get, HttpResponse, Result, web };
 use serde::{ Deserialize, Serialize };
 
+use crate::database::{ AuthTokenEntry };
 use crate::state::AppState;
 
 #[derive(Serialize, Deserialize)]
-struct TokenResponse<T> {
-    token: Vec<T>, // soon to be string
+struct TokenResponse {
+    token: Vec<AuthTokenEntry>,
     msg: i8
 }
 

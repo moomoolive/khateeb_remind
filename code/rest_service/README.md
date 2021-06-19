@@ -23,5 +23,7 @@ cargo build --release
 
 ### Run tests
 ```
-cargo test
+cargo test -- --test-threads 1
 ```
+* tests need to be single threaded so setup and tear down will not affect test results
+* developement database server must be running
