@@ -12,7 +12,6 @@ struct TokenResponse<T> {
 #[get("/authenticate")]
 pub async fn authenticate(data: web::Data<AppState>) -> Result<HttpResponse> {
     let token = data
-        .as_ref()
         .db
         .find_auth_tokens()
         .await;

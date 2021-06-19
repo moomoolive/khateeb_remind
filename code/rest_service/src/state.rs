@@ -1,8 +1,6 @@
-use crate::database::{ DatabaseInterfaces };
-
-use actix_web::{ web };
+use crate::database::{ DatabaseMiddleware };
 
 #[derive(Debug)]
 pub struct AppState {
-    pub db: web::Data<DatabaseInterfaces>
+    pub db: DatabaseMiddleware
 }
