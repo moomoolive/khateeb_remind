@@ -1,5 +1,5 @@
-use crate::database::{ DatabaseMiddleware, DatabaseConfig };
-use crate::routes::{ authenticate };
+use crate::database::{ DatabaseMiddleware, DatabaseConfig, CacheDatabase };
+use crate::routes::{ timings, locations, jummahs };
 use crate::state::{ AppState };
 
 use actix_web::{ App, HttpServer };
@@ -23,12 +23,16 @@ pub async fn create_server(config: &ServerConfig<'_>) -> std::io::Result<()> {
         // proxy pointing to server
         let cors = Cors::permissive();
         let app_state = AppState {
-            db: db.clone()
+            db: db.clone(),
+            cache_db: CacheDatabase::new(),
+            refresh_cache_after: 30
         };
         App::new()
             .wrap(cors)
             .data(app_state)
-            .service(authenticate)
+            .service(timings)
+            .service(locations)
+            .service(jummahs)
     })
     .bind(format!("0.0.0.0:{}", config.network_port))?
     .run()

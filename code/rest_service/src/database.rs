@@ -37,8 +37,6 @@ pub struct DatabaseMiddleware {
     client: Client
 }
 
-const get_all_documents_in_single_batch: i64 = -5000;
-
 impl DatabaseMiddleware {
     pub async fn new(options: &DatabaseConfig<'_>) -> Self {
         let mut client_options = ClientOptions::parse(options.uri)
@@ -61,6 +59,7 @@ impl DatabaseMiddleware {
     }
 
     fn create_query_options_with_projection(&self, p: Document) -> FindOptions {
+        let get_all_documents_in_single_batch = -5000;
         let options = FindOptions::builder()
             .projection(p)
             .limit(get_all_documents_in_single_batch)
@@ -105,14 +104,19 @@ impl DatabaseMiddleware {
     }
 
     fn get_all_active_documents_filter(&self, institution_id: &str) -> Document {
+        let id = match ObjectId::with_string(institution_id) {
+            Ok(x) => x,
+            _ => ObjectId::new()
+        };
         doc!{ 
-            "institutionID": ObjectId::with_string(institution_id),
+            "institutionID": id,
             "active": true 
         }
     }
 
-    async fn return_all_documents_in_cursor(&self, mut cursor: Cursor) -> Vec<Document> {
+    async fn return_documents_in_cursor_stream(&self, cursor: Cursor) -> Vec<Document> {
         let mut vec = Vec::new();
+        let mut cursor = cursor;
         while let Some(doc) = cursor.next().await {
             if let Ok(d) = doc {
                 vec.push(d);
@@ -127,14 +131,14 @@ impl DatabaseMiddleware {
             doc!{ "__v": -1, "active": -1 }
         );
         let query = collection.find(self.get_all_active_documents_filter(institution_id), query_options);
-        let mut cursor = match query.await {
+        let cursor = match query.await {
             Ok(data) => data,
             Err(e) => {
-                eprintln!("error occured when fetching auth tokens {}", e);
+                eprintln!("error occured when fetching locations {}", e);
                 return Vec::new()
             }
         };
-        self.return_all_documents_in_cursor(cursor).await
+        self.return_documents_in_cursor_stream(cursor).await
     }
 
     fn timings_collection(&self) -> Collection {
@@ -147,14 +151,14 @@ impl DatabaseMiddleware {
             doc!{ "__v": -1, "active": -1, "defaultKhateebs": -1 }
         );
         let query = collection.find(self.get_all_active_documents_filter(institution_id), query_options);
-        let mut cursor = match query.await {
+        let cursor = match query.await {
             Ok(data) => data,
             Err(e) => {
-                eprintln!("error occured when fetching auth tokens {}", e);
+                eprintln!("error occured when fetching timings {}", e);
                 return Vec::new()
             }
         };
-        self.return_all_documents_in_cursor(cursor)
+        self.return_documents_in_cursor_stream(cursor).await
     }
 
     // used for testing only
@@ -283,7 +287,7 @@ mod test {
                 "institutionID": institution_ids[2].clone(),
                 "locationID": location_ids[3].clone(),
                 "name": "rand5",
-                "active": true,
+                "active": false,
                 "hour": 12,
                 "minute": 30
             },
@@ -345,7 +349,7 @@ mod test {
         return vec
     }
 
-    async fn setup() {
+    async fn setup() -> Vec<ObjectId> {
         let connection = get_connection().await;
         let inst = connection
             .collection(INSTITUTIONS_COLLECTION)
@@ -386,6 +390,8 @@ mod test {
             .insert_many(test_jummahs(&institution_ids, &user_ids, &timings_ids), None)
             .await
             .unwrap();
+
+        institution_ids
     }
 
     async fn teardown() {
@@ -438,5 +444,55 @@ mod test {
         assert_eq!(cache_db.verify("random key"), None);
         assert_eq!(cache_db.verify("another"), None);
         assert_eq!(cache_db.verify("hackerkey123"), None);
+    }
+
+    #[tokio::test]
+    async fn fetch_locations_interface_should_correctly_fetch_locations() {
+        run_test(async {
+            let db = create_database_middleware().await;
+            let inst_ids = setup().await;
+            let mut res = Vec::new();
+            for id in inst_ids {
+                let hexified = id.to_hex();
+                let results = db.find_locations(&hexified).await;
+                res.extend(results);
+            }
+            assert_eq!(res.len(), 3);
+        }).await
+    }
+
+    #[tokio::test]
+    async fn fetch_locations_interface_should_return_empty_array_on_invalid_institution_id() {
+        run_test(async {
+            let db = create_database_middleware().await;
+            let hexified = ObjectId::new().to_hex();
+            let res = db.find_locations(&hexified).await;
+            assert_eq!(res.len(), 0);
+        }).await
+    }
+
+    #[tokio::test]
+    async fn fetch_timings_interface_should_correctly_fetch_timings() {
+        run_test(async {
+            let db = create_database_middleware().await;
+            let inst_ids = setup().await;
+            let mut res = Vec::new();
+            for id in inst_ids {
+                let hexified = id.to_hex();
+                let results = db.find_timings(&hexified).await;
+                res.extend(results);
+            }
+            assert_eq!(res.len(), 2);
+        }).await
+    }
+
+    #[tokio::test]
+    async fn fetch_timings_interface_should_return_empty_array_on_invalid_institution_id() {
+        run_test(async {
+            let db = create_database_middleware().await;
+            let hexified = ObjectId::new().to_hex();
+            let res = db.find_timings(&hexified).await;
+            assert_eq!(res.len(), 0);
+        }).await
     }
 }
