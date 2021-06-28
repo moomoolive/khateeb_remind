@@ -103,28 +103,31 @@ export default {
         fullName(state) {
             return `${state.userInfo.firstName} ${state.userInfo.lastName}`
         },
-        validAuthentication(state, { isLoggedIn, decodedJWT: { exp: tokenExpirationInSeconds } }) {
-            if (!isLoggedIn)
+        validAuthentication(_, { isLoggedIn, decodedJWT: { exp: tokenExpirationInSeconds } }) {
+            if (!isLoggedIn) {
                 return false
+            }
             const oneSecondInMilliseconds = 1_000
             const expirationTimeInUNIXTime = new Date(tokenExpirationInSeconds * oneSecondInMilliseconds).getTime()
             const UNIXTimeNow = new Date().getTime()
             return expirationTimeInUNIXTime > UNIXTimeNow
             
         },
-        type(state, { isLoggedIn, decodedJWT }) {
-            if (isLoggedIn)
+        type(_, { isLoggedIn, decodedJWT }) {
+            if (isLoggedIn) {
                 return decodedJWT.__t
-            else
+            } else {
                 return 'none'
+            }
         },
-        authLevel(state, { isLoggedIn }) {
-            if (isLoggedIn)
-                return auth.userTypeToAuthLevel(state.userInfo.__t)
-            else
+        authLevel(_, { isLoggedIn, decodedJWT }) {
+            if (isLoggedIn) {
+                return auth.userTypeToAuthLevel(decodedJWT.__t)
+            } else {
                 return 0
+            }
         },
-        isLoggedInAsGenericUser(state, { decodedJWT }) {
+        isLoggedInAsGenericUser(_, { decodedJWT }) {
             return !decodedJWT.institutionID
         }
     } 

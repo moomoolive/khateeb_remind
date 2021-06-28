@@ -131,7 +131,7 @@ export default {
 
 .announcement-container {
     width: 89%;
-    max-width: 900px;
+    max-width: $singular-collapsable-box-max-width;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 20px;

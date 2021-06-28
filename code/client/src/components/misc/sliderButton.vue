@@ -45,7 +45,7 @@ export default {
 
 .slider {
   position: absolute;
-  cursor: pointer;
+  @include is-clickable();
   top: 0;
   left: 0;
   right: 0;

@@ -333,14 +333,14 @@ async function deleteEntry(options={}) {
     try {
         const targetModel = helpers.dynamicUserModel(options.targetModel)
         const filter = options.filter || {}
-        const user = await users.findEntry({ filter, targetModel })
+        const user = await findEntry({ filter, targetModel })
         const dependantsRes = await user.deactivateAccount(options.postHook)
         const userUpdateRes = await users.updateOne(
             filter,
             { 
                 active: false , 
                 scheduleRestrictions: [],
-                // remove username - refer to explanation in schema section
+                // remove username - refer to explanation in user schema
                 $unset: { username: "" } 
             }
         )
@@ -365,6 +365,23 @@ function confirmAuthorizationByKey(key="1234", confirmed) {
     )
 }
 
+async function findEntryByAuthorizationKey(userId, authId) {
+    try {
+        const user = await findEntry({ 
+            filter: { "_id": userId },
+            dataShape: ["authorizations", "firstName"] 
+        })
+        if (!user) {
+            return null
+        } else {
+            return user.authorizations.find(a => a.authId.toString() === authId )
+        }
+    } catch(err) {
+        console.error(err)
+        return null
+    }
+}
+
 module.exports = {
     findKhateebs,
     getUserScheduleRestrictionsAssociatedWithInstitution,
@@ -383,5 +400,6 @@ module.exports = {
     findAuthorizationHolders,
     deleteEntry,
     confirmAuthorizationByKey,
-    updateEntryAndReturnOldCopy
+    updateEntryAndReturnOldCopy,
+    findEntryByAuthorizationKey
 }

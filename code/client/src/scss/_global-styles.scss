@@ -49,13 +49,12 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: get-color("light-grey", 0.6);
-    @include completely-round-border();
+    background: get-color("grey", 0.7);
     @include scrollbar-padding();
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: get-color("grey", 0.6);
+    background: get-color("light-grey", 0.7);
     @include scrollbar-padding();
 }
 
@@ -83,7 +82,7 @@ button {
     font-size: 16px;
     transition-duration: 0.4s;
     outline: none;
-    cursor: pointer;
+    @include is-clickable();
 
     $marginOne: 7px;
     margin: $marginOne $marginOne $marginOne $marginOne;

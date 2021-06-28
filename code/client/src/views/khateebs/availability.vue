@@ -223,7 +223,7 @@ export default {
 .user-setting {
     margin-bottom: 20px;
     width: 80%;
-    max-width: 800px;
+    max-width: $singular-collapsable-box-max-width;
     @include center-margin();
     max-height: 1500px;
 }

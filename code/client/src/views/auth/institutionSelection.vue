@@ -106,7 +106,7 @@ import generalMessage from '@/components/misc/generalMessage.vue'
 
 import sleepHelpers from '@/libraries/sleep/main.js'
 
-import Config from 'config$'
+import Config from '$config'
 
 export default {
     name: "institutionSelections",
@@ -268,7 +268,7 @@ export default {
 
 .signup-link {
     margin-bottom: 7px;
-    cursor: pointer;
+    @include is-clickable();
 
     &:hover {
         color: get-color("blue");

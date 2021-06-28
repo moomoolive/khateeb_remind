@@ -2,12 +2,12 @@
     <div class="container">
 
         <div class="display">
-            <button :class="elementSize" @click="incrementHour(1)">+</button>
+            <button :class="`green ${elementSize}`" @click="incrementHour(1)">+</button>
             <p :class="`${textColor} ${elementSize}`">{{ hour }}</p>
             <button :class="`red ${elementSize}`" @click="incrementHour(-1)">-</button>
         </div>
         <div class="display">
-            <button :class="elementSize" @click="incrementMinute(1)">+</button>
+            <button :class="`green ${elementSize}`" @click="incrementMinute(1)">+</button>
             <p :class="`${textColor} ${elementSize}`">{{ minute }}</p>
             <button :class="`red ${elementSize}`" @click="incrementMinute(-1)">-</button>
         </div>

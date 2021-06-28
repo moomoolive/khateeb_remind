@@ -3,7 +3,7 @@
 import { register } from 'register-service-worker'
 import footerPopups from './libraries/footerPopup/main.js'
 
-import Config from 'config$'
+import Config from '$config'
 
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {

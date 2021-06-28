@@ -25,6 +25,7 @@
                 :buttonText="`Log In`"
                 :confirmBeforeSubmit="false"
                 :disableIfSameAsStart="false"
+                :showLoadingSpinnerInButton="showAuthRequestedSpinner"
                 @submitted="login($event)"
             />
 
@@ -54,13 +55,16 @@ export default {
             errorMsg: '',
             userCredentials: this.getUserCredentials() ||  '',
             userCredentialKey: "username",
-            pathToPublicFolder: process.env.BASE_URL
+            pathToPublicFolder: process.env.BASE_URL,
+            showAuthRequestedSpinner: false
         }
     },
     methods: {
         async login(loginInfo={}) {
             const authRes = await this._api.auth.getToken(loginInfo)
+            this.showAuthRequestedSpinner = true
             if (!authRes.token || authRes.msg !== 'success') {
+                this.showAuthRequestedSpinner = false
                 return this.errorMsg = 'Incorrect Username or Password'
             }
             this.$store.dispatch('user/updateToken', authRes.token)
@@ -119,7 +123,7 @@ p {
     top: 50px;
     font-size: 19px;
     font-weight: bold;
-    cursor: pointer;
+    @include is-clickable();
 
     &:hover {
         color: get-color("yellow");

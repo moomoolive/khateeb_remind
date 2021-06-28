@@ -27,6 +27,12 @@ npm run test:unit
 npm run test:int
 ```
 
+### Run all tests in specificied folder/file on save (Hot reload of test)
+```
+npm run test:development
+```
+* To change target folder change the argument following "test:unit" keyword
+
 ### Runs All Server Tests
 ```
 npm run test:int

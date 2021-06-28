@@ -146,8 +146,9 @@ export default {
         async logout() {
             this.close()
             const confirm = await this._utils.confirm(`Are you sure you want to logout?`)
-            if (!confirm)
+            if (!confirm) {
                 return
+            }
             this.$store.dispatch('user/logout')
         },
         downgradeUserAuthorization() {
@@ -182,7 +183,7 @@ p {
 
 .menu-item {
     background-color: get-color("grey", 0.9);
-    cursor: pointer;
+    @include is-clickable();
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 10px;

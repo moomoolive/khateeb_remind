@@ -75,7 +75,7 @@
 <script>
 import jummahHelpers from '@/libraries/jummahs/main.js'
 
-import Config from 'config$'
+import Config from '$config'
 
 export default {
     name: "jummahSettingsPopup",

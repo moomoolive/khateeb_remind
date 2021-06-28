@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const queryType = require('query-types')
 const qs = require('qs')
 const path = require('path')
+const helmet = require("helmet")
 
 // all added global variables are prepended with a '$'
 global.$rootDir = path.resolve(__dirname)
@@ -26,6 +27,8 @@ server.use(express.json({ limit: networkConfig.maxJSONSize }))
 server.use(globalMiddleWare.generalError)
 server.set('query parser', q => qs.parse(q, { comma: true }))
 server.use(queryType.middleware())
+server.disable("etag")
+server.use(helmet())
 
 server.options('*', cors())
 server.post('*', globalMiddleWare.noEmptyBody)
@@ -43,6 +46,7 @@ server.use('/auth', routes.auth)
 server.use('/sysAdmin', routes.sysAdmin)
 server.use('/user', routes.user)
 server.use('/logos', routes.logos)
+server.use("/rest-tokens", routes.restTokens)
 
 db.once('open', async () => { 
     const dbType = databaseConfig.URI.split(':')[0] === 'mongodb' ? 'Local' : 'Production'
@@ -50,4 +54,8 @@ db.once('open', async () => {
     await cronJobs.start()
 })
 db.on('error', (error) => { console.log(`Connection error : ${error}`) })
-server.listen(networkConfig.port, () => { console.log(`server is listening on port ${networkConfig.port}`) })
+
+// returns instance of server - used for testing
+module.exports = server.listen(networkConfig.port, () => {
+    console.log(`server is listening on port ${networkConfig.port}`) 
+})

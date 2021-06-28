@@ -122,16 +122,19 @@ export default {
         this.activeMenu = !this.activeMenu
       },
       closeProfileDetails() {
-        if (this.showProfileDetails)
+        if (this.showProfileDetails) {
           this.showProfileDetails = false
+        }
       },
       closeMenu() {
-        if (this.activeMenu)
+        if (this.activeMenu) {
           this.activeMenu = false
+        }
       },
       closeNotificationScroller() {
-        if (this.$store.state.notifications.display.show)
+        if (this.$store.state.notifications.display.show) {
           this.$store.commit('notifications/close')
+        }
       },
       closeAllMenus() {
         this.closeMenu()
@@ -139,8 +142,9 @@ export default {
         this.closeNotificationScroller()
       },
       redirect(path) {
-        if (path !== this.$router.currentRoute.fullPath)
+        if (path !== this.$router.currentRoute.fullPath) {
           this.$router.push(path)
+        }
         this.closeAllMenus()
       },
       logout() {
@@ -158,7 +162,7 @@ export default {
 
 <style lang="scss" scoped>
 .topnav {
-  background-color: get-color("grey", 0.5);
+  background-color: get-color("grey", 0.9);
   height: 5vh;
   min-height: 43px;
   max-height: 50px;
@@ -172,7 +176,7 @@ export default {
   padding: 5px;
   position: absolute;
   left: 5px;
-  cursor: pointer;
+  @include is-clickable();
 }
 
 .signup-buttons {
@@ -204,10 +208,11 @@ export default {
   font-size: 35px;
   margin-left: 10px;
   margin-right: 10px;
-  cursor: pointer;
+  @include is-clickable();
+  color: get-color("blue");
 
   &.active {
-    color: get-color("blue");
+    color: get-color("green");
   }
 }
 
@@ -285,5 +290,10 @@ export default {
     right: 25px;
     top: 40px;
   }
+
+  .right-side-menu {
+    display: none;
+  }
+  
 }
 </style>

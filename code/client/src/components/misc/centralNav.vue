@@ -11,7 +11,10 @@
                     @click="outbound(link.route)"
                 >
                 <p>{{ _utils.stringFormat(link.name) }}
-                    <span class="arrow-icon">></span></p>
+                    <span class="arrow-icon to-link-arrow">
+                        <fa-icon icon="arrow-right" /> 
+                    </span>
+                </p>
                 </button>
             </div>
         </div>
@@ -19,8 +22,9 @@
         <div v-if="navMode === 'outbound'" class="return-to-central-container">
             <button class="back-to-central silver" @click="toCentral()">
                 <p>
-                    <!-- eslint-disable-next-line -->
-                    <span class="back-arrow"> < </span> 
+                    <span class="back-arrow"> 
+                        <fa-icon icon="arrow-left" /> 
+                    </span> 
                     Back
                 </p>
             </button>
@@ -101,10 +105,13 @@ p {
     font-size: 20px;
 }
 
+.back-arrow, .to-link-arrow {
+    font-size: 17px;
+}
+
 .arrow-icon {
     float: right;
     margin-right: 0;
-    right: -5%;
 }
 
 .indicator {
@@ -142,6 +149,10 @@ p {
       .back-to-central {
           width: 70px;
           height: 32px;
+      }
+
+      .back-arrow, .to-link-arrow {
+          font-size: 12px;
       }
 }
 </style>

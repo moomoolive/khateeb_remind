@@ -1,6 +1,6 @@
 import helpers from './helpers.js'
 
-import Config from 'config$'
+import Config from '$config'
 
 const subscribeUserToPushNotifications = async (serviceWorkerReg={}) => {
     try {
@@ -21,9 +21,7 @@ const getServiceWorkerRegistration = async () => {
             return registration
         }
         return null     
-    } catch(err) {
-        // eslint-disable-next-line
-        console.log(`Couldn't get service worker registration. `, err)
+    } catch {
         return null
     }
 }

@@ -31,7 +31,13 @@ import {
     faChevronDown,
     faStarAndCrescent,
     faSignOutAlt,
-    faSearch
+    faSearch,
+    faTimes,
+    faCompass,
+    faPlus,
+    faMinus,
+    faArrowLeft,
+    faArrowRight
  } from '@fortawesome/free-solid-svg-icons'
 
  import {
@@ -88,4 +94,10 @@ export default [
     faStarAndCrescent,
     faSignOutAlt,
     faSearch,
+    faTimes,
+    faCompass,
+    faPlus,
+    faMinus,
+    faArrowLeft,
+    faArrowRight
 ]

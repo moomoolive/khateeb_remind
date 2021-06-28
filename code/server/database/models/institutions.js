@@ -12,6 +12,7 @@ const timings = require($rootDir + "/database/models/timings.js")
 const userScheduleRestrictions = require($rootDir + "/database/models/userScheduleRestrictions.js")
 const announcements = require($rootDir + "/database/models/announcements.js")
 const jummahPreferences = require($rootDir + "/database/models/jummahPreferences.js")
+const restTokens = require($rootDir + "/database/models/restTokens.js")
 
 const institution = new mongoose.Schema({
     name: {
@@ -183,6 +184,7 @@ const directDependenciesList = [
     { name: "jummahPreferences", key: "institutionID", model: userScheduleRestrictions },
     { name: "userScheduleRestrictions", key: "institution", model: jummahPreferences },
     { name: "announcements", key: "institutionID", model: announcements },
+    { name: "restTokens", key: "institution", model: restTokens },
 ]
 institution.methods.deleteDirectDependencies = async function() {
     const res = {}

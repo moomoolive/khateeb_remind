@@ -10,6 +10,7 @@ const khateebs = require('./routes/khateebs.js')
 const announcements = require('./routes/announcements.js')
 const institutions = require('./routes/institutions.js')
 const logos = require('./routes/logos.js')
+const restTokens = require('./routes/restTokens.js')
 
 const routesList = {
     misc,
@@ -23,7 +24,8 @@ const routesList = {
     announcements,
     institutions,
     institutionAdmins,
-    logos
+    logos,
+    restTokens
 }
 
 module.exports = routesList

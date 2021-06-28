@@ -12,7 +12,7 @@
         >
             {{ headline }}
             <span style="float: right;" class="icon">
-                {{ isActive ? "-" : "+" }}
+                <fa-icon :icon="isActive ? 'minus' : 'plus'" />
             </span>
             <div class="tag">
                 <tag-box 

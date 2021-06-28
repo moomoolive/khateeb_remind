@@ -20,7 +20,7 @@ npm run build
 npm run test:unit
 ```
 
-### Run all tests in specificied folder/file on save 
+### Run all tests in specificied folder/file on save (Hot reload of test)
 ```
 npm run test:development
 ```

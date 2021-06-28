@@ -6,7 +6,7 @@
 import helpers from '@/libraries/requests/requestManager/main.js'
 import footerPopups from '@/libraries/footerPopup/main.js'
 
-import Config from 'config$'
+import Config from '$config'
 
 export default {
     name: 'requestManager',

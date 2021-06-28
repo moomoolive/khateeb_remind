@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import Config from 'config$'
+import Config from '$config'
 
 export default {
     name: 'loading',

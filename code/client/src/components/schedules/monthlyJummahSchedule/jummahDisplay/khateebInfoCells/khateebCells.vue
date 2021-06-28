@@ -16,7 +16,7 @@
             </span>
         </div>
 
-        <div v-show="khateebPreferences[1].khateebID" class="khateeb-role-label" @click="toggleBackupDisplay()">
+        <div v-show="khateebPreferences[1].khateebID" class="khateeb-role-label clickable" @click="toggleBackupDisplay()">
             <div>
                 <dropdown-arrow 
                     :fontSize="12"
@@ -111,6 +111,10 @@ div {
     display: flex;
     justify-content: flex-start;
     align-items: center;
+
+    &.clickable {
+        @include is-clickable();
+    }
 }
 
 .khateeb-name-label {

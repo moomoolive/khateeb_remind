@@ -1,5 +1,6 @@
 // constants
 @import './consts/_viewport.scss';
+@import './consts/UI-elements';
 
 // functions
 @import './functions/_colors.scss';
@@ -13,3 +14,4 @@
 @import './mixins/_margins.scss';
 @import './mixins/fonts.scss';
 @import './mixins/paddings.scss';
+@import './mixins/built-in-HTML-graphics';

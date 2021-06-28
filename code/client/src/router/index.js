@@ -49,41 +49,57 @@ const router = new VueRouter({
   }
 })
 
-router.beforeEach((to, from, next) => {
-  if (store.state.router.firstPage)
+// register landing page hook
+router.beforeEach((to, _, next) => {
+  if (store.state.router.firstPage) {
     store.dispatch('router/registerLandingPage', helpers.fullPath(to))
-  
-  if (to.matched.some(record => record.meta.noSiteBanner)) {
-    if (store.state.websiteBanner.show)
-      store.commit("websiteBanner/show")
   }
-  if (to.matched.some(record => beforeNavHooks.authRequired(record))) {
-    const origin = { notificationOrigin: "web-app" }
-    const threeTenthsOfASecond = 300
-    if (!store.getters['user/isLoggedIn']) {
-      next('/')
-      window.setTimeout(() => { 
-        _utils.alert('Please login to view this page', "caution", origin) 
-        }, threeTenthsOfASecond)
-      return
-    }
-    else if (!store.getters['user/validAuthentication']) {
-      window.setTimeout(() => {
-        _utils.alert('Your login has expired. Please sign-in again', "caution", origin)
+  next()
+})
+
+// website banner hook
+router.beforeEach((to, _, next) => {
+  const isBannerAllowOnCurrentPage = to.matched.some(record => record.meta.noSiteBanner)
+  if (isBannerAllowOnCurrentPage && store.state.websiteBanner.show) {
+    store.commit("websiteBanner/show")
+  }
+  next()
+})
+
+// auth hook
+router.beforeEach((to, _, next) => {
+  const isAuthRequired = to.matched.some(record => {
+    return beforeNavHooks.authRequired(record)
+  })
+  if (!isAuthRequired) {
+    return next()
+  }
+  const origin = { notificationOrigin: "web-app" }
+  const threeTenthsOfASecond = 300
+  if (!store.getters['user/isLoggedIn']) {
+    next('/')
+    window.setTimeout(() => { 
+      _utils.alert('Please login to view this page', "caution", origin) 
       }, threeTenthsOfASecond)
-      store.dispatch('logout')
-      return
-    }
-    else if (!_utils.validAuthentication(to.meta.auth)) {
-      if (!store.state.router.firstPage) {
-        window.setTimeout(() => notificationHelpers.unauthorizedMsg(), threeTenthsOfASecond)
-      }
-      next(helpers.homepageURL(store.getters.userType))
-    }
-    next() 
-  } else {
-    next()
+    return
   }
+  else if (!store.getters['user/validAuthentication']) {
+    window.setTimeout(() => {
+      _utils.alert('Your login has expired. Please sign-in again', "caution", origin)
+    }, threeTenthsOfASecond)
+    store.dispatch('logout')
+    return
+  }
+  else if (!_utils.validAuthentication(to.meta.auth)) {
+    const isFirstPage = store.state.router.firstPage
+    if (!isFirstPage && to.path === "/authorizations") {
+      window.setTimeout(() => notificationHelpers.signOutOfInstitution(), threeTenthsOfASecond)
+    } else if (!isFirstPage) {
+      window.setTimeout(() => notificationHelpers.unauthorizedMsg(), threeTenthsOfASecond)
+    }
+    next(helpers.homepageURL(store.getters.userType))
+  }
+  next() 
 })
 
 export default router

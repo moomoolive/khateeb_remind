@@ -49,7 +49,7 @@
                     <a 
                         @click="toUsecasePage()"
                     >
-                        Why Use Khateeb Remind?
+                        Why Khateeb Remind?
                     </a>
                 </nav>
 
@@ -66,7 +66,7 @@
                         target="_blank"
                         rel="noopener"
                     >
-                        Contribute to Source Code
+                        Source Code
                     </a>
                 </nav>
                 
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import Config from 'config$'
+import Config from '$config'
 
 import { CollapseTransition } from "@ivanv/vue-collapse-transition"
 
@@ -166,7 +166,7 @@ a {
     color: get-color("silver");
     font-size: 15px;
     margin-bottom: 9px;
-    cursor: pointer;
+    @include is-clickable();
     color: get-color("dark-blue");
     @include alternate-font();
     
@@ -176,8 +176,8 @@ a {
 }
 
 .footer-links-section {
-    margin-top: 15px;
-    margin-left: 20px;
+    margin-top: 30px;
+    margin-left: 30px;
     margin-right: 40px;
 }
 
@@ -206,8 +206,9 @@ a {
     @include flexbox-default();
     margin-bottom: 10px;
     margin-left: auto;
+    margin-right: 7px;
     width: 118px;
-    cursor: pointer;
+    @include is-clickable();
 }
 
 @media screen and (max-width: $phone-width) {

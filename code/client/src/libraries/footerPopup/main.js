@@ -1,6 +1,6 @@
 import helpers from './helpers.js'
 
-import Config from 'config$'
+import Config from '$config'
 
 const appWillUpdateMessage = () => {
     const toSeconds = Config.pwaConfig.reloadDelayAfterNewServiceWorkerDetected / 1_000

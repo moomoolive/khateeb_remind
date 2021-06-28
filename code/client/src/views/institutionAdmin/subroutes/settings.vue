@@ -1,7 +1,10 @@
 <template>
     <div>
         <loading>
-            <div v-if="showSettings && settingsArePresent" class="settings-container">
+            <div 
+                v-if="showSettings && settingsArePresent" 
+                class="settings-container"
+            >
                 
                 <collapsable-box
                     class="setting-container"
@@ -146,6 +149,19 @@
                         })"
                         :textColor="`off-white`"
                     />
+                </collapsable-box>
+
+                <collapsable-box
+                    class="setting-container"
+                    :headline="`Developer Tools`"
+                    :tagDetails="[{
+                        words: 'No REST Token',
+                        color: `important`,
+                        symbol: '🔗'
+                    }]"
+                    ref="developer-tools"
+                >
+                    Coming soon insha'Allah
                 </collapsable-box>
 
                 <collapsable-box
