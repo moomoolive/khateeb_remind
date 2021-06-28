@@ -7,10 +7,8 @@ const locations = require($rootDir + "/database/models/locations.js")
 
 const jummahPreference = new mongoose.Schema({
     institutionID: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true,
-        minLength: $config.consts.mongooseIdLength,
-        maxLength: $config.consts.mongooseIdLength,
         ref: 'institution'
     },
     date: {

@@ -2,10 +2,8 @@ const mongoose = require('mongoose')
 
 const restToken = new mongoose.Schema({
     institution: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true,
-        minLength: $config.consts.mongooseIdLength,
-        maxLength: $config.consts.mongooseIdLength,
         ref: 'institution'
     },
     tag: {

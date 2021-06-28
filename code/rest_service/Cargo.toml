@@ -1,5 +1,5 @@
 [package]
-name = "rest_microservice"
+name = "rest_service"
 version = "0.1.0"
 authors = ["Mostafa Elbannan <mostafaelbannan1@gmail.com>"]
 edition = "2018"
@@ -11,10 +11,24 @@ actix-web = "3"
 serde = "1.0.126"
 futures = "0.3"
 actix-cors = "0.5.4"
-mongodb = "1.2.2"
-bson = "1.2.0"
-tokio = { version = "0.2", features = ["macros", "rt-threaded"] }
-chrono = "0.4"
+lazy_static = "1.4.0"
+cronjob = "0.3.17"
+actix-service = "2.0.0"
+actix-rt = "2.2.0"
+
+[dependencies.mongodb]
+default-features = false
+version = "1.2.2"
+features = ["tokio-runtime"]
+
+[dependencies.tokio]
+version = "0.2"
+features = ["full"]
+
+[dependencies.redis]
+package = "redis"
+version = "0.20.2"
+features = ["tokio-comp"]
 
 [dev-dependencies]
 cargo-watch = "7.8.0"

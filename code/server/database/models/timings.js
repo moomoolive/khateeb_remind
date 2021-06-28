@@ -23,10 +23,8 @@ const defaultKhateebsDefaultValue = new Array(5).fill(
 
 const timing = new mongoose.Schema({
     institutionID: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true,
-        minLength: $config.consts.mongooseIdLength,
-        maxLength: $config.consts.mongooseIdLength,
         ref: 'institution'
     },
     locationID: {

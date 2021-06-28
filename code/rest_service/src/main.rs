@@ -1,20 +1,16 @@
-mod database;
-mod state;
+mod server;
+mod consts;
+mod io;
+mod cron_job;
 mod routes;
-mod server_utils;
 
-use server_utils::{ create_server, ServerConfig };
-use database::{ DatabaseConfig };
+use server::{ create_server };
+use cron_job::start_refresh_cache_cron_job;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let config = ServerConfig {
-        db: DatabaseConfig {
-            uri: "mongodb://localhost:27017/",
-            client_name: String::from("rest_service")
-        },
-        server_mode: "debug",
-        network_port: 80
-    };
-    create_server(&config).await
+    // how to start tokio reactor here ?
+    let seconds_per_minute = 60;
+    start_refresh_cache_cron_job(seconds_per_minute * 30);
+    create_server().await
 }

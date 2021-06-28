@@ -1,0 +1,15 @@
+FROM rust:1.52
+
+WORKDIR /usr/src/rest_service
+COPY . .
+
+RUN apt-get update
+
+ENV DB_URI=mongodb://localhost:27017
+ENV CACHE_URI=redis://localhost:6379/
+
+RUN cargo install --path .
+
+EXPOSE 80
+
+CMD ["rest_service"]

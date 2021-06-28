@@ -4,10 +4,8 @@ const timings = require($rootDir + "/database/models/timings.js")
 
 const location = new mongoose.Schema({
     institutionID: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true,
-        minLength: $config.consts.mongooseIdLength,
-        maxLength: $config.consts.mongooseIdLength,
         ref: 'institution'
     },
     name: {
