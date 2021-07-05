@@ -1,5 +1,11 @@
 # binaries
-target/
+/target
 
-# windows batch files
+# dependency lock file
+Cargo.lock
+
+# windows scripts
 *.bat
+
+# rust panic outputs
+panic!**

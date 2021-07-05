@@ -1,28 +1,65 @@
 use actix_web::{ App, HttpServer, middleware };
 use actix_cors::Cors;
 
-use std::env::{ set_var };
-
-use crate::consts::PORT;
 use crate::routes::{ locations };
+use crate::io::{ DatabaseMiddleware, CacheMiddleware };
 
-/// Creates an instance of the Khateeb Remind
-/// "Rest Service" server
-pub async fn create_server() -> std::io::Result<()> {
-    set_var("RUST_LOG", format!("actix_web={}", "DEBUG"));
-    
+struct ServerState {
+    db: DatabaseMiddleware,
+    cache: CacheMiddleware
+}
+
+impl ServerState {
+    pub fn new(db: DatabaseMiddleware, cache: CacheMiddleware) -> Self {
+        ServerState { db, cache }
+    }
+}
+
+pub async fn create_server(config: ServerConfig<'static>) -> std::io::Result<()> {
+    std::env::set_var("RUST_LOG", format!("actix_web={}", "DEBUG"));
+    let db = DatabaseMiddleware::new(
+        config.database_address.ip_address,
+        config.database_address.tcp_port
+    ).await;
+    let cache = CacheMiddleware::new(
+        config.cache_database_address.ip_address,
+        config.cache_database_address.tcp_port
+    ).await;
     HttpServer::new(move || {
         // allow all requests CORS policy
         // cors policy should be configured within
         // proxy pointing to server
         let cors = Cors::permissive();
+        let app_data = ServerState::new(db.clone(), cache.clone());
         App::new()
             .wrap(cors)
             .wrap(middleware::Logger::default())
             .service(locations)
+            .app_data(app_data)
     })
-    .bind(format!("0.0.0.0:{}", PORT))?
+    .bind(format!("0.0.0.0:{}", config.server_port))?
     .run()
     .await
 }
 
+type Seconds = u64;
+
+#[derive(Clone)]
+pub struct ServerConfig<'a> {
+    pub database_address: TcpAddress<'a>,
+    pub cache_database_address: TcpAddress<'a>,
+    pub refresh_cache_rate: Seconds,
+    pub server_port: u64
+}
+
+#[derive(Clone)]
+pub struct TcpAddress<'a>{
+    pub ip_address: &'a str,
+    pub tcp_port: u16
+}
+
+impl<'a> TcpAddress<'a> {
+    pub fn new(ip_address: &'a str, tcp_port: u16) -> Self {
+        TcpAddress { ip_address, tcp_port }
+    }
+}

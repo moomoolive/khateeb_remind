@@ -1,85 +1,60 @@
-use serde::{ Serialize, Deserialize };
-use mongodb::{ Client as MongoClient, Collection };
+const DATABASE_NAME: &str = "khateebRemind";
+
+use mongodb::{ Client as MongoClient, Database };
 use redis::{ 
-    Client as RedisClient, aio::Connection, RedisResult };
-use tokio::stream::StreamExt;
+    aio::Connection as RedisConnection, 
+    ConnectionInfo, 
+    ConnectionAddr, 
+    aio::connect_tokio as RedisClient 
+};
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd)]
-pub struct AuthTokenEntry {
-    pub id: String,
-    pub institution: String
-}
-
-/*
-pub async fn create_db_connection(uri: &str) {
-
-}*/
-
-/// Create TCP connection with database and return cursor
-/// pointing to authentication token collection in a synchronous manner
-pub async fn auth_tokens_collection_sync(
-    db_uri: &str, 
-    db_name: &str, 
-    auth_token_collection_name: &str) -> Collection {
-    let client = MongoClient::with_uri_str(db_uri)
+pub async fn create_database_connection(ip_address: &str, tcp_port: u16) -> Database {
+    let database_uri = format!("mongodb://{}:{}", ip_address, tcp_port);
+    let client = MongoClient::with_uri_str(&database_uri)
         .await
         .expect("couldn't connect to database");
-    let database = client.database(db_name);
-    database.collection(auth_token_collection_name)
+    client.database(DATABASE_NAME)
 }
 
-/// Create TCP connection with cache database
-/// in a synchoronous manner
-pub async fn cache_db_connection_sync(cache_uri: &str) -> Connection {
-    let redis_client = RedisClient::open(cache_uri)
-        .expect("Error when setting cache settings");
-    redis_client.get_async_connection()
-        .await
-        .expect("couldn't connect to cache")
-}
-
-/// Refresh cache database's authentication token inventory
-/// in a synchronous manner.
-/// Recommended to be put on seperate thread
-pub async fn refresh_cache_sync(collection: &Collection, cache_connection: &mut Connection) {
-    let auth_tokens = get_auth_tokens_sync(&collection).await;
-    println!("{:#?}", auth_tokens);
-    for entry in auth_tokens.iter() {
-        println!("{:#?}", entry);
-        //let _ = insert_in_cache_sync(cache_connection, &entry.id, &entry.institution).await;
-    }
-}
-
-async fn insert_in_cache_sync(cache_connection: &mut Connection, key: &str, value: &str) -> RedisResult<()> {
-    redis::cmd("SET")
-        .arg(&[key, value])
-        .query_async(cache_connection)
-        .await
-}
-
-pub async fn get_auth_tokens_sync(collection: &Collection) -> Vec<AuthTokenEntry> {
-    let mut cursor = match collection.find(None, None).await {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("{}", e);
-            return Vec::new();
-        }
+pub async fn create_cache_layer_connection(cache_ip_address: &str, tcp_port: u16) -> RedisConnection  {
+    let address = ConnectionAddr::Tcp(String::from(cache_ip_address), tcp_port);
+    let connection = ConnectionInfo {
+        addr: Box::new(address),
+        db: 0,
+        username: None,
+        passwd: None
     };
-    let mut auth_tokens = Vec::new();
-    while let Some(doc) = cursor.next().await {
-        if let Ok(d) = doc {
-            let id = d
-                .get_object_id("_id")
-                .map(|o_id| o_id.to_hex())
-                .unwrap(); 
-            // it's known that at this point it's safe to unwrap
-            let institution = d
-                .get_object_id("institution")
-                .unwrap();
-            let institution = String::from(institution.to_hex());
-            let entry = AuthTokenEntry { id, institution };
-            auth_tokens.push(entry);
-        }
+    RedisClient(&connection)
+        .await
+        .expect("Couldn't connect to cache db")
+}
+
+#[derive(Clone, Debug)]
+pub struct DatabaseMiddleware {
+    client: Database
+}
+
+impl DatabaseMiddleware {
+    pub async fn new(database_ip_address: &str, database_tcp_port: u16) -> Self {
+        let client = create_database_connection(
+            database_ip_address,
+            database_tcp_port
+        ).await;
+        DatabaseMiddleware { client }
     }
-    auth_tokens
+}
+
+use std::sync::Arc;
+
+#[derive(Clone)]
+pub struct CacheMiddleware {
+    client: Arc<RedisConnection>
+}
+
+impl CacheMiddleware {
+    pub async fn new(cache_ip_address: &str, tcp_port: u16) -> Self {
+        let client = create_cache_layer_connection(cache_ip_address, tcp_port).await;
+        let client = Arc::new(client);
+        CacheMiddleware { client }
+    }
 }

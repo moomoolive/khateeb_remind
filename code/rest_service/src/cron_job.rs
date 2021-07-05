@@ -1,32 +1,63 @@
-use crate::consts::{ DB_NAME, REST_TOKENS_COLLECTION, DB_URI, CACHE_URI };
-use crate::io::{ 
-    auth_tokens_collection_sync, 
-    cache_db_connection_sync,
-    refresh_cache_sync
-};
+use actix_web::rt::Arbiter as runtime;
+use redis::{ RedisResult, aio::Connection };
+use tokio::{ stream::StreamExt, time::Duration, time::delay_for  };
+use serde::{ Serialize, Deserialize };
+use mongodb::Database;
 
-/*
-    tokio::spawn(async {
+use crate::io::{ create_database_connection, create_cache_layer_connection };
+use crate::server::ServerConfig;
+
+const REST_TOKEN_COLLECTION: &str = "resttokens";
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd)]
+pub struct AuthTokenEntry {
+    pub id: String,
+    pub institution: String
+}
+
+pub fn start_refresh_cache_cron_job(config: ServerConfig<'static>) {
+    runtime::spawn(async move {
+        let database = create_database_connection(
+            config.database_address.ip_address,
+            config.database_address.tcp_port
+        ).await;
+        let mut cache_client = create_cache_layer_connection(
+            config.cache_database_address.ip_address,
+            config.cache_database_address.tcp_port
+        ).await;
         loop {
-            println!("hi");
-            delay_for(tokio::time::Duration::from_secs(1)).await;
+            refresh_cache_database(&database, &mut cache_client).await;
+            delay_for(Duration::from_secs(config.refresh_cache_rate)).await;
         }
     });
-//delay_for(tokio::time::Duration::from_secs(seconds)).await;
-*/
+}
 
-/// Creates a cron job that refreshes the cache database's
-/// authentication token inventory, in an asynchronous manner.
-/// Tokio reactor MUST be running or this function will cause
-/// the thread it's on to crash.
-pub fn start_refresh_cache_cron_job(seconds: u64) {
-    tokio::spawn(async move {
-        let collection = auth_tokens_collection_sync(&*DB_URI, DB_NAME, REST_TOKENS_COLLECTION).await;
-        let mut con = cache_db_connection_sync(&*CACHE_URI).await;
-        
-        while {
-            refresh_cache_sync(&collection, &mut con).await;
-            true
-        } {}
-    });
+async fn refresh_cache_database(db_connection: &Database, cache_db_connection: &mut Connection) {
+    let collection = db_connection.collection(REST_TOKEN_COLLECTION);
+    let mut cursor = match collection.find(None, None).await {
+        Ok(data) => data,
+        Err(_) => return
+    };
+    let mut auth_tokens = Vec::new();
+    while let Some(doc) = cursor.next().await {
+        if let Ok(d) = doc {
+            let id = d
+                .get_object_id("_id")
+                .map(|o_id| o_id.to_hex())
+                .unwrap(); 
+            let institution = d
+                .get_object_id("institution")
+                .unwrap();
+            let institution = String::from(institution.to_hex());
+            let entry = AuthTokenEntry { id, institution };
+            auth_tokens.push(entry);
+        }
+    }
+    println!("{:#?}", auth_tokens);
+    for token in auth_tokens {
+        let _: RedisResult<()> = redis::cmd("SET")
+            .arg(&[token.id, token.institution])
+            .query_async(cache_db_connection)
+            .await;
+    }
 }

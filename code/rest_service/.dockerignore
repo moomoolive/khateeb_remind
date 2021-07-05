@@ -1,8 +1,0 @@
-# binaries
-target/
-
-# windows batch files
-*.bat
-
-# READMEs
-*.md
