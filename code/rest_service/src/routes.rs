@@ -86,6 +86,11 @@ pub async fn jummahs(auth: Authorized, info: Query<Info>, mut server_state: Serv
     Ok(HttpResponse::Ok().json(ServerResponse { data, msg: "success" }))
 }
 
+#[get("/health-endpoint")]
+pub async fn health_endpoint() -> Result<HttpResponse, ServerErrors> {
+    Ok(HttpResponse::Ok().json(1))
+}
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct ServerResponse<'a> {
     pub data: Vec<Document>,

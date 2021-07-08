@@ -118,6 +118,8 @@ impl DatabaseMiddleware {
                     "let": { "pid": "$khateebID" },
                     // transforms "khateebID" field which is a string into
                     // an ObjectId and then performs a lookup on it
+                    // Note: I'm pretty sure this can be optimized much more
+                    // but for now this is fine
                     "pipeline": [
                         {
                             "$match": {
