@@ -1,6 +1,12 @@
 const DATABASE_NAME: &str = "khateebRemind";
 
-use mongodb::{ Client as MongoClient, Database };
+use mongodb::{ 
+    Client as MongoClient, 
+    Database,
+    bson::{ Document as MongoDocument, doc, oid::ObjectId },
+    options::FindOptions,
+    Cursor
+};
 use redis::{ 
     aio::MultiplexedConnection as RedisConnection,
     RedisResult
@@ -20,10 +26,16 @@ pub async fn create_cache_layer_connection(cache_ip_address: &str, tcp_port: u16
     client.get_multiplexed_tokio_connection().await.unwrap()
 }
 
+use tokio::stream::StreamExt as TokioStream; 
+
 #[derive(Clone, Debug)]
 pub struct DatabaseMiddleware {
     client: Database
 }
+
+const LOCATIONS_COLLECTION: &str = "locations";
+const TIMINGS_COLLECTION: &str = "timings";
+const JUMMAHS_COLLECTION: &str = "jummahpreferences";
 
 impl DatabaseMiddleware {
     pub async fn new(database_ip_address: &str, database_tcp_port: u16) -> Self {
@@ -32,6 +44,70 @@ impl DatabaseMiddleware {
             database_tcp_port
         ).await;
         DatabaseMiddleware { client }
+    }
+ 
+    pub async fn find_locations(&self, institution_id: &str, doc_limit: Option<i64>) -> Vec<MongoDocument> {
+        let collection = self.client.collection(LOCATIONS_COLLECTION);
+        let query_options = FindOptions::builder()
+            .projection(doc!{ "name": 1, "address": 1 })
+            .limit(Self::document_limit(doc_limit))
+            .build();
+        let query = collection.find(Self::get_all_active_documents(institution_id), query_options);
+        let cursor = match query.await {
+            Ok(data) => data,
+            Err(e) => {
+                eprintln!("error occured when fetching locations {}", e);
+                return Vec::new()
+            }
+        };
+        Self::return_data_from_stream(cursor).await
+    }
+
+    async fn return_data_from_stream(mut cursor: Cursor) -> Vec<MongoDocument> {
+        let mut vec = Vec::new();
+        while let Some(document) = TokioStream::next(&mut cursor).await {
+            if let Ok(data) = document {
+                vec.push(data);
+            }
+        }
+        vec
+    }
+
+    fn get_all_active_documents(institution_id: &str) -> MongoDocument {
+        let id = ObjectId::with_string(institution_id).unwrap_or(ObjectId::new());
+        doc! { "institutionID" : id, "active": true }
+    }
+
+    // using -1 with a mongo cursor returns all requested documents
+    // in a single stream rather than over multiple streams
+    fn document_limit(doc_limit: Option<i64>) -> i64 {
+        let get_all_documents_in_a_single_batch = -1;
+        match doc_limit {
+            Some(l) => l * get_all_documents_in_a_single_batch,
+            None => 200 * get_all_documents_in_a_single_batch
+        }
+    }
+
+    pub async fn find_timings(&self, institution_id: &str, doc_limit: Option<i64>) -> Vec<MongoDocument> {
+        let collection = self.client.collection(TIMINGS_COLLECTION);
+        let query_options = FindOptions::builder()
+            .projection(doc!{ "hour": 1, "minute": 1, "locationID": 1 })
+            .limit(Self::document_limit(doc_limit))
+            .build();
+        let query = collection.find(Self::get_all_active_documents(institution_id), query_options);
+        let cursor = match query.await {
+            Ok(data) => data,
+            Err(e) => {
+                eprintln!("error occured when fetching timings {}", e);
+                return Vec::new()
+            }
+        };
+        Self::return_data_from_stream(cursor).await
+    }
+
+    pub async fn find_jummahs(&self, institution_id: &str, doc_limit: Option<i64>) -> Vec<MongoDocument> {
+        let collection = self.client.collection(JUMMAHS_COLLECTION);
+        Vec::new()
     }
 }
 

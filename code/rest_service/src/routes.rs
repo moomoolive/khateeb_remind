@@ -46,11 +46,30 @@ impl FromRequest for ServerState {
 
 #[get("/locations")]
 pub async fn locations(auth: Authorized, info: Query<Info>, mut server_state: ServerState) -> Result<HttpResponse, ServerErrors> {
-    println!("{:?}", info);
-    println!("{:?}", auth.token);
-    let institution_id = server_state.cache.institution_lookup(&auth.token).await;
-    println!("{}", institution_id);
-    Ok(HttpResponse::Ok().json(ServerResponse { data: Vec::new(), msg: "success" }))
+    let institution_id = server_state.cache
+        .institution_lookup(&auth.token)
+        .await;
+    if institution_id == String::from("none") {
+        return Err(ServerErrors::InstitutionNotFound)
+    }
+    let data = server_state.db
+        .find_locations(&institution_id, info.entry_limit)
+        .await;
+    Ok(HttpResponse::Ok().json(ServerResponse { data, msg: "success" }))
+}
+
+#[get("/timings")]
+pub async fn timings(auth: Authorized, info: Query<Info>, mut server_state: ServerState) -> Result<HttpResponse, ServerErrors> {
+    let institution_id = server_state.cache
+        .institution_lookup(&auth.token)
+        .await;
+    if institution_id == String::from("none") {
+        return Err(ServerErrors::InstitutionNotFound)
+    }
+    let data = server_state.db
+        .find_timings(&institution_id, info.entry_limit)
+        .await;
+    Ok(HttpResponse::Ok().json(ServerResponse { data, msg: "success" }))
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
@@ -67,13 +86,15 @@ impl fmt::Display for ServerResponse<'_> {
 
 #[derive(Deserialize, Debug, PartialEq, Clone)]
 pub struct Info {
-    pub document_limit: Option<i32>
+    pub entry_limit: Option<i64>
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Authorized {
     token: String
 }
+
+const DATABASE_ID_LENGTH: usize = 24;
 
 impl FromRequest for Authorized {
     type Error = ServerErrors;
@@ -82,14 +103,13 @@ impl FromRequest for Authorized {
 
     fn from_request<'b>(req: &'b HttpRequest, _: &mut Payload) -> Self::Future {
         let auth_token: Option<&'b actix_web::http::HeaderValue> = req.headers().get("authorization");
-        if let Some(token) = auth_token {
-            let token = match token.to_str() {
-                Ok(x) => x,
-                Err(_) => "none"
-            };
-            futures::future::ok(Authorized { token: String::from(token) })
-        } else {
-            futures::future::err(ServerErrors::UnauthorizedError)
+        if auth_token.is_none() {
+            return futures::future::err(ServerErrors::UnauthorizedError)
         }
+        let token = auth_token.unwrap().to_str().unwrap_or("none");
+        if token.len() != DATABASE_ID_LENGTH {
+            return futures::future::err(ServerErrors::InvalidToken)
+        }
+        futures::future::ok(Authorized { token: String::from(token) })
     }
 }

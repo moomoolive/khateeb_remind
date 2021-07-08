@@ -57,11 +57,11 @@ async fn refresh_cache_database(db_connection: &Database, cache_db_connection: &
             auth_tokens.push(entry);
         }
     }
-    for token in auth_tokens {
+    for token in auth_tokens.iter() {
         let _: RedisResult<()> = redis::cmd("SET")
             .arg(&[&token.id, &token.institution])
             .query_async(cache_db_connection)
             .await;
     }
-    println!("Tokens successfully loaded into cache");
+    println!("{} Token(s) successfully loaded into cache", auth_tokens.len());
 }

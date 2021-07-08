@@ -1,7 +1,7 @@
 use actix_web::{ App, HttpServer, middleware };
 use actix_cors::Cors;
 
-use crate::routes::{ locations, ServerState };
+use crate::routes::{ locations, ServerState, timings };
 use crate::io::{ DatabaseMiddleware, CacheMiddleware };
 
 pub async fn create_server(config: ServerConfig<'static>) -> std::io::Result<()> {
@@ -23,8 +23,9 @@ pub async fn create_server(config: ServerConfig<'static>) -> std::io::Result<()>
         App::new()
             .wrap(cors)
             .wrap(middleware::Logger::default())
-            .service(locations)
             .app_data(app_data)
+            .service(locations)
+            .service(timings)
     })
     .bind(format!("0.0.0.0:{}", config.server_port))?
     .run()
