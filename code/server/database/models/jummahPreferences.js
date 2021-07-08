@@ -16,17 +16,13 @@ const jummahPreference = new mongoose.Schema({
         required: true
     },
     locationID: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true,
-        minLength: $config.consts.mongooseIdLength,
-        maxLength: $config.consts.mongooseIdLength,
         ref: 'location'
     },
     timingID: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true,
-        minLength: $config.consts.mongooseIdLength,
-        maxLength: $config.consts.mongooseIdLength,
         ref: 'timing'
     },
     khateebID: {

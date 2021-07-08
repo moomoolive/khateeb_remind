@@ -36,6 +36,7 @@ pub struct DatabaseMiddleware {
 const LOCATIONS_COLLECTION: &str = "locations";
 const TIMINGS_COLLECTION: &str = "timings";
 const JUMMAHS_COLLECTION: &str = "jummahpreferences";
+const USERS_COLLECTION: &str = "users";
 
 impl DatabaseMiddleware {
     pub async fn new(database_ip_address: &str, database_tcp_port: u16) -> Self {
@@ -56,7 +57,7 @@ impl DatabaseMiddleware {
         let cursor = match query.await {
             Ok(data) => data,
             Err(e) => {
-                eprintln!("error occured when fetching locations {}", e);
+                eprintln!("error occured when fetching locations: {}", e);
                 return Vec::new()
             }
         };
@@ -98,7 +99,7 @@ impl DatabaseMiddleware {
         let cursor = match query.await {
             Ok(data) => data,
             Err(e) => {
-                eprintln!("error occured when fetching timings {}", e);
+                eprintln!("error occured when fetching timings: {}", e);
                 return Vec::new()
             }
         };
@@ -107,7 +108,52 @@ impl DatabaseMiddleware {
 
     pub async fn find_jummahs(&self, institution_id: &str, doc_limit: Option<i64>) -> Vec<MongoDocument> {
         let collection = self.client.collection(JUMMAHS_COLLECTION);
-        Vec::new()
+        let id = ObjectId::with_string(institution_id).unwrap_or(ObjectId::new());
+        let query = collection.aggregate(vec![
+            doc!{ "$match": { "institutionID": id, "khateebID": { "$ne": "none" } } },
+            doc!{ "$limit": Self::document_limit(doc_limit) * -1 },
+            doc! {
+                "$lookup": {
+                    "from": USERS_COLLECTION,
+                    "let": { "pid": "$khateebID" },
+                    // transforms "khateebID" field which is a string into
+                    // an ObjectId and then performs a lookup on it
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$eq": [ "$_id", { "$toObjectId": "$$pid" } ]
+                                }
+                            }
+                        }
+                    ],
+                    "as": "khateeb"
+                }
+            },
+            doc!{ "$unwind": "$khateeb" },
+            doc!{
+                "$project": {
+                    "_id": "$_id",
+                    "institutionID": "$institutionID",
+                    "timingID": "$timingID",
+                    "locationID": "$locationID",
+                    "khateebFirstName": "$khateeb.firstName",
+                    "khateebLastName": "$khateeb.lastName",
+                    "khateebTitle": "$khateeb.title",
+                    "date": "$date",
+                    "isGivingKhutbah": "$isGivingKhutbah",
+                    "isBackup": "$isBackup"
+                }
+            }
+        ], None);
+        let cursor = match query.await {
+            Ok(data) => data,
+            Err(e) => {
+                eprintln!("error occurred when fetching jummahs: {}", e);
+                return Vec::new()
+            }
+        };
+        Self::return_data_from_stream(cursor).await
     }
 }
 

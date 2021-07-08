@@ -72,6 +72,20 @@ pub async fn timings(auth: Authorized, info: Query<Info>, mut server_state: Serv
     Ok(HttpResponse::Ok().json(ServerResponse { data, msg: "success" }))
 }
 
+#[get("/jummahs")]
+pub async fn jummahs(auth: Authorized, info: Query<Info>, mut server_state: ServerState) -> Result<HttpResponse, ServerErrors> {
+    let institution_id = server_state.cache
+        .institution_lookup(&auth.token)
+        .await;
+    if institution_id == String::from("none") {
+        return Err(ServerErrors::InstitutionNotFound)
+    }
+    let data = server_state.db
+        .find_jummahs(&institution_id, info.entry_limit)
+        .await;
+    Ok(HttpResponse::Ok().json(ServerResponse { data, msg: "success" }))
+}
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct ServerResponse<'a> {
     pub data: Vec<Document>,
