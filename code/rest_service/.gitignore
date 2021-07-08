@@ -9,3 +9,6 @@ Cargo.lock
 
 # rust panic outputs
 panic!**
+
+# production dockerfile
+dockerfile.prod

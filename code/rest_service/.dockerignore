@@ -1,0 +1,14 @@
+# binaries
+target/
+
+# windows batch files
+*.bat
+
+# READMEs
+*.md
+
+# rust panic outputs
+panic!**
+
+# dependency lock file
+Cargo.lock
