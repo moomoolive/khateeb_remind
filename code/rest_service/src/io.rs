@@ -2,10 +2,8 @@ const DATABASE_NAME: &str = "khateebRemind";
 
 use mongodb::{ Client as MongoClient, Database };
 use redis::{ 
-    aio::Connection as RedisConnection, 
-    ConnectionInfo, 
-    ConnectionAddr, 
-    aio::connect_tokio as RedisClient 
+    aio::MultiplexedConnection as RedisConnection,
+    RedisResult
 };
 
 pub async fn create_database_connection(ip_address: &str, tcp_port: u16) -> Database {
@@ -17,16 +15,9 @@ pub async fn create_database_connection(ip_address: &str, tcp_port: u16) -> Data
 }
 
 pub async fn create_cache_layer_connection(cache_ip_address: &str, tcp_port: u16) -> RedisConnection  {
-    let address = ConnectionAddr::Tcp(String::from(cache_ip_address), tcp_port);
-    let connection = ConnectionInfo {
-        addr: Box::new(address),
-        db: 0,
-        username: None,
-        passwd: None
-    };
-    RedisClient(&connection)
-        .await
-        .expect("Couldn't connect to cache db")
+    let cache_address = format!("redis://{}:{}", cache_ip_address, tcp_port);
+    let client = redis::Client::open(cache_address).unwrap();
+    client.get_multiplexed_tokio_connection().await.unwrap()
 }
 
 #[derive(Clone, Debug)]
@@ -44,17 +35,26 @@ impl DatabaseMiddleware {
     }
 }
 
-use std::sync::Arc;
-
 #[derive(Clone)]
 pub struct CacheMiddleware {
-    client: Arc<RedisConnection>
+    client: RedisConnection
 }
 
 impl CacheMiddleware {
     pub async fn new(cache_ip_address: &str, tcp_port: u16) -> Self {
         let client = create_cache_layer_connection(cache_ip_address, tcp_port).await;
-        let client = Arc::new(client);
         CacheMiddleware { client }
+    }
+
+    pub async fn institution_lookup(&mut self, auth_token: &str) -> String {
+        let mut con = self.client.clone();
+        let val: RedisResult<String> = redis::cmd("GET")
+            .arg(auth_token)
+            .query_async(&mut con)
+            .await;
+        match val {
+            RedisResult::Ok(v) => v,
+            _ => String::from("none")
+        }
     }
 }

@@ -20,9 +20,13 @@ version = "1.2.2"
 features = ["tokio-runtime"]
 
 [dependencies.redis]
-package = "redis"
 version = "0.17"
-features = ["tokio-comp"]
+features = [
+    "tokio-rt-core", 
+    "tokio-comp", 
+    "connection-manager",
+    "aio"
+]
 
 [dev-dependencies]
 cargo-watch = "7.8.0"

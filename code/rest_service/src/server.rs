@@ -1,19 +1,8 @@
 use actix_web::{ App, HttpServer, middleware };
 use actix_cors::Cors;
 
-use crate::routes::{ locations };
+use crate::routes::{ locations, ServerState };
 use crate::io::{ DatabaseMiddleware, CacheMiddleware };
-
-struct ServerState {
-    db: DatabaseMiddleware,
-    cache: CacheMiddleware
-}
-
-impl ServerState {
-    pub fn new(db: DatabaseMiddleware, cache: CacheMiddleware) -> Self {
-        ServerState { db, cache }
-    }
-}
 
 pub async fn create_server(config: ServerConfig<'static>) -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", format!("actix_web={}", "DEBUG"));

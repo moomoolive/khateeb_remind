@@ -1,6 +1,10 @@
 use actix_web::rt::Arbiter as runtime;
-use redis::{ RedisResult, aio::Connection };
-use tokio::{ stream::StreamExt, time::Duration, time::delay_for  };
+use redis::{ RedisResult, aio::MultiplexedConnection as RedisConnection };
+use tokio::{ 
+    stream::StreamExt as TokioStream, 
+    time::Duration, 
+    time::delay_for  
+};
 use serde::{ Serialize, Deserialize };
 use mongodb::Database;
 
@@ -32,14 +36,14 @@ pub fn start_refresh_cache_cron_job(config: ServerConfig<'static>) {
     });
 }
 
-async fn refresh_cache_database(db_connection: &Database, cache_db_connection: &mut Connection) {
+async fn refresh_cache_database(db_connection: &Database, cache_db_connection: &mut RedisConnection) {
     let collection = db_connection.collection(REST_TOKEN_COLLECTION);
     let mut cursor = match collection.find(None, None).await {
         Ok(data) => data,
         Err(_) => return
     };
-    let mut auth_tokens = Vec::new();
-    while let Some(doc) = cursor.next().await {
+    let mut auth_tokens = Vec::new(); 
+    while let Some(doc) = TokioStream::next(&mut cursor).await {
         if let Ok(d) = doc {
             let id = d
                 .get_object_id("_id")
@@ -53,11 +57,11 @@ async fn refresh_cache_database(db_connection: &Database, cache_db_connection: &
             auth_tokens.push(entry);
         }
     }
-    println!("{:#?}", auth_tokens);
     for token in auth_tokens {
         let _: RedisResult<()> = redis::cmd("SET")
-            .arg(&[token.id, token.institution])
+            .arg(&[&token.id, &token.institution])
             .query_async(cache_db_connection)
             .await;
     }
+    println!("Tokens successfully loaded into cache");
 }

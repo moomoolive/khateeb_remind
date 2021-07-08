@@ -5,7 +5,8 @@ use actix_web::{
     web::Query, 
     dev::Payload,
     FromRequest, 
-    HttpRequest
+    HttpRequest,
+    Error as ActixWebError
 };
 use serde::{ Deserialize, Serialize };
 use mongodb::bson::{ Document };
@@ -14,11 +15,41 @@ use futures::future::{ Ready };
 use std::fmt;
 
 use crate::errors::Errors as ServerErrors;
+use crate::io::{ DatabaseMiddleware, CacheMiddleware };
+
+#[derive(Clone)]
+pub struct ServerState {
+    pub db: DatabaseMiddleware,
+    pub cache: CacheMiddleware
+}
+
+impl ServerState {
+    pub fn new(db: DatabaseMiddleware, cache: CacheMiddleware) -> Self {
+        ServerState { db, cache }
+    }
+}
+
+impl FromRequest for ServerState {
+    type Config = ();
+    type Error = ActixWebError;
+    type Future = Ready<Result<Self, Self::Error>>;
+    
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        // not sure if cloning app data on every request is a good idea
+        // from a performance standpoint - but was implemented this way
+        // because it was easier to compile --> will probably change in 
+        // future (isa)
+        let state = req.app_data::<Self>().unwrap().clone();
+        futures::future::ok(state)
+    }
+}
 
 #[get("/locations")]
-pub async fn locations(auth: Authorized, info: Query<Info>) -> Result<HttpResponse, ServerErrors> {
+pub async fn locations(auth: Authorized, info: Query<Info>, mut server_state: ServerState) -> Result<HttpResponse, ServerErrors> {
     println!("{:?}", info);
     println!("{:?}", auth.token);
+    let institution_id = server_state.cache.institution_lookup(&auth.token).await;
+    println!("{}", institution_id);
     Ok(HttpResponse::Ok().json(ServerResponse { data: Vec::new(), msg: "success" }))
 }
 
