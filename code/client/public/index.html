@@ -3,6 +3,25 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 
+      Header to prevent inline scripting attacks.
+      
+      Now you're probably wondering why I have "unsafe-eval"
+      in the policy, and you wouldn't be wrong to be confused.
+      It's here because one of the key npm packages: "vue-page-transition",
+      uses "eval" once in it's source code. Why does it do that? I'm honestly
+      not sure why - hopefully I can figure out a way to replace it. 
+    -->
+    <meta 
+      http-equiv="content-security-policy" 
+      content="script-src
+        'self'
+        'unsafe-eval'
+        localhost:*
+        *.khateebs.com 
+        khateebs.com
+      "
+    >
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>khateebRemind.png">
     <title>Khateeb Remind: Khateeb Scheduling. Made Simple.</title>

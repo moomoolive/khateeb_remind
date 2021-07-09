@@ -11,13 +11,11 @@
 
         <collapse-transition :duration="400" :dimension="`width`">
           <div v-show="$store.state.app.isOffline" class="no-wifi">
-            <span class="red">
               <fa-icon 
                 :icon="['fas', 'wifi']" 
-                :class="`menu-icon-svg${showProfileDetails ? ' active' : ''}`"
+                :class="`menu-icon-svg red${showProfileDetails ? ' active' : ''}`"
               />
-            </span>
-            </div>
+          </div>
         </collapse-transition>
 
         <div class="right-side-menu">
@@ -213,6 +211,10 @@ export default {
 
   &.active {
     color: get-color("green");
+  }
+
+  &.red {
+    color: get-color("red");
   }
 }
 

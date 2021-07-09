@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
+    "serve:prod": "npm run build && lite-server --baseDir=\"dist\" -c lite-server.prod.config.json",
     "build": "vue-cli-service build",
     "test:debug": "vue-cli-service test:unit ./tests",
     "test:unit": "vue-cli-service test:unit ./src/libraries/*",
